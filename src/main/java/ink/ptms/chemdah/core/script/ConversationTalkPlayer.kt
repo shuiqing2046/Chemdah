@@ -8,6 +8,13 @@ import io.izzel.taboolib.kotlin.kether.common.api.QuestContext
 import io.izzel.taboolib.kotlin.kether.common.util.LocalizedException
 import java.util.concurrent.CompletableFuture
 
+/**
+ * Chemdah
+ * ink.ptms.chemdah.core.script.ConversationTalkPlayer
+ *
+ * @author sky
+ * @since 2021/2/10 6:39 下午
+ */
 class ConversationTalkPlayer(val token: String) : QuestAction<Void>() {
 
     override fun process(frame: QuestContext.Frame): CompletableFuture<Void> {

@@ -45,6 +45,7 @@ data class Conversation(
      *
      * @param player 玩家
      * @param origin 原点（对话实体的头顶坐标）
+     * @param sessionTop 上层会话（继承关系）
      */
     fun open(player: Player, origin: Location, sessionTop: Session? = null): CompletableFuture<Session> {
         val future = CompletableFuture<Session>()

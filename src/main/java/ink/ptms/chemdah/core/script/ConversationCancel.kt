@@ -8,7 +8,7 @@ import java.util.concurrent.CompletableFuture
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.script.ConversationGoto
+ * ink.ptms.chemdah.core.script.ConversationCancel
  *
  * @author sky
  * @since 2021/2/10 6:39 下午

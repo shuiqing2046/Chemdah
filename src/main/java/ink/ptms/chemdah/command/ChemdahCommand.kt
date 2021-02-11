@@ -1,9 +1,6 @@
 package ink.ptms.chemdah.command
 
-import ink.ptms.chemdah.Chemdah
 import ink.ptms.chemdah.api.ChemdahAPI
-import ink.ptms.chemdah.core.conversation.ConversationLoader
-import ink.ptms.chemdah.core.conversation.ConversationManager
 import io.izzel.taboolib.module.command.base.BaseCommand
 import io.izzel.taboolib.module.command.base.BaseMainCommand
 import io.izzel.taboolib.module.command.base.SubCommand
