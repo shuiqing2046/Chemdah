@@ -1,0 +1,11 @@
+theme-test:
+  format:
+    - ' {title}'
+    - ''
+    - '  &f" &7{npcSide}&r &f"'
+    - ''
+    - '  {select} [ &7{playerSide}&r ]'
+  select:
+    char: '>'
+    other: ' '
+    color: '&b&n'
