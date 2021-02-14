@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture
  */
 interface Theme {
 
-    open fun reloadConfig() {
+    fun reloadConfig() {
     }
 
     fun reload(session: Session): CompletableFuture<Void>

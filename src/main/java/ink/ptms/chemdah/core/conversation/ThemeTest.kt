@@ -77,7 +77,7 @@ object ThemeTest : Theme, Listener {
     }
 
     override fun reloadConfig() {
-
+        settings = ThemeTestSettings(ConversationManager.conf.getConfigurationSection("theme-test")!!)
     }
 
     override fun reload(session: Session): CompletableFuture<Void> {
@@ -141,39 +141,55 @@ object ThemeTest : Theme, Listener {
         canReply: Boolean
     ) {
         session.conversation.playerSide.checked(session).thenApply { replies ->
-            val json = newJson()
-            json.append(" ${session.conversation.option.title}:").newLine()
-            json.newLine()
-            messages.forEachIndexed { i, fully ->
-                when {
-                    messageLine > i -> json.append("  §f\" §7$fully§r §f\"").newLine()
-                    messageLine == i -> json.append("  §f\" §7$printText§r §f\"").newLine()
-                    else -> json.newLine()
-                }
-            }
-            json.newLine()
-            session.playerReplyForDisplay.clear()
-            session.playerReplyForDisplay.addAll(replies)
-            if (canReply) {
-                replies.forEachIndexed { n, reply ->
-                    if (messageLine + 1 >= messages.size && printEnd) {
-                        val text = reply.text(session)
-                        if (session.playerSide == reply) {
-                            json.append("  > [ §b§n${text}§r ]").hoverText(text).clickCommand("/session reply ${reply.uuid}").newLine()
-                        } else {
-                            json.append("    [ §7${text}§r ]").hoverText(text).clickCommand("/session reply ${reply.uuid}").newLine()
+            newJson().also { json ->
+                settings.format.forEach {
+                    when {
+                        it.contains("{title}") -> {
+                            json.append(it.replace("{title}", session.conversation.option.title)).newLine()
                         }
-                    } else {
-                        if (n == 0) {
-                            json.append("    §8...").newLine()
-                        } else {
-                            json.newLine()
+                        it.contains("{npcSide}") -> {
+                            messages.forEachIndexed { i, fully ->
+                                when {
+                                    messageLine > i -> json.append(it.replace("{npcSide}", fully)).newLine()
+                                    messageLine == i -> json.append(it.replace("{npcSide}", printText)).newLine()
+                                    else -> json.newLine()
+                                }
+                            }
+                        }
+                        it.contains("{playerSide}") -> {
+                            session.playerReplyForDisplay.clear()
+                            session.playerReplyForDisplay.addAll(replies)
+                            if (canReply) {
+                                replies.forEachIndexed { n, reply ->
+                                    if (messageLine + 1 >= messages.size && printEnd) {
+                                        val text = reply.text(session)
+                                        if (session.playerSide == reply) {
+                                            json.append(it.replace("{select}", settings.selectChar).replace("{playerSide}", "${settings.selectColor}$text"))
+                                                .hoverText(text)
+                                                .clickCommand("/session reply ${reply.uuid}")
+                                                .newLine()
+                                        } else {
+                                            json.append(it.replace("{select}", settings.selectOther).replace("{playerSide}", text))
+                                                .hoverText(text)
+                                                .clickCommand("/session reply ${reply.uuid}")
+                                                .newLine()
+                                        }
+                                    } else {
+                                        if (n == 0) {
+                                            json.append(settings.talking).newLine()
+                                        } else {
+                                            json.newLine()
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else -> {
+                            json.append(it).newLine()
                         }
                     }
                 }
-            }
-            json.newLine()
-            json.send(session.player)
+            }.send(session.player)
             if (messageLine + 1 == messages.size && printEnd) {
                 complete(null)
             }

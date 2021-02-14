@@ -1,5 +1,6 @@
 package ink.ptms.chemdah.core.conversation
 
+import ink.ptms.chemdah.core.script.colored
 import org.bukkit.configuration.ConfigurationSection
 
 /**
@@ -11,11 +12,9 @@ import org.bukkit.configuration.ConfigurationSection
  */
 data class ThemeTestSettings(
     val root: ConfigurationSection,
-    val format: List<String>,
-    val selectChar: String,
-    val selectOther: String,
-    val selectColor: String
-) {
-
-
-}
+    val format: List<String> = root.getStringList("format").map { it.colored() },
+    val selectChar: String = root.getString("select.char", "")!!,
+    val selectOther: String = root.getString("select.other", "")!!,
+    val selectColor: String = root.getString("select.color", "")!!.colored(),
+    val talking: String = root.getString("talking", "")!!.colored()
+)
