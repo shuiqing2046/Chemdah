@@ -23,7 +23,7 @@ class ConversationCancel : QuestAction<Void>() {
 
     companion object {
 
-        @KetherParser(["cancel"], namespace = "chemdah:conversation")
+        @KetherParser(["cancel"], namespace = "chemdah-conversation")
         fun parser() = ScriptParser.parser {
             ConversationCancel()
         }

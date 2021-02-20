@@ -30,7 +30,7 @@ class ConversationTalkNPC(val token: String) : QuestAction<Void>() {
 
     companion object {
 
-        @KetherParser(["talk"], namespace = "chemdah:conversation:npc")
+        @KetherParser(["talk"], namespace = "chemdah-conversation-npc")
         fun parser() = ScriptParser.parser {
             ConversationTalkNPC(it.nextToken())
         }

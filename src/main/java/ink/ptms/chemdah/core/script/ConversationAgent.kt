@@ -24,7 +24,7 @@ class ConversationAgent : QuestAction<Void>() {
 
     companion object {
 
-        @KetherParser(["agent"], namespace = "chemdah:conversation")
+        @KetherParser(["agent"], namespace = "chemdah-conversation")
         fun parser() = ScriptParser.parser {
             ConversationAgent()
         }

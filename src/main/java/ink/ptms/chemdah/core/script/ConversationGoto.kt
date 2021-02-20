@@ -29,7 +29,7 @@ class ConversationGoto(val conversation: String) : QuestAction<Session>() {
 
     companion object {
 
-        @KetherParser(["goto"], namespace = "chemdah:conversation:player")
+        @KetherParser(["goto"], namespace = "chemdah-conversation-player")
         fun parser() = ScriptParser.parser {
             ConversationGoto(it.nextToken())
         }

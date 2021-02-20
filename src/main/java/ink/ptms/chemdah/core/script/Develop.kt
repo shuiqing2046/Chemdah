@@ -42,18 +42,18 @@ fun String.colored(): String {
 
 fun AgentType.namespace() = listOf(
     "chemdah",
-    "chemdah:conversation",
-    "chemdah:conversation:${namespace}"
+    "chemdah-conversation",
+    "chemdah-conversation-${namespace}"
 )
 
 val namespaceConversationNPC = listOf(
     "chemdah",
-    "chemdah:conversation",
-    "chemdah:conversation:npc"
+    "chemdah-conversation",
+    "chemdah-conversation-npc"
 )
 
 val namespaceConversationPlayer = listOf(
     "chemdah",
-    "chemdah:conversation",
-    "chemdah:conversation:player"
+    "chemdah-conversation",
+    "chemdah-conversation-player"
 )

@@ -34,7 +34,7 @@ class ConversationTalkPlayer(val token: String) : QuestAction<Void>() {
 
     companion object {
 
-        @KetherParser(["talk"], namespace = "chemdah:conversation:player")
+        @KetherParser(["talk"], namespace = "chemdah-conversation-player")
         fun parser() = ScriptParser.parser {
             ConversationTalkPlayer(it.nextToken())
         }
