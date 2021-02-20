@@ -31,6 +31,7 @@ data class Session(
         }
 
     val npcSide = ArrayList<String>()
+    var npcName = ""
     var npcTalking = false
 
     var playerSide: PlayerReply? = null

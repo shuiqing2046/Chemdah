@@ -24,7 +24,7 @@ class ConversationGoto(val conversation: String) : QuestAction<Session>() {
         session.variables.clear()
         session.variables.putAll(frame.vars())
         session.conversation = conversation
-        return conversation.open(session.player, session.origin, session)
+        return conversation.open(session.player, session.origin, sessionTop = session)
     }
 
     companion object {

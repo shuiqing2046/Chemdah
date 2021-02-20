@@ -3,6 +3,8 @@ package ink.ptms.chemdah.core.conversation
 import ink.ptms.chemdah.Chemdah
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.conversation.AgentType.Companion.toAgentType
+import ink.ptms.chemdah.util.asList
+import ink.ptms.chemdah.util.asMap
 import io.izzel.taboolib.module.db.local.SecuredFile
 import io.izzel.taboolib.module.inject.TFunction
 import io.izzel.taboolib.util.Coerce
@@ -77,13 +79,7 @@ object ConversationLoader {
             } ?: Trigger(emptyList()),
             root.getStringList("npc"),
             root.getList("player")?.run {
-                PlayerSide(mapNotNull {
-                    when (it) {
-                        is Map<*, *> -> it.map { (k, v) -> k.toString() to v }.toMap()
-                        is ConfigurationSection -> it.getValues(false)
-                        else -> null
-                    }
-                }.map {
+                PlayerSide(mapNotNull { it?.asMap() }.map {
                     PlayerReply(
                         it,
                         it["if"]?.toString(),
@@ -94,24 +90,16 @@ object ConversationLoader {
             } ?: PlayerSide(emptyList()),
             root.getString("condition"),
             root.getKeys(false)
-                .filter { it.startsWith("\$on") }
+                .filter { it.startsWith("agent(") && it.endsWith(")") }
                 .map {
-                    val args = it.split(" ")
+                    val args = it.substring("agent(".length, it.length - 1).split("&").map { a -> a.trim() }
                     Agent(
-                        args.getOrNull(1).toString().toAgentType(),
+                        args[0].toAgentType(),
                         root.get(it)!!.asList(),
-                        Coerce.toInteger(args.getOrNull(2))
+                        Coerce.toInteger(args.getOrNull(1))
                     )
                 }.sortedByDescending { it.priority },
             option
         )
-    }
-
-    private fun Any.asList(): List<String> {
-        return if (this !is List<*>) {
-            listOf(toString())
-        } else {
-            map { it.toString() }
-        }
     }
 }

@@ -145,7 +145,7 @@ object ThemeTest : Theme, Listener {
                 settings.format.forEach {
                     when {
                         it.contains("{title}") -> {
-                            json.append(it.replace("{title}", session.conversation.option.title)).newLine()
+                            json.append(it.replace("{title}", session.conversation.option.title.replace("{name}", session.npcName))).newLine()
                         }
                         it.contains("{npcSide}") -> {
                             messages.forEachIndexed { i, fully ->

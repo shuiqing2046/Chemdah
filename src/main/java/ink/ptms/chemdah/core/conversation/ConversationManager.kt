@@ -1,6 +1,7 @@
 package ink.ptms.chemdah.core.conversation
 
 import ink.ptms.adyeshach.api.event.AdyeshachEntityInteractEvent
+import ink.ptms.adyeshach.common.entity.type.AdyHuman
 import ink.ptms.chemdah.api.ChemdahAPI
 import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.module.config.TConfig
@@ -63,6 +64,7 @@ object ConversationManager : Listener {
                 open(e.player, e.rightClicked.location.also {
                     it.y += e.rightClicked.height
                 })
+                ChemdahAPI.getConversationSession(e.player)?.npcName = name
             }
         }
     }
@@ -79,6 +81,11 @@ object ConversationManager : Listener {
                         open(e.player, e.entity.getLocation().also {
                             it.y += e.entity.entityType.entitySize.height
                         })
+                        ChemdahAPI.getConversationSession(e.player)?.npcName = if (e.entity is AdyHuman) {
+                            (e.entity as AdyHuman).getName()
+                        } else {
+                            e.entity.getCustomName()
+                        }
                     }
                 }
             }
@@ -97,6 +104,7 @@ object ConversationManager : Listener {
                     open(e.player, e.rightClicked.location.also {
                         it.y += e.rightClicked.height
                     })
+                    ChemdahAPI.getConversationSession(e.player)?.npcName = npc.fullName
                 }
             }
         }
@@ -114,6 +122,7 @@ object ConversationManager : Listener {
                     open(e.player, e.rightClicked.location.also {
                         it.y += e.rightClicked.height
                     })
+                    ChemdahAPI.getConversationSession(e.player)?.npcName = mob.displayName
                 }
             }
         }
