@@ -2,6 +2,7 @@ package ink.ptms.chemdah.core.conversation
 
 import ink.ptms.chemdah.Chemdah
 import ink.ptms.chemdah.api.ChemdahAPI
+import ink.ptms.chemdah.api.event.ConversationEvents
 import io.izzel.taboolib.module.command.lite.CommandBuilder
 import io.izzel.taboolib.module.inject.TInject
 import org.bukkit.Location
@@ -49,6 +50,7 @@ data class Session(
             conversation.option.instanceTheme.end(this).thenApply {
                 future.complete(null)
                 ConversationManager.sessions.remove(player.name)
+                ConversationEvents.Closed(this).call()
             }
         }
         return future

@@ -6,6 +6,9 @@ import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.module.inject.TListener
 import io.izzel.taboolib.module.locale.TLocale
 import io.izzel.taboolib.module.tellraw.TellrawJson
+import io.izzel.taboolib.util.lite.Effects
+import org.bukkit.Particle
+import org.bukkit.Sound
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerItemHeldEvent
@@ -90,6 +93,8 @@ object ThemeTest : Theme, Listener {
     }
 
     override fun begin(session: Session): CompletableFuture<Void> {
+        Effects.create(Particle.CLOUD, session.origin.clone().add(0.0, 1.5, 0.0)).count(5).range(50.0).play()
+        session.origin.world!!.playSound(session.origin, Sound.ENTITY_ITEM_PICKUP, 1f, 0f)
         effects[session.player.name] = effectFreeze.mapNotNull { session.player.getPotionEffect(it.first) }.filter { it.duration in 10..9999 }
         effectFreeze.forEach { session.player.addPotionEffect(PotionEffect(it.first, 99999, it.second)) }
         return npcTalk(session, session.npcSide)
