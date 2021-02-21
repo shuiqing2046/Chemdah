@@ -20,7 +20,7 @@ class ConversationGoto(val conversation: String) : QuestAction<Session>() {
     override fun process(frame: QuestContext.Frame): CompletableFuture<Session> {
         val conversation = ChemdahAPI.getConversation(conversation) ?: error("Conversation not found: $conversation")
         val session = frame.getSession()
-        session.next = true
+        session.isNext = true
         session.variables.clear()
         session.variables.putAll(frame.vars())
         session.conversation = conversation

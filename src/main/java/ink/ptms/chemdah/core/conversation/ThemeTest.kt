@@ -2,15 +2,18 @@ package ink.ptms.chemdah.core.conversation
 
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.util.printed
+import io.izzel.taboolib.cronus.CronusUtils
 import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.module.inject.TListener
 import io.izzel.taboolib.module.locale.TLocale
 import io.izzel.taboolib.module.tellraw.TellrawJson
+import io.izzel.taboolib.util.Coerce
 import io.izzel.taboolib.util.lite.Effects
 import org.bukkit.Particle
 import org.bukkit.Sound
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerItemHeldEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.player.PlayerSwapHandItemsEvent
@@ -50,14 +53,7 @@ object ThemeTest : Theme, Listener {
                 if (select != index) {
                     session.playerSide = replies[select]
                     CompletableFuture<Void>().run {
-                        npcTalk(
-                            session,
-                            session.npcSide,
-                            session.npcSide.size,
-                            "",
-                            printEnd = true,
-                            canReply = true
-                        )
+                        npcTalk(session, session.npcSide, session.npcSide.size, "", printEnd = true, canReply = true)
                     }
                 }
             }
@@ -69,11 +65,26 @@ object ThemeTest : Theme, Listener {
         val session = ChemdahAPI.getConversationSession(e.player) ?: return
         if (session.conversation.option.theme == "test") {
             e.isCancelled = true
-            if (!session.npcTalking) {
+            if (session.npcTalking) {
+                session.npcTalking = false
+            } else {
                 session.playerSide?.run {
                     check(session).thenApply {
                         select(session)
                     }
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    fun e(e: AsyncPlayerChatEvent) {
+        val session = ChemdahAPI.getConversationSession(e.player) ?: return
+        if (session.conversation.option.theme == "test" && !session.npcTalking && CronusUtils.isInt(e.message)) {
+            e.isCancelled = true
+            session.playerReplyForDisplay.getOrNull(Coerce.toInteger(e.message) - 1)?.run {
+                check(session).thenApply {
+                    select(session)
                 }
             }
         }
@@ -86,15 +97,15 @@ object ThemeTest : Theme, Listener {
     override fun reload(session: Session): CompletableFuture<Void> {
         val future = CompletableFuture<Void>()
         session.conversation.playerSide.checked(session).thenApply {
-            session.playerSide = it.getOrNull(session.player.inventory.heldItemSlot)
+            session.playerSide = it.getOrNull(session.player.inventory.heldItemSlot.coerceAtMost(it.size - 1))
             future.complete(null)
         }
         return future
     }
 
     override fun begin(session: Session): CompletableFuture<Void> {
-        Effects.create(Particle.CLOUD, session.origin.clone().add(0.0, 1.5, 0.0)).count(5).range(50.0).play()
-        session.origin.world!!.playSound(session.origin, Sound.ENTITY_ITEM_PICKUP, 1f, 0f)
+        Effects.create(Particle.CLOUD, session.origin.clone().add(0.0, 1.5, 0.0)).count(5).player(session.player).play()
+        session.player.playSound(session.origin, Sound.ENTITY_ITEM_PICKUP, 1f, 0f)
         effects[session.player.name] = effectFreeze.mapNotNull { session.player.getPotionEffect(it.first) }.filter { it.duration in 10..9999 }
         effectFreeze.forEach { session.player.addPotionEffect(PotionEffect(it.first, 99999, it.second)) }
         return npcTalk(session, session.npcSide)
@@ -115,11 +126,18 @@ object ThemeTest : Theme, Listener {
         val messages = TLocale.Translate.setColored(message)
         var d = 0L
         var cancel = false
+        session.npcTalking = true
         messages.map { it.printed("_") }.forEachIndexed { messageLine, messageText ->
             messageText.forEachIndexed { printLine, printText ->
                 Tasks.delay(d++) {
                     if (session.isValid) {
-                        future.npcTalk(session, messages, messageLine, printText, printLine + 1 == messageText.size, canReply)
+                        if (session.npcTalking) {
+                            future.npcTalk(session, messages, messageLine, printText, printLine + 1 == messageText.size, canReply)
+                        } else if (!cancel) {
+                            cancel = true
+                            future.npcTalk(session, session.npcSide, session.npcSide.size, "", printEnd = true, canReply = true)
+                            future.complete(null)
+                        }
                     } else if (!cancel) {
                         cancel = true
                         future.complete(null)
@@ -127,7 +145,6 @@ object ThemeTest : Theme, Listener {
                 }
             }
         }
-        session.npcTalking = true
         future.thenAccept {
             session.npcTalking = false
         }

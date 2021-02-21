@@ -31,6 +31,9 @@ data class Session(
             return session != null && session === this && session.conversation === conversation
         }
 
+    val distance: Double
+        get() = origin.distance(player.location) - origin.distance(location)
+
     val npcSide = ArrayList<String>()
     var npcName = ""
     var npcTalking = false
@@ -38,8 +41,8 @@ data class Session(
     var playerSide: PlayerReply? = null
     var playerReplyForDisplay = ArrayList<PlayerReply>()
 
-    var next = false
-    var refuse = 0
+    var isNext = false
+    var isClosed = false
 
     /**
      * 关闭会话

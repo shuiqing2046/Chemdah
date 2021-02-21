@@ -2,8 +2,8 @@ package ink.ptms.chemdah.core.conversation
 
 import ink.ptms.adyeshach.api.event.AdyeshachEntityInteractEvent
 import ink.ptms.adyeshach.common.entity.type.AdyHuman
+import ink.ptms.chemdah.Chemdah
 import ink.ptms.chemdah.api.ChemdahAPI
-import ink.ptms.chemdah.api.event.ConversationEvents
 import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.module.config.TConfig
 import io.izzel.taboolib.module.i18n.I18n
@@ -15,9 +15,12 @@ import io.lumine.xikage.mythicmobs.MythicMobs
 import net.citizensnpcs.api.CitizensAPI
 import org.bukkit.Bukkit
 import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.inventory.EquipmentSlot
 import java.util.concurrent.ConcurrentHashMap
@@ -43,14 +46,30 @@ object ConversationManager : Listener {
     private fun tick() {
         Bukkit.getOnlinePlayers().forEach {
             val session = sessions[it.name] ?: return@forEach
-            if (session.location != it.location && session.refuse != -1) {
-                if (session.refuse++ < 3) {
-                    session.location = it.location
-                } else {
-                    session.refuse = -1
-                    Tasks.task {
-                        session.close(refuse = true)
-                    }
+            if (session.isClosed) {
+                return@forEach
+            }
+            // 远离或背对对话单位
+            if (session.location.world!!.name != session.player.world.name
+                || session.location.direction.dot(session.player.location.direction) < 0
+                || session.distance > 0.5
+            ) {
+                session.isClosed = true
+                Tasks.task {
+                    session.close(refuse = true)
+                }
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    fun e(e: EntityDamageEvent) {
+        if (e.entity is Player) {
+            val session = sessions[e.entity.name] ?: return
+            if (!session.isClosed) {
+                session.isClosed = true
+                Tasks.task {
+                    session.close(refuse = true)
                 }
             }
         }
