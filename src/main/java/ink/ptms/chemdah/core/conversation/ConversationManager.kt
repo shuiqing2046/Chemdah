@@ -2,7 +2,6 @@ package ink.ptms.chemdah.core.conversation
 
 import ink.ptms.adyeshach.api.event.AdyeshachEntityInteractEvent
 import ink.ptms.adyeshach.common.entity.type.AdyHuman
-import ink.ptms.chemdah.Chemdah
 import ink.ptms.chemdah.api.ChemdahAPI
 import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.module.config.TConfig
@@ -20,7 +19,6 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.inventory.EquipmentSlot
 import java.util.concurrent.ConcurrentHashMap
