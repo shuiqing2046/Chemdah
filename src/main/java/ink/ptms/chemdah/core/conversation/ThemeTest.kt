@@ -147,52 +147,56 @@ object ThemeTest : Theme, Listener {
     ) {
         session.conversation.playerSide.checked(session).thenApply { replies ->
             newJson().also { json ->
-                settings.format.forEach {
-                    when {
-                        it.contains("{title}") -> {
-                            json.append(it.replace("{title}", session.conversation.option.title.replace("{name}", session.npcName))).newLine()
-                        }
-                        it.contains("{npcSide}") -> {
-                            messages.forEachIndexed { i, fully ->
-                                when {
-                                    messageLine > i -> json.append(it.replace("{npcSide}", fully)).newLine()
-                                    messageLine == i -> json.append(it.replace("{npcSide}", printText)).newLine()
-                                    else -> json.newLine()
+                try {
+                    settings.format.forEach {
+                        when {
+                            it.contains("{title}") -> {
+                                json.append(it.replace("{title}", session.conversation.option.title.replace("{name}", session.npcName))).newLine()
+                            }
+                            it.contains("{npcSide}") -> {
+                                messages.forEachIndexed { i, fully ->
+                                    when {
+                                        messageLine > i -> json.append(it.replace("{npcSide}", fully)).newLine()
+                                        messageLine == i -> json.append(it.replace("{npcSide}", printText)).newLine()
+                                        else -> json.newLine()
+                                    }
                                 }
                             }
-                        }
-                        it.contains("{playerSide}") -> {
-                            session.playerReplyForDisplay.clear()
-                            session.playerReplyForDisplay.addAll(replies)
-                            if (canReply) {
-                                replies.forEachIndexed { n, reply ->
-                                    if (messageLine + 1 >= messages.size && printEnd) {
-                                        val text = reply.text(session)
-                                        if (session.playerSide == reply) {
-                                            json.append(it.replace("{select}", settings.selectChar).replace("{playerSide}", "${settings.selectColor}$text"))
-                                                .hoverText(text)
-                                                .clickCommand("/session reply ${reply.uuid}")
-                                                .newLine()
+                            it.contains("{playerSide}") -> {
+                                session.playerReplyForDisplay.clear()
+                                session.playerReplyForDisplay.addAll(replies)
+                                if (canReply) {
+                                    replies.forEachIndexed { n, reply ->
+                                        if (messageLine + 1 >= messages.size && printEnd) {
+                                            val text = reply.text(session)
+                                            if (session.playerSide == reply) {
+                                                json.append(it.replace("{select}", settings.selectChar).replace("{playerSide}", "${settings.selectColor}$text"))
+                                                    .hoverText(text)
+                                                    .clickCommand("/session reply ${reply.uuid}")
+                                                    .newLine()
+                                            } else {
+                                                json.append(it.replace("{select}", settings.selectOther).replace("{playerSide}", text))
+                                                    .hoverText(text)
+                                                    .clickCommand("/session reply ${reply.uuid}")
+                                                    .newLine()
+                                            }
                                         } else {
-                                            json.append(it.replace("{select}", settings.selectOther).replace("{playerSide}", text))
-                                                .hoverText(text)
-                                                .clickCommand("/session reply ${reply.uuid}")
-                                                .newLine()
-                                        }
-                                    } else {
-                                        if (n == 0) {
-                                            json.append(settings.talking).newLine()
-                                        } else {
-                                            json.newLine()
+                                            if (n == 0) {
+                                                json.append(settings.talking).newLine()
+                                            } else {
+                                                json.newLine()
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
-                        else -> {
-                            json.append(it).newLine()
+                            else -> {
+                                json.append(it).newLine()
+                            }
                         }
                     }
+                } catch (ex: Throwable) {
+                    ex.printStackTrace()
                 }
             }.send(session.player)
             if (messageLine + 1 == messages.size && printEnd) {

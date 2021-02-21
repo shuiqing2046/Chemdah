@@ -46,6 +46,5 @@ object ChemdahAPI {
         Chemdah.conf.reload()
         ConversationManager.conf.reload()
         ConversationLoader.load()
-        conversationTheme.values.forEach { it.reloadConfig() }
     }
 }

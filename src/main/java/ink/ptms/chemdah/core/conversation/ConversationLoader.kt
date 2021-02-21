@@ -29,6 +29,7 @@ object ConversationLoader {
         }
         ChemdahAPI.conversation.clear()
         ChemdahAPI.conversation.putAll(load(file).map { it.id to it })
+        ChemdahAPI.conversationTheme.values.forEach { it.reloadConfig() }
     }
 
     fun load(file: FileConfiguration): List<Conversation> {
