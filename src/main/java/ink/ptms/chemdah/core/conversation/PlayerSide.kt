@@ -21,7 +21,7 @@ data class PlayerSide(
             if (cur < reply.size) {
                 val reply = reply[cur]
                 reply.check(session).thenApply {
-                    if (Coerce.toBoolean(it)) {
+                    if (it) {
                         r.add(reply)
                     }
                     process(cur + 1)

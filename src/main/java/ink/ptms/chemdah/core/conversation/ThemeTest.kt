@@ -70,7 +70,9 @@ object ThemeTest : Theme, Listener {
             } else {
                 session.playerSide?.run {
                     check(session).thenApply {
-                        select(session)
+                        if (it) {
+                            select(session)
+                        }
                     }
                 }
             }
@@ -84,7 +86,9 @@ object ThemeTest : Theme, Listener {
             e.isCancelled = true
             session.playerReplyForDisplay.getOrNull(Coerce.toInteger(e.message) - 1)?.run {
                 check(session).thenApply {
-                    select(session)
+                    if (it) {
+                        select(session)
+                    }
                 }
             }
         }
