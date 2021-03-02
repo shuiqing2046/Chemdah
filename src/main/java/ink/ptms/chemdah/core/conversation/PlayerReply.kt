@@ -30,11 +30,8 @@ data class PlayerReply(
             KetherFunction.parse(text, namespace = namespaceConversationPlayer) {
                 extend(session.variables)
             }
-        } catch (e: LocalizedException) {
-            e.print()
-            e.localizedMessage
         } catch (e: Throwable) {
-            e.printStackTrace()
+            e.print()
             e.localizedMessage
         }
     }
@@ -49,11 +46,8 @@ data class PlayerReply(
                 }.thenApply {
                     Coerce.toBoolean(it)
                 }
-            } catch (e: LocalizedException) {
-                e.print()
-                CompletableFuture.completedFuture(false)
             } catch (e: Throwable) {
-                e.printStackTrace()
+                e.print()
                 CompletableFuture.completedFuture(false)
             }
         }
@@ -70,12 +64,8 @@ data class PlayerReply(
                     session.close()
                 }
             }
-        } catch (e: LocalizedException) {
-            e.print()
-            session.close()
-            CompletableFuture.completedFuture(null)
         } catch (e: Throwable) {
-            e.printStackTrace()
+            e.print()
             session.close()
             CompletableFuture.completedFuture(null)
         }

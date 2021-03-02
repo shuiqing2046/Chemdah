@@ -6,7 +6,7 @@ import io.izzel.taboolib.module.inject.TInject
 
 object Chemdah : Plugin() {
 
-    @TInject
+    @TInject(migrate = true)
     lateinit var conf: TConfig
         private set
 

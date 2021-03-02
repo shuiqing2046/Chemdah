@@ -1,0 +1,44 @@
+template:
+  task(0):
+    objective: block break
+    if:
+      material: stone
+      position: world 0 0 0 ~ 10 10 10
+      $: player sneaking
+    when:
+      amount: 10
+    meta:
+      timeout: 1h
+    apply(Guide):
+      distance: 2
+      position: world 0 0 0
+      content:
+        ...
+    apply(Stats):
+      content: ...
+      process: ...
+  meta:
+    clone: ~
+    alias: alias
+    label:
+      - label
+    timeout: 1d
+    control:
+      - type: coexist
+        data:
+          alias: 1
+          label: 2
+      - type: repeat accept
+        data:
+          amount: 2
+          period: 1d
+      - type: cooldown
+        data:
+          time: 1d
+          group: template
+    automation:
+      auto-accept: false
+      plan:
+        type: weekly 0 6
+        count: 2
+        group: template

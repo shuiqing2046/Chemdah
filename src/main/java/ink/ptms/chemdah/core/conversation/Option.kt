@@ -1,6 +1,8 @@
 package ink.ptms.chemdah.core.conversation
 
 import ink.ptms.chemdah.api.ChemdahAPI
+import ink.ptms.chemdah.core.conversation.theme.Theme
+import ink.ptms.chemdah.core.conversation.theme.ThemeTest
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
 

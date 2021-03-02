@@ -1,10 +1,11 @@
-package ink.ptms.chemdah.core.conversation
+package ink.ptms.chemdah.core.conversation.theme
 
+import ink.ptms.chemdah.core.conversation.Session
 import java.util.concurrent.CompletableFuture
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.conversation.Theme
+ * ink.ptms.chemdah.core.conversation.theme.Theme
  *
  * @author sky
  * @since 2021/2/10 10:27 上午

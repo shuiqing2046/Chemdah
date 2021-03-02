@@ -19,6 +19,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.player.PlayerCommandPreprocessEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.inventory.EquipmentSlot
 import java.util.concurrent.ConcurrentHashMap
@@ -33,7 +34,7 @@ import java.util.concurrent.ConcurrentHashMap
 @TListener
 object ConversationManager : Listener {
 
-    @TInject("conversation.yml")
+    @TInject("conversation.yml", migrate = true)
     lateinit var conf: TConfig
         private set
 
@@ -83,6 +84,22 @@ object ConversationManager : Listener {
                     it.y += e.rightClicked.height
                 })
                 ChemdahAPI.getConversationSession(e.player)?.npcName = name
+            }
+        }
+    }
+
+    @EventHandler
+    fun e(e: PlayerCommandPreprocessEvent) {
+        if (e.message.startsWith("/session")) {
+            e.isCancelled = true
+            val args = e.message.split(" ").toMutableList().also {
+                it.removeFirst()
+            }
+            if (args.size == 2 && args[0] == "reply") {
+                val session = ChemdahAPI.getConversationSession(e.player) ?: return
+                session.conversation.playerSide.checked(session).thenApply { replies ->
+                    replies.firstOrNull { it.uuid.toString() == args[1] }?.select(session)
+                }
             }
         }
     }

@@ -3,6 +3,7 @@ package ink.ptms.chemdah.core.script
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.conversation.AgentType
 import ink.ptms.chemdah.core.conversation.Session
+import ink.ptms.chemdah.util.warning
 import io.izzel.taboolib.kotlin.kether.ScriptContext
 import io.izzel.taboolib.kotlin.kether.common.api.QuestContext
 import io.izzel.taboolib.kotlin.kether.common.util.LocalizedException
@@ -29,10 +30,12 @@ fun ScriptContext.extend(map: Map<String, Any?>) {
     }
 }
 
-fun LocalizedException.print() {
-    println("[Chemdah] Unexpected exception while parsing kether shell:")
-    localizedMessage.split("\n").forEach {
-        println("[Chemdah] $it")
+fun Throwable.print() {
+    if (this is LocalizedException) {
+        warning("Unexpected exception while parsing kether script:")
+        localizedMessage.split("\n").forEach { warning(it) }
+    } else {
+        printStackTrace()
     }
 }
 
@@ -56,4 +59,9 @@ val namespaceConversationPlayer = listOf(
     "chemdah",
     "chemdah-conversation",
     "chemdah-conversation-player"
+)
+
+val namespaceQuest = listOf(
+    "chemdah",
+    "chemdah-quest"
 )

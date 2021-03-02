@@ -1,6 +1,8 @@
-package ink.ptms.chemdah.core.conversation
+package ink.ptms.chemdah.core.conversation.theme
 
 import ink.ptms.chemdah.api.ChemdahAPI
+import ink.ptms.chemdah.core.conversation.ConversationManager
+import ink.ptms.chemdah.core.conversation.Session
 import ink.ptms.chemdah.util.printed
 import io.izzel.taboolib.cronus.CronusUtils
 import io.izzel.taboolib.kotlin.Tasks

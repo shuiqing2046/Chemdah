@@ -5,8 +5,12 @@ import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.event.ConversationEvents
 import io.izzel.taboolib.module.command.lite.CommandBuilder
 import io.izzel.taboolib.module.inject.TInject
+import io.izzel.taboolib.module.inject.TListener
 import org.bukkit.Location
 import org.bukkit.entity.Player
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
+import org.bukkit.event.player.PlayerCommandPreprocessEvent
 import org.bukkit.permissions.PermissionDefault
 import java.util.concurrent.CompletableFuture
 
@@ -80,22 +84,5 @@ data class Session(
 
     init {
         reload()
-    }
-
-    companion object {
-
-        @TInject
-        val session = CommandBuilder.create("session", Chemdah.plugin)
-            .permissionDefault(PermissionDefault.TRUE)
-            .execute { sender, args ->
-                if (sender is Player) {
-                    if (args.getOrNull(0) == "reply" && args.size == 2) {
-                        val session = ChemdahAPI.getConversationSession(sender) ?: return@execute
-                        session.conversation.playerSide.checked(session).thenApply { replies ->
-                            replies.firstOrNull { it.uuid.toString() == args[1] }?.select(session)
-                        }
-                    }
-                }
-            }!!
     }
 }

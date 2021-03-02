@@ -23,11 +23,8 @@ class ConversationTalkPlayer(val token: String) : QuestAction<Void>() {
                 val session = frame.getSession()
                 session.conversation.option.instanceTheme.npcTalk(session, listOf(colored()), false)
             }
-        } catch (e: LocalizedException) {
-            e.print()
-            CompletableFuture.completedFuture(null)
         } catch (e: Throwable) {
-            e.printStackTrace()
+            e.print()
             CompletableFuture.completedFuture(null)
         }
     }

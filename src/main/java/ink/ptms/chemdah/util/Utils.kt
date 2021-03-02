@@ -1,5 +1,6 @@
 package ink.ptms.chemdah.util
 
+import org.bukkit.Bukkit
 import org.bukkit.configuration.ConfigurationSection
 
 fun String.printed(separator: String = ""): List<String> {
@@ -26,9 +27,9 @@ fun Any.asMap() = when (this) {
 }
 
 fun Any.asList(): List<String> {
-    return if (this !is List<*>) {
-        listOf(toString())
-    } else {
-        map { it.toString() }
-    }
+    return if (this is List<*>) map { it.toString() } else listOf(toString())
+}
+
+fun warning(any: Any?) {
+    Bukkit.getLogger().warning("[Chemdah] $any")
 }

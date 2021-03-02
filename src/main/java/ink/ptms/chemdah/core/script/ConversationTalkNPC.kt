@@ -20,10 +20,8 @@ class ConversationTalkNPC(val token: String) : QuestAction<Void>() {
     override fun process(frame: QuestContext.Frame): CompletableFuture<Void> {
         try {
             frame.getSession().npcSide.add(KetherFunction.parse(token, namespace = namespaceConversationNPC) { extend(frame.vars()) }.colored())
-        } catch (e: LocalizedException) {
-            e.print()
         } catch (e: Throwable) {
-            e.printStackTrace()
+            e.print()
         }
         return CompletableFuture.completedFuture(null)
     }

@@ -83,11 +83,8 @@ data class Conversation(
                             KetherFunction.parse(it, namespace = namespaceConversationNPC) {
                                 extend(session.variables)
                             }
-                        } catch (e: LocalizedException) {
-                            e.print()
-                            e.localizedMessage
                         } catch (e: Throwable) {
-                            e.printStackTrace()
+                            e.print()
                             e.localizedMessage
                         }
                     })
