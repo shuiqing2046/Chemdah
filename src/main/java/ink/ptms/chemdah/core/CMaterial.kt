@@ -12,7 +12,7 @@ import org.bukkit.block.Block
  * @author sky
  * @since 2021/3/2 5:41 下午
  */
-class Materials(val materials: List<XMaterial>) {
+class CMaterial(val materials: List<XMaterial>) {
 
     fun isBlock(block: Block) = materials.any { it.isBlock(block) }
 
@@ -22,8 +22,8 @@ class Materials(val materials: List<XMaterial>) {
             return XBlock.isSimilar(block, this) && (Version.isAfter(Version.v1_13) || block.data == data)
         }
 
-        fun List<XMaterial>.toMaterials(): Materials {
-            return Materials(this)
+        fun List<XMaterial>.toMaterials(): CMaterial {
+            return CMaterial(this)
         }
     }
 }

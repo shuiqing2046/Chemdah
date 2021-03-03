@@ -3,11 +3,15 @@ package ink.ptms.chemdah.api
 import ink.ptms.chemdah.Chemdah
 import ink.ptms.chemdah.core.conversation.*
 import ink.ptms.chemdah.core.conversation.theme.Theme
+import ink.ptms.chemdah.core.quest.PlayerProfile
 import ink.ptms.chemdah.core.quest.Template
 import ink.ptms.chemdah.core.quest.addon.Addon
 import ink.ptms.chemdah.core.quest.meta.Meta
 import ink.ptms.chemdah.core.quest.objective.Objective
+import io.izzel.taboolib.module.inject.PlayerContainer
 import org.bukkit.entity.Player
+import org.bukkit.event.Event
+import java.util.concurrent.ConcurrentHashMap
 
 object ChemdahAPI {
 
@@ -17,7 +21,9 @@ object ChemdahAPI {
     val quest = HashMap<String, Template>()
     val questMeta = HashMap<String, Class<out Meta>>()
     val questAddon = HashMap<String, Class<out Addon>>()
-    val questObjective = HashMap<String, Objective>()
+    val questObjective = HashMap<String, Objective<out Event>>()
+
+    val playerProfile = ConcurrentHashMap<String, PlayerProfile>()
 
     fun getConversationSession(player: Player) = ConversationManager.sessions[player.name]
 
@@ -32,6 +38,8 @@ object ChemdahAPI {
     fun getQuestAddon(id: String) = questAddon[id]
 
     fun getQuestObjective(id: String) = questObjective[id]
+
+    fun getPlayerProfile(player: Player) = playerProfile[player.name]!!
 
     /**
      * 1。重载中心配置文件

@@ -3,6 +3,13 @@ package ink.ptms.chemdah.core.quest
 import ink.ptms.chemdah.core.Metadata
 import ink.ptms.chemdah.core.Metadata.Companion.data
 
+/**
+ * Chemdah
+ * ink.ptms.chemdah.core.quest.QuestMetaOperator
+ *
+ * @author sky
+ * @since 2021/3/2 1:13 上午
+ */
 class QuestMetaOperator(val profile: PlayerProfile, val task: Task) {
 
     val metadata: Metadata?
@@ -17,4 +24,8 @@ class QuestMetaOperator(val profile: PlayerProfile, val task: Task) {
     fun remove(node: String) = metadata?.remove("${task.metaNode}.$node")
 
     fun containsKey(node: String) = metadata?.containsKey("${task.metaNode}.$node")
+
+    fun clear() {
+        metadata?.run { removeIf { it.first.startsWith(task.metaNode) } }
+    }
 }

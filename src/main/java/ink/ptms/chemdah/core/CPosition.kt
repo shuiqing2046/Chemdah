@@ -1,6 +1,7 @@
 package ink.ptms.chemdah.core
 
 import ink.ptms.chemdah.util.warning
+import io.izzel.taboolib.kotlin.navigation.pathfinder.bukkit.BoundingBox
 import io.izzel.taboolib.util.Coerce
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -12,14 +13,14 @@ import org.bukkit.Location
  * @author sky
  * @since 2021/3/2 2:51 下午
  */
-abstract class Cosition(val source: String) {
+abstract class CPosition(val source: String) {
 
     abstract fun inside(location: Location): Boolean
 
     /**
      * world 0 0 0 > 10 10 10
      */
-    class Area(source: String) : Cosition(source) {
+    class Area(source: String) : CPosition(source) {
 
         val world: String
         val box: BoundingBox
@@ -45,7 +46,7 @@ abstract class Cosition(val source: String) {
     /**
      * world 0 0 0 ~ 10
      */
-    class Range(source: String) : Cosition(source) {
+    class Range(source: String) : CPosition(source) {
 
         val position: Location
         val r: Double
@@ -64,7 +65,7 @@ abstract class Cosition(val source: String) {
     /**
      * world 0 0 0 & 1 1 1 & 2 2 2
      */
-    class Single(source: String) : Cosition(source) {
+    class Single(source: String) : CPosition(source) {
 
         val positions = ArrayList<Location>()
 
@@ -89,7 +90,7 @@ abstract class Cosition(val source: String) {
         }
     }
 
-    class Unrecognized(source: String, val message: String): Cosition(source) {
+    class Unrecognized(source: String, val message: String): CPosition(source) {
 
         override fun inside(location: Location): Boolean {
             warning("Unrecognized position format: $source ($message)")
@@ -99,7 +100,7 @@ abstract class Cosition(val source: String) {
 
     companion object {
 
-        fun String.toCosition(): Cosition {
+        fun String.toCosition(): CPosition {
             return try {
                 when {
                     ">" in this -> Area(this)

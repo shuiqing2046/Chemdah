@@ -1,10 +1,10 @@
 package ink.ptms.chemdah.core.quest
 
 import ink.ptms.chemdah.core.Metadata
-import ink.ptms.chemdah.core.Metadata.Companion.data
 import ink.ptms.chemdah.core.script.namespaceQuest
 import ink.ptms.chemdah.core.script.print
 import ink.ptms.chemdah.util.asList
+import io.izzel.taboolib.internal.gson.annotations.Expose
 import io.izzel.taboolib.kotlin.kether.KetherShell
 import io.izzel.taboolib.util.Coerce
 import org.bukkit.Bukkit
@@ -13,11 +13,10 @@ import org.bukkit.event.Event
 import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.CopyOnWriteArrayList
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.quest.Profile
+ * ink.ptms.chemdah.core.quest.PlayerProfile
  *
  * @author sky
  * @since 2021/3/2 12:00 上午

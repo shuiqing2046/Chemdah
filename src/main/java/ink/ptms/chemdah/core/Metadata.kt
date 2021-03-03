@@ -1,10 +1,9 @@
 package ink.ptms.chemdah.core
 
-import ink.ptms.chemdah.core.Cosition.Companion.toCosition
-import ink.ptms.chemdah.core.Materials.Companion.toMaterials
+import ink.ptms.chemdah.core.CPosition.Companion.toCosition
+import ink.ptms.chemdah.core.CMaterial.Companion.toMaterials
 import ink.ptms.chemdah.util.asList
 import io.izzel.taboolib.internal.xseries.XMaterial
-import io.izzel.taboolib.kotlin.Reflex
 import io.izzel.taboolib.kotlin.Reflex.Companion.toReflex
 import io.izzel.taboolib.module.nms.nbt.NBTBase
 import io.izzel.taboolib.module.nms.nbt.NBTCompound
@@ -46,6 +45,14 @@ class Metadata {
     fun clear() = map.clear()
 
     fun copy() = Metadata(map)
+
+    fun removeIf(predicate: (Pair<String, Data>) -> Boolean) {
+        map.entries.forEach {
+            if (predicate(it.toPair())) {
+                remove(it.key)
+            }
+        }
+    }
 
     fun compound() = NBTCompound().also {
         map.map { (k, v) ->
