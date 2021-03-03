@@ -25,20 +25,44 @@ object ChemdahAPI {
 
     val playerProfile = ConcurrentHashMap<String, PlayerProfile>()
 
+    /**
+     * 获取正在进行的回话
+     */
     fun getConversationSession(player: Player) = ConversationManager.sessions[player.name]
 
+    /**
+     * 获取对话资源
+     */
     fun getConversation(id: String) = conversation[id]
 
+    /**
+     * 获取对话模式
+     */
     fun getConversationTheme(id: String) = conversationTheme[id]
 
+    /**
+     * 获取任务模板
+     */
     fun getQuestTemplate(id: String) = quest[id]
 
+    /**
+     * 获取任务元数据
+     */
     fun getQuestMeta(id: String) = questMeta[id]
 
+    /**
+     * 获取任务扩展
+     */
     fun getQuestAddon(id: String) = questAddon[id]
 
+    /**
+     * 获取任务目标
+     */
     fun getQuestObjective(id: String) = questObjective[id]
 
+    /**
+     * 获取已经缓存的玩家数据
+     */
     fun getPlayerProfile(player: Player) = playerProfile[player.name]!!
 
     /**

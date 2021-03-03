@@ -1,6 +1,8 @@
 package ink.ptms.chemdah.core.quest
 
+import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.quest.meta.Meta
+import io.lumine.xikage.mythicmobs.MythicMobs
 import org.bukkit.configuration.ConfigurationSection
 
 /**
@@ -16,6 +18,5 @@ class Template(val id: String, val config: ConfigurationSection) {
     val meta = ArrayList<Meta>()
 
     init {
-
     }
 }

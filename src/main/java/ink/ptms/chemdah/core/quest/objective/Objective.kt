@@ -1,6 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective
 
 import ink.ptms.chemdah.core.quest.PlayerProfile
+import ink.ptms.chemdah.core.quest.Progress
 import ink.ptms.chemdah.core.quest.Task
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
@@ -71,9 +72,7 @@ abstract class Objective<E : Event> {
      * 当条目完成
      */
     open fun onComplete(profile: PlayerProfile, task: Task) {
-        profile.metadata(task) {
-            put("completed", true)
-        }
+        setCompletedSignature(profile, task, true)
     }
 
     /**
@@ -112,19 +111,39 @@ abstract class Objective<E : Event> {
     }
 
     /**
-     * 检查条目继续的所有条件
+     * 检查条目完成的所有条件
      * 当所有条件满足时再检查脚本代理
      *
      * 当 "completed" 为 "true" 则强制判定为已完成
      */
     open fun checkGoal(profile: PlayerProfile, task: Task): CompletableFuture<Boolean> {
-        if (profile.metadata(task) { get("completed", false).toBoolean() }) {
-            return CompletableFuture.completedFuture(false)
-        }
-        return if (goals.all { it(profile, task) }) {
-            profile.checkAgent(task.goal["$"]?.value)
-        } else {
-            CompletableFuture.completedFuture(false)
+        return when {
+            hasCompletedSignature(profile, task) -> CompletableFuture.completedFuture(false)
+            goals.all { it(profile, task) } -> profile.checkAgent(task.goal["$"]?.value)
+            else -> CompletableFuture.completedFuture(false)
         }
     }
+
+    /**
+     * 设置目标为已完成状态
+     */
+    fun setCompletedSignature(profile: PlayerProfile, task: Task, value: Boolean) {
+        profile.metadata(task) {
+            put("completed", value)
+        }
+    }
+
+    /**
+     * 检测目标是否为已完成状态
+     */
+    fun hasCompletedSignature(profile: PlayerProfile, task: Task): Boolean {
+        return profile.metadata(task) {
+            get("completed", false).toBoolean()
+        }
+    }
+
+    /**
+     * 获取条目进度
+     */
+    abstract fun progress(profile: PlayerProfile, task: Task): Progress
 }
