@@ -2,7 +2,7 @@ package ink.ptms.chemdah.core.quest
 
 import ink.ptms.chemdah.Chemdah
 import ink.ptms.chemdah.api.ChemdahAPI
-import ink.ptms.chemdah.core.SingleListener
+import ink.ptms.chemdah.util.SingleListener
 import ink.ptms.chemdah.core.quest.addon.Addon
 import ink.ptms.chemdah.core.quest.meta.Meta
 import ink.ptms.chemdah.core.quest.objective.Objective
@@ -11,6 +11,7 @@ import io.izzel.taboolib.compat.kotlin.CompatKotlin
 import io.izzel.taboolib.module.inject.TFunction
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
+import org.bukkit.event.EventHandler
 
 /**
  * Chemdah
@@ -54,6 +55,21 @@ object QuestHandler {
     }
 
     fun handleEvent(player: Player, event: Event, objective: Objective<Event>) {
-
+        ChemdahAPI.getPlayerProfile(player).also { profile ->
+            // 通过事件获取所有正在进行的任务条目
+            profile.getTasks(event).forEach { task ->
+                // 如果含有完成标记，则不在进行该条目
+                if (objective.hasCompletedSignature(profile, task)) {
+                    return@forEach
+                }
+                // 判断条件并进行该条目
+                objective.checkCondition(profile, task, event).thenAccept { cond ->
+                    if (cond) {
+                        objective.onContinue(profile, task, event)
+                        objective.checkComplete(profile, task)
+                    }
+                }
+            }
+        }
     }
 }

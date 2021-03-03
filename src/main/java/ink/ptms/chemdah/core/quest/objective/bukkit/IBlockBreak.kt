@@ -1,10 +1,11 @@
-package ink.ptms.chemdah.core.quest.objective
+package ink.ptms.chemdah.core.quest.objective.bukkit
 
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
 import org.bukkit.event.block.BlockBreakEvent
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.quest.objective.IBlockBreak
+ * ink.ptms.chemdah.core.quest.objective.impl.IBlockBreak
  *
  * @author sky
  * @since 2021/3/2 5:09 下午

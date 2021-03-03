@@ -1,9 +1,7 @@
 package ink.ptms.chemdah.core.quest
 
 import ink.ptms.chemdah.api.ChemdahAPI
-import ink.ptms.chemdah.core.Metadata
-import ink.ptms.chemdah.core.quest.meta.Meta
-import org.bukkit.configuration.ConfigurationSection
+import ink.ptms.chemdah.core.DataContainer
 
 /**
  * Chemdah
@@ -14,8 +12,11 @@ import org.bukkit.configuration.ConfigurationSection
  */
 class Quest(val id: String) {
 
-    val template: Template?
-        get() = ChemdahAPI.getQuestTemplate(id)
+    val isValid: Boolean
+        get() = ChemdahAPI.getQuestTemplate(id) != null
 
-    val metadata = Metadata()
+    val template: Template
+        get() = ChemdahAPI.getQuestTemplate(id)!!
+
+    val persistentDataContainer = DataContainer()
 }

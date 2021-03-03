@@ -1,4 +1,4 @@
-package ink.ptms.chemdah.core.quest
+package ink.ptms.chemdah.core.quest.objective
 
 /**
  * Chemdah

@@ -1,7 +1,6 @@
 package ink.ptms.chemdah.core.quest.objective
 
-import ink.ptms.chemdah.core.quest.PlayerProfile
-import ink.ptms.chemdah.core.quest.Progress
+import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Task
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
@@ -64,22 +63,22 @@ abstract class Objective<E : Event> {
     }
 
     /**
-     * 当条目继续
+     * 当条目继续时
      */
     abstract fun onContinue(profile: PlayerProfile, task: Task, event: Event)
 
     /**
-     * 当条目完成
+     * 当条目完成时
      */
     open fun onComplete(profile: PlayerProfile, task: Task) {
         setCompletedSignature(profile, task, true)
     }
 
     /**
-     * 当条目重置
+     * 当条目重置时
      */
     open fun onReset(profile: PlayerProfile, task: Task) {
-        profile.metadata(task) {
+        profile.dataOperator(task) {
             clear()
         }
     }
@@ -87,7 +86,7 @@ abstract class Objective<E : Event> {
     /**
      * 添加条目继续的条件
      */
-    fun addCondition(func: (PlayerProfile, Task, E) -> Boolean) {
+    open fun addCondition(func: (PlayerProfile, Task, E) -> Boolean) {
         conditions += func
     }
 
@@ -106,7 +105,7 @@ abstract class Objective<E : Event> {
     /**
      * 添加条目完成的条件
      */
-    fun addGoal(func: (PlayerProfile, Task) -> Boolean) {
+    open fun addGoal(func: (PlayerProfile, Task) -> Boolean) {
         goals += func
     }
 
@@ -125,10 +124,24 @@ abstract class Objective<E : Event> {
     }
 
     /**
+     * 检查条目完成的所有条件
+     * 当条件满足时则完成条目
+     */
+    open fun checkComplete(profile: PlayerProfile, task: Task) {
+        if (!hasCompletedSignature(profile, task)) {
+            checkGoal(profile, task).thenAccept {
+                if (it && !hasCompletedSignature(profile, task)) {
+                    onComplete(profile, task)
+                }
+            }
+        }
+    }
+
+    /**
      * 设置目标为已完成状态
      */
-    fun setCompletedSignature(profile: PlayerProfile, task: Task, value: Boolean) {
-        profile.metadata(task) {
+    open fun setCompletedSignature(profile: PlayerProfile, task: Task, value: Boolean) {
+        profile.dataOperator(task) {
             put("completed", value)
         }
     }
@@ -136,8 +149,8 @@ abstract class Objective<E : Event> {
     /**
      * 检测目标是否为已完成状态
      */
-    fun hasCompletedSignature(profile: PlayerProfile, task: Task): Boolean {
-        return profile.metadata(task) {
+    open fun hasCompletedSignature(profile: PlayerProfile, task: Task): Boolean {
+        return profile.dataOperator(task) {
             get("completed", false).toBoolean()
         }
     }
@@ -145,5 +158,5 @@ abstract class Objective<E : Event> {
     /**
      * 获取条目进度
      */
-    abstract fun progress(profile: PlayerProfile, task: Task): Progress
+    abstract fun getProgress(profile: PlayerProfile, task: Task): Progress
 }

@@ -3,12 +3,11 @@ package ink.ptms.chemdah.api
 import ink.ptms.chemdah.Chemdah
 import ink.ptms.chemdah.core.conversation.*
 import ink.ptms.chemdah.core.conversation.theme.Theme
-import ink.ptms.chemdah.core.quest.PlayerProfile
+import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Template
 import ink.ptms.chemdah.core.quest.addon.Addon
 import ink.ptms.chemdah.core.quest.meta.Meta
 import ink.ptms.chemdah.core.quest.objective.Objective
-import io.izzel.taboolib.module.inject.PlayerContainer
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import java.util.concurrent.ConcurrentHashMap

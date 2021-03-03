@@ -1,4 +1,4 @@
-package ink.ptms.chemdah.core.quest
+package ink.ptms.chemdah.core.quest.meta
 
 /**
  * Chemdah
@@ -7,5 +7,5 @@ package ink.ptms.chemdah.core.quest
  * @author sky
  * @since 2021/3/4 12:45 上午
  */
-interface Container {
+interface MetaContainer {
 }

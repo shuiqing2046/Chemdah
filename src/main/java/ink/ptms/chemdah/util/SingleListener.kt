@@ -1,4 +1,4 @@
-package ink.ptms.chemdah.core
+package ink.ptms.chemdah.util
 
 import ink.ptms.chemdah.Chemdah
 import org.bukkit.Bukkit
@@ -10,8 +10,11 @@ import org.bukkit.plugin.EventExecutor
 /**
  * @author IzzelAliz
  */
-class SingleListener<T : Event>(private val clazz: Class<T>, private val predicate: (T) -> Boolean, private val consumer: (T) -> Unit) : Listener,
-    EventExecutor {
+class SingleListener<T : Event>(
+    private val clazz: Class<T>,
+    private val predicate: (T) -> Boolean,
+    private val consumer: (T) -> Unit
+) : Listener, EventExecutor {
 
     override fun execute(listener: Listener, event: Event) {
         try {

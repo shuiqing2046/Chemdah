@@ -1,6 +1,6 @@
 package ink.ptms.chemdah.core.database
 
-import ink.ptms.chemdah.core.quest.PlayerProfile
+import ink.ptms.chemdah.core.PlayerProfile
 import org.bukkit.entity.Player
 
 /**
