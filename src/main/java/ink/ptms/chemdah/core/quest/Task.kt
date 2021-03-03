@@ -14,13 +14,13 @@ import org.bukkit.configuration.ConfigurationSection
  * @author sky
  * @since 2021/3/1 11:51 下午
  */
-class Task(val id: String, val config: ConfigurationSection, val template: Template) {
+class Task(val id: String, val config: ConfigurationSection, val template: Template) : Container {
 
     val objective = ChemdahAPI.questObjective[config.getString("objective").toString()]!!
     val condition = Metadata()
     val goal = Metadata()
-    val meta = ArrayList<Meta>()
-    val addon = ArrayList<Addon>()
+    val meta = HashMap<String, Meta>()
+    val addon = HashMap<String, Addon>()
 
     val metaNode = "${template.id}.$id"
 

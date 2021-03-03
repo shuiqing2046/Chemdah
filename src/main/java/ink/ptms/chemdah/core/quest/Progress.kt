@@ -13,9 +13,8 @@ abstract class Progress(val current: Any, val target: Any) {
 
     companion object {
 
-        fun Any.to(target: Any, percent: Double): Progress {
-            val current = this
-            return object : Progress(current, target) {
+        fun Any.to(target: Any, percent: Double) = let {
+            object : Progress(it, target) {
                 override val percent = percent
             }
         }
