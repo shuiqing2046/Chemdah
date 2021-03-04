@@ -1,6 +1,5 @@
 package ink.ptms.chemdah.core.conversation
 
-import io.izzel.taboolib.util.Coerce
 import java.util.concurrent.CompletableFuture
 
 /**

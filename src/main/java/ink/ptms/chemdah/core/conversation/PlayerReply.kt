@@ -5,7 +5,6 @@ import ink.ptms.chemdah.core.script.namespaceConversationPlayer
 import ink.ptms.chemdah.core.script.print
 import io.izzel.taboolib.kotlin.kether.KetherFunction
 import io.izzel.taboolib.kotlin.kether.KetherShell
-import io.izzel.taboolib.kotlin.kether.common.util.LocalizedException
 import io.izzel.taboolib.util.Coerce
 import java.util.*
 import java.util.concurrent.CompletableFuture

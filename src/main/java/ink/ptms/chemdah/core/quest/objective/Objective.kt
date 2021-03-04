@@ -49,6 +49,11 @@ abstract class Objective<E : Event> {
     open val ignoreCancelled = true
 
     /**
+     * 异步事件
+     */
+    open val isAsync = false
+
+    /**
      * 获取事件中的玩家
      */
     var handler: ((E) -> Player?) = { null }
@@ -86,7 +91,7 @@ abstract class Objective<E : Event> {
     /**
      * 添加条目继续的条件
      */
-    open fun addCondition(func: (PlayerProfile, Task, E) -> Boolean) {
+    fun addCondition(func: (PlayerProfile, Task, E) -> Boolean) {
         conditions += func
     }
 
@@ -105,7 +110,7 @@ abstract class Objective<E : Event> {
     /**
      * 添加条目完成的条件
      */
-    open fun addGoal(func: (PlayerProfile, Task) -> Boolean) {
+    fun addGoal(func: (PlayerProfile, Task) -> Boolean) {
         goals += func
     }
 

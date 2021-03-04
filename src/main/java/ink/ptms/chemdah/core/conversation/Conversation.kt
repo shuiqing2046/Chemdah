@@ -3,9 +3,10 @@ package ink.ptms.chemdah.core.conversation
 import ink.ptms.chemdah.api.event.ConversationEvents
 import ink.ptms.chemdah.core.conversation.ConversationManager.sessions
 import ink.ptms.chemdah.core.script.extend
-import ink.ptms.chemdah.core.script.namespace
 import ink.ptms.chemdah.core.script.namespaceConversationNPC
 import ink.ptms.chemdah.core.script.print
+import ink.ptms.chemdah.util.mirrorDefine
+import ink.ptms.chemdah.util.mirrorFinish
 import io.izzel.taboolib.kotlin.kether.KetherFunction
 import io.izzel.taboolib.kotlin.kether.KetherShell
 import io.izzel.taboolib.kotlin.kether.common.util.LocalizedException
@@ -49,11 +50,13 @@ data class Conversation(
      * @param sessionTop 上层会话（继承关系）
      */
     fun open(player: Player, origin: Location, sessionTop: Session? = null): CompletableFuture<Session> {
+        mirrorDefine("Conversation:open")
         val future = CompletableFuture<Session>()
         val session = sessionTop ?: Session(this, player.location.clone(), origin.clone(), player)
         // 事件
         if (ConversationEvents.Pre(this, session, sessionTop != null).call().isCancelled) {
             future.complete(session)
+            mirrorFinish("Conversation:open")
             return future
         }
         // 注册会话
@@ -97,6 +100,7 @@ data class Conversation(
                 }
             }
         }
+        mirrorFinish("Conversation:open")
         return future
     }
 
@@ -108,9 +112,11 @@ data class Conversation(
      * @param agentType 脚本代理类型
      */
     fun agent(session: Session, agentType: AgentType): CompletableFuture<Void> {
+        mirrorDefine("Conversation:agent")
         val future = CompletableFuture<Void>()
         if (ConversationEvents.Agent(this, session, agentType).call().isCancelled) {
             future.complete(null)
+            mirrorFinish("Conversation:agent")
             return future
         }
         val agents = agent.filter { it.type == agentType }
@@ -119,16 +125,13 @@ data class Conversation(
                 try {
                     KetherShell.eval(agents[cur].action.toMutableList().also {
                         it.add("agent")
-                    }, namespace = agentType.namespace()) {
+                    }, namespace = agentType.namespaceAll()) {
                         extend(session.variables)
                     }.thenApply {
                         process(cur + 1)
                     }
-                } catch (e: LocalizedException) {
-                    e.print()
-                    session.close()
                 } catch (e: Throwable) {
-                    e.printStackTrace()
+                    e.print()
                     session.close()
                 }
             } else {
@@ -136,6 +139,7 @@ data class Conversation(
             }
         }
         process(0)
+        mirrorFinish("Conversation:agent")
         return future
     }
 }

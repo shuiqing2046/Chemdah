@@ -9,32 +9,39 @@ template:
       amount: 10
     meta:
       timeout: 1h
-    apply(Guide):
+    apply(guide):
       distance: 2
       position: world 0 0 0
       content:
         ...
-    apply(Stats):
-      content: ...
-      process: ...
+    apply(stats):
+      value: ...
+      target: ...
+      percent: ...
+    agent(task continue):
+      ...
+  agent(quest accept):
+    ...
   meta:
-    clone: ~
+    import: ~
     alias: alias
     label:
       - label
     timeout: 1d
     control:
+      - type: cooldown
+        data:
+          time: 1d
+          group: template
       - type: coexist
         data:
           alias: 1
-          label: 2
+          label(a): 2
+          label(b): 2
       - type: repeat accept
         data:
           amount: 2
           period: 1d
-      - type: cooldown
-        data:
-          time: 1d
           group: template
     automation:
       auto-accept: false
@@ -42,3 +49,4 @@ template:
         type: weekly 0 6
         count: 2
         group: template
+        method: START_IN_MONDAY

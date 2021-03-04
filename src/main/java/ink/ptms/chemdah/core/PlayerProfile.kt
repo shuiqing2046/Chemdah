@@ -1,8 +1,11 @@
 package ink.ptms.chemdah.core
 
+import ink.ptms.chemdah.core.quest.Idx
 import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.core.quest.QuestDataOperator
 import ink.ptms.chemdah.core.quest.Task
+import ink.ptms.chemdah.core.quest.meta.MetaAlias.Companion.alias
+import ink.ptms.chemdah.core.quest.meta.MetaLabel.Companion.label
 import ink.ptms.chemdah.core.script.namespaceQuest
 import ink.ptms.chemdah.core.script.print
 import ink.ptms.chemdah.util.asList
@@ -14,7 +17,6 @@ import org.bukkit.event.Event
 import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.collections.ArrayList
 
 /**
  * Chemdah
@@ -29,6 +31,9 @@ class PlayerProfile(val uniqueId: UUID) {
         get() = Bukkit.getPlayer(uniqueId)!!
 
     val quest = ConcurrentHashMap<String, Quest>()
+    val questValid: Map<String, Quest>
+        get() = quest.filterValues { it.isValid }
+
     val persistentDataContainer = DataContainer()
 
     /**
@@ -43,7 +48,23 @@ class PlayerProfile(val uniqueId: UUID) {
      */
     fun getTasks(event: Event): List<Task> {
         return quest.filterValues { it.isValid }.flatMap { (_, v) ->
-            v.template.task.values.filter { it.objective.event.isInstance(event) }
+            v.template.task.values.filter {
+                it.objective.event.isInstance(event)
+            }
+        }
+    }
+
+    /**
+     * 通过序号、别名或标签获取所有符合要求且正在进行中的有效任务
+     */
+    fun getQuests(value: String, idx: Idx = Idx.ID): List<Quest> {
+        return when (idx) {
+            Idx.ID -> {
+                quest.filterValues { it.isValid && (it.template.id == value || it.template.alias() == value) }.values.toList()
+            }
+            Idx.LABEL -> {
+                quest.filterValues { it.isValid && value in it.template.label() }.values.toList()
+            }
         }
     }
 

@@ -1,24 +1,32 @@
 package ink.ptms.chemdah.api
 
 import ink.ptms.chemdah.Chemdah
-import ink.ptms.chemdah.core.conversation.*
-import ink.ptms.chemdah.core.conversation.theme.Theme
 import ink.ptms.chemdah.core.PlayerProfile
+import ink.ptms.chemdah.core.conversation.Conversation
+import ink.ptms.chemdah.core.conversation.ConversationLoader
+import ink.ptms.chemdah.core.conversation.ConversationManager
+import ink.ptms.chemdah.core.conversation.theme.Theme
+import ink.ptms.chemdah.core.quest.Idx
 import ink.ptms.chemdah.core.quest.Template
 import ink.ptms.chemdah.core.quest.addon.Addon
 import ink.ptms.chemdah.core.quest.meta.Meta
+import ink.ptms.chemdah.core.quest.meta.MetaAlias.Companion.alias
+import ink.ptms.chemdah.core.quest.meta.MetaLabel.Companion.label
 import ink.ptms.chemdah.core.quest.objective.Objective
+import io.izzel.taboolib.kotlin.Mirror
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import java.util.concurrent.ConcurrentHashMap
 
 object ChemdahAPI {
 
+    val mirror = Mirror()
+
     val conversation = HashMap<String, Conversation>()
     val conversationTheme = HashMap<String, Theme>()
 
     val quest = HashMap<String, Template>()
-    val questMeta = HashMap<String, Class<out Meta>>()
+    val questMeta = HashMap<String, Class<out Meta<*>>>()
     val questAddon = HashMap<String, Class<out Addon>>()
     val questObjective = HashMap<String, Objective<out Event>>()
 
@@ -43,6 +51,20 @@ object ChemdahAPI {
      * 获取任务模板
      */
     fun getQuestTemplate(id: String) = quest[id]
+
+    /**
+     * 通过序号、别名或标签获取所有符合要求的任务模板
+     */
+    fun getQuestTemplate(value: String, idx: Idx = Idx.ID): List<Template> {
+        return when (idx) {
+            Idx.ID -> {
+                quest.filterValues { it.id == value || it.alias() == value }.values.toList()
+            }
+            Idx.LABEL -> {
+                quest.filterValues { value in it.label() }.values.toList()
+            }
+        }
+    }
 
     /**
      * 获取任务元数据

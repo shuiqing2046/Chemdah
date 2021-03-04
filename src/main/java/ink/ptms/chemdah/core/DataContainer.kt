@@ -20,7 +20,7 @@ class DataContainer {
 
     operator fun get(key: String) = map[key]
 
-    fun get(key: String, def: Any) = map[key] ?: def.data()
+    operator fun get(key: String, def: Any) = map[key] ?: def.data()
 
     fun put(key: String, value: Any) = map.put(key, value.data())
 

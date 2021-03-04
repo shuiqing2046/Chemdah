@@ -1,8 +1,8 @@
 package ink.ptms.chemdah.core.quest.objective
 
 import ink.ptms.chemdah.core.PlayerProfile
-import ink.ptms.chemdah.core.quest.objective.Progress.Companion.to
 import ink.ptms.chemdah.core.quest.Task
+import ink.ptms.chemdah.core.quest.objective.Progress.Companion.progress
 import org.bukkit.event.Event
 
 /**
@@ -17,7 +17,7 @@ abstract class ObjectiveCountable<E : Event> : Objective<E>() {
     init {
         addGoal { profile, task ->
             profile.dataOperator(task) {
-                get("amount", 0).toInt() >= task.goal.get("amount", 1).toInt()
+                get("amount", 0).toInt() >= task.goal["amount", 1].toInt()
             }
         }
     }
@@ -29,12 +29,12 @@ abstract class ObjectiveCountable<E : Event> : Objective<E>() {
     }
 
     override fun getProgress(profile: PlayerProfile, task: Task): Progress {
-        val target = task.goal.get("amount", 1).toInt()
+        val target = task.goal["amount", 1].toInt()
         return if (hasCompletedSignature(profile, task)) {
-            target.to(target, 1.0)
+            target.progress(target, 1.0)
         } else {
             profile.dataOperator(task) {
-                get("amount", 0).toInt().let { a -> a.to(target, a / target.toDouble()) }
+                get("amount", 0).toInt().let { a -> a.progress(target, a / target.toDouble()) }
             }
         }
     }

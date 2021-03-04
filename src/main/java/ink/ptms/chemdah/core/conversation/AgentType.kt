@@ -2,7 +2,34 @@ package ink.ptms.chemdah.core.conversation
 
 enum class AgentType(val namespace: String) {
 
-    BEGIN("npc"), REFUSE("player"), END("player"), NONE("player");
+    /**
+     * 对话开始
+     */
+    BEGIN("npc"),
+
+    /**
+     * 对话放弃
+     */
+    REFUSE("player"),
+
+    /**
+     * 对话结束
+     */
+    END("player"),
+
+    /**
+     * 无
+     */
+    NONE("");
+
+    /**
+     * 获取所有 Kether 命名空间
+     */
+    fun namespaceAll() = listOf(
+        "chemdah",
+        "chemdah-conversation",
+        "chemdah-conversation-${namespace}"
+    )
 
     companion object {
 

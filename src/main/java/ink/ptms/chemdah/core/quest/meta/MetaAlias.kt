@@ -1,6 +1,8 @@
 package ink.ptms.chemdah.core.quest.meta
 
 import ink.ptms.chemdah.core.quest.Id
+import ink.ptms.chemdah.core.quest.QuestContainer
+import ink.ptms.chemdah.core.quest.Template
 
 /**
  * Chemdah
@@ -10,7 +12,13 @@ import ink.ptms.chemdah.core.quest.Id
  * @since 2021/3/1 11:47 下午
  */
 @Id("alias")
-class MetaAlias(source: Any) : Meta(source) {
+@MetaType(MetaType.Type.TEXT)
+class MetaAlias(source: String?, questContainer: QuestContainer) : Meta<String?>(source, questContainer) {
 
-    val alias = source.toString()
+    val alias = source
+
+    companion object {
+
+        fun Template.alias() = meta<MetaAlias>("alias")?.alias
+    }
 }

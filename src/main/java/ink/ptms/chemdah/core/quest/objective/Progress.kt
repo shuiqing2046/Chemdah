@@ -7,16 +7,10 @@ package ink.ptms.chemdah.core.quest.objective
  * @author sky
  * @since 2021/3/3 4:51 下午
  */
-abstract class Progress(val current: Any, val target: Any) {
-
-    abstract val percent: Double
+open class Progress(val value: Any, val target: Any, val percent: Double) {
 
     companion object {
 
-        fun Any.to(target: Any, percent: Double) = let {
-            object : Progress(it, target) {
-                override val percent = percent
-            }
-        }
+        fun Any.progress(target: Any, percent: Double) = Progress(this, target, percent)
     }
 }

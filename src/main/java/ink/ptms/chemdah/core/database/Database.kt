@@ -20,5 +20,5 @@ interface Database {
     /**
      * 将玩家数据写入数据库
      */
-    fun update(player: Player, playerProfile: PlayerProfile)
+    fun update(player: Player, playerProfileProfile: PlayerProfile)
 }
