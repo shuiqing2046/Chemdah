@@ -4,7 +4,7 @@ import ink.ptms.chemdah.Chemdah
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.quest.addon.Addon
 import ink.ptms.chemdah.core.quest.objective.Objective
-import ink.ptms.chemdah.core.quest.option.Meta
+import ink.ptms.chemdah.core.quest.meta.Meta
 import ink.ptms.chemdah.util.SingleListener
 import ink.ptms.chemdah.util.mirrorFuture
 import io.izzel.taboolib.TabooLibLoader
@@ -129,19 +129,22 @@ object QuestHandler {
             Chemdah.plugin.saveResource("quest/example.yml", true)
         }
         ChemdahAPI.quest.clear()
-        loadTemplate(file)
+        ChemdahAPI.quest.putAll(loadTemplate(file).map { it.id to it })
         println("[Chemdah] ${ChemdahAPI.quest.size} template loaded.")
     }
 
-    fun loadTemplate(file: File) {
-        if (file.isDirectory) {
-            file.listFiles()?.forEach {
-                loadTemplate(it)
+    fun loadTemplate(file: File): List<Template> {
+        return when {
+            file.isDirectory -> {
+                file.listFiles()?.flatMap { loadTemplate(it) }?.toList() ?: emptyList()
             }
-        } else if (file.name.endsWith(".yml")) {
-            val conf = SecuredFile.loadConfiguration(file)
-            conf.getKeys(false).forEach { id ->
-                ChemdahAPI.quest[id] = Template(id, conf.getConfigurationSection(id)!!)
+            file.name.endsWith(".yml") -> {
+                SecuredFile.loadConfiguration(file).run {
+                    getKeys(false).map { Template(it, getConfigurationSection(it)!!) }
+                }
+            }
+            else -> {
+                emptyList()
             }
         }
     }

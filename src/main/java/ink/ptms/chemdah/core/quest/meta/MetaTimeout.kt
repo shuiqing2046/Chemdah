@@ -1,4 +1,4 @@
-package ink.ptms.chemdah.core.quest.option
+package ink.ptms.chemdah.core.quest.meta
 
 import ink.ptms.chemdah.core.quest.Id
 import ink.ptms.chemdah.core.quest.QuestContainer

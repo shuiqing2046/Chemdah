@@ -30,6 +30,7 @@ object ConversationLoader {
         ChemdahAPI.conversation.clear()
         ChemdahAPI.conversation.putAll(load(file).map { it.id to it })
         ChemdahAPI.conversationTheme.values.forEach { it.reloadConfig() }
+        println("[Chemdah] ${ChemdahAPI.conversation.size} conversation loaded.")
     }
 
     fun load(file: FileConfiguration): List<Conversation> {
@@ -46,20 +47,24 @@ object ConversationLoader {
     }
 
     fun load(file: File): List<Conversation> {
-        return if (file.isDirectory) {
-            file.listFiles()?.flatMap { load(it) }?.toList() ?: emptyList()
-        } else {
-            SecuredFile.loadConfiguration(file).run {
-                val option = if (isConfigurationSection("__option__")) {
-                    Option(getConfigurationSection("__option__")!!)
-                } else {
-                    Option.default
-                }
-                getKeys(false)
-                    .filter { it != "__option__" && isConfigurationSection(it) }
-                    .map {
+        return when {
+            file.isDirectory -> {
+                file.listFiles()?.flatMap { load(it) }?.toList() ?: emptyList()
+            }
+            file.name.endsWith(".yml") -> {
+                SecuredFile.loadConfiguration(file).run {
+                    val option = if (isConfigurationSection("__option__")) {
+                        Option(getConfigurationSection("__option__")!!)
+                    } else {
+                        Option.default
+                    }
+                    getKeys(false).filter { it != "__option__" && isConfigurationSection(it) }.map {
                         load(file, option, getConfigurationSection(it)!!)
                     }
+                }
+            }
+            else -> {
+                emptyList()
             }
         }
     }

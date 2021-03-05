@@ -21,4 +21,15 @@ interface Database {
      * 将玩家数据写入数据库
      */
     fun update(player: Player, playerProfileProfile: PlayerProfile)
+
+    companion object {
+
+        val INSTANCE: Database by lazy {
+            when (Type.INSTANCE) {
+                Type.SQL -> DatabaseSQL()
+                Type.LOCAL -> DatabaseLocal()
+                Type.MONGODB -> DatabaseMongoDB()
+            }
+        }
+    }
 }

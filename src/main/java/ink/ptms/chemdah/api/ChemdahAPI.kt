@@ -7,12 +7,13 @@ import ink.ptms.chemdah.core.conversation.ConversationLoader
 import ink.ptms.chemdah.core.conversation.ConversationManager
 import ink.ptms.chemdah.core.conversation.theme.Theme
 import ink.ptms.chemdah.core.quest.Idx
+import ink.ptms.chemdah.core.quest.QuestHandler
 import ink.ptms.chemdah.core.quest.Template
 import ink.ptms.chemdah.core.quest.addon.Addon
 import ink.ptms.chemdah.core.quest.meta.MetaLabel.Companion.label
 import ink.ptms.chemdah.core.quest.objective.Objective
-import ink.ptms.chemdah.core.quest.option.Meta
-import ink.ptms.chemdah.core.quest.option.MetaAlias.Companion.alias
+import ink.ptms.chemdah.core.quest.meta.Meta
+import ink.ptms.chemdah.core.quest.meta.MetaAlias.Companion.alias
 import ink.ptms.chemdah.util.Mirror
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
@@ -90,14 +91,16 @@ object ChemdahAPI {
     fun getPlayerProfile(player: Player) = playerProfile[player.name]!!
 
     /**
-     * 1。重载中心配置文件
-     * 2。重载对话配置文件
-     * 3。重载对话
-     * 4。重载对话展示模式
+     * 1 重载中心配置文件
+     * 2 重载对话配置文件
+     * 3 重载对话
+     * 4 重载对话展示模式
+     * 5 重载任务
      */
     fun reloadAll() {
         Chemdah.conf.reload()
         ConversationManager.conf.reload()
         ConversationLoader.load()
+        QuestHandler.loadTemplate()
     }
 }

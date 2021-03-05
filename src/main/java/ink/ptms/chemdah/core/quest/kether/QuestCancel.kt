@@ -1,4 +1,4 @@
-package ink.ptms.chemdah.core.quest.meta
+package ink.ptms.chemdah.core.quest.kether
 
 import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
@@ -8,7 +8,7 @@ import java.util.concurrent.CompletableFuture
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.quest.meta.QuestCancel
+ * ink.ptms.chemdah.core.quest.kether.QuestCancel
  *
  * @author sky
  * @since 2021/2/10 6:39 下午

@@ -1,0 +1,14 @@
+database:
+  use: SQL
+  source:
+    SQL:
+      host: localhost
+      port: 3306
+      user: root
+      password: root
+      database: test
+      table: chemdah
+    MongoDB:
+      host: localhost
+      database: test
+      collection: chemdah

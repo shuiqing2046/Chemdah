@@ -3,9 +3,9 @@ package ink.ptms.chemdah.core.quest
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.event.QuestEvents
 import ink.ptms.chemdah.core.PlayerProfile
-import ink.ptms.chemdah.core.quest.option.Meta
-import ink.ptms.chemdah.core.quest.option.MetaControl
-import ink.ptms.chemdah.core.quest.option.MetaControl.Companion.control
+import ink.ptms.chemdah.core.quest.meta.Meta
+import ink.ptms.chemdah.core.quest.meta.MetaControl
+import ink.ptms.chemdah.core.quest.meta.MetaControl.Companion.control
 import ink.ptms.chemdah.util.asList
 import ink.ptms.chemdah.util.mirrorFuture
 import org.bukkit.configuration.ConfigurationSection

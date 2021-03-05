@@ -4,9 +4,9 @@ import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.event.QuestEvents
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.AgentType.Companion.toAgentType
-import ink.ptms.chemdah.core.quest.option.Meta
-import ink.ptms.chemdah.core.quest.option.MetaReset.Companion.reset
-import ink.ptms.chemdah.core.quest.option.MetaType
+import ink.ptms.chemdah.core.quest.meta.Meta
+import ink.ptms.chemdah.core.quest.meta.MetaReset.Companion.reset
+import ink.ptms.chemdah.core.quest.meta.MetaType
 import ink.ptms.chemdah.util.asList
 import ink.ptms.chemdah.util.mirrorFuture
 import ink.ptms.chemdah.util.namespaceQuest

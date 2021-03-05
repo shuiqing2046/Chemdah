@@ -1,6 +1,6 @@
 template:
   task(0):
-    objective: always
+    objective: block break
     if:
       material: stone
       position: world 0 0 0 ~ 10 10 10
@@ -12,16 +12,13 @@ template:
     addon(guide):
       distance: 2
       position: world 0 0 0
-      content:
-        ...
+      content: ~
     addon(stats):
-      value: ...
-      target: ...
-      percent: ...
-    agent(continue):
-      ...
-  agent(accept):
-    ...
+      value: ~
+      target: ~
+      percent: ~
+    agent(continue): ~
+  agent(accept): ~
   meta:
     import: ~
     alias: alias

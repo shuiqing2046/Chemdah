@@ -4,8 +4,8 @@ import ink.ptms.chemdah.core.quest.Idx
 import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.core.quest.QuestDataOperator
 import ink.ptms.chemdah.core.quest.Task
+import ink.ptms.chemdah.core.quest.meta.MetaAlias.Companion.alias
 import ink.ptms.chemdah.core.quest.meta.MetaLabel.Companion.label
-import ink.ptms.chemdah.core.quest.option.MetaAlias.Companion.alias
 import ink.ptms.chemdah.util.asList
 import ink.ptms.chemdah.util.namespaceQuest
 import ink.ptms.chemdah.util.print

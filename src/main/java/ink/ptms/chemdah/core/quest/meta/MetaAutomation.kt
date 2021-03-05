@@ -1,4 +1,4 @@
-package ink.ptms.chemdah.core.quest.option
+package ink.ptms.chemdah.core.quest.meta
 
 import com.google.common.base.Enums
 import ink.ptms.chemdah.api.ChemdahAPI
