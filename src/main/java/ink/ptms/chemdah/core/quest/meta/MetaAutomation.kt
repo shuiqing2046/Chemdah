@@ -1,14 +1,18 @@
 package ink.ptms.chemdah.core.quest.meta
 
 import com.google.common.base.Enums
-import ink.ptms.chemdah.core.quest.Id
-import ink.ptms.chemdah.core.quest.QuestContainer
-import ink.ptms.chemdah.core.quest.Template
+import ink.ptms.chemdah.api.ChemdahAPI
+import ink.ptms.chemdah.core.quest.*
+import io.izzel.taboolib.module.inject.TSchedule
 import io.izzel.taboolib.util.Coerce
+import io.izzel.taboolib.util.lite.Numbers
 import io.izzel.taboolib.util.lite.cooldown.RealTime
 import io.izzel.taboolib.util.lite.cooldown.RealTimeUnit
+import org.bukkit.Bukkit
 import org.bukkit.configuration.ConfigurationSection
 import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.random.Random
 
 /**
  * Chemdah
@@ -50,7 +54,7 @@ class MetaAutomation(source: ConfigurationSection?, questContainer: QuestContain
             else -> null
         }
         if (type != null) {
-            Plan(type, source.getInt("count"), source.getString("group"))
+            Plan(type, source.getInt("count", 1), source.getString("group"))
         } else {
             null
         }
@@ -98,10 +102,62 @@ class MetaAutomation(source: ConfigurationSection?, questContainer: QuestContain
         }
     }
 
+    class Group(val groupId: String, val plan: Plan) {
+
+        val quests = ArrayList<Template>()
+    }
+
     companion object {
 
         fun Template.isAutoAccept() = meta<MetaAutomation>("automation")?.isAutoAccept ?: false
 
         fun Template.plan() = meta<MetaAutomation>("automation")?.plan
+
+        @TSchedule(period = 20, async = true)
+        fun automation() {
+            val groups = HashMap<String, Group>()
+            val autoAccept = ArrayList<Template>()
+            ChemdahAPI.quest.forEach { (_, quest) ->
+                if (quest.isAutoAccept()) {
+                    autoAccept.add(quest)
+                } else {
+                    val plan = quest.plan()
+                    if (plan != null) {
+                        val id = if (plan.group != null) "@${plan.group}" else quest.id
+                        val group = groups.computeIfAbsent(id) { Group(id, plan) }
+                        group.quests.add(quest)
+                    }
+                }
+            }
+            Bukkit.getOnlinePlayers().forEach { player ->
+                val profile = ChemdahAPI.getPlayerProfile(player)
+                // 自动接受的任务
+                autoAccept.forEach {
+                    if (profile.getQuests(it.id).isNotEmpty()) {
+                        it.acceptTo(profile)
+                    }
+                }
+                // 定时计划
+                groups.forEach { (id, group) ->
+                    val nextTime = profile.persistentDataContainer["automation.$id.next", 0L].toLong()
+                    if (nextTime < System.currentTimeMillis()) {
+                        profile.persistentDataContainer["automation.$id.next"] = group.plan.nextTime
+                        val pool = group.quests.toMutableList()
+                        var i = group.plan.count
+                        fun process() {
+                            if (i > 0 && pool.isNotEmpty()) {
+                                pool.removeAt(Random.nextInt(pool.size)).acceptTo(profile).thenAccept {
+                                    if (it == AcceptResult.SUCCESSFUL) {
+                                        i--
+                                    }
+                                    process()
+                                }
+                            }
+                        }
+                        process()
+                    }
+                }
+            }
+        }
     }
 }

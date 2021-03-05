@@ -4,11 +4,10 @@ import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.event.QuestEvents
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.meta.Meta
+import ink.ptms.chemdah.core.quest.meta.MetaControl
 import ink.ptms.chemdah.core.quest.meta.MetaControl.Companion.control
 import ink.ptms.chemdah.util.asList
-import ink.ptms.chemdah.util.mirrorDefine
-import ink.ptms.chemdah.util.mirrorFinish
-import io.netty.util.concurrent.CompleteFuture
+import ink.ptms.chemdah.util.mirrorFuture
 import org.bukkit.configuration.ConfigurationSection
 import java.util.concurrent.CompletableFuture
 
@@ -19,9 +18,9 @@ import java.util.concurrent.CompletableFuture
  * @author sky
  * @since 2021/3/1 11:43 下午
  */
-class Template(val id: String, config: ConfigurationSection) : QuestContainer(config) {
+class Template(id: String, config: ConfigurationSection) : QuestContainer(id, config) {
 
-    val task = HashMap<String, Task>()
+    val tasks = HashMap<String, Task>()
     val metaImport = config.get("meta.import")?.asList() ?: emptyList()
 
     init {
@@ -30,7 +29,7 @@ class Template(val id: String, config: ConfigurationSection) : QuestContainer(co
             .filter { it.startsWith("task(") && it.endsWith(")") }
             .forEach {
                 val taskId = it.substring("task(".length, it.length - 1)
-                task[taskId] = Task(taskId, config.getConfigurationSection(it)!!, this)
+                tasks[taskId] = Task(taskId, config.getConfigurationSection(it)!!, this)
             }
     }
 
@@ -53,33 +52,43 @@ class Template(val id: String, config: ConfigurationSection) : QuestContainer(co
      * 使玩家接受任务
      */
     fun acceptTo(profile: PlayerProfile): CompletableFuture<AcceptResult> {
-        mirrorDefine("Template:acceptTo")
-        val future = CompletableFuture<AcceptResult>()
-        if (profile.questValid.containsKey(id)) {
-            future.complete(AcceptResult.ALREADY_EXISTS)
-            mirrorFinish("Template:acceptTo")
-            return future
-        }
-        if (QuestEvents.Accept(this, profile).call().isCancelled) {
-            future.complete(AcceptResult.CANCELLED_BY_EVENT)
-            mirrorFinish("Template:acceptTo")
-            return future
-        }
-        val control = control()
-        if (control.check(profile)) {
-            agent(profile, AgentType.QUEST_ACCEPT).thenAccept {
-                if (it) {
-                    control.signature(profile)
-                    profile.quest[id] = Quest(id, profile)
-                    future.complete(AcceptResult.SUCCESSFUL)
-                } else {
-                    future.complete(AcceptResult.CANCELLED_BY_AGENT)
-                }
+        return accept(profile).thenApply {
+            if (it != AcceptResult.SUCCESSFUL) {
+                agent(profile, AgentType.QUEST_ACCEPT_CANCELLED)
             }
-        } else {
-            future.complete(AcceptResult.CANCELLED_BY_CONTROL)
+            it
         }
-        mirrorFinish("Template:acceptTo")
+    }
+
+    private fun accept(profile: PlayerProfile): CompletableFuture<AcceptResult> {
+        val future = CompletableFuture<AcceptResult>()
+        mirrorFuture("Template:accept") {
+            if (profile.getQuests(id).isNotEmpty()) {
+                future.complete(AcceptResult.ALREADY_EXISTS)
+                finish()
+            }
+            if (QuestEvents.Accept(this@Template, profile).call().isCancelled) {
+                future.complete(AcceptResult.CANCELLED_BY_EVENT)
+                finish()
+            }
+            val control = control()
+            if (control.check(profile)) {
+                agent(profile, AgentType.QUEST_ACCEPT).thenAccept {
+                    if (it) {
+                        control.signature(profile, MetaControl.ControlRepeat.Type.ACCEPT)
+                        profile.registerQuest(Quest(id, profile))
+                        future.complete(AcceptResult.SUCCESSFUL)
+                        QuestEvents.Accepted(this@Template, profile).call()
+                    } else {
+                        future.complete(AcceptResult.CANCELLED_BY_AGENT)
+                    }
+                    finish()
+                }
+            } else {
+                future.complete(AcceptResult.CANCELLED_BY_CONTROL)
+                finish()
+            }
+        }
         return future
     }
 }

@@ -23,6 +23,7 @@ abstract class ObjectiveCountable<E : Event> : Objective<E>() {
     }
 
     override fun onContinue(profile: PlayerProfile, task: Task, event: Event) {
+        super.onContinue(profile, task, event)
         profile.dataOperator(task) {
             put("amount", get("amount", 0).toInt() + 1)
         }

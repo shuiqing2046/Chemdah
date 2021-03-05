@@ -1,6 +1,6 @@
 template:
   task(0):
-    objective: block break
+    objective: always
     if:
       material: stone
       position: world 0 0 0 ~ 10 10 10
@@ -8,7 +8,8 @@ template:
     when:
       amount: 10
     meta:
-      timeout: 1h
+      timeout: 1d
+      timeout: 2020/03/05 03:20
     apply(guide):
       distance: 2
       position: world 0 0 0
@@ -18,9 +19,9 @@ template:
       value: ...
       target: ...
       percent: ...
-    agent(task continue):
+    agent(continue):
       ...
-  agent(quest accept):
+  agent(accept):
     ...
   meta:
     import: ~

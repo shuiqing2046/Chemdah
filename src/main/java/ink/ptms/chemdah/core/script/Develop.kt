@@ -2,7 +2,6 @@ package ink.ptms.chemdah.core.script
 
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.PlayerProfile
-import ink.ptms.chemdah.core.conversation.AgentType
 import ink.ptms.chemdah.core.conversation.Session
 import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.core.quest.QuestContainer

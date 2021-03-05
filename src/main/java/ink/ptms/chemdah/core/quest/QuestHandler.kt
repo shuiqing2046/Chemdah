@@ -4,17 +4,16 @@ import ink.ptms.chemdah.Chemdah
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.quest.addon.Addon
 import ink.ptms.chemdah.core.quest.meta.Meta
-import ink.ptms.chemdah.core.quest.meta.MetaAlias.Companion.alias
-import ink.ptms.chemdah.core.quest.meta.MetaLabel.Companion.label
 import ink.ptms.chemdah.core.quest.objective.Objective
 import ink.ptms.chemdah.util.SingleListener
-import ink.ptms.chemdah.util.mirror
-import ink.ptms.chemdah.util.mirrorDefine
+import ink.ptms.chemdah.util.mirrorFuture
 import io.izzel.taboolib.TabooLibLoader
 import io.izzel.taboolib.compat.kotlin.CompatKotlin
 import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.module.db.local.SecuredFile
 import io.izzel.taboolib.module.inject.TFunction
+import io.izzel.taboolib.module.inject.TSchedule
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import java.io.File
@@ -28,6 +27,31 @@ import java.io.File
  */
 object QuestHandler {
 
+    @TSchedule(period = 20, async = true)
+    private fun tick() {
+        mirrorFuture("QuestHandler:tick") {
+            Bukkit.getOnlinePlayers().forEach {
+                ChemdahAPI.getPlayerProfile(it).also { profile ->
+                    // 检测所有有效任务
+                    profile.quests.forEach { quest ->
+                        // 检测超时
+                        if (quest.isTimeout) {
+                            quest.failureQuest()
+                        } else {
+                            // 检查条目自动完成
+                            quest.tasks.forEach { task ->
+                                task.objective.checkComplete(profile, task)
+                            }
+                            // 检查任务自动完成
+                            quest.checkComplete()
+                        }
+                    }
+                }
+            }
+            finish()
+        }
+    }
+
     @Suppress("UNCHECKED_CAST")
     @TFunction.Init
     private fun register() {
@@ -36,14 +60,19 @@ object QuestHandler {
                 val objective = CompatKotlin.getInstance(it) as? Objective<Event>
                 if (objective != null) {
                     ChemdahAPI.questObjective[objective.name] = objective
-                    SingleListener.listen(objective.event.java, objective.priority, objective.ignoreCancelled) { e ->
-                        objective.handler(e)?.run {
-                            if (objective.isAsync) {
-                                Tasks.task(true) {
+                    // 是否注册监听器
+                    if (objective.isListener) {
+                        // 对该条目注册独立监听器
+                        SingleListener.listen(objective.event.java, objective.priority, objective.ignoreCancelled) { e ->
+                            // 获取该监听器中的玩家对象
+                            objective.handler(e)?.run {
+                                if (objective.isAsync) {
+                                    Tasks.task(true) {
+                                        handleEvent(this, e, objective)
+                                    }
+                                } else {
                                     handleEvent(this, e, objective)
                                 }
-                            } else {
-                                handleEvent(this, e, objective)
                             }
                         }
                     }
@@ -63,8 +92,16 @@ object QuestHandler {
         loadTemplate()
     }
 
+    /**
+     * 处理事件所对应的条目类型
+     * 会进行完成检测
+     *
+     * @param player 玩家
+     * @param event 事件
+     * @param objective 条目类型
+     */
     fun handleEvent(player: Player, event: Event, objective: Objective<Event>) {
-        mirror("QuestHandler:handleEvent:${objective.name}") {
+        mirrorFuture("QuestHandler:handleEvent:${objective.name}") {
             ChemdahAPI.getPlayerProfile(player).also { profile ->
                 // 通过事件获取所有正在进行的任务条目
                 profile.getTasks(event).forEach { task ->
@@ -77,10 +114,12 @@ object QuestHandler {
                         if (cond) {
                             objective.onContinue(profile, task, event)
                             objective.checkComplete(profile, task)
+                            task.getQuest(profile)?.checkComplete()
                         }
                     }
                 }
             }
+            finish()
         }
     }
 

@@ -9,6 +9,4 @@ import ink.ptms.chemdah.core.quest.QuestContainer
  * @author sky
  * @since 2021/3/1 11:43 下午
  */
-abstract class Meta<T>(val source: T, val questContainer: QuestContainer) {
-
-}
+abstract class Meta<T>(val source: T, val questContainer: QuestContainer)

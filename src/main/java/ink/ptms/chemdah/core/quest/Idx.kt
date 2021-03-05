@@ -9,5 +9,5 @@ package ink.ptms.chemdah.core.quest
  */
 enum class Idx {
     
-    ID, LABEL
+    ID, ID_ALIAS, LABEL
 }

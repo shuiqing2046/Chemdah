@@ -1,6 +1,5 @@
 package ink.ptms.chemdah.core.quest
 
-import ink.ptms.chemdah.core.DataContainer
 import ink.ptms.chemdah.core.DataContainer.Companion.data
 import ink.ptms.chemdah.core.PlayerProfile
 
@@ -13,8 +12,7 @@ import ink.ptms.chemdah.core.PlayerProfile
  */
 class QuestDataOperator(val profile: PlayerProfile, val task: Task) {
 
-    val container: DataContainer?
-        get() = profile.quest[task.template.id]?.persistentDataContainer
+    val container = profile.quests.firstOrNull { it.id == task.template.id }?.persistentDataContainer
 
     fun containsKey(node: String) = container?.containsKey("${task.metaNode}.$node")
 

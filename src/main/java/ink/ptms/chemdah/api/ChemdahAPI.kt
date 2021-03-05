@@ -13,7 +13,7 @@ import ink.ptms.chemdah.core.quest.meta.Meta
 import ink.ptms.chemdah.core.quest.meta.MetaAlias.Companion.alias
 import ink.ptms.chemdah.core.quest.meta.MetaLabel.Companion.label
 import ink.ptms.chemdah.core.quest.objective.Objective
-import io.izzel.taboolib.kotlin.Mirror
+import ink.ptms.chemdah.util.Mirror
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import java.util.concurrent.ConcurrentHashMap
@@ -58,6 +58,9 @@ object ChemdahAPI {
     fun getQuestTemplate(value: String, idx: Idx = Idx.ID): List<Template> {
         return when (idx) {
             Idx.ID -> {
+                quest.filterValues { it.id == value }.values.toList()
+            }
+            Idx.ID_ALIAS -> {
                 quest.filterValues { it.id == value || it.alias() == value }.values.toList()
             }
             Idx.LABEL -> {

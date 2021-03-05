@@ -30,11 +30,28 @@ class PlayerProfile(val uniqueId: UUID) {
     val player: Player
         get() = Bukkit.getPlayer(uniqueId)!!
 
-    val quest = ConcurrentHashMap<String, Quest>()
-    val questValid: Map<String, Quest>
-        get() = quest.filterValues { it.isValid }
+    val quests: Collection<Quest>
+        get() = questMap.filterValues { it.isValid }.values
 
     val persistentDataContainer = DataContainer()
+
+    private val questMap = ConcurrentHashMap<String, Quest>()
+
+    /**
+     * 强制注册新的任务
+     * 会覆盖原有的相同任务且不会进行任何条件判断和触发事件
+     */
+    fun registerQuest(quest: Quest) {
+        questMap[quest.id] = quest
+    }
+
+    /**
+     * 强制注销任务
+     * 不会进行任何条件判断和触发事件
+     */
+    fun unregisterQuest(quest: Quest) {
+        questMap.remove(quest.id)
+    }
 
     /**
      * 获取条目数据控制器
@@ -47,11 +64,7 @@ class PlayerProfile(val uniqueId: UUID) {
      * 通过事件获取所有正在进行中的有效条目（有效任务）
      */
     fun getTasks(event: Event): List<Task> {
-        return quest.filterValues { it.isValid }.flatMap { (_, v) ->
-            v.template.task.values.filter {
-                it.objective.event.isInstance(event)
-            }
-        }
+        return quests.flatMap { quest -> quest.tasks.filter { it.objective.event.isInstance(event) } }
     }
 
     /**
@@ -60,10 +73,13 @@ class PlayerProfile(val uniqueId: UUID) {
     fun getQuests(value: String, idx: Idx = Idx.ID): List<Quest> {
         return when (idx) {
             Idx.ID -> {
-                quest.filterValues { it.isValid && (it.template.id == value || it.template.alias() == value) }.values.toList()
+                quests.filter { it.id == value }
+            }
+            Idx.ID_ALIAS -> {
+                quests.filter { it.id == value || it.template.alias() == value }
             }
             Idx.LABEL -> {
-                quest.filterValues { it.isValid && value in it.template.label() }.values.toList()
+                quests.filter { value in it.template.label() }
             }
         }
     }

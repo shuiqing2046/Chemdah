@@ -81,11 +81,11 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
         override fun check(profile: PlayerProfile, template: Template): Boolean {
             if (alias > 0) {
                 val a = template.alias()
-                if (a != null && profile.questValid.count { it.value.template.alias() == a } > alias) {
+                if (a != null && profile.quests.count { it.template.alias() == a } > alias) {
                     return false
                 }
             }
-            if (label.any { label -> profile.questValid.count { label.key in it.value.template.label() } > label.value }) {
+            if (label.any { label -> profile.quests.count { label.key in it.template.label() } > label.value }) {
                 return false
             }
             return true
@@ -138,8 +138,8 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
             return control == null || control.all { it.check(profile, template) }
         }
 
-        fun signature(profile: PlayerProfile) {
-            control?.forEach { it.signature(profile, template) }
+        fun signature(profile: PlayerProfile, type: ControlRepeat.Type = ControlRepeat.Type.COMPLETE) {
+            control?.filter { it !is ControlRepeat || it.type == type }?.forEach { it.signature(profile, template) }
         }
     }
 

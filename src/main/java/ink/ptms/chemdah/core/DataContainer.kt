@@ -22,6 +22,8 @@ class DataContainer {
 
     operator fun get(key: String, def: Any) = map[key] ?: def.data()
 
+    operator fun set(key: String, value: Any) = map.put(key, value.data())
+
     fun put(key: String, value: Any) = map.put(key, value.data())
 
     fun remove(key: String) = map.remove(key)

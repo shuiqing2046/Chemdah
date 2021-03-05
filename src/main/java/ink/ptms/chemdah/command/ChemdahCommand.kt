@@ -16,7 +16,7 @@ import org.bukkit.command.CommandSender
 @BaseCommand(name = "chemdah", aliases = ["ch"], permission = "chemdah.command")
 class ChemdahCommand : BaseMainCommand() {
 
-    @SubCommand(description = "重载配置文件")
+    @SubCommand(description = "重载配置文件", priority = 1.0)
     fun reload(sender: CommandSender, args: Array<String>) {
         ChemdahAPI.reloadAll()
         sender.sendMessage("§c[Chemdah] §7Successful.")
