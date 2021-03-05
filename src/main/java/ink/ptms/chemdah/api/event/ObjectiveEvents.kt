@@ -2,7 +2,6 @@ package ink.ptms.chemdah.api.event
 
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Task
-import ink.ptms.chemdah.core.quest.Template
 import ink.ptms.chemdah.core.quest.objective.Objective
 import io.izzel.taboolib.module.event.EventNormal
 import org.bukkit.Bukkit

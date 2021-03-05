@@ -4,8 +4,8 @@ import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Id
 import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.objective.Progress
-import ink.ptms.chemdah.core.script.namespaceQuest
 import ink.ptms.chemdah.util.asList
+import ink.ptms.chemdah.util.namespaceQuest
 import io.izzel.taboolib.kotlin.kether.KetherShell
 import io.izzel.taboolib.util.Coerce
 import org.bukkit.configuration.ConfigurationSection

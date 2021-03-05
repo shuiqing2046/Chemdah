@@ -4,11 +4,11 @@ import ink.ptms.chemdah.core.quest.Idx
 import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.core.quest.QuestDataOperator
 import ink.ptms.chemdah.core.quest.Task
-import ink.ptms.chemdah.core.quest.meta.MetaAlias.Companion.alias
 import ink.ptms.chemdah.core.quest.meta.MetaLabel.Companion.label
-import ink.ptms.chemdah.core.script.namespaceQuest
-import ink.ptms.chemdah.core.script.print
+import ink.ptms.chemdah.core.quest.option.MetaAlias.Companion.alias
 import ink.ptms.chemdah.util.asList
+import ink.ptms.chemdah.util.namespaceQuest
+import ink.ptms.chemdah.util.print
 import io.izzel.taboolib.kotlin.kether.KetherShell
 import io.izzel.taboolib.util.Coerce
 import org.bukkit.Bukkit

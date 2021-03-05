@@ -1,6 +1,6 @@
 package ink.ptms.chemdah.core.conversation.theme
 
-import ink.ptms.chemdah.core.script.colored
+import ink.ptms.chemdah.util.colored
 import org.bukkit.configuration.ConfigurationSection
 
 /**

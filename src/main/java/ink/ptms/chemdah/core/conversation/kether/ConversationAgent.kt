@@ -1,5 +1,7 @@
-package ink.ptms.chemdah.core.script
+package ink.ptms.chemdah.core.conversation.kether
 
+import ink.ptms.chemdah.util.getSession
+import ink.ptms.chemdah.util.vars
 import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import io.izzel.taboolib.kotlin.kether.common.api.QuestAction
@@ -8,7 +10,7 @@ import java.util.concurrent.CompletableFuture
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.script.ConversationAgent
+ * ink.ptms.chemdah.core.conversation.kether.ConversationAgent
  *
  * @author sky
  * @since 2021/2/10 6:39 下午

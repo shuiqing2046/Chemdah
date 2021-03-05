@@ -1,5 +1,6 @@
-package ink.ptms.chemdah.core.script
+package ink.ptms.chemdah.core.conversation.kether
 
+import ink.ptms.chemdah.util.*
 import io.izzel.taboolib.kotlin.kether.KetherFunction
 import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
@@ -9,7 +10,7 @@ import java.util.concurrent.CompletableFuture
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.script.ConversationTalkPlayer
+ * ink.ptms.chemdah.core.conversation.kether.ConversationTalkPlayer
  *
  * @author sky
  * @since 2021/2/10 6:39 下午

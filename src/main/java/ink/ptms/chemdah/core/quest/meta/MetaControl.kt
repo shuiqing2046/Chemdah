@@ -1,4 +1,4 @@
-package ink.ptms.chemdah.core.quest.meta
+package ink.ptms.chemdah.core.quest.option
 
 import com.google.common.base.Enums
 import ink.ptms.chemdah.core.PlayerProfile

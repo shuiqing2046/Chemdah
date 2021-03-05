@@ -1,4 +1,4 @@
-package ink.ptms.chemdah.core.script
+package ink.ptms.chemdah.util
 
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.PlayerProfile
@@ -7,7 +7,6 @@ import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.core.quest.QuestContainer
 import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.Template
-import ink.ptms.chemdah.util.warning
 import io.izzel.taboolib.kotlin.kether.ScriptContext
 import io.izzel.taboolib.kotlin.kether.common.api.QuestContext
 import io.izzel.taboolib.kotlin.kether.common.util.LocalizedException

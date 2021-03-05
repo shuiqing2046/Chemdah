@@ -37,9 +37,9 @@ class Task(id: String, config: ConfigurationSection, val template: Template) : Q
             goal.put(k, v.data())
         }
         config.getKeys(false)
-            .filter { it.startsWith("apply(") && it.endsWith(")") }
+            .filter { it.startsWith("addon(") && it.endsWith(")") }
             .forEach {
-                val addonId = it.substring("apply(".length, it.length - 1)
+                val addonId = it.substring("addon(".length, it.length - 1)
                 val addon = ChemdahAPI.getQuestAddon(addonId)
                 if (addon != null) {
                     this.addons[addonId] = Reflection.instantiateObject(addon, config.getConfigurationSection(it)!!, this) as Addon

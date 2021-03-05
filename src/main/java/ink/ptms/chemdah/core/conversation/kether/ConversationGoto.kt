@@ -1,7 +1,9 @@
-package ink.ptms.chemdah.core.script
+package ink.ptms.chemdah.core.conversation.kether
 
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.conversation.Session
+import ink.ptms.chemdah.util.getSession
+import ink.ptms.chemdah.util.vars
 import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import io.izzel.taboolib.kotlin.kether.common.api.QuestAction
@@ -10,7 +12,7 @@ import java.util.concurrent.CompletableFuture
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.script.ConversationGoto
+ * ink.ptms.chemdah.core.conversation.kether.ConversationGoto
  *
  * @author sky
  * @since 2021/2/10 6:39 下午

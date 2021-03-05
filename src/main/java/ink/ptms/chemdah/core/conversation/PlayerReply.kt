@@ -1,8 +1,8 @@
 package ink.ptms.chemdah.core.conversation
 
-import ink.ptms.chemdah.core.script.extend
-import ink.ptms.chemdah.core.script.namespaceConversationPlayer
-import ink.ptms.chemdah.core.script.print
+import ink.ptms.chemdah.util.extend
+import ink.ptms.chemdah.util.namespaceConversationPlayer
+import ink.ptms.chemdah.util.print
 import io.izzel.taboolib.kotlin.kether.KetherFunction
 import io.izzel.taboolib.kotlin.kether.KetherShell
 import io.izzel.taboolib.util.Coerce

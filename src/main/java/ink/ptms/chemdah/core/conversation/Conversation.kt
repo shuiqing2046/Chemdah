@@ -2,10 +2,10 @@ package ink.ptms.chemdah.core.conversation
 
 import ink.ptms.chemdah.api.event.ConversationEvents
 import ink.ptms.chemdah.core.conversation.ConversationManager.sessions
-import ink.ptms.chemdah.core.script.extend
-import ink.ptms.chemdah.core.script.namespaceConversationNPC
-import ink.ptms.chemdah.core.script.print
+import ink.ptms.chemdah.util.extend
 import ink.ptms.chemdah.util.mirrorFuture
+import ink.ptms.chemdah.util.namespaceConversationNPC
+import ink.ptms.chemdah.util.print
 import io.izzel.taboolib.kotlin.kether.KetherFunction
 import io.izzel.taboolib.kotlin.kether.KetherShell
 import io.izzel.taboolib.util.Coerce

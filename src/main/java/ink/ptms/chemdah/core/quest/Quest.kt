@@ -4,9 +4,9 @@ import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.event.QuestEvents
 import ink.ptms.chemdah.core.DataContainer
 import ink.ptms.chemdah.core.PlayerProfile
-import ink.ptms.chemdah.core.quest.meta.MetaControl
 import ink.ptms.chemdah.core.quest.meta.MetaControl.Companion.control
 import ink.ptms.chemdah.core.quest.meta.MetaTimeout.Companion.isTimeout
+import ink.ptms.chemdah.core.quest.option.MetaControl
 import ink.ptms.chemdah.util.mirrorFuture
 
 /**

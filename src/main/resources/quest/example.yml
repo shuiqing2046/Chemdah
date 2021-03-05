@@ -9,13 +9,12 @@ template:
       amount: 10
     meta:
       timeout: 1d
-      timeout: 2020/03/05 03:20
-    apply(guide):
+    addon(guide):
       distance: 2
       position: world 0 0 0
       content:
         ...
-    apply(stats):
+    addon(stats):
       value: ...
       target: ...
       percent: ...
