@@ -3,8 +3,8 @@ package ink.ptms.chemdah.core.quest
 import ink.ptms.chemdah.Chemdah
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.quest.addon.Addon
-import ink.ptms.chemdah.core.quest.objective.Objective
 import ink.ptms.chemdah.core.quest.meta.Meta
+import ink.ptms.chemdah.core.quest.objective.Objective
 import ink.ptms.chemdah.util.SingleListener
 import ink.ptms.chemdah.util.mirrorFuture
 import io.izzel.taboolib.TabooLibLoader

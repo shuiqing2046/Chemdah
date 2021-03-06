@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.database
 
 import ink.ptms.chemdah.core.PlayerProfile
-import ink.ptms.chemdah.core.quest.Id
+import ink.ptms.chemdah.core.quest.Quest
 import org.bukkit.entity.Player
 
 /**
@@ -17,7 +17,11 @@ class DatabaseMongoDB : Database {
         TODO("Not yet implemented")
     }
 
-    override fun update(player: Player, playerProfileProfile: PlayerProfile) {
+    override fun update(player: Player, playerProfile: PlayerProfile) {
+        TODO("Not yet implemented")
+    }
+
+    override fun releaseQuest(player: Player, playerProfile: PlayerProfile, quest: Quest) {
         TODO("Not yet implemented")
     }
 }

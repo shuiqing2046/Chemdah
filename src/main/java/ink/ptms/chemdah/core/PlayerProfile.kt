@@ -1,11 +1,13 @@
 package ink.ptms.chemdah.core
 
+import ink.ptms.adyeshach.common.util.Tasks
 import ink.ptms.chemdah.core.quest.Idx
 import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.core.quest.QuestDataOperator
 import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.meta.MetaAlias.Companion.alias
 import ink.ptms.chemdah.core.quest.meta.MetaLabel.Companion.label
+import ink.ptms.chemdah.database.Database
 import ink.ptms.chemdah.util.asList
 import ink.ptms.chemdah.util.namespaceQuest
 import ink.ptms.chemdah.util.print
@@ -30,12 +32,22 @@ class PlayerProfile(val uniqueId: UUID) {
     val player: Player
         get() = Bukkit.getPlayer(uniqueId)!!
 
+    val playerOnline: Boolean
+        get() = Bukkit.getPlayer(uniqueId) != null
+
     val quests: Collection<Quest>
         get() = questMap.filterValues { it.isValid }.values
 
     val persistentDataContainer = DataContainer()
 
     private val questMap = ConcurrentHashMap<String, Quest>()
+
+    /**
+     * 数据是否发生变动
+     */
+    fun isChanged(): Boolean {
+        return persistentDataContainer.changed || quests.any { it.persistentDataContainer.changed }
+    }
 
     /**
      * 强制注册新的任务
@@ -48,9 +60,15 @@ class PlayerProfile(val uniqueId: UUID) {
     /**
      * 强制注销任务
      * 不会进行任何条件判断和触发事件
+     * @param release 是否从数据库释放数据
      */
-    fun unregisterQuest(quest: Quest) {
+    fun unregisterQuest(quest: Quest, release: Boolean = false) {
         questMap.remove(quest.id)
+        if (release) {
+            Tasks.task(true) {
+                Database.INSTANCE.releaseQuest(player, this, quest)
+            }
+        }
     }
 
     /**

@@ -10,10 +10,10 @@ import ink.ptms.chemdah.core.quest.Idx
 import ink.ptms.chemdah.core.quest.QuestHandler
 import ink.ptms.chemdah.core.quest.Template
 import ink.ptms.chemdah.core.quest.addon.Addon
-import ink.ptms.chemdah.core.quest.meta.MetaLabel.Companion.label
-import ink.ptms.chemdah.core.quest.objective.Objective
 import ink.ptms.chemdah.core.quest.meta.Meta
 import ink.ptms.chemdah.core.quest.meta.MetaAlias.Companion.alias
+import ink.ptms.chemdah.core.quest.meta.MetaLabel.Companion.label
+import ink.ptms.chemdah.core.quest.objective.Objective
 import ink.ptms.chemdah.util.Mirror
 import org.bukkit.entity.Player
 import org.bukkit.event.Event

@@ -11,7 +11,7 @@ sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
 taboolib {
-    tabooLibVersion = '5.57'
+    tabooLibVersion = '5.58'
     loaderVersion = '2.12'
     classifier = null
     builtin = true
@@ -25,7 +25,7 @@ dependencies {
     implementation 'public:Citizens:1.0.0'
     implementation 'public:MythicMobs:1.0.1'
     implementation 'ink.ptms.adyeshach:Adyeshach:1.1.9'
-    implementation 'ink.ptms.core:v11600:11600:all'
+    implementation 'ink.ptms.core:v11604:11604:all'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib'
     implementation fileTree(dir: 'libs', includes: ['*.jar'])
 }

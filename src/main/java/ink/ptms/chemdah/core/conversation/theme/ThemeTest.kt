@@ -3,9 +3,9 @@ package ink.ptms.chemdah.core.conversation.theme
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.conversation.ConversationManager
 import ink.ptms.chemdah.core.conversation.Session
-import ink.ptms.chemdah.util.printed
 import io.izzel.taboolib.cronus.CronusUtils
 import io.izzel.taboolib.kotlin.Tasks
+import io.izzel.taboolib.kotlin.toPrinted
 import io.izzel.taboolib.module.inject.TListener
 import io.izzel.taboolib.module.locale.TLocale
 import io.izzel.taboolib.module.tellraw.TellrawJson
@@ -133,7 +133,7 @@ object ThemeTest : Theme, Listener {
         var d = 0L
         var cancel = false
         session.npcTalking = true
-        messages.map { it.printed("_") }.forEachIndexed { messageLine, messageText ->
+        messages.map { it.toPrinted("_") }.forEachIndexed { messageLine, messageText ->
             messageText.forEachIndexed { printLine, printText ->
                 Tasks.delay(d++) {
                     if (session.isValid) {
