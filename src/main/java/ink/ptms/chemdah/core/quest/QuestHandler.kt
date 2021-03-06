@@ -5,10 +5,10 @@ import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.quest.addon.Addon
 import ink.ptms.chemdah.core.quest.meta.Meta
 import ink.ptms.chemdah.core.quest.objective.Objective
-import ink.ptms.chemdah.util.SingleListener
 import ink.ptms.chemdah.util.mirrorFuture
 import io.izzel.taboolib.TabooLibLoader
 import io.izzel.taboolib.compat.kotlin.CompatKotlin
+import io.izzel.taboolib.kotlin.SingleListener
 import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.module.db.local.SecuredFile
 import io.izzel.taboolib.module.inject.TFunction

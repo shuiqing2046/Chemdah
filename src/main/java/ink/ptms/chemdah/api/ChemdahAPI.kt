@@ -14,7 +14,7 @@ import ink.ptms.chemdah.core.quest.meta.Meta
 import ink.ptms.chemdah.core.quest.meta.MetaAlias.Companion.alias
 import ink.ptms.chemdah.core.quest.meta.MetaLabel.Companion.label
 import ink.ptms.chemdah.core.quest.objective.Objective
-import ink.ptms.chemdah.util.Mirror
+import io.izzel.taboolib.kotlin.Mirror
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import java.util.concurrent.ConcurrentHashMap
