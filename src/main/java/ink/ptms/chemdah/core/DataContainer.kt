@@ -21,7 +21,7 @@ class DataContainer {
     private var locked = false
 
     var changed = false
-        private set(value) {
+        set(value) {
             if (!locked) {
                 field = value
             }

@@ -142,12 +142,10 @@ class DatabaseSQL : Database {
                                         userId.complete(stmt.generatedKeys.getLong("id"))
                                     }
                                 }.run()
-                            future.complete(null)
-                        }
+                        }.complete(null)
                     }
                 }.run()
-            future.complete(null)
-        }
+        }.complete(null)
         return userId
     }
 
@@ -160,8 +158,7 @@ class DatabaseSQL : Database {
                         tableQuest.insert(null, quest.id, stmt.generatedKeys.getLong("id"), userId, true).run(dataSource)
                     }
                 }
-            future.complete(null)
-        }
+        }.complete(null)
     }
 
     override fun select(player: Player): PlayerProfile {

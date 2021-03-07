@@ -54,7 +54,9 @@ class PlayerProfile(val uniqueId: UUID) {
      * 会覆盖原有的相同任务且不会进行任何条件判断和触发事件
      */
     fun registerQuest(quest: Quest) {
-        questMap[quest.id] = quest
+        questMap[quest.id] = quest.also {
+            it.persistentDataContainer.changed = true
+        }
     }
 
     /**
