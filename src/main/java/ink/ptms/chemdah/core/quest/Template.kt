@@ -24,13 +24,9 @@ class Template(id: String, config: ConfigurationSection) : QuestContainer(id, co
     val metaImport = config.get("meta.import")?.asList() ?: emptyList()
 
     init {
-        // 加载条目
-        config.getKeys(false)
-            .filter { it.startsWith("task(") && it.endsWith(")") }
-            .forEach {
-                val taskId = it.substring("task(".length, it.length - 1)
-                tasks[taskId] = Task(taskId, config.getConfigurationSection(it)!!, this)
-            }
+        config.getConfigurationSection("task")?.getKeys(false)?.forEach {
+            tasks[it] = Task(it, config.getConfigurationSection(it)!!, this)
+        }
     }
 
     /**

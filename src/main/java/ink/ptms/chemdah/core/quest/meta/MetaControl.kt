@@ -20,6 +20,7 @@ import java.util.concurrent.CompletableFuture
  * @author sky
  * @since 2021/3/1 11:47 下午
  */
+@Suppress("UNCHECKED_CAST")
 @Id("control")
 @MetaType(MetaType.Type.MAP_LIST)
 class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer) : Meta<List<Map<String, Any>>>(source, questContainer) {
@@ -37,17 +38,11 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
                         ControlCooldown(map["time"]?.toString()?.toTime() ?: return@forEach, map["group"]?.toString())
                     }
                     type == "coexist" -> {
-                        ControlCoexist(Coerce.toInteger(map["alias"]), map
-                            .filterKeys {
-                                it.startsWith("label(") && it.endsWith(")")
-                            }.map {
-                                it.key.substring("label(".length, it.key.length - 1) to Coerce.toInteger(it.value)
-                            }.toMap()
-                        )
+                        ControlCoexist(map["alias"].asInt(), map["label"].asMap().map { it.key to it.value.asInt() }.toMap())
                     }
                     type.startsWith("repeat") -> {
                         val trigger = ControlRepeat.Type.fromName(type.substring("repeat".length).trim())
-                        ControlRepeat(trigger, Coerce.toInteger(map["amount"]), map["period"]?.toString()?.toTime(), map["group"]?.toString())
+                        ControlRepeat(trigger, map["amount"].asInt(), map["period"]?.toString()?.toTime(), map["group"]?.toString())
                     }
                     else -> {
                         warning("Unrecognized control format: $map")

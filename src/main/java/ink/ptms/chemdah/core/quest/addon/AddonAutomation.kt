@@ -1,4 +1,4 @@
-package ink.ptms.chemdah.core.quest.meta
+package ink.ptms.chemdah.core.quest.addon
 
 import com.google.common.base.Enums
 import ink.ptms.chemdah.api.ChemdahAPI
@@ -19,18 +19,17 @@ import kotlin.random.Random
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.quest.meta.MetaAutomation
+ * ink.ptms.chemdah.core.quest.addon.MetaAutomation
  *
  * @author sky
  * @since 2021/3/1 11:47 下午
  */
 @Id("automation")
-@MetaType(MetaType.Type.SECTION)
-class MetaAutomation(source: ConfigurationSection?, questContainer: QuestContainer) : Meta<ConfigurationSection?>(source, questContainer) {
+class AddonAutomation(source: ConfigurationSection, questContainer: QuestContainer) : Addon(source, questContainer) {
 
-    val isAutoAccept = source?.getBoolean("auto-accept")
+    val isAutoAccept = source.getBoolean("auto-accept")
 
-    val plan = if (source != null && source.contains("plan")) {
+    val plan = if (source.contains("plan")) {
         val method = Enums.getIfPresent(RealTime::class.java, source.getString("method").toString().toUpperCase()).or(RealTime.START_IN_MONDAY)
         val args = source.getString("type").toString().toLowerCase().split(" ")
         val type = when (args[0]) {
@@ -112,9 +111,9 @@ class MetaAutomation(source: ConfigurationSection?, questContainer: QuestContain
 
     companion object {
 
-        fun Template.isAutoAccept() = meta<MetaAutomation>("automation")?.isAutoAccept ?: false
+        fun Template.isAutoAccept() = addon<AddonAutomation>("automation")?.isAutoAccept ?: false
 
-        fun Template.plan() = meta<MetaAutomation>("automation")?.plan
+        fun Template.plan() = addon<AddonAutomation>("automation")?.plan
 
         @TSchedule(period = 20, async = true)
         fun automation() {

@@ -2,6 +2,7 @@ package ink.ptms.chemdah.core.quest.meta
 
 import ink.ptms.chemdah.core.quest.Id
 import ink.ptms.chemdah.core.quest.QuestContainer
+import ink.ptms.chemdah.core.quest.Task
 
 /**
  * Chemdah
@@ -14,10 +15,12 @@ import ink.ptms.chemdah.core.quest.QuestContainer
 @MetaType(MetaType.Type.TEXT)
 class MetaName(source: String?, questContainer: QuestContainer) : Meta<String?>(source, questContainer) {
 
-    val displayName = source.toString()
+    val displayName = source
 
     companion object {
 
-        fun QuestContainer.displayName() = meta<MetaName>("name")?.displayName ?: id
+        fun QuestContainer.displayName(): String {
+            return meta<MetaName>("name")?.displayName ?: if (this is Task) template.displayName() else id
+        }
     }
 }

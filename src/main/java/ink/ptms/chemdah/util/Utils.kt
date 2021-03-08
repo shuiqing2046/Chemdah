@@ -13,10 +13,14 @@ import org.bukkit.configuration.ConfigurationSection
 val conf: TConfig
     get() = Chemdah.conf
 
-fun Any.asMap() = when (this) {
+fun Any?.asInt() = Coerce.toInteger(this)
+
+fun Any?.asDouble() = Coerce.toDouble(this)
+
+fun Any?.asMap() = when (this) {
     is Map<*, *> -> this.map { (k, v) -> k.toString() to v }.toMap()
     is ConfigurationSection -> this.getValues(false)
-    else -> null
+    else -> emptyMap()
 }
 
 fun Any.asList(): List<String> {

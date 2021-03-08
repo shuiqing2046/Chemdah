@@ -8,10 +8,7 @@ import ink.ptms.chemdah.core.quest.addon.Addon
 import ink.ptms.chemdah.core.quest.meta.Meta
 import ink.ptms.chemdah.core.quest.meta.MetaReset.Companion.reset
 import ink.ptms.chemdah.core.quest.meta.MetaType
-import ink.ptms.chemdah.util.asList
-import ink.ptms.chemdah.util.mirrorFuture
-import ink.ptms.chemdah.util.namespaceQuest
-import ink.ptms.chemdah.util.print
+import ink.ptms.chemdah.util.*
 import io.izzel.taboolib.kotlin.kether.KetherShell
 import io.izzel.taboolib.util.Coerce
 import io.izzel.taboolib.util.Reflection
@@ -65,7 +62,7 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
             Agent(
                 type.toAgentType(),
                 config.get(it)!!.asList(),
-                Coerce.toInteger(args.getOrNull(1))
+                args.getOrNull(1).asInt()
             )
         }.sortedByDescending { it.priority }
 
