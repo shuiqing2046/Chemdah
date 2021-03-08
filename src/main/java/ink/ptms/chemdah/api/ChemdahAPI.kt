@@ -7,7 +7,7 @@ import ink.ptms.chemdah.core.conversation.ConversationLoader
 import ink.ptms.chemdah.core.conversation.ConversationManager
 import ink.ptms.chemdah.core.conversation.theme.Theme
 import ink.ptms.chemdah.core.quest.Idx
-import ink.ptms.chemdah.core.quest.QuestHandler
+import ink.ptms.chemdah.core.quest.QuestLoader
 import ink.ptms.chemdah.core.quest.Template
 import ink.ptms.chemdah.core.quest.addon.Addon
 import ink.ptms.chemdah.core.quest.meta.Meta
@@ -101,6 +101,6 @@ object ChemdahAPI {
         Chemdah.conf.reload()
         ConversationManager.conf.reload()
         ConversationLoader.load()
-        QuestHandler.loadTemplate()
+        QuestLoader.loadTemplate()
     }
 }

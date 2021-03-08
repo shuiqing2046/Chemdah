@@ -1,0 +1,72 @@
+default:
+  task(0):
+    objective: block break
+    if:
+      material: diamond_ore
+    when:
+      amount: 10
+    meta:
+      label: L1
+      progress:
+        visible: true
+        visible-always: true
+  addon(ui):
+    visible: true
+    visible-always: true
+    icon: diamond
+    description:
+      - '&7Mine &3[10 Diamond Ores] &7anywhere.'
+  agent(complete): |-
+    tell colored *"&3[break diamond] &7completed!"
+  meta:
+    name: Break Diamond
+
+template:
+  task(0):
+    objective: block break
+    if:
+      material: stone
+      position: world 0 0 0 ~ 10 10 10
+      $: player sneaking
+    when:
+      amount: 10
+    meta:
+      timeout: 1d
+    addon(track):
+      distance: 2
+      position: world 0 0 0
+      content: ~
+    addon(progress):
+      value: ~
+      target: ~
+      percent: ~
+    agent(continue): ~
+  agent(accept): ~
+  meta:
+    import: ~
+    alias: alias
+    label:
+      - label
+    timeout: 1d
+    control:
+      - type: cooldown
+        data:
+          time: 1d
+          group: template
+      - type: coexist
+        data:
+          alias: 1
+          label(a): 2
+          label(b): 2
+      - type: repeat accept
+        data:
+          amount: 2
+          period: 1d
+          group: template
+    automation:
+      auto-accept: false
+      plan:
+        type: weekly 0 6
+        count: 2
+        group: template
+        method: START_IN_MONDAY

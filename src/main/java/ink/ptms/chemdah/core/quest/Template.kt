@@ -44,7 +44,7 @@ class Template(id: String, config: ConfigurationSection) : QuestContainer(id, co
                     ChemdahAPI.getQuestTemplate(clone)?.metaAll()?.run { it.putAll(this) }
                 }
             }
-            it.putAll(meta)
+            it.putAll(metaMap)
         }
     }
 
@@ -72,21 +72,23 @@ class Template(id: String, config: ConfigurationSection) : QuestContainer(id, co
                 finish()
             }
             val control = control()
-            if (control.check(profile)) {
-                agent(profile, AgentType.QUEST_ACCEPT).thenAccept {
-                    if (it) {
-                        control.signature(profile, MetaControl.ControlRepeat.Type.ACCEPT)
-                        profile.registerQuest(Quest(id, profile))
-                        future.complete(AcceptResult.SUCCESSFUL)
-                        QuestEvents.Accepted(this@Template, profile).call()
-                    } else {
-                        future.complete(AcceptResult.CANCELLED_BY_AGENT)
+            control.check(profile).thenApply { c ->
+                if (c) {
+                    agent(profile, AgentType.QUEST_ACCEPT).thenAccept { a ->
+                        if (a) {
+                            control.signature(profile, MetaControl.ControlRepeat.Type.ACCEPT)
+                            profile.registerQuest(Quest(id, profile))
+                            future.complete(AcceptResult.SUCCESSFUL)
+                            QuestEvents.Accepted(this@Template, profile).call()
+                        } else {
+                            future.complete(AcceptResult.CANCELLED_BY_AGENT)
+                        }
+                        finish()
                     }
+                } else {
+                    future.complete(AcceptResult.CANCELLED_BY_CONTROL)
                     finish()
                 }
-            } else {
-                future.complete(AcceptResult.CANCELLED_BY_CONTROL)
-                finish()
             }
         }
         return future

@@ -4,6 +4,7 @@ import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.event.QuestEvents
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.AgentType.Companion.toAgentType
+import ink.ptms.chemdah.core.quest.addon.Addon
 import ink.ptms.chemdah.core.quest.meta.Meta
 import ink.ptms.chemdah.core.quest.meta.MetaReset.Companion.reset
 import ink.ptms.chemdah.core.quest.meta.MetaType
@@ -26,41 +27,70 @@ import java.util.concurrent.CompletableFuture
  */
 abstract class QuestContainer(val id: String, val config: ConfigurationSection) {
 
-    protected val meta = HashMap<String, Meta<*>>()
-    protected val agent: List<Agent>
-
-    init {
-        config.getConfigurationSection("meta")?.getKeys(false)?.forEach {
-            val questMeta = ChemdahAPI.getQuestMeta(it)
-            if (questMeta != null) {
-                val metaType = if (questMeta.isAnnotationPresent(MetaType::class.java)) {
-                    questMeta.getAnnotation(MetaType::class.java).type
-                } else {
-                    MetaType.Type.ANY
-                }
-                meta[it] = Reflection.instantiateObject(questMeta, metaType[config, "meta.$it"], this) as Meta<*>
+    protected val metaMap: Map<String, Meta<*>> = config.getConfigurationSection("meta")?.getKeys(false)?.mapNotNull {
+        val meta = ChemdahAPI.getQuestMeta(it)
+        if (meta != null) {
+            val metaType = if (meta.isAnnotationPresent(MetaType::class.java)) {
+                meta.getAnnotation(MetaType::class.java).type
+            } else {
+                MetaType.Type.ANY
             }
+            it to Reflection.instantiateObject(meta, metaType[config, "meta.$it"], this) as Meta<*>
+        } else {
+            null
         }
-        agent = config.getKeys(false)
-            .filter { it.startsWith("agent(") && it.endsWith(")") }
-            .map {
-                val args = it.substring("agent(".length, it.length - 1).split("&").map { a -> a.trim() }
-                val type = when (this) {
-                    is Template -> "quest_${args[0]}"
-                    is Task -> "task_${args[0]}"
-                    else -> args[0]
-                }
-                Agent(
-                    type.toAgentType(),
-                    config.get(it)!!.asList(),
-                    Coerce.toInteger(args.getOrNull(1))
-                )
-            }.sortedByDescending { it.priority }
-    }
+    }?.toMap() ?: emptyMap()
+
+    protected val addonMap: Map<String, Addon> = config.getKeys(false)
+        .filter { it.startsWith("addon(") && it.endsWith(")") }
+        .mapNotNull {
+            val addonId = it.substring("addon(".length, it.length - 1)
+            val addon = ChemdahAPI.getQuestAddon(addonId)
+            if (addon != null) {
+                addonId to Reflection.instantiateObject(addon, config.getConfigurationSection(it)!!, this) as Addon
+            } else {
+                null
+            }
+        }.toMap()
+
+    protected val agentList: List<Agent> = config.getKeys(false)
+        .filter { it.startsWith("agent(") && it.endsWith(")") }
+        .map {
+            val args = it.substring("agent(".length, it.length - 1).split("&").map { a -> a.trim() }
+            val type = when (this) {
+                is Template -> "quest_${args[0]}"
+                is Task -> "task_${args[0]}"
+                else -> args[0]
+            }
+            Agent(
+                type.toAgentType(),
+                config.get(it)!!.asList(),
+                Coerce.toInteger(args.getOrNull(1))
+            )
+        }.sortedByDescending { it.priority }
+
+    val node: String
+        get() = when (this) {
+            is Template -> id
+            is Task -> template.id
+            else -> "null"
+        }
+
+    val path: String
+        get() = when (this) {
+            is Template -> id
+            is Task -> "${template.id}.${id}"
+            else -> "null"
+        }
 
     @Suppress("UNCHECKED_CAST")
     fun <T : Meta<*>> meta(metaId: String): T? {
-        return meta[metaId] as? T?
+        return metaMap[metaId] as? T?
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun <T : Addon> addon(addonId: String): T? {
+        return addonMap[addonId] as? T?
     }
 
     /**
@@ -113,11 +143,11 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
                 future.complete(false)
                 finish()
             }
-            val agents = agent.filter { it.type == agentType }
+            val agent = agentList.filter { it.type == agentType }
             fun process(cur: Int) {
-                if (cur < agents.size) {
+                if (cur < agent.size) {
                     try {
-                        KetherShell.eval(agents[cur].action, namespace = agentType.namespaceAll()) {
+                        KetherShell.eval(agent[cur].action, namespace = agentType.namespaceAll()) {
                             sender = profile.player
                             rootFrame().variables().also { vars ->
                                 vars.set("@Quest", quest)

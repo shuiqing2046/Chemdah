@@ -11,6 +11,8 @@ open class Progress(val value: Any, val target: Any, val percent: Double) {
 
     companion object {
 
+        val empty = Progress(0, 0, 0.0)
+
         fun Any.progress(target: Any, percent: Double) = Progress(this, target, percent)
     }
 }

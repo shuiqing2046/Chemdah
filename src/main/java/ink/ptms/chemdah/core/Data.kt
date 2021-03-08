@@ -1,15 +1,22 @@
 package ink.ptms.chemdah.core
 
-import ink.ptms.chemdah.core.CMaterial.Companion.toMaterials
-import ink.ptms.chemdah.core.CPosition.Companion.toCosition
+import ink.ptms.chemdah.util.InferArea.Companion.toCosition
+import ink.ptms.chemdah.util.Mats.Companion.toMats
 import ink.ptms.chemdah.util.asList
 import io.izzel.taboolib.internal.xseries.XMaterial
 import io.izzel.taboolib.util.Coerce
 
+/**
+ * Chemdah
+ * ink.ptms.chemdah.core.Data
+ *
+ * @author sky
+ * @since 2021/3/2 12:00 上午
+ */
 class Data(val value: Any) {
 
     private val lazyMaterial by lazy {
-        asList().mapNotNull { XMaterial.matchXMaterial(it.trim()).orElse(null) }.toMaterials()
+        asList().mapNotNull { XMaterial.matchXMaterial(it.trim()).orElse(null) }.toMats()
     }
 
     private val lazyPosition by lazy {

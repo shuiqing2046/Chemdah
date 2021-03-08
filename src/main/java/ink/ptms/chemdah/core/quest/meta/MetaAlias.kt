@@ -6,7 +6,7 @@ import ink.ptms.chemdah.core.quest.Template
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.quest.meta.MetaAliases
+ * ink.ptms.chemdah.core.quest.meta.MetaAlias
  *
  * @author sky
  * @since 2021/3/1 11:47 下午

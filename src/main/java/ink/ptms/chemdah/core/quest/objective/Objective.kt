@@ -191,5 +191,7 @@ abstract class Objective<E : Event> {
     /**
      * 获取条目进度
      */
-    abstract fun getProgress(profile: PlayerProfile, task: Task): Progress
+    open fun getProgress(profile: PlayerProfile, task: Task): Progress {
+        return Progress.empty
+    }
 }

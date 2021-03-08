@@ -9,11 +9,11 @@ import io.izzel.taboolib.module.nms.nbt.NBTCompound
 import java.util.concurrent.ConcurrentHashMap
 
 /**
- * TabooCodeOriginal
- * ink.ptms.taboocode.api.CodeMeta
+ * Chemdah
+ * ink.ptms.chemdah.core.DataContainer
  *
  * @author sky
- * @since 2021/1/12 10:48 上午
+ * @since 2021/3/2 12:00 上午
  */
 class DataContainer {
 

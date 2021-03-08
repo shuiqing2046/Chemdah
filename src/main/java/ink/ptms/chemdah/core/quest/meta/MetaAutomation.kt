@@ -6,6 +6,7 @@ import ink.ptms.chemdah.core.quest.AcceptResult
 import ink.ptms.chemdah.core.quest.Id
 import ink.ptms.chemdah.core.quest.QuestContainer
 import ink.ptms.chemdah.core.quest.Template
+import ink.ptms.chemdah.util.mirrorFuture
 import io.izzel.taboolib.module.inject.TSchedule
 import io.izzel.taboolib.util.Coerce
 import io.izzel.taboolib.util.lite.cooldown.RealTime
@@ -117,6 +118,9 @@ class MetaAutomation(source: ConfigurationSection?, questContainer: QuestContain
 
         @TSchedule(period = 20, async = true)
         fun automation() {
+            if (Bukkit.getOnlinePlayers().isEmpty()) {
+                return
+            }
             val groups = HashMap<String, Group>()
             val autoAccept = ArrayList<Template>()
             ChemdahAPI.quest.forEach { (_, quest) ->
@@ -131,34 +135,40 @@ class MetaAutomation(source: ConfigurationSection?, questContainer: QuestContain
                     }
                 }
             }
-            Bukkit.getOnlinePlayers().forEach { player ->
-                val profile = ChemdahAPI.getPlayerProfile(player)
-                // 自动接受的任务
-                autoAccept.forEach {
-                    if (profile.getQuests(it.id).isNotEmpty()) {
-                        it.acceptTo(profile)
+            if (groups.isEmpty() || autoAccept.isEmpty()) {
+                return
+            }
+            mirrorFuture("MetaAutomation") {
+                Bukkit.getOnlinePlayers().forEach { player ->
+                    val profile = ChemdahAPI.getPlayerProfile(player)
+                    // 自动接受的任务
+                    autoAccept.forEach {
+                        if (profile.getQuests(it.id).isNotEmpty()) {
+                            it.acceptTo(profile)
+                        }
                     }
-                }
-                // 定时计划
-                groups.forEach { (id, group) ->
-                    val nextTime = profile.persistentDataContainer["automation.$id.next", 0L].toLong()
-                    if (nextTime < System.currentTimeMillis()) {
-                        profile.persistentDataContainer["automation.$id.next"] = group.plan.nextTime
-                        val pool = group.quests.toMutableList()
-                        var i = group.plan.count
-                        fun process() {
-                            if (i > 0 && pool.isNotEmpty()) {
-                                pool.removeAt(Random.nextInt(pool.size)).acceptTo(profile).thenAccept {
-                                    if (it == AcceptResult.SUCCESSFUL) {
-                                        i--
+                    // 定时计划
+                    groups.forEach { (id, group) ->
+                        val nextTime = profile.persistentDataContainer["quest.automation.$id.next", 0L].toLong()
+                        if (nextTime < System.currentTimeMillis()) {
+                            profile.persistentDataContainer["quest.automation.$id.next"] = group.plan.nextTime
+                            val pool = group.quests.toMutableList()
+                            var i = group.plan.count
+                            fun process() {
+                                if (i > 0 && pool.isNotEmpty()) {
+                                    pool.removeAt(Random.nextInt(pool.size)).acceptTo(profile).thenAccept {
+                                        if (it == AcceptResult.SUCCESSFUL) {
+                                            i--
+                                        }
+                                        process()
                                     }
-                                    process()
                                 }
                             }
+                            process()
                         }
-                        process()
                     }
                 }
+                finish()
             }
         }
     }

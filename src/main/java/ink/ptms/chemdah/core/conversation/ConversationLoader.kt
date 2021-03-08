@@ -23,9 +23,9 @@ object ConversationLoader {
 
     @TFunction.Init
     fun load() {
-        val file = File(Chemdah.plugin.dataFolder, "conversation")
+        val file = File(Chemdah.plugin.dataFolder, "core/conversation")
         if (!file.exists()) {
-            Chemdah.plugin.saveResource("conversation/example.yml", true)
+            Chemdah.plugin.saveResource("core/conversation/example.yml", true)
         }
         ChemdahAPI.conversation.clear()
         ChemdahAPI.conversation.putAll(load(file).map { it.id to it })

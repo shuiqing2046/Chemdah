@@ -9,6 +9,9 @@ database:
       database: test
       table: chemdah
     MongoDB:
-      host: localhost
+      client: localhost
       database: test
       collection: chemdah
+
+settings:
+  default-progress-meta-content: '&3[{name}] &7{current}/{target} &f[{percent}%]'

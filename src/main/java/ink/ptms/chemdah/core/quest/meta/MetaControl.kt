@@ -7,10 +7,11 @@ import ink.ptms.chemdah.core.quest.QuestContainer
 import ink.ptms.chemdah.core.quest.Template
 import ink.ptms.chemdah.core.quest.meta.MetaAlias.Companion.alias
 import ink.ptms.chemdah.core.quest.meta.MetaLabel.Companion.label
-import ink.ptms.chemdah.util.toTime
-import ink.ptms.chemdah.util.warning
+import ink.ptms.chemdah.util.*
 import io.izzel.taboolib.cronus.util.Time
+import io.izzel.taboolib.kotlin.kether.KetherShell
 import io.izzel.taboolib.util.Coerce
+import java.util.concurrent.CompletableFuture
 
 /**
  * Chemdah
@@ -27,47 +28,73 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
 
     init {
         source.forEach { map ->
-            val type = map["type"].toString().toLowerCase()
-            when {
-                type == "cooldown" -> {
-                    ControlCooldown(map["time"]?.toString()?.toTime() ?: return@forEach, map["group"]?.toString())
+            if (map["$"] != null) {
+                control += ControlAgent(map["$"]!!.asList())
+            } else {
+                val type = map["type"].toString().toLowerCase()
+                when {
+                    type == "cooldown" -> {
+                        ControlCooldown(map["time"]?.toString()?.toTime() ?: return@forEach, map["group"]?.toString())
+                    }
+                    type == "coexist" -> {
+                        ControlCoexist(Coerce.toInteger(map["alias"]), map
+                            .filterKeys {
+                                it.startsWith("label(") && it.endsWith(")")
+                            }.map {
+                                it.key.substring("label(".length, it.key.length - 1) to Coerce.toInteger(it.value)
+                            }.toMap()
+                        )
+                    }
+                    type.startsWith("repeat") -> {
+                        val trigger = ControlRepeat.Type.fromName(type.substring("repeat".length).trim())
+                        ControlRepeat(trigger, Coerce.toInteger(map["amount"]), map["period"]?.toString()?.toTime(), map["group"]?.toString())
+                    }
+                    else -> {
+                        warning("Unrecognized control format: $map")
+                        null
+                    }
+                }?.run {
+                    control += this
                 }
-                type == "coexist" -> {
-                    ControlCoexist(Coerce.toInteger(map["alias"]), map
-                        .filterKeys {
-                            it.startsWith("label(") && it.endsWith(")")
-                        }.map {
-                            it.key.substring("label(".length, it.key.length - 1) to Coerce.toInteger(it.value)
-                        }.toMap()
-                    )
-                }
-                type.startsWith("repeat") -> {
-                    val trigger = ControlRepeat.Type.fromName(type.substring("repeat".length).trim())
-                    ControlRepeat(trigger, Coerce.toInteger(map["amount"]), map["period"]?.toString()?.toTime(), map["group"]?.toString())
-                }
-                else -> {
-                    warning("Unrecognized control format: $map")
-                    null
-                }
-            }?.run {
-                control += this
             }
         }
     }
 
     abstract class Control {
 
-        abstract fun check(profile: PlayerProfile, template: Template): Boolean
+        abstract fun check(profile: PlayerProfile, template: Template): CompletableFuture<Boolean>
 
         abstract fun signature(profile: PlayerProfile, template: Template)
     }
 
+    class ControlAgent(val agent: List<String>) : Control() {
+
+        override fun check(profile: PlayerProfile, template: Template): CompletableFuture<Boolean> {
+            return try {
+                KetherShell.eval(agent.asList(), namespace = namespaceQuest) {
+                    this.sender = profile.player
+                    rootFrame().variables().also { vars ->
+                        vars.set("@QuestContainer", template)
+                    }
+                }.thenApply {
+                    Coerce.toBoolean(it)
+                }
+            } catch (e: Throwable) {
+                e.print()
+                CompletableFuture.completedFuture(false)
+            }
+        }
+
+        override fun signature(profile: PlayerProfile, template: Template) {
+        }
+    }
+
     class ControlCooldown(val time: Time, val group: String?) : Control() {
 
-        override fun check(profile: PlayerProfile, template: Template): Boolean {
+        override fun check(profile: PlayerProfile, template: Template): CompletableFuture<Boolean> {
             val id = "quest.cooldown.${if (group != null) "@$group" else template.id}"
             val start = profile.persistentDataContainer[id, 0L].toLong()
-            return time.`in`(start).isTimeout(start)
+            return CompletableFuture.completedFuture(time.`in`(start).isTimeout(start))
         }
 
         override fun signature(profile: PlayerProfile, template: Template) {
@@ -78,17 +105,17 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
 
     class ControlCoexist(val alias: Int, val label: Map<String, Int>) : Control() {
 
-        override fun check(profile: PlayerProfile, template: Template): Boolean {
+        override fun check(profile: PlayerProfile, template: Template): CompletableFuture<Boolean> {
             if (alias > 0) {
                 val a = template.alias()
                 if (a != null && profile.quests.count { it.template.alias() == a } > alias) {
-                    return false
+                    return CompletableFuture.completedFuture(false)
                 }
             }
             if (label.any { label -> profile.quests.count { label.key in it.template.label() } > label.value }) {
-                return false
+                return CompletableFuture.completedFuture(false)
             }
-            return true
+            return CompletableFuture.completedFuture(true)
         }
 
         override fun signature(profile: PlayerProfile, template: Template) {
@@ -97,14 +124,14 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
 
     class ControlRepeat(val type: Type, val amount: Int, val period: Time?, val group: String?) : Control() {
 
-        override fun check(profile: PlayerProfile, template: Template): Boolean {
+        override fun check(profile: PlayerProfile, template: Template): CompletableFuture<Boolean> {
             val id = "quest.repeat.${if (group != null) "@$group" else template.id}.${type.name.toLowerCase()}"
             val time = profile.persistentDataContainer["$id.time", 0L].toLong()
             // 超出重复限时
             if (period != null && period.`in`(time).isTimeout(time)) {
-                return true
+                return CompletableFuture.completedFuture(true)
             }
-            return profile.persistentDataContainer["$id.amount", 0].toInt() < amount
+            return CompletableFuture.completedFuture(profile.persistentDataContainer["$id.amount", 0].toInt() < amount)
         }
 
         override fun signature(profile: PlayerProfile, template: Template) {
@@ -134,8 +161,31 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
 
     class ControlOperator(val template: Template, val control: List<Control>?) {
 
-        fun check(profile: PlayerProfile): Boolean {
-            return control == null || control.all { it.check(profile, template) }
+        fun check(profile: PlayerProfile): CompletableFuture<Boolean> {
+            val future = CompletableFuture<Boolean>()
+            if (control == null) {
+                future.complete(true)
+                return future
+            }
+            mirrorFuture("MetaControl:check") {
+                fun process(cur: Int) {
+                    if (cur < control.size) {
+                        control[cur].check(profile, template).thenApply {
+                            if (it) {
+                                process(cur + 1)
+                            } else {
+                                future.complete(false)
+                                finish()
+                            }
+                        }
+                    } else {
+                        future.complete(true)
+                        finish()
+                    }
+                }
+                process(0)
+            }
+            return future
         }
 
         fun signature(profile: PlayerProfile, type: ControlRepeat.Type = ControlRepeat.Type.COMPLETE) {
