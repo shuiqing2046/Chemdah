@@ -1,9 +1,10 @@
 package ink.ptms.chemdah.core.quest.objective
 
-import ink.ptms.chemdah.api.event.ObjectiveEvents
+import ink.ptms.chemdah.api.event.ObjectiveEvent
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.AgentType
 import ink.ptms.chemdah.core.quest.Task
+import ink.ptms.chemdah.core.quest.meta.MetaRestart.Companion.restart
 import ink.ptms.chemdah.util.mirrorFuture
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
@@ -79,7 +80,7 @@ abstract class Objective<E : Event> {
      * 当条目继续时
      */
     open fun onContinue(profile: PlayerProfile, task: Task, event: Event) {
-        ObjectiveEvents.Continue(this, task, profile).call()
+        ObjectiveEvent.Continue(this, task, profile).call()
         task.agent(profile, AgentType.TASK_CONTINUE)
     }
 
@@ -87,7 +88,7 @@ abstract class Objective<E : Event> {
      * 当条目完成时
      */
     open fun onComplete(profile: PlayerProfile, task: Task) {
-        ObjectiveEvents.Complete(this, task, profile).call()
+        ObjectiveEvent.Complete(this, task, profile).call()
         task.agent(profile, AgentType.TASK_COMPLETE)
         setCompletedSignature(profile, task, true)
     }
@@ -96,7 +97,7 @@ abstract class Objective<E : Event> {
      * 当条目重置时
      */
     open fun onReset(profile: PlayerProfile, task: Task) {
-        ObjectiveEvents.Reset(this, task, profile).call()
+        ObjectiveEvent.Reset(this, task, profile).call()
         task.agent(profile, AgentType.TASK_RESET)
         profile.dataOperator(task) {
             clear()
@@ -153,7 +154,7 @@ abstract class Objective<E : Event> {
     open fun checkComplete(profile: PlayerProfile, task: Task) {
         if (!hasCompletedSignature(profile, task)) {
             mirrorFuture("Objective:checkComplete") {
-                task.checkReset(profile).thenAccept { reset ->
+                task.restart(profile).thenAccept { reset ->
                     if (reset) {
                         onReset(profile, task)
                         finish()

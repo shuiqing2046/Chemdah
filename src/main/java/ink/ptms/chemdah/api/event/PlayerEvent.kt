@@ -7,17 +7,27 @@ import org.bukkit.entity.Player
 
 /**
  * Chemdah
- * ink.ptms.chemdah.api.event.ChemdahEvents
+ * ink.ptms.chemdah.api.event.PlayerEvent
  *
  * @author sky
  * @since 2021/3/7 1:31 上午
  */
-class ChemdahEvents {
+class PlayerEvent {
 
     /**
      * 当玩家数据加载完成时
      */
     class Selected(val player: Player, val playerProfile: PlayerProfile) : EventNormal<Selected>() {
+
+        init {
+            async(!Bukkit.isPrimaryThread())
+        }
+    }
+
+    /**
+     * 当玩家数据更新时
+     */
+    class Updated(val player: Player, val playerProfile: PlayerProfile) : EventNormal<Updated>() {
 
         init {
             async(!Bukkit.isPrimaryThread())

@@ -1,11 +1,12 @@
 package ink.ptms.chemdah.core.quest
 
 import ink.ptms.chemdah.api.ChemdahAPI
-import ink.ptms.chemdah.api.event.QuestEvents
+import ink.ptms.chemdah.api.event.QuestEvent
 import ink.ptms.chemdah.core.DataContainer
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.meta.MetaControl
 import ink.ptms.chemdah.core.quest.meta.MetaControl.Companion.control
+import ink.ptms.chemdah.core.quest.meta.MetaRestart.Companion.restart
 import ink.ptms.chemdah.core.quest.meta.MetaTimeout.Companion.isTimeout
 import ink.ptms.chemdah.util.mirrorFuture
 
@@ -49,12 +50,12 @@ class Quest(val id: String, val profile: PlayerProfile) {
      */
     fun checkComplete() {
         mirrorFuture("Quest:checkComplete") {
-            template.checkReset(profile).thenAccept { reset ->
+            template.restart(profile).thenAccept { reset ->
                 if (reset) {
                     resetQuest()
                     finish()
                 } else {
-                    if (tasks.all { it.objective.hasCompletedSignature(profile, it) } && QuestEvents.Complete(template, profile).call().nonCancelled()) {
+                    if (tasks.all { it.objective.hasCompletedSignature(profile, it) } && QuestEvent.Complete(this@Quest, profile).call().nonCancelled()) {
                         template.agent(profile, AgentType.QUEST_COMPLETE).thenAccept {
                             if (it) {
                                 template.control().signature(profile, MetaControl.ControlRepeat.Type.COMPLETE)
@@ -76,7 +77,7 @@ class Quest(val id: String, val profile: PlayerProfile) {
      */
     fun failureQuest() {
         mirrorFuture("Quest:failure") {
-            if (QuestEvents.Failure(template, profile).call().nonCancelled()) {
+            if (QuestEvent.Failure(this@Quest, profile).call().nonCancelled()) {
                 template.agent(profile, AgentType.QUEST_FAILURE).thenAccept {
                     if (it) {
                         template.control().signature(profile, MetaControl.ControlRepeat.Type.FAILURE)
@@ -95,7 +96,7 @@ class Quest(val id: String, val profile: PlayerProfile) {
      */
     fun resetQuest() {
         mirrorFuture("Quest:reset") {
-            if (QuestEvents.Reset(template, profile).call().nonCancelled()) {
+            if (QuestEvent.Reset(this@Quest, profile).call().nonCancelled()) {
                 template.agent(profile, AgentType.QUEST_RESET).thenAccept {
                     if (it) {
                         tasks.forEach { task -> task.objective.onReset(profile, task) }

@@ -1,3 +1,8 @@
+
+
+#         Powered by TabooLib 5.0         #
+
+
 default:
   meta:
     name: Break Diamond
@@ -9,18 +14,16 @@ default:
         material: diamond_ore
       when:
         amount: 10
-      meta:
-        progress:
-          visible: true
-          visible-always: true
+      addon(stats):
+        visible: true
   addon(ui):
     visible: true
     start: false
     icon: diamond -data 0 -c 0 --unbreakable
     description:
       - '&7Mine &3[10 Diamond Ores] &7anywhere.'
-  agent(complete): |-
-    tell colored *"&3[break diamond] &7completed!"
+  agent(complete):
+    - tell colored *"&3[break diamond] &7completed!"
 
 template:
   meta:
@@ -60,11 +63,6 @@ template:
         distance: 2
         position: world 0 0 0
         content: ~
-      addon(progress):
-        value: ~
-        target: ~
-        percent: ~
-      agent(continue): ~
   addon(automation):
     auto-accept: false
     plan:

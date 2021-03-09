@@ -7,7 +7,9 @@ package ink.ptms.chemdah.core.quest.objective
  * @author sky
  * @since 2021/3/3 4:51 下午
  */
-open class Progress(val value: Any, val target: Any, val percent: Double) {
+open class Progress(val value: Any, val target: Any, percent: Double) {
+
+    val percent = percent.coerceAtMost(1.0).coerceAtLeast(0.0)
 
     companion object {
 

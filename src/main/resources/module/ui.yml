@@ -1,3 +1,8 @@
+
+
+#         Powered by TabooLib 5.0         #
+
+
 default:
   name: '{name}''s Quests [Pg.{page}]'
   item:

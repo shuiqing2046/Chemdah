@@ -1,16 +1,14 @@
 package ink.ptms.chemdah.core.quest
 
 import ink.ptms.chemdah.api.ChemdahAPI
-import ink.ptms.chemdah.api.event.QuestEvents
+import ink.ptms.chemdah.api.event.QuestEvent
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.AgentType.Companion.toAgentType
 import ink.ptms.chemdah.core.quest.addon.Addon
 import ink.ptms.chemdah.core.quest.meta.Meta
-import ink.ptms.chemdah.core.quest.meta.MetaReset.Companion.reset
 import ink.ptms.chemdah.core.quest.meta.MetaType
 import ink.ptms.chemdah.util.*
 import io.izzel.taboolib.kotlin.kether.KetherShell
-import io.izzel.taboolib.util.Coerce
 import io.izzel.taboolib.util.Reflection
 import org.bukkit.configuration.ConfigurationSection
 import java.util.concurrent.CompletableFuture
@@ -102,31 +100,6 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
     }
 
     /**
-     * 检查重置条件
-     */
-    fun checkReset(profile: PlayerProfile): CompletableFuture<Boolean> {
-        val future = CompletableFuture<Boolean>()
-        mirrorFuture("QuestContainer:checkReset") {
-            val reset = reset()
-            if (reset.isEmpty()) {
-                future.complete(false)
-                finish()
-            }
-            KetherShell.eval(reset, namespace = namespaceQuest) {
-                sender = profile.player
-                rootFrame().variables().also { vars ->
-                    vars.set("@Quest", getQuest(profile))
-                    vars.set("@QuestContainer", this@QuestContainer)
-                }
-            }.thenApply {
-                future.complete(Coerce.toBoolean(it))
-                finish()
-            }
-        }
-        return future
-    }
-
-    /**
      * 指定脚本代理
      * 当高优先级的脚本代理取消行为时后续脚本代理将不再运行
      *
@@ -136,7 +109,7 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
     fun agent(profile: PlayerProfile, agentType: AgentType, quest: Quest? = null): CompletableFuture<Boolean> {
         val future = CompletableFuture<Boolean>()
         mirrorFuture("QuestContainer:agent") {
-            if (QuestEvents.Agent(this@QuestContainer, profile, agentType).call().isCancelled) {
+            if (QuestEvent.Agent(this@QuestContainer, profile, agentType).call().isCancelled) {
                 future.complete(false)
                 finish()
             }

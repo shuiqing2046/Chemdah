@@ -8,12 +8,12 @@ import org.bukkit.Bukkit
 
 /**
  * Chemdah
- * ink.ptms.chemdah.api.event.QuestEvents
+ * ink.ptms.chemdah.api.event.ObjectiveEvent
  *
  * @author sky
  * @since 2021/2/21 1:07 上午
  */
-class ObjectiveEvents {
+class ObjectiveEvent {
 
     /**
      * 当条目继续时

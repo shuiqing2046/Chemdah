@@ -14,7 +14,7 @@ import org.bukkit.Bukkit
  * @author sky
  * @since 2021/2/21 1:07 上午
  */
-class ConversationEvents {
+class ConversationEvent {
 
     /**
      * 当对话中当脚本代理执行时

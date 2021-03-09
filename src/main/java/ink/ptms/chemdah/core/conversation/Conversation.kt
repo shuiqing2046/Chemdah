@@ -1,6 +1,6 @@
 package ink.ptms.chemdah.core.conversation
 
-import ink.ptms.chemdah.api.event.ConversationEvents
+import ink.ptms.chemdah.api.event.ConversationEvent
 import ink.ptms.chemdah.core.conversation.ConversationManager.sessions
 import ink.ptms.chemdah.util.extend
 import ink.ptms.chemdah.util.mirrorFuture
@@ -52,7 +52,7 @@ data class Conversation(
         mirrorFuture("Conversation:open") {
             val session = sessionTop ?: Session(this@Conversation, player.location.clone(), origin.clone(), player)
             // 事件
-            if (ConversationEvents.Pre(this@Conversation, session, sessionTop != null).call().isCancelled) {
+            if (ConversationEvent.Pre(this@Conversation, session, sessionTop != null).call().isCancelled) {
                 future.complete(session)
                 finish()
             }
@@ -70,12 +70,12 @@ data class Conversation(
                         if (sessionTop != null) {
                             sessionTop.close().thenApply {
                                 future.complete(session)
-                                ConversationEvents.Cancelled(this@Conversation, session, true).call()
+                                ConversationEvent.Cancelled(this@Conversation, session, true).call()
                                 finish()
                             }
                         } else {
                             future.complete(session)
-                            ConversationEvents.Cancelled(this@Conversation, session, false).call()
+                            ConversationEvent.Cancelled(this@Conversation, session, false).call()
                             finish()
                         }
                     } else {
@@ -90,11 +90,11 @@ data class Conversation(
                                 e.localizedMessage
                             }
                         })
-                        ConversationEvents.Begin(this@Conversation, session, sessionTop != null).call()
+                        ConversationEvent.Begin(this@Conversation, session, sessionTop != null).call()
                         // 渲染对话
                         option.instanceTheme.begin(session).thenAccept {
                             future.complete(session)
-                            ConversationEvents.Post(this@Conversation, session, sessionTop != null).call()
+                            ConversationEvent.Post(this@Conversation, session, sessionTop != null).call()
                             finish()
                         }
                     }
@@ -114,7 +114,7 @@ data class Conversation(
     fun agent(session: Session, agentType: AgentType): CompletableFuture<Void> {
         val future = CompletableFuture<Void>()
         mirrorFuture("Conversation:agent") {
-            if (ConversationEvents.Agent(this@Conversation, session, agentType).call().isCancelled) {
+            if (ConversationEvent.Agent(this@Conversation, session, agentType).call().isCancelled) {
                 future.complete(null)
                 finish()
             }

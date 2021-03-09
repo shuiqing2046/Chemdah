@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.core.database
 
 import ink.ptms.chemdah.api.ChemdahAPI
-import ink.ptms.chemdah.api.event.ChemdahEvents
+import ink.ptms.chemdah.api.event.PlayerEvent
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.util.colored
@@ -71,7 +71,7 @@ interface Database {
                 mirrorFuture("Database:select") {
                     INSTANCE.select(e.player).also {
                         ChemdahAPI.playerProfile[e.player.name] = it
-                        ChemdahEvents.Selected(e.player, it).call()
+                        PlayerEvent.Selected(e.player, it).call()
                     }
                     finish()
                 }
@@ -85,6 +85,7 @@ interface Database {
                 Tasks.task(true) {
                     mirrorFuture("Database:update") {
                         INSTANCE.update(e.player, playerProfile)
+                        PlayerEvent.Updated(e.player, playerProfile).call()
                         finish()
                     }
                 }
@@ -98,6 +99,7 @@ interface Database {
                 if (playerProfile.isChanged()) {
                     mirrorFuture("Database:update") {
                         INSTANCE.update(it, playerProfile)
+                        PlayerEvent.Updated(it, playerProfile).call()
                         finish()
                     }
                 }

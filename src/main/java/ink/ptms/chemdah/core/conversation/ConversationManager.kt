@@ -34,7 +34,7 @@ import java.util.concurrent.ConcurrentHashMap
 @TListener
 object ConversationManager : Listener {
 
-    @TInject("conversation.yml", migrate = true)
+    @TInject("core/conversation.yml", migrate = true)
     lateinit var conf: TConfig
         private set
 
