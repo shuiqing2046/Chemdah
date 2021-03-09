@@ -1,3 +1,8 @@
+
+
+#         Powered by TabooLib 5.0         #
+
+
 theme-test-help:
   ==: ACTION
   text: 'Use the &eNUMBER KEY (1-9) &fto select the reply and press the &eF &fto select it.'

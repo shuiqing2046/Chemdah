@@ -1,21 +1,12 @@
-
-
-#         Powered by TabooLib 5.0         #
-
-
 default:
-  meta:
-    name: Break Diamond
-    label: L1
-  task:
-    0:
-      objective: block break
-      if:
-        material: diamond_ore
-      when:
-        amount: 10
-      addon(stats):
-        visible: true
+  task(0):
+    objective: block break
+    if:
+      material: diamond_ore
+    when:
+      amount: 10
+    addon(stats):
+      visible: true
   addon(ui):
     visible: true
     start: false
@@ -24,8 +15,32 @@ default:
       - '&7Mine &3[10 Diamond Ores] &7anywhere.'
   agent(complete):
     - tell colored *"&3[break diamond] &7completed!"
+  meta:
+    name: Break Diamond
+    label: L1
 
 template:
+  task(0):
+    objective: block break
+    if:
+      material: stone
+      position: world 0 0 0 ~ 10 10 10
+      $: player sneaking
+    when:
+      amount: 10
+    meta:
+      timeout: 1d
+    addon(track):
+      distance: 2
+      position: world 0 0 0
+      content: ~
+  addon(automation):
+    auto-accept: false
+    plan:
+      type: weekly 0 6
+      count: 2
+      group: template
+      method: START_IN_MONDAY
   meta:
     import: ~
     alias: alias
@@ -48,25 +63,3 @@ template:
           amount: 2
           period: 1d
           group: template
-  task:
-    0:
-      objective: block break
-      if:
-        material: stone
-        position: world 0 0 0 ~ 10 10 10
-        $: player sneaking
-      when:
-        amount: 10
-      meta:
-        timeout: 1d
-      addon(track):
-        distance: 2
-        position: world 0 0 0
-        content: ~
-  addon(automation):
-    auto-accept: false
-    plan:
-      type: weekly 0 6
-      count: 2
-      group: template
-      method: START_IN_MONDAY

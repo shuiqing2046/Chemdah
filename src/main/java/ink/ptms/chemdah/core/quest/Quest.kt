@@ -26,10 +26,10 @@ class Quest(val id: String, val profile: PlayerProfile) {
         get() = ChemdahAPI.getQuestTemplate(id) != null
 
     val isCompleted: Boolean
-        get() = isValid && template.tasks.all { it.value.objective.hasCompletedSignature(profile, it.value) }
+        get() = isValid && template.task.all { it.value.objective.hasCompletedSignature(profile, it.value) }
 
     val tasks: Collection<Task>
-        get() = template.tasks.values
+        get() = template.task.values
 
     val startTime: Long
         get() = persistentDataContainer["start", 0L].toLong()

@@ -22,7 +22,7 @@ import java.util.concurrent.CompletableFuture
  */
 abstract class QuestContainer(val id: String, val config: ConfigurationSection) {
 
-    protected val metaMap: Map<String, Meta<*>> = config.getConfigurationSection("meta")?.getKeys(false)?.mapNotNull {
+    protected val metaMap = config.getConfigurationSection("meta")?.getKeys(false)?.mapNotNull {
         val meta = ChemdahAPI.getQuestMeta(it)
         if (meta != null) {
             val metaType = if (meta.isAnnotationPresent(MetaType::class.java)) {
@@ -36,7 +36,7 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
         }
     }?.toMap() ?: emptyMap()
 
-    protected val addonMap: Map<String, Addon> = config.getKeys(false)
+    protected val addonMap = config.getKeys(false)
         .filter { it.startsWith("addon(") && it.endsWith(")") }
         .mapNotNull {
             val addonId = it.substring("addon(".length, it.length - 1)
@@ -48,7 +48,7 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
             }
         }.toMap()
 
-    protected val agentList: List<Agent> = config.getKeys(false)
+    protected val agentList = config.getKeys(false)
         .filter { it.startsWith("agent(") && it.endsWith(")") }
         .map {
             val args = it.substring("agent(".length, it.length - 1).split("&").map { a -> a.trim() }

@@ -20,14 +20,14 @@ import java.util.concurrent.CompletableFuture
  */
 class Template(id: String, config: ConfigurationSection) : QuestContainer(id, config) {
 
-    val tasks = HashMap<String, Task>()
-    val metaImport = config.get("meta.import")?.asList() ?: emptyList()
+    val task = config.getKeys(false)
+        .filter { it.startsWith("task(") && it.endsWith(")") }
+        .map {
+            val taskId = it.substring("task(".length, it.length - 1)
+            taskId to Task(taskId, config.getConfigurationSection(it)!!, this)
+        }.toMap()
 
-    init {
-        config.getConfigurationSection("task")?.getKeys(false)?.forEach {
-            tasks[it] = Task(it, config.getConfigurationSection(it)!!, this)
-        }
-    }
+    private val metaImport = config.get("meta.import")?.asList() ?: emptyList()
 
     /**
      * 获取包含模板导入 (import) 的所有任务元数据
