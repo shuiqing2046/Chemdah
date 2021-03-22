@@ -19,7 +19,7 @@ default:
         - '&7 [ {{ ui progress bar [ L3 ] }} &7] {{ ui progress percent [ L3 ] }}%'
         - ''
         - '&8{{ ui progress percent [ L1 L2 L3 ] }}% total'
-    type:
+    filter:
       material: name_tag
       name: '&e&lFilter'
       lore:

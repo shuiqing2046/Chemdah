@@ -3,6 +3,7 @@ package ink.ptms.chemdah.core.conversation.theme
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.conversation.ConversationManager
 import ink.ptms.chemdah.core.conversation.Session
+import ink.ptms.chemdah.util.colored
 import io.izzel.taboolib.cronus.CronusUtils
 import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.kotlin.toPrinted
@@ -129,16 +130,15 @@ object ThemeTest : Theme, Listener {
 
     override fun npcTalk(session: Session, message: List<String>, canReply: Boolean): CompletableFuture<Void> {
         val future = CompletableFuture<Void>()
-        val messages = TLocale.Translate.setColored(message)
         var d = 0L
         var cancel = false
         session.npcTalking = true
-        messages.map { it.toPrinted("_") }.forEachIndexed { messageLine, messageText ->
+        message.colored().map { it.toPrinted("_") }.forEachIndexed { messageLine, messageText ->
             messageText.forEachIndexed { printLine, printText ->
                 Tasks.delay(d++) {
                     if (session.isValid) {
                         if (session.npcTalking) {
-                            future.npcTalk(session, messages, messageLine, printText, printLine + 1 == messageText.size, canReply)
+                            future.npcTalk(session, message, messageLine, printText, printLine + 1 == messageText.size, canReply)
                         } else if (!cancel) {
                             cancel = true
                             future.npcTalk(session, session.npcSide, session.npcSide.size, "", printEnd = true, canReply = true)
@@ -177,7 +177,7 @@ object ThemeTest : Theme, Listener {
                                 json.append(it.replace("{title}", session.conversation.option.title.replace("{name}", session.npcName))).newLine()
                             }
                             it.contains("{npcSide}") -> {
-                                messages.forEachIndexed { i, fully ->
+                                messages.colored().forEachIndexed { i, fully ->
                                     when {
                                         messageLine > i -> json.append(it.replace("{npcSide}", fully)).newLine()
                                         messageLine == i -> json.append(it.replace("{npcSide}", printText)).newLine()

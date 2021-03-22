@@ -10,7 +10,7 @@ import ink.ptms.chemdah.core.quest.Template
 import io.izzel.taboolib.kotlin.kether.ScriptContext
 import io.izzel.taboolib.kotlin.kether.common.api.QuestContext
 import io.izzel.taboolib.kotlin.kether.common.util.LocalizedException
-import io.izzel.taboolib.module.locale.chatcolor.TColor
+import io.izzel.taboolib.module.locale.TLocale
 import org.bukkit.entity.Player
 
 val namespaceQuest = listOf(
@@ -37,7 +37,11 @@ val namespaceConversationPlayer = listOf(
 )
 
 fun String.colored(): String {
-    return TColor.translate(this)
+    return TLocale.Translate.setColored(this)
+}
+
+fun List<String>.colored(): List<String> {
+    return TLocale.Translate.setColored(this)
 }
 
 fun QuestContext.Frame.getQuest(): Quest {
