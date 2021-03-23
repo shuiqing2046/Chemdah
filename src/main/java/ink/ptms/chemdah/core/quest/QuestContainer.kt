@@ -37,9 +37,9 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
     }?.toMap() ?: emptyMap()
 
     protected val addonMap = config.getKeys(false)
-        .filter { it.startsWith("addon(") && it.endsWith(")") }
+        .filter { it.startsWith("addon:") }
         .mapNotNull {
-            val addonId = it.substring("addon(".length, it.length - 1)
+            val addonId = it.substring("addon:".length)
             val addon = ChemdahAPI.getQuestAddon(addonId)
             if (addon != null) {
                 addonId to Reflection.instantiateObject(addon, config.getConfigurationSection(it)!!, this) as Addon
@@ -49,9 +49,9 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
         }.toMap()
 
     protected val agentList = config.getKeys(false)
-        .filter { it.startsWith("agent(") && it.endsWith(")") }
+        .filter { it.startsWith("agent:") }
         .map {
-            val args = it.substring("agent(".length, it.length - 1).split("&").map { a -> a.trim() }
+            val args = it.substring("agent:".length).split("&").map { a -> a.trim() }
             val type = when (this) {
                 is Template -> "quest_${args[0]}"
                 is Task -> "task_${args[0]}"

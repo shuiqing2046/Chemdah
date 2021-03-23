@@ -26,6 +26,7 @@ default:
         - '&8- &f{filter}'
         - ''
         - '&8CLICK TO EDIT'
+      all-key: ALL
     quest:
       started:
         material: orange_stained_glass_pane

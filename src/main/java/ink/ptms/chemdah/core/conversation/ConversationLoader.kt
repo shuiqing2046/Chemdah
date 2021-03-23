@@ -96,9 +96,9 @@ object ConversationLoader {
             } ?: PlayerSide(emptyList()),
             root.getString("condition"),
             root.getKeys(false)
-                .filter { it.startsWith("agent(") && it.endsWith(")") }
+                .filter { it.startsWith("agent:") }
                 .map {
-                    val args = it.substring("agent(".length, it.length - 1).split("&").map { a -> a.trim() }
+                    val args = it.substring("agent:".length).split("&").map { a -> a.trim() }
                     Agent(
                         args[0].toAgentType(),
                         root.get(it)!!.asList(),

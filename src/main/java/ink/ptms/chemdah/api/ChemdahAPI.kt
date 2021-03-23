@@ -14,10 +14,12 @@ import ink.ptms.chemdah.core.quest.meta.Meta
 import ink.ptms.chemdah.core.quest.meta.MetaAlias.Companion.alias
 import ink.ptms.chemdah.core.quest.meta.MetaLabel.Companion.label
 import ink.ptms.chemdah.core.quest.objective.Objective
+import ink.ptms.chemdah.module.Module
 import io.izzel.taboolib.kotlin.Mirror
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.reflect.KClass
 
 object ChemdahAPI {
 
@@ -87,8 +89,21 @@ object ChemdahAPI {
 
     /**
      * 获取已经缓存的玩家数据
+     * 如玩家不存在则会直接跑出 NullPointerException 异常
+     *
+     * @throws NullPointerException
      */
+    @Throws(NullPointerException::class)
     fun getPlayerProfile(player: Player) = playerProfile[player.name]!!
+
+    /**
+     * 获取已注册的模块
+     * 如模块不存在则会直接抛出 NullPointerException 异常
+     *
+     * @throws NullPointerException
+     */
+    @Throws(NullPointerException::class)
+    fun <T : Module> getModule(kClass: KClass<T>) = Module.modules[kClass.simpleName]!!
 
     /**
      * 1 重载中心配置文件
@@ -96,11 +111,13 @@ object ChemdahAPI {
      * 3 重载对话
      * 4 重载对话展示模式
      * 5 重载任务
+     * 6 重载模块
      */
     fun reloadAll() {
         Chemdah.conf.reload()
         ConversationManager.conf.reload()
         ConversationLoader.load()
         QuestLoader.loadTemplate()
+        Module.modules.values.forEach { it.reload() }
     }
 }

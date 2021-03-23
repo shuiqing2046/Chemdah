@@ -21,9 +21,9 @@ import java.util.concurrent.CompletableFuture
 class Template(id: String, config: ConfigurationSection) : QuestContainer(id, config) {
 
     val task = config.getKeys(false)
-        .filter { it.startsWith("task(") && it.endsWith(")") }
+        .filter { it.startsWith("task:") }
         .map {
-            val taskId = it.substring("task(".length, it.length - 1)
+            val taskId = it.substring("task:".length)
             taskId to Task(taskId, config.getConfigurationSection(it)!!, this)
         }.toMap()
 

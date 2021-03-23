@@ -5,7 +5,7 @@ __option__:
 conversation_0:
   npc id: 'adyeshach test'
   npc:
-    - 'Hi! {{sender}}.'
+    - 'Hi! {{ sender }}.'
     - 'I''m conversation tester for Chemdah.'
   player:
     - reply: 'Hi!'
@@ -33,19 +33,19 @@ conversation_0_2:
   npc:
     - 'Here! Choose a number please.'
   player:
-    - reply: '{{&chooseA}}?'
+    - reply: '{{ &chooseA }}?'
       then: |-
         set choose to &chooseA
         goto conversation_0_3
-    - reply: '{{&chooseB}}?'
+    - reply: '{{ &chooseB }}?'
       then: |-
         set choose to &chooseB
         goto conversation_0_3
-    - reply: '{{&chooseC}}?'
+    - reply: '{{ &chooseC }}?'
       then: |-
         set choose to &chooseC
         goto conversation_0_3
-  agent(begin): |-
+  agent:begin: |-
     set chooseA to round random 10
     set chooseB to round random 10
     set chooseC to round random 10
@@ -60,7 +60,7 @@ conversation_0_3:
       reply: 'Oh! Jesus.'
       then:
         - talk "Don''t worry."
-  agent(begin): |-
+  agent:begin: |-
     if check &choose not null then {
       tell color *"&c[Error] &7no choosed."
       cancel
@@ -68,12 +68,12 @@ conversation_0_3:
       set number to round random 10
       set win to check &choose > &number
       if &win then {
-        talk "{{&choose}}!"
-        talk "You win! number is {{&number}}"
+        talk "{{ &choose }}!"
+        talk "You win! number is {{ &number }}"
       } else {
-        talk "{{&choose}}?"
-        talk "You lose! number is {{&number}}"
+        talk "{{ &choose }}?"
+        talk "You lose! number is {{ &number }}"
       }
     }
-  agent(refuse):
+  agent:refuse:
     - talk "All right, see you later."

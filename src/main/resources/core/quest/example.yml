@@ -1,26 +1,26 @@
 default:
-  task(0):
+  task:0:
     objective: block break
     if:
       material: diamond_ore
     when:
       amount: 10
-    addon(stats):
+    addon:stats:
       visible: true
-  addon(ui):
+  addon:ui:
     visible: true
     start: false
     icon: diamond -data 0 -c 0 --unbreakable
     description:
       - '&7Mine &3[10 Diamond Ores] &7anywhere.'
-  agent(complete):
+  agent:complete:
     - tell colored *"&3[break diamond] &7completed!"
   meta:
     name: Break Diamond
     label: L1
 
 template:
-  task(0):
+  task:0:
     objective: block break
     if:
       material: stone
@@ -30,11 +30,11 @@ template:
       amount: 10
     meta:
       timeout: 1d
-    addon(track):
+    addon:track:
       distance: 2
       position: world 0 0 0
       content: ~
-  addon(automation):
+  addon:automation:
     auto-accept: false
     plan:
       type: weekly 0 6
