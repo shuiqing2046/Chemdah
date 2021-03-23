@@ -52,8 +52,7 @@ interface Database {
                     Type.MONGODB -> DatabaseMongoDB()
                 }
             } catch (e: Throwable) {
-                e.printStackTrace()
-                DatabaseError(e.localizedMessage)
+                DatabaseError(e)
             }
         }
 

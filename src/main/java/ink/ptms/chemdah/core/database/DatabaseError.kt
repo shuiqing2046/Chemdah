@@ -11,17 +11,17 @@ import org.bukkit.entity.Player
  * @author sky
  * @since 2021/3/5 3:51 下午
  */
-class DatabaseError(val cause: String) : Database {
+class DatabaseError(val cause: Throwable) : Database {
 
     override fun select(player: Player): PlayerProfile {
-        throw IllegalAccessError("Database initialization failed: $cause")
+        throw IllegalAccessError("Database initialization failed: ${cause.localizedMessage}")
     }
 
     override fun update(player: Player, playerProfile: PlayerProfile) {
-        throw IllegalAccessError("Database initialization failed: $cause")
+        throw IllegalAccessError("Database initialization failed: ${cause.localizedMessage}")
     }
 
     override fun releaseQuest(player: Player, playerProfile: PlayerProfile, quest: Quest) {
-        throw IllegalAccessError("Database initialization failed: $cause")
+        throw IllegalAccessError("Database initialization failed: ${cause.localizedMessage}")
     }
 }
