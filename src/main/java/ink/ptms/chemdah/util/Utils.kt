@@ -12,6 +12,7 @@ import io.izzel.taboolib.util.item.ItemBuilder
 import io.izzel.taboolib.util.item.Items
 import org.bukkit.Bukkit
 import org.bukkit.configuration.ConfigurationSection
+import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 
 val conf: TConfig
@@ -71,6 +72,9 @@ fun ItemStack.setIcon(value: String) {
         }
         if (tags.contains("unbreakable")) {
             itemBuilder.unbreakable(true)
+        }
+        if (tags.contains("noflags")) {
+            itemBuilder.flags(*ItemFlag.values())
         }
     }
     itemBuilder.build()

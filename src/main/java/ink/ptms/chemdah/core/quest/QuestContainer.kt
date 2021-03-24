@@ -22,6 +22,9 @@ import java.util.concurrent.CompletableFuture
  */
 abstract class QuestContainer(val id: String, val config: ConfigurationSection) {
 
+    /**
+     * 元数据容器
+     */
     protected val metaMap = config.getConfigurationSection("meta")?.getKeys(false)?.mapNotNull {
         val meta = ChemdahAPI.getQuestMeta(it)
         if (meta != null) {
@@ -36,6 +39,9 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
         }
     }?.toMap() ?: emptyMap()
 
+    /**
+     * 扩展列表
+     */
     protected val addonMap = config.getKeys(false)
         .filter { it.startsWith("addon:") }
         .mapNotNull {
@@ -48,6 +54,9 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
             }
         }.toMap()
 
+    /**
+     * 脚本代理列表
+     */
     protected val agentList = config.getKeys(false)
         .filter { it.startsWith("agent:") }
         .map {
@@ -64,6 +73,10 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
             )
         }.sortedByDescending { it.priority }
 
+    /**
+     * 当前节点
+     * 任务则返回任务序号，条目则返回条目序号
+     */
     val node: String
         get() = when (this) {
             is Template -> id
@@ -71,6 +84,10 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
             else -> "null"
         }
 
+    /**
+     * 任务路径
+     * 作为持久化储存的唯一标识符
+     */
     val path: String
         get() = when (this) {
             is Template -> id

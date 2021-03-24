@@ -20,6 +20,9 @@ import java.util.concurrent.CompletableFuture
  */
 class Template(id: String, config: ConfigurationSection) : QuestContainer(id, config) {
 
+    /**
+     * 所有任务条目
+     */
     val task = config.getKeys(false)
         .filter { it.startsWith("task:") }
         .map {
@@ -27,6 +30,9 @@ class Template(id: String, config: ConfigurationSection) : QuestContainer(id, co
             taskId to Task(taskId, config.getConfigurationSection(it)!!, this)
         }.toMap()
 
+    /**
+     * 元数据引用
+     */
     private val metaImport = config.get("meta.import")?.asList() ?: emptyList()
 
     /**
@@ -48,22 +54,32 @@ class Template(id: String, config: ConfigurationSection) : QuestContainer(id, co
      * 使玩家接受任务
      */
     fun acceptTo(profile: PlayerProfile): CompletableFuture<AcceptResult> {
-        return accept(profile).thenApply {
-            if (it != AcceptResult.SUCCESSFUL) {
+        return checkAccept(profile).thenApply {
+            if (it == AcceptResult.SUCCESSFUL) {
+                val quest = Quest(id, profile)
+                val control = control()
+                control.signature(profile, MetaControl.ControlRepeat.Type.ACCEPT)
+                profile.registerQuest(quest)
+                QuestEvent.Accepted(quest, profile).call()
+                agent(profile, AgentType.QUEST_START)
+            } else {
                 agent(profile, AgentType.QUEST_ACCEPT_CANCELLED)
             }
             it
         }
     }
 
-    private fun accept(profile: PlayerProfile): CompletableFuture<AcceptResult> {
+    /**
+     * 检测玩家是否可以接受该任务
+     */
+    fun checkAccept(profile: PlayerProfile): CompletableFuture<AcceptResult> {
         val future = CompletableFuture<AcceptResult>()
-        mirrorFuture("Template:accept") {
+        mirrorFuture("Template:checkAccept") {
             if (profile.getQuests(id).isNotEmpty()) {
                 future.complete(AcceptResult.ALREADY_EXISTS)
                 finish()
             }
-            if (QuestEvent.Accept(this@Template, profile).call().isCancelled) {
+            if (QuestEvent.AcceptCheck(this@Template, profile).call().isCancelled) {
                 future.complete(AcceptResult.CANCELLED_BY_EVENT)
                 finish()
             }
@@ -72,11 +88,7 @@ class Template(id: String, config: ConfigurationSection) : QuestContainer(id, co
                 if (c) {
                     agent(profile, AgentType.QUEST_ACCEPT).thenAccept { a ->
                         if (a) {
-                            val quest = Quest(id, profile)
-                            control.signature(profile, MetaControl.ControlRepeat.Type.ACCEPT)
-                            profile.registerQuest(quest)
                             future.complete(AcceptResult.SUCCESSFUL)
-                            QuestEvent.Accepted(quest, profile).call()
                         } else {
                             future.complete(AcceptResult.CANCELLED_BY_AGENT)
                         }

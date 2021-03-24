@@ -5,6 +5,21 @@
 
 default:
   name: '{name}''s Quests [Pg.{page}]'
+  menu:
+    quest:
+      rows: 6
+      slot: [
+          12, 13, 14, 15, 16,
+          21, 22, 23, 24, 25,
+          30, 31, 32, 33, 34,
+          39, 40, 41, 42, 43
+      ]
+      methods:
+        info: 19
+        filter: 28
+    filter:
+      rows: 3
+      slot: [ 10, 11, 12, 13, 14, 15, 16 ]
   item:
     info:
       material: totem
@@ -68,8 +83,38 @@ default:
         material: gray_stained_glass_pane
         name: '&8Unavailable'
   include:
-    - L1
-    - L2
-    - L3
+    L1:
+      active:
+        material: golden_sword
+        name: '&fL1 quests'
+        lore:
+          - '&a&lINCLUDED'
+      normal:
+        material: golden_sword
+        name: '&fL1 quests'
+        lore:
+          - '&7INCLUDE'
+    L2:
+      active:
+        material: iron_pickaxe
+        name: '&fL2 quests'
+        lore:
+          - '&a&lINCLUDED'
+      normal:
+        material: iron_pickaxe
+        name: '&fL2 quests'
+        lore:
+          - '&7INCLUDE'
+    L3:
+      active:
+        material: stone
+        name: '&fL3 quests'
+        lore:
+          - '&a&lINCLUDED'
+      normal:
+        material: stone
+        name: '&fL3 quests'
+        lore:
+          - '&7INCLUDE'
   exclude:
     - S1

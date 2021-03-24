@@ -1,16 +1,18 @@
 package ink.ptms.chemdah.module.ui
 
+import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.PlayerProfile
-import ink.ptms.chemdah.core.quest.Quest
+import ink.ptms.chemdah.core.quest.AcceptResult
+import ink.ptms.chemdah.core.quest.Idx
+import ink.ptms.chemdah.core.quest.Template
 import ink.ptms.chemdah.core.quest.addon.AddonUI.Companion.ui
-import ink.ptms.chemdah.core.quest.meta.MetaName.Companion.displayName
+import ink.ptms.chemdah.core.quest.meta.MetaLabel.Companion.label
 import ink.ptms.chemdah.util.colored
-import ink.ptms.chemdah.util.setIcon
-import io.izzel.taboolib.kotlin.kether.KetherFunction
 import io.izzel.taboolib.util.item.Items
 import org.bukkit.configuration.ConfigurationSection
-import org.bukkit.inventory.ItemStack
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 /**
@@ -22,89 +24,74 @@ import kotlin.collections.HashMap
  */
 class UI(val config: ConfigurationSection) {
 
-    val playerFilters = HashMap<UUID, List<String>>()
-
     val name = config.getString("name")?.colored().toString()
-    val include: List<String> = config.getStringList("include")
+    val menuQuestRows = config.getInt("menu.quest.rows")
+    val menuQuestSlot: List<Int> = config.getIntegerList("menu.quest.slot")
+    val menuQuestSlotInfo = config.getInt("menu.quest.methods.info")
+    val menuQuestSlotFilter = config.getInt("menu.quest.methods.filter")
+    val menuFilterRows = config.getInt("menu.filter.rows")
+    val menuFilterSlot: List<Int> = config.getIntegerList("menu.filter.slot")
+    val include = ArrayList<Include>()
     val exclude: List<String> = config.getStringList("exclude")
     val items = HashMap<ItemType, Item>()
 
+    val playerFilters = ConcurrentHashMap<UUID, List<String>>()
+
     init {
+        config.getConfigurationSection("include")?.getKeys(false)?.forEach {
+            val active = config.getConfigurationSection("include.$it.active") ?: return@forEach
+            val normal = config.getConfigurationSection("include.$it.normal") ?: return@forEach
+            include.add(Include(it, Items.loadItem(active)!!, Items.loadItem(normal)!!))
+        }
         items[ItemType.INFO] = Item(config.getConfigurationSection("item.info")!!)
         items[ItemType.FILTER] = ItemFilter(config.getConfigurationSection("item.filter")!!)
-        items[ItemType.QUEST_STARTED] = Item(config.getConfigurationSection("item.quest.started")!!)
-        items[ItemType.QUEST_CAN_START] = Item(config.getConfigurationSection("item.quest.can-start")!!)
-        items[ItemType.QUEST_CANNOT_START] = Item(config.getConfigurationSection("item.quest.cannot-start")!!)
-        items[ItemType.QUEST_COMPLETE] = Item(config.getConfigurationSection("item.quest.completed")!!)
-        items[ItemType.QUEST_UNAVAILABLE] = Item(config.getConfigurationSection("item.quest.unavailable")!!)
+        items[ItemType.QUEST_STARTED] = ItemQuest(config.getConfigurationSection("item.quest.started")!!)
+        items[ItemType.QUEST_CAN_START] = ItemQuest(config.getConfigurationSection("item.quest.can-start")!!)
+        items[ItemType.QUEST_CANNOT_START] = ItemQuest(config.getConfigurationSection("item.quest.cannot-start")!!)
+        items[ItemType.QUEST_COMPLETE] = ItemQuest(config.getConfigurationSection("item.quest.completed")!!)
+        items[ItemType.QUEST_UNAVAILABLE] = ItemQuest(config.getConfigurationSection("item.quest.unavailable")!!)
     }
 
-    open class Item(val config: ConfigurationSection) {
-
-        val itemStackBase = Items.loadItem(config)!!
-
-        open fun getItemStack(player: PlayerProfile, ui: UI, quest: Quest): ItemStack {
-            return itemStackBase.clone().also {
-                it.itemMeta = it.itemMeta?.also { meta ->
-                    meta.setDisplayName(KetherFunction.parse(meta.displayName))
-                    meta.lore = it.lore?.map { lore ->
-                        KetherFunction.parse(lore)
-                    }
-                }
-            }
-        }
-    }
-
-    open class ItemFilter(config: ConfigurationSection) : Item(config) {
-
-        val allKey = config.getString("all-key")!!
-
-        override fun getItemStack(player: PlayerProfile, ui: UI, quest: Quest): ItemStack {
-            return super.getItemStack(player, ui, quest).also {
-                it.itemMeta = it.itemMeta?.also { meta ->
-                    meta.lore = meta.lore?.flatMap { lore ->
-                        if (lore.contains("{filter}")) {
-                            val filter = ui.playerFilters[player.player.uniqueId] ?: listOf(allKey)
-                            filter.map { i -> lore.replace("{filter}", i) }
+    fun collectQuests(playerProfile: PlayerProfile, callback: (List<Template>) -> Unit) {
+        val collect = ArrayList<Pair<Template, ItemType>>()
+        val quests = collectQuests()
+        fun process(cur: Int) {
+            if (cur < quests.size) {
+                val quest = quests[cur]
+                val ui = quest.ui()
+                // 正在进行该任务
+                if (playerProfile.getQuestById(quest.id) != null) {
+                    collect.add(quest to ItemType.QUEST_STARTED)
+                    process(cur + 1)
+                } else {
+                    // 任务接受条件判断
+                    quest.checkAccept(playerProfile).thenAccept { cond ->
+                        // 任务可以接受
+                        if (cond == AcceptResult.SUCCESSFUL) {
+                            collect.add(quest to ItemType.QUEST_CAN_START)
                         } else {
-                            listOf(lore)
+                            // 任务已完成
+                            if (playerProfile.isQuestCompleted(quest.id)) {
+                                // 任务允许显示完成状态
+                                if (ui?.visibleComplete == true) {
+                                    collect.add(quest to ItemType.QUEST_COMPLETE)
+                                }
+                            } else {
+                                collect.add(quest to ItemType.QUEST_CANNOT_START)
+                            }
                         }
+                        process(cur + 1)
                     }
                 }
+            } else {
+
             }
         }
+        process(0)
     }
 
-    open class ItemQuest(config: ConfigurationSection) : Item(config) {
-
-        override fun getItemStack(player: PlayerProfile, ui: UI, quest: Quest): ItemStack {
-            return super.getItemStack(player, ui, quest).also {
-                val addonUI = quest.template.ui()
-                if (addonUI?.icon != null) {
-                    it.setIcon(addonUI.icon)
-                }
-                it.itemMeta = it.itemMeta?.also { meta ->
-                    meta.setDisplayName(meta.displayName.replace("{name}", quest.template.displayName()))
-                    meta.lore = meta.lore?.flatMap { lore ->
-                        if (lore.contains("{description}")) {
-                            addonUI?.description?.map { i -> lore.replace("{description}", i) } ?: emptyList()
-                        } else {
-                            listOf(lore)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    enum class ItemType {
-
-        INFO,
-        FILTER,
-        QUEST_STARTED,
-        QUEST_CAN_START,
-        QUEST_CANNOT_START,
-        QUEST_COMPLETE,
-        QUEST_UNAVAILABLE
+    fun collectQuests(): List<Template> {
+        val include = include.map { it.id }
+        return ChemdahAPI.quest.filter { (_, v) -> v.label().any { it in include } && v.label().none { it in exclude } }.values.toList()
     }
 }

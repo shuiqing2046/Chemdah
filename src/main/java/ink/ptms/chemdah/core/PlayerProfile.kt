@@ -29,25 +29,39 @@ import java.util.concurrent.ConcurrentHashMap
  */
 class PlayerProfile(val uniqueId: UUID) {
 
+    /**
+     * 玩家实例
+     */
     val player: Player
         get() = Bukkit.getPlayer(uniqueId)!!
 
+    /**
+     * 玩家是否在线
+     */
     val playerOnline: Boolean
         get() = Bukkit.getPlayer(uniqueId) != null
 
+    /**
+     * 所有正在进行中的有效任务
+     */
     val quests: Collection<Quest>
         get() = questMap.filterValues { it.isValid }.values
 
-    val persistentDataContainer = DataContainer()
-
-    private val questMap = ConcurrentHashMap<String, Quest>()
+    /**
+     * 任务或玩家数据是否发生变动
+     */
+    val changed: Boolean
+        get() = persistentDataContainer.changed || quests.any { it.persistentDataContainer.changed }
 
     /**
-     * 数据是否发生变动
+     * 持久化数据储存容器
      */
-    fun isChanged(): Boolean {
-        return persistentDataContainer.changed || quests.any { it.persistentDataContainer.changed }
-    }
+    val persistentDataContainer = DataContainer()
+
+    /**
+     * 任务容器
+     */
+    private val questMap = ConcurrentHashMap<String, Quest>()
 
     /**
      * 强制注册新的任务
@@ -65,7 +79,9 @@ class PlayerProfile(val uniqueId: UUID) {
      * @param release 是否从数据库释放数据
      */
     fun unregisterQuest(quest: Quest, release: Boolean = false) {
+        // 删除缓存
         questMap.remove(quest.id)
+        // 释放数据
         if (release) {
             Tasks.task(true) {
                 Database.INSTANCE.releaseQuest(player, this, quest)
@@ -76,16 +92,17 @@ class PlayerProfile(val uniqueId: UUID) {
     /**
      * 获取条目数据控制器
      */
-    fun <T> dataOperator(task: Task, func: QuestDataOperator.() -> T): T {
-        return func.invoke(QuestDataOperator(this, task))
-    }
+    fun <T> dataOperator(task: Task, func: QuestDataOperator.() -> T) = func.invoke(QuestDataOperator(this, task))
 
     /**
      * 通过事件获取所有正在进行中的有效条目（有效任务）
      */
-    fun getTasks(event: Event): List<Task> {
-        return quests.flatMap { quest -> quest.tasks.filter { it.objective.event.isInstance(event) } }
-    }
+    fun getTasks(event: Event) = quests.flatMap { quest -> quest.tasks.filter { it.objective.event.isInstance(event) } }
+
+    /**
+     * 通过序号获取正在进行中的有效任务
+     */
+    fun getQuestById(value: String) = getQuests(value, Idx.ID).firstOrNull()
 
     /**
      * 通过序号、别名或标签获取所有符合要求且正在进行中的有效任务
@@ -104,6 +121,19 @@ class PlayerProfile(val uniqueId: UUID) {
         }
     }
 
+    /**
+     * 通过序号判断该任务是否已经完成
+     */
+    fun isQuestCompleted(value: String) = getQuestCompletedDate(value) > 0L
+
+    /**
+     * 通过序号判断该任务的上次完成时间
+     */
+    fun getQuestCompletedDate(value: String) = persistentDataContainer["quest.complete.$value", 0L].toLong()
+
+    /**
+     * 执行事件脚本代理
+     */
     fun checkAgent(agent: Any?, event: Event? = null): CompletableFuture<Boolean> {
         agent ?: return CompletableFuture.completedFuture(true)
         return try {

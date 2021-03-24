@@ -29,9 +29,9 @@ class QuestEvent {
     }
 
     /**
-     * 当任务接受时
+     * 当任务进行接受检测时
      */
-    class Accept(val template: Template, val playerProfile: PlayerProfile): EventCancellable<Accept>() {
+    class AcceptCheck(val template: Template, val playerProfile: PlayerProfile): EventCancellable<AcceptCheck>() {
 
         init {
             async(!Bukkit.isPrimaryThread())

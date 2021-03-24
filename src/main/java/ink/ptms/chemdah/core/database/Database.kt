@@ -80,7 +80,7 @@ interface Database {
         @EventHandler
         fun e(e: PlayerQuitEvent) {
             val playerProfile = ChemdahAPI.playerProfile.remove(e.player.name)
-            if (playerProfile?.isChanged() == true) {
+            if (playerProfile?.changed == true) {
                 Tasks.task(true) {
                     mirrorFuture("Database:update") {
                         INSTANCE.update(e.player, playerProfile)
@@ -95,7 +95,7 @@ interface Database {
         fun update200() {
             Bukkit.getOnlinePlayers().forEach {
                 val playerProfile = ChemdahAPI.getPlayerProfile(it)
-                if (playerProfile.isChanged()) {
+                if (playerProfile.changed) {
                     mirrorFuture("Database:update") {
                         INSTANCE.update(it, playerProfile)
                         PlayerEvent.Updated(it, playerProfile).call()

@@ -8,9 +8,10 @@ default:
     addon:stats:
       visible: true
   addon:ui:
-    visible: true
-    start: false
-    icon: diamond -data 0 -c 0 --unbreakable
+    visible:
+      start: true
+      complete: true
+    icon: iron_pickaxe --noflags
     description:
       - '&7Mine &3[10 Diamond Ores] &7anywhere.'
   agent:complete:
