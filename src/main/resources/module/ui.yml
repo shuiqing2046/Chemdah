@@ -52,6 +52,10 @@ default:
           - '{description}'
           - ''
           - '&8CLICK TO TRACK'
+        enchant:
+          LUCK: 1
+        flags:
+          - HIDE_ENCHANTS
       can-start:
         material: lime_stained_glass_pane
         name: '&a&l{name}'

@@ -3,7 +3,6 @@ package ink.ptms.chemdah.module.ui
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.AcceptResult
-import ink.ptms.chemdah.core.quest.Idx
 import ink.ptms.chemdah.core.quest.Template
 import ink.ptms.chemdah.core.quest.addon.AddonUI.Companion.ui
 import ink.ptms.chemdah.core.quest.meta.MetaLabel.Companion.label
@@ -11,6 +10,7 @@ import ink.ptms.chemdah.util.colored
 import io.izzel.taboolib.util.item.Items
 import org.bukkit.configuration.ConfigurationSection
 import java.util.*
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
@@ -35,7 +35,7 @@ class UI(val config: ConfigurationSection) {
     val exclude: List<String> = config.getStringList("exclude")
     val items = HashMap<ItemType, Item>()
 
-    val playerFilters = ConcurrentHashMap<UUID, List<String>>()
+    val playerFilters = ConcurrentHashMap<UUID, MutableList<String>>()
 
     init {
         config.getConfigurationSection("include")?.getKeys(false)?.forEach {
@@ -47,51 +47,64 @@ class UI(val config: ConfigurationSection) {
         items[ItemType.FILTER] = ItemFilter(config.getConfigurationSection("item.filter")!!)
         items[ItemType.QUEST_STARTED] = ItemQuest(config.getConfigurationSection("item.quest.started")!!)
         items[ItemType.QUEST_CAN_START] = ItemQuest(config.getConfigurationSection("item.quest.can-start")!!)
-        items[ItemType.QUEST_CANNOT_START] = ItemQuest(config.getConfigurationSection("item.quest.cannot-start")!!)
-        items[ItemType.QUEST_COMPLETE] = ItemQuest(config.getConfigurationSection("item.quest.completed")!!)
-        items[ItemType.QUEST_UNAVAILABLE] = ItemQuest(config.getConfigurationSection("item.quest.unavailable")!!)
+        items[ItemType.QUEST_CANNOT_START] = ItemQuestNoIcon(config.getConfigurationSection("item.quest.cannot-start")!!)
+        items[ItemType.QUEST_COMPLETE] = ItemQuestNoIcon(config.getConfigurationSection("item.quest.completed")!!)
+        items[ItemType.QUEST_UNAVAILABLE] = ItemQuestNoIcon(config.getConfigurationSection("item.quest.unavailable")!!)
     }
 
-    fun collectQuests(playerProfile: PlayerProfile, callback: (List<Template>) -> Unit) {
-        val collect = ArrayList<Pair<Template, ItemType>>()
-        val quests = collectQuests()
+    /**
+     * 打开任务页面
+     */
+    fun open(playerProfile: PlayerProfile) {
+        collectQuests(playerProfile).thenAccept { UIMenu(this, playerProfile, it).open() }
+    }
+
+    /**
+     * 获取所有被收录的有效任务列表
+     * 并根据任务状态排序
+     */
+    fun collectQuests(playerProfile: PlayerProfile): CompletableFuture<List<UITemplate>> {
+        val completableFuture = CompletableFuture<List<UITemplate>>()
+        // 临时容器
+        val collect = ArrayList<UITemplate>()
+        // 玩家筛选列表
+        val includePlayer = playerFilters.computeIfAbsent(playerProfile.uniqueId) { ArrayList() }
+        val include = include.map { it.id }.filter { it in includePlayer || includePlayer.isEmpty() }
+        // 筛选任务列表
+        val quests = ChemdahAPI.quest.filter { (_, v) -> v.label().any { it in include } && v.label().none { it in exclude } }.values.toList()
         fun process(cur: Int) {
             if (cur < quests.size) {
                 val quest = quests[cur]
                 val ui = quest.ui()
                 // 正在进行该任务
                 if (playerProfile.getQuestById(quest.id) != null) {
-                    collect.add(quest to ItemType.QUEST_STARTED)
+                    collect.add(UITemplate(quest, ItemType.QUEST_STARTED))
                     process(cur + 1)
                 } else {
                     // 任务接受条件判断
                     quest.checkAccept(playerProfile).thenAccept { cond ->
                         // 任务可以接受
                         if (cond == AcceptResult.SUCCESSFUL) {
-                            collect.add(quest to ItemType.QUEST_CAN_START)
+                            collect.add(UITemplate(quest, ItemType.QUEST_CAN_START))
                         } else {
                             // 任务已完成
                             if (playerProfile.isQuestCompleted(quest.id)) {
                                 // 任务允许显示完成状态
                                 if (ui?.visibleComplete == true) {
-                                    collect.add(quest to ItemType.QUEST_COMPLETE)
+                                    collect.add(UITemplate(quest, ItemType.QUEST_COMPLETE))
                                 }
                             } else {
-                                collect.add(quest to ItemType.QUEST_CANNOT_START)
+                                collect.add(UITemplate(quest, ItemType.QUEST_CANNOT_START))
                             }
                         }
                         process(cur + 1)
                     }
                 }
             } else {
-
+                completableFuture.complete(collect.sortedByDescending { it.itemType.priority })
             }
         }
         process(0)
-    }
-
-    fun collectQuests(): List<Template> {
-        val include = include.map { it.id }
-        return ChemdahAPI.quest.filter { (_, v) -> v.label().any { it in include } && v.label().none { it in exclude } }.values.toList()
+        return completableFuture
     }
 }

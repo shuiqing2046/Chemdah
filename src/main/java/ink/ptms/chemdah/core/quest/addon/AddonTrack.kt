@@ -1,10 +1,7 @@
 package ink.ptms.chemdah.core.quest.addon
 
 import ink.ptms.chemdah.core.PlayerProfile
-import ink.ptms.chemdah.core.quest.Id
-import ink.ptms.chemdah.core.quest.Idx
-import ink.ptms.chemdah.core.quest.Quest
-import ink.ptms.chemdah.core.quest.QuestContainer
+import ink.ptms.chemdah.core.quest.*
 import org.bukkit.configuration.ConfigurationSection
 
 /**
@@ -22,7 +19,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
         /**
          * 当前任务追踪
          */
-        var PlayerProfile.trackQuest: Quest?
+        var PlayerProfile.trackQuest: Template?
             set(value) {
                 if (value != null) {
                     persistentDataContainer["quest.track"] = value.id
@@ -30,8 +27,6 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                     persistentDataContainer.remove("quest.track")
                 }
             }
-            get() = persistentDataContainer["quest.track"]?.let {
-                getQuests(it.toString(), Idx.ID)[0]
-            }
+            get() = persistentDataContainer["quest.track"]?.let { getQuestById(it.toString())?.template }
     }
 }
