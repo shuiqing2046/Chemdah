@@ -1,7 +1,6 @@
 package ink.ptms.chemdah.module.ui
 
 import ink.ptms.chemdah.core.PlayerProfile
-import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.core.quest.Template
 import ink.ptms.chemdah.core.quest.addon.AddonUI.Companion.ui
 import ink.ptms.chemdah.core.quest.meta.MetaName.Companion.displayName

@@ -2,10 +2,13 @@ package ink.ptms.chemdah.module.ui
 
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Template
+import ink.ptms.chemdah.core.quest.addon.AddonTrack.Companion.isTrackable
+import ink.ptms.chemdah.core.quest.addon.AddonTrack.Companion.trackQuest
 import io.izzel.taboolib.module.db.local.SecuredFile
 import io.izzel.taboolib.util.item.Items
 import io.izzel.taboolib.util.item.inventory.ClickEvent
 import io.izzel.taboolib.util.item.inventory.linked.MenuLinked
+import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
@@ -70,8 +73,16 @@ class UIMenu(val ui: UI, val profile: PlayerProfile, val templates: List<UITempl
     }
 
     override fun onClick(event: ClickEvent, template: UITemplate) {
+        // 当任务为正在进行或可以开始时
         if (template.itemType == ItemType.QUEST_STARTED || template.itemType == ItemType.QUEST_CAN_START) {
-
+            // 当任务允许被追踪时才会关闭界面
+            if (template.template.isTrackable()) {
+                // 追踪任务
+                profile.trackQuest = template.template
+                // 播放音效并关闭界面
+                event.clicker.playSound(event.clicker.location, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1f, 1f)
+                event.clicker.closeInventory()
+            }
         }
     }
 

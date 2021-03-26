@@ -36,7 +36,7 @@ object ChemdahAPI {
     val playerProfile = ConcurrentHashMap<String, PlayerProfile>()
 
     /**
-     * 获取正在进行的回话
+     * 获取正在进行的会话
      */
     fun getConversationSession(player: Player) = ConversationManager.sessions[player.name]
 

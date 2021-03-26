@@ -1,7 +1,6 @@
 package ink.ptms.chemdah.module.ui
 
 import ink.ptms.chemdah.core.PlayerProfile
-import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.core.quest.Template
 import io.izzel.taboolib.kotlin.kether.KetherFunction
 import io.izzel.taboolib.util.item.Items

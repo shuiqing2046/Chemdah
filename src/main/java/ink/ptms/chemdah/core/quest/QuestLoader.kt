@@ -4,9 +4,11 @@ import ink.ptms.chemdah.Chemdah
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.quest.addon.Addon
 import ink.ptms.chemdah.core.quest.meta.Meta
+import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.Objective
 import ink.ptms.chemdah.util.mirrorFuture
 import io.izzel.taboolib.TabooLibLoader
+import io.izzel.taboolib.Version
 import io.izzel.taboolib.compat.kotlin.CompatKotlin
 import io.izzel.taboolib.kotlin.SingleListener
 import io.izzel.taboolib.kotlin.Tasks
@@ -59,6 +61,18 @@ object QuestLoader {
             if (Objective::class.java.isAssignableFrom(it)) {
                 val objective = CompatKotlin.getInstance(it) as? Objective<Event>
                 if (objective != null) {
+                    // 检测依赖环境
+                    if (it.isAnnotationPresent(Dependency::class.java)) {
+                        val dependency = it.getAnnotation(Dependency::class.java)
+                        // 不支持的扩展
+                        if (dependency.plugin != "minecraft" && Bukkit.getPluginManager().getPlugin(dependency.plugin) == null) {
+                            return@forEach
+                        }
+                        // 不支持的版本
+                        if (Version.isBefore(dependency.version)) {
+                            return@forEach
+                        }
+                    }
                     ChemdahAPI.questObjective[objective.name] = objective
                     // 是否注册监听器
                     if (objective.isListener) {

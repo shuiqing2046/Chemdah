@@ -5,7 +5,7 @@ import org.bukkit.event.Event
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.quest.objective.impl.IBlockBreak
+ * ink.ptms.chemdah.core.quest.objective.other.INever
  *
  * @author sky
  * @since 2021/3/2 5:09 下午

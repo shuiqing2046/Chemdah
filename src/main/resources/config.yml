@@ -23,3 +23,31 @@ default-stats:
   style: SOLID
   color: WHITE
   content: '&3[{name}] &7{value}/{target} &f[{percent}%]'
+
+default-track:
+  mark:
+    value: true
+    type: HAPPY_VILLAGER
+    size: 0
+    count: 1000
+    distance:
+      min: 16
+      max: 64
+  navigation:
+    value: true
+    type: END_ROD
+    size:
+      x: 0
+      y: 1.5
+    count: 20
+    content:
+      - '&a[{name}]'
+      - '{distance}m'
+    distance: 6
+  scoreboard:
+    value: true
+    content:
+      - '&6&lTRACKS'
+      - - ''
+        - '{name}'
+        - '{description}'

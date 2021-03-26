@@ -3,7 +3,6 @@ package ink.ptms.chemdah.module.ui
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.AcceptResult
-import ink.ptms.chemdah.core.quest.Template
 import ink.ptms.chemdah.core.quest.addon.AddonUI.Companion.ui
 import ink.ptms.chemdah.core.quest.meta.MetaLabel.Companion.label
 import ink.ptms.chemdah.util.colored
@@ -32,7 +31,7 @@ class UI(val config: ConfigurationSection) {
     val menuFilterRows = config.getInt("menu.filter.rows")
     val menuFilterSlot: List<Int> = config.getIntegerList("menu.filter.slot")
     val include = ArrayList<Include>()
-    val exclude: List<String> = config.getStringList("exclude")
+    val exclude = config.getStringList("exclude").toList()
     val items = HashMap<ItemType, Item>()
 
     val playerFilters = ConcurrentHashMap<UUID, MutableList<String>>()
@@ -85,7 +84,10 @@ class UI(val config: ConfigurationSection) {
                     quest.checkAccept(playerProfile).thenAccept { cond ->
                         // 任务可以接受
                         if (cond == AcceptResult.SUCCESSFUL) {
-                            collect.add(UITemplate(quest, ItemType.QUEST_CAN_START))
+                            // 任务允许显示可接受状态
+                            if (ui?.visibleStart == true) {
+                                collect.add(UITemplate(quest, ItemType.QUEST_CAN_START))
+                            }
                         } else {
                             // 任务已完成
                             if (playerProfile.isQuestCompleted(quest.id)) {
@@ -94,7 +96,10 @@ class UI(val config: ConfigurationSection) {
                                     collect.add(UITemplate(quest, ItemType.QUEST_COMPLETE))
                                 }
                             } else {
-                                collect.add(UITemplate(quest, ItemType.QUEST_CANNOT_START))
+                                // 任务允许显示无法接受状态
+                                if (ui?.visibleStart == true) {
+                                    collect.add(UITemplate(quest, ItemType.QUEST_CANNOT_START))
+                                }
                             }
                         }
                         process(cur + 1)

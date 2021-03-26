@@ -2,20 +2,20 @@ package ink.ptms.chemdah.core.quest.objective.bukkit
 
 import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
-import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.block.BlockPlaceEvent
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.quest.objective.bukkit.IBlockBreak
+ * ink.ptms.chemdah.core.quest.objective.bukkit.IBlockPlace
  *
  * @author sky
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
-object IBlockBreak : ObjectiveCountable<BlockBreakEvent>() {
+object IBlockPlace : ObjectiveCountable<BlockPlaceEvent>() {
 
-    override val name = "block break"
-    override val event = BlockBreakEvent::class
+    override val name = "block place"
+    override val event = BlockPlaceEvent::class
 
     init {
         handler {
@@ -26,6 +26,9 @@ object IBlockBreak : ObjectiveCountable<BlockBreakEvent>() {
         }
         addCondition { _, task, e ->
             !task.condition.containsKey("material") || task.condition["material"]!!.toMaterial().isBlock(e.block)
+        }
+        addCondition { _, task, e ->
+            !task.condition.containsKey("material:against") || task.condition["material:against"]!!.toMaterial().isBlock(e.blockAgainst)
         }
     }
 }

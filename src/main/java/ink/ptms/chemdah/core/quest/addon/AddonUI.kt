@@ -19,7 +19,7 @@ class AddonUI(config: ConfigurationSection, questContainer: QuestContainer) : Ad
      * 持续在 UI 中显示
      * 启用后则可能显示为 can-start 或 cannot-start
      */
-    val visibleStart = config.getBoolean("visible.start", true)
+    val visibleStart = config.getBoolean("visible.start", false)
 
     /**
      * 任务完成后显示为 complete 已完成状态
@@ -34,7 +34,7 @@ class AddonUI(config: ConfigurationSection, questContainer: QuestContainer) : Ad
     /**
      * 显示介绍
      */
-    val description: List<String> = config.getStringList("description")
+    val description = config.getStringList("description").toList()
 
     companion object {
 

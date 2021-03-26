@@ -23,10 +23,10 @@ class Task(id: String, config: ConfigurationSection, val template: Template) : Q
     val metaNode = "${template.id}.$id"
 
     init {
-        config.getConfigurationSection("if")?.getValues(false)?.forEach { (k, v) ->
+        config.getConfigurationSection("condition")?.getValues(false)?.forEach { (k, v) ->
             condition.put(k, v.data())
         }
-        config.getConfigurationSection("when")?.getValues(false)?.forEach { (k, v) ->
+        config.getConfigurationSection("goal")?.getValues(false)?.forEach { (k, v) ->
             goal.put(k, v.data())
         }
     }

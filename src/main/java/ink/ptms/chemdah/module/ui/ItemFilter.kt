@@ -1,7 +1,6 @@
 package ink.ptms.chemdah.module.ui
 
 import ink.ptms.chemdah.core.PlayerProfile
-import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.core.quest.Template
 import ink.ptms.chemdah.util.asList
 import org.bukkit.configuration.ConfigurationSection
