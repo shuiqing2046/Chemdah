@@ -2,6 +2,7 @@ package ink.ptms.chemdah.core.quest
 
 import ink.ptms.chemdah.Chemdah
 import ink.ptms.chemdah.api.ChemdahAPI
+import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.core.quest.addon.Addon
 import ink.ptms.chemdah.core.quest.meta.Meta
 import ink.ptms.chemdah.core.quest.objective.Dependency
@@ -33,7 +34,7 @@ object QuestLoader {
     private fun tick() {
         mirrorFuture("QuestHandler:tick") {
             Bukkit.getOnlinePlayers().forEach {
-                ChemdahAPI.getPlayerProfile(it).also { profile ->
+                it.chemdahProfile.also { profile ->
                     // 检测所有有效任务
                     profile.quests.forEach { quest ->
                         // 检测超时
@@ -116,7 +117,7 @@ object QuestLoader {
      */
     fun handleEvent(player: Player, event: Event, objective: Objective<Event>) {
         mirrorFuture("QuestHandler:handleEvent:${objective.name}") {
-            ChemdahAPI.getPlayerProfile(player).also { profile ->
+            player.chemdahProfile.also { profile ->
                 // 通过事件获取所有正在进行的任务条目
                 profile.getTasks(event).forEach { task ->
                     // 如果含有完成标记，则不在进行该条目

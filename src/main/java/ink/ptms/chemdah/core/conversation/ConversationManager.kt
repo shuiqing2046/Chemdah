@@ -3,6 +3,7 @@ package ink.ptms.chemdah.core.conversation
 import ink.ptms.adyeshach.api.event.AdyeshachEntityInteractEvent
 import ink.ptms.adyeshach.common.entity.type.AdyHuman
 import ink.ptms.chemdah.api.ChemdahAPI
+import ink.ptms.chemdah.api.ChemdahAPI.conversationSession
 import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.module.config.TConfig
 import io.izzel.taboolib.module.i18n.I18n
@@ -76,14 +77,14 @@ object ConversationManager : Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private fun e(e: PlayerInteractAtEntityEvent) {
-        if (e.hand == EquipmentSlot.HAND && ChemdahAPI.getConversationSession(e.player) == null) {
+        if (e.hand == EquipmentSlot.HAND && e.player.conversationSession == null) {
             val name = I18n.get().getName(e.rightClicked)
             ChemdahAPI.conversation.values.firstOrNull { it.isNPC("minecraft", name) }?.run {
                 e.isCancelled = true
                 open(e.player, e.rightClicked.location.also {
                     it.y += e.rightClicked.height
                 })
-                ChemdahAPI.getConversationSession(e.player)?.npcName = name
+                e.player.conversationSession?.npcName = name
             }
         }
     }
@@ -96,7 +97,7 @@ object ConversationManager : Listener {
                 it.removeFirst()
             }
             if (args.size == 2 && args[0] == "reply") {
-                val session = ChemdahAPI.getConversationSession(e.player) ?: return
+                val session = e.player.conversationSession ?: return
                 session.conversation.playerSide.checked(session).thenApply { replies ->
                     replies.firstOrNull { it.uuid.toString() == args[1] }?.select(session)
                 }
@@ -109,14 +110,14 @@ object ConversationManager : Listener {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         fun e(e: AdyeshachEntityInteractEvent) {
-            if (e.isMainHand && ChemdahAPI.getConversationSession(e.player) == null) {
+            if (e.isMainHand && e.player.conversationSession == null) {
                 ChemdahAPI.conversation.values.firstOrNull { it.isNPC("adyeshach", e.entity.id) }?.run {
                     e.isCancelled = true
                     Tasks.task {
                         open(e.player, e.entity.getLocation().also {
                             it.y += e.entity.entityType.entitySize.height
                         })
-                        ChemdahAPI.getConversationSession(e.player)?.npcName = if (e.entity is AdyHuman) {
+                        e.player.conversationSession?.npcName = if (e.entity is AdyHuman) {
                             (e.entity as AdyHuman).getName()
                         } else {
                             e.entity.getCustomName()
@@ -132,14 +133,14 @@ object ConversationManager : Listener {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         fun e(e: PlayerInteractAtEntityEvent) {
-            if (e.hand == EquipmentSlot.HAND && e.rightClicked.hasMetadata("NPC") && ChemdahAPI.getConversationSession(e.player) == null) {
+            if (e.hand == EquipmentSlot.HAND && e.rightClicked.hasMetadata("NPC") && e.player.conversationSession == null) {
                 val npc = CitizensAPI.getNPCRegistry().getNPC(e.rightClicked) ?: return
                 ChemdahAPI.conversation.values.firstOrNull { it.isNPC("citizens", npc.id.toString()) }?.run {
                     e.isCancelled = true
                     open(e.player, e.rightClicked.location.also {
                         it.y += e.rightClicked.height
                     })
-                    ChemdahAPI.getConversationSession(e.player)?.npcName = npc.fullName
+                    e.player.conversationSession?.npcName = npc.fullName
                 }
             }
         }
@@ -150,14 +151,14 @@ object ConversationManager : Listener {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         fun e(e: PlayerInteractAtEntityEvent) {
-            if (e.hand == EquipmentSlot.HAND && e.rightClicked is LivingEntity && ChemdahAPI.getConversationSession(e.player) == null) {
+            if (e.hand == EquipmentSlot.HAND && e.rightClicked is LivingEntity && e.player.conversationSession == null) {
                 val mob = MythicMobs.inst().mobManager.getMythicMobInstance(e.rightClicked) ?: return
                 ChemdahAPI.conversation.values.firstOrNull { it.isNPC("citizens", mob.type.internalName) }?.run {
                     e.isCancelled = true
                     open(e.player, e.rightClicked.location.also {
                         it.y += e.rightClicked.height
                     })
-                    ChemdahAPI.getConversationSession(e.player)?.npcName = mob.displayName
+                    e.player.conversationSession?.npcName = mob.displayName
                 }
             }
         }

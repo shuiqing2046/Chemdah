@@ -1,6 +1,8 @@
 package ink.ptms.chemdah.util
 
 import ink.ptms.chemdah.api.ChemdahAPI
+import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
+import ink.ptms.chemdah.api.ChemdahAPI.conversationSession
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.conversation.Session
 import ink.ptms.chemdah.core.quest.Quest
@@ -62,12 +64,11 @@ fun QuestContext.Frame.getTask(): Task {
 
 fun QuestContext.Frame.getSession(): Session {
     val player = (context() as ScriptContext).sender as? Player ?: error("No player selected.")
-    return ChemdahAPI.getConversationSession(player) ?: error("No session selected.")
+    return player.conversationSession ?: error("No session selected.")
 }
 
 fun QuestContext.Frame.getProfile(): PlayerProfile {
-    val player = (context() as ScriptContext).sender as? Player ?: error("No player selected.")
-    return ChemdahAPI.getPlayerProfile(player)
+    return ((context() as ScriptContext).sender as? Player ?: error("No player selected.")).chemdahProfile
 }
 
 fun QuestContext.Frame.vars() = HashMap<String, Any?>().also { map ->

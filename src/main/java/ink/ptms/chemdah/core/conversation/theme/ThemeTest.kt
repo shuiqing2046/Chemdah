@@ -1,6 +1,7 @@
 package ink.ptms.chemdah.core.conversation.theme
 
 import ink.ptms.chemdah.api.ChemdahAPI
+import ink.ptms.chemdah.api.ChemdahAPI.conversationSession
 import ink.ptms.chemdah.core.conversation.ConversationManager
 import ink.ptms.chemdah.core.conversation.Session
 import ink.ptms.chemdah.util.colored
@@ -47,7 +48,7 @@ object ThemeTest : Theme, Listener {
 
     @EventHandler
     fun e(e: PlayerItemHeldEvent) {
-        val session = ChemdahAPI.getConversationSession(e.player) ?: return
+        val session = e.player.conversationSession ?: return
         if (session.conversation.option.theme == "test" && !session.npcTalking) {
             val replies = session.playerReplyForDisplay
             if (replies.isNotEmpty()) {
@@ -65,7 +66,7 @@ object ThemeTest : Theme, Listener {
 
     @EventHandler
     fun e(e: PlayerSwapHandItemsEvent) {
-        val session = ChemdahAPI.getConversationSession(e.player) ?: return
+        val session = e.player.conversationSession ?: return
         if (session.conversation.option.theme == "test") {
             e.isCancelled = true
             if (session.npcTalking) {
@@ -84,7 +85,7 @@ object ThemeTest : Theme, Listener {
 
     @EventHandler
     fun e(e: AsyncPlayerChatEvent) {
-        val session = ChemdahAPI.getConversationSession(e.player) ?: return
+        val session = e.player.conversationSession ?: return
         if (session.conversation.option.theme == "test" && !session.npcTalking && CronusUtils.isInt(e.message)) {
             e.isCancelled = true
             session.playerReplyForDisplay.getOrNull(Coerce.toInteger(e.message) - 1)?.run {

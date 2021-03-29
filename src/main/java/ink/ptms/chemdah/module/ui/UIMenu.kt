@@ -86,7 +86,11 @@ class UIMenu(val ui: UI, val profile: PlayerProfile, val templates: List<UITempl
         }
     }
 
-    override fun generateItem(player: Player, template: UITemplate, index: Int, slot: Int): ItemStack {
+    override fun generateItem(player: Player, template: UITemplate, index: Int, slot: Int): ItemStack? {
+        return null
+    }
+
+    override fun generateItemAsync(player: Player, template: UITemplate, index: Int, slot: Int): ItemStack {
         return ui.items[template.itemType]!!.getItemStack(profile, ui, template.template)
     }
 

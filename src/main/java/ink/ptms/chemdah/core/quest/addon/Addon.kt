@@ -10,6 +10,4 @@ import org.bukkit.configuration.ConfigurationSection
  * @author sky
  * @since 2021/3/2 1:03 上午
  */
-abstract class Addon(val config: ConfigurationSection, val questContainer: QuestContainer) {
-
-}
+abstract class Addon(val config: ConfigurationSection, val questContainer: QuestContainer)

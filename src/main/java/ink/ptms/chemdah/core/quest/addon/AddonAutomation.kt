@@ -2,6 +2,7 @@ package ink.ptms.chemdah.core.quest.addon
 
 import com.google.common.base.Enums
 import ink.ptms.chemdah.api.ChemdahAPI
+import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.core.quest.AcceptResult
 import ink.ptms.chemdah.core.quest.Id
 import ink.ptms.chemdah.core.quest.QuestContainer
@@ -26,43 +27,6 @@ import kotlin.random.Random
  */
 @Id("automation")
 class AddonAutomation(source: ConfigurationSection, questContainer: QuestContainer) : Addon(source, questContainer) {
-
-    val isAutoAccept = source.getBoolean("auto-accept")
-
-    val plan = if (source.contains("plan")) {
-        val method = Enums.getIfPresent(RealTime::class.java, source.getString("method").toString().toUpperCase()).or(RealTime.START_IN_MONDAY)
-        val args = source.getString("type").toString().toLowerCase().split(" ")
-        val type = when (args[0]) {
-            "hour" -> PlanTypeHour(
-                method,
-                RealTimeUnit.HOUR,
-                Coerce.toInteger(args[1]),
-            )
-            "day", "daily" -> PlanTypeDaily(
-                method,
-                RealTimeUnit.DAY,
-                Coerce.toInteger(args[1]),
-                Coerce.toInteger(args.getOrNull(2) ?: 6),
-                Coerce.toInteger(args.getOrNull(3) ?: 0)
-            )
-            "week", "weekly" -> PlanTypeWeekly(
-                method,
-                RealTimeUnit.WEEK,
-                Coerce.toInteger(args[1]),
-                Coerce.toInteger(args.getOrNull(2) ?: 0),
-                Coerce.toInteger(args.getOrNull(3) ?: 6),
-                Coerce.toInteger(args.getOrNull(4) ?: 0)
-            )
-            else -> null
-        }
-        if (type != null) {
-            Plan(type, source.getInt("count", 1), source.getString("group"))
-        } else {
-            null
-        }
-    } else {
-        null
-    }
 
     class Plan(val type: PlanType, val count: Int, val group: String?) {
 
@@ -109,6 +73,43 @@ class AddonAutomation(source: ConfigurationSection, questContainer: QuestContain
         val quests = ArrayList<Template>()
     }
 
+    val isAutoAccept = source.getBoolean("auto-accept")
+
+    val plan = if (source.contains("plan")) {
+        val method = Enums.getIfPresent(RealTime::class.java, source.getString("method").toString().toUpperCase()).or(RealTime.START_IN_MONDAY)
+        val args = source.getString("type").toString().toLowerCase().split(" ")
+        val type = when (args[0]) {
+            "hour" -> PlanTypeHour(
+                method,
+                RealTimeUnit.HOUR,
+                Coerce.toInteger(args[1]),
+            )
+            "day", "daily" -> PlanTypeDaily(
+                method,
+                RealTimeUnit.DAY,
+                Coerce.toInteger(args[1]),
+                Coerce.toInteger(args.getOrNull(2) ?: 6),
+                Coerce.toInteger(args.getOrNull(3) ?: 0)
+            )
+            "week", "weekly" -> PlanTypeWeekly(
+                method,
+                RealTimeUnit.WEEK,
+                Coerce.toInteger(args[1]),
+                Coerce.toInteger(args.getOrNull(2) ?: 0),
+                Coerce.toInteger(args.getOrNull(3) ?: 6),
+                Coerce.toInteger(args.getOrNull(4) ?: 0)
+            )
+            else -> null
+        }
+        if (type != null) {
+            Plan(type, source.getInt("count", 1), source.getString("group"))
+        } else {
+            null
+        }
+    } else {
+        null
+    }
+
     companion object {
 
         fun Template.isAutoAccept() = addon<AddonAutomation>("automation")?.isAutoAccept ?: false
@@ -139,7 +140,7 @@ class AddonAutomation(source: ConfigurationSection, questContainer: QuestContain
             }
             mirrorFuture("MetaAutomation") {
                 Bukkit.getOnlinePlayers().forEach { player ->
-                    val profile = ChemdahAPI.getPlayerProfile(player)
+                    val profile = player.chemdahProfile
                     // 自动接受的任务
                     autoAccept.forEach {
                         if (profile.getQuests(it.id).isNotEmpty()) {

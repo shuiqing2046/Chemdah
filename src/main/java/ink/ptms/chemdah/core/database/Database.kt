@@ -1,6 +1,7 @@
 package ink.ptms.chemdah.core.database
 
 import ink.ptms.chemdah.api.ChemdahAPI
+import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.api.event.PlayerEvent
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Quest
@@ -94,7 +95,7 @@ interface Database {
         @TSchedule(period = 200, async = true)
         fun update200() {
             Bukkit.getOnlinePlayers().forEach {
-                val playerProfile = ChemdahAPI.getPlayerProfile(it)
+                val playerProfile = it.chemdahProfile
                 if (playerProfile.changed) {
                     mirrorFuture("Database:update") {
                         INSTANCE.update(it, playerProfile)

@@ -39,22 +39,31 @@ import java.util.concurrent.atomic.AtomicReference
 @Id("stats")
 class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) : Addon(config, questContainer) {
 
+    class StatsMap {
+
+        val bossBar = ConcurrentHashMap<String, Pair<BossBar, Long>>()
+        val bossBarAlways = ConcurrentHashMap<String, BossBar>()
+    }
+
     val agent = config.get("$", "pass")!!.asList()
     val visible = config.getBoolean("visible")
     val visibleAlways = config.getBoolean("visible-always")
     val bossMusic = config.getBoolean("boss-music")
     val darkenSky = config.getBoolean("darken-sky")
     val stay = config.getInt("stay", conf.getInt("default-stats.stay"))
+
     val style = try {
         BarStyle.valueOf(config.getString("style", conf.getString("default-stats.style"))!!.toUpperCase())
     } catch (ignored: Throwable) {
         BarStyle.SOLID
     }
+
     val color = try {
         BarColor.valueOf(config.getString("color", conf.getString("default-stats.color"))!!.toUpperCase())
     } catch (ignored: Throwable) {
         BarColor.WHITE
     }
+
     val content = config.getString("content", conf.getStringColored("default-stats.content")).toString()
 
     fun getTitle(task: Task, progress: Progress) = content
@@ -95,12 +104,6 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
             )
         }
         return future
-    }
-
-    class StatsMap {
-
-        val bossBar = ConcurrentHashMap<String, Pair<BossBar, Long>>()
-        val bossBarAlways = ConcurrentHashMap<String, BossBar>()
     }
 
     @TListener

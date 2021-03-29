@@ -5,6 +5,7 @@ import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.conversation.Conversation
 import ink.ptms.chemdah.core.conversation.ConversationLoader
 import ink.ptms.chemdah.core.conversation.ConversationManager
+import ink.ptms.chemdah.core.conversation.Session
 import ink.ptms.chemdah.core.conversation.theme.Theme
 import ink.ptms.chemdah.core.quest.Idx
 import ink.ptms.chemdah.core.quest.QuestLoader
@@ -36,9 +37,20 @@ object ChemdahAPI {
     val playerProfile = ConcurrentHashMap<String, PlayerProfile>()
 
     /**
-     * 获取正在进行的会话
+     * 获取已经缓存的玩家数据
+     * 如玩家不存在则会直接跑出 NullPointerException 异常
+     *
+     * @throws NullPointerException
      */
-    fun getConversationSession(player: Player) = ConversationManager.sessions[player.name]
+    val Player.chemdahProfile: PlayerProfile
+        @Throws(NullPointerException::class)
+        get() = ChemdahAPI.playerProfile[name]!!
+
+    /**
+     * 获取玩家正在进行的会话
+     */
+    val Player.conversationSession: Session?
+       get() = ConversationManager.sessions[name]
 
     /**
      * 获取对话资源
@@ -86,15 +98,6 @@ object ChemdahAPI {
      * 获取任务目标
      */
     fun getQuestObjective(id: String) = questObjective[id]
-
-    /**
-     * 获取已经缓存的玩家数据
-     * 如玩家不存在则会直接跑出 NullPointerException 异常
-     *
-     * @throws NullPointerException
-     */
-    @Throws(NullPointerException::class)
-    fun getPlayerProfile(player: Player) = playerProfile[player.name]!!
 
     /**
      * 获取已注册的模块

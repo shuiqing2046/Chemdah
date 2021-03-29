@@ -25,6 +25,7 @@ default-stats:
   content: '&3[{name}] &7{value}/{target} &f[{percent}%]'
 
 default-track:
+  message: 'Tracking [{name}]... click to cancel.'
   mark:
     value: true
     type: HAPPY_VILLAGER
@@ -33,6 +34,7 @@ default-track:
     distance:
       min: 16
       max: 64
+    period: 20
   navigation:
     value: true
     type: END_ROD
@@ -44,6 +46,7 @@ default-track:
       - '&a[{name}]'
       - '{distance}m'
     distance: 6
+    period: 40
   scoreboard:
     value: true
     content:

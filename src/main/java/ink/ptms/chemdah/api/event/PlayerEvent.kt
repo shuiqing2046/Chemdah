@@ -1,6 +1,8 @@
 package ink.ptms.chemdah.api.event
 
 import ink.ptms.chemdah.core.PlayerProfile
+import ink.ptms.chemdah.core.quest.Template
+import io.izzel.taboolib.module.event.EventCancellable
 import io.izzel.taboolib.module.event.EventNormal
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -28,6 +30,16 @@ class PlayerEvent {
      * 当玩家数据更新时
      */
     class Updated(val player: Player, val playerProfile: PlayerProfile) : EventNormal<Updated>() {
+
+        init {
+            async(!Bukkit.isPrimaryThread())
+        }
+    }
+
+    /**
+     * 当玩家追踪任务时
+     */
+    class Track(val player: Player, val playerProfile: PlayerProfile, val template: Template): EventCancellable<Track>() {
 
         init {
             async(!Bukkit.isPrimaryThread())
