@@ -2,7 +2,7 @@ package ink.ptms.chemdah.module.ui
 
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Template
-import ink.ptms.chemdah.core.quest.addon.AddonTrack.Companion.isTrackable
+import ink.ptms.chemdah.core.quest.addon.AddonTrack.Companion.allowTracked
 import ink.ptms.chemdah.core.quest.addon.AddonTrack.Companion.trackQuest
 import io.izzel.taboolib.module.db.local.SecuredFile
 import io.izzel.taboolib.util.item.Items
@@ -76,7 +76,7 @@ class UIMenu(val ui: UI, val profile: PlayerProfile, val templates: List<UITempl
         // 当任务为正在进行或可以开始时
         if (template.itemType == ItemType.QUEST_STARTED || template.itemType == ItemType.QUEST_CAN_START) {
             // 当任务允许被追踪时才会关闭界面
-            if (template.template.isTrackable()) {
+            if (template.template.allowTracked()) {
                 // 追踪任务
                 profile.trackQuest = template.template
                 // 播放音效并关闭界面

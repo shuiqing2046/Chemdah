@@ -78,7 +78,7 @@ class PlayerProfile(val uniqueId: UUID) {
      * 不会进行任何条件判断和触发事件
      * @param release 是否从数据库释放数据
      */
-    fun unregisterQuest(quest: Quest, release: Boolean = false) {
+    fun unregisterQuest(quest: Quest, release: Boolean = true) {
         // 删除缓存
         questMap.remove(quest.id)
         // 释放数据

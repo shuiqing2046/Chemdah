@@ -63,7 +63,7 @@ object ConversationManager : Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    fun e(e: EntityDamageEvent) {
+    private fun e(e: EntityDamageEvent) {
         if (e.entity is Player) {
             val session = sessions[e.entity.name] ?: return
             if (!session.isClosed) {
@@ -90,7 +90,7 @@ object ConversationManager : Listener {
     }
 
     @EventHandler
-    fun e(e: PlayerCommandPreprocessEvent) {
+    private fun e(e: PlayerCommandPreprocessEvent) {
         if (e.message.startsWith("/session")) {
             e.isCancelled = true
             val args = e.message.split(" ").toMutableList().also {

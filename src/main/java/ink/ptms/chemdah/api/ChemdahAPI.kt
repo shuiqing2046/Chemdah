@@ -38,7 +38,7 @@ object ChemdahAPI {
 
     /**
      * 获取已经缓存的玩家数据
-     * 如玩家不存在则会直接跑出 NullPointerException 异常
+     * 如玩家不存在则会直接抛出 NullPointerException 异常
      *
      * @throws NullPointerException
      */

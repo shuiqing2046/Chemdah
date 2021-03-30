@@ -39,7 +39,7 @@ class PlayerEvent {
     /**
      * 当玩家追踪任务时
      */
-    class Track(val player: Player, val playerProfile: PlayerProfile, val template: Template): EventCancellable<Track>() {
+    class Track(val player: Player, val playerProfile: PlayerProfile, val trackingQuest: Template?): EventCancellable<Track>() {
 
         init {
             async(!Bukkit.isPrimaryThread())

@@ -73,6 +73,8 @@ class DataContainer {
 
     fun entries() = map.entries
 
+    fun keys() = map.keys().toList()
+
     fun copy() = DataContainer(map)
 
     fun flush(): DataContainer {

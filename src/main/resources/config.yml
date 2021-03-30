@@ -45,8 +45,10 @@ default-track:
     content:
       - '&a[{name}]'
       - '{distance}m'
-    distance: 6
-    period: 40
+    distance:
+      min: 6
+      max: 64
+    period: 60
   scoreboard:
     value: true
     content:

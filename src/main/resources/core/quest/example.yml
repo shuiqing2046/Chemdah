@@ -34,7 +34,6 @@
     description:
       - '&7Mine &3[10 Emerald Ores] &7at the world center.'
   addon:track:
-    mark: true
     center: world 0 0 0
   agent:complete:
     - tell colored *"&3[Break Emeralds] &7completed!"

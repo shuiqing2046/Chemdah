@@ -73,6 +73,14 @@ class Quest(val id: String, val profile: PlayerProfile) {
     }
 
     /**
+     * 完成任务
+     */
+    fun completeQuest() {
+        tasks.forEach { it.objective.setCompletedSignature(profile, it, true) }
+        checkComplete()
+    }
+
+    /**
      * 放弃任务
      */
     fun failureQuest() {

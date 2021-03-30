@@ -1,6 +1,5 @@
 package ink.ptms.chemdah.util
 
-import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.api.ChemdahAPI.conversationSession
 import ink.ptms.chemdah.core.PlayerProfile
@@ -9,9 +8,11 @@ import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.core.quest.QuestContainer
 import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.Template
+import io.izzel.taboolib.cronus.util.StringNumber
 import io.izzel.taboolib.kotlin.kether.ScriptContext
 import io.izzel.taboolib.kotlin.kether.common.api.QuestContext
 import io.izzel.taboolib.kotlin.kether.common.util.LocalizedException
+import io.izzel.taboolib.kotlin.kether.inferType
 import io.izzel.taboolib.module.locale.TLocale
 import org.bukkit.entity.Player
 
@@ -103,4 +104,9 @@ fun Throwable.print() {
     } else {
         printStackTrace()
     }
+}
+
+fun Any?.increaseAny(any: Any): Any {
+    this ?: return any
+    return StringNumber(toString()).add(any.toString()).get()
 }
