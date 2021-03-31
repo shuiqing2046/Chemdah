@@ -9,7 +9,7 @@ import java.util.concurrent.CompletableFuture
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.conversation.kether.ConversationCancel
+ * ink.ptms.chemdah.module.kether.conversation.ConversationCancel
  *
  * @author sky
  * @since 2021/2/10 6:39 下午

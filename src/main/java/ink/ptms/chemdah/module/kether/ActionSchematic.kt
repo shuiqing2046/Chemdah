@@ -29,7 +29,7 @@ import java.util.concurrent.CompletableFuture
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.quest.kether.ActionSchematic
+ * ink.ptms.chemdah.module.kether.ActionSchematic
  *
  * @author sky
  * @since 2021/2/10 6:39 下午

@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.conversation.kether.ConversationGoto
+ * ink.ptms.chemdah.module.kether.conversation.ConversationGoto
  *
  * @author sky
  * @since 2021/2/10 6:39 下午

@@ -15,7 +15,7 @@ import java.util.concurrent.CompletableFuture
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.quest.kether.ActionQuest
+ * ink.ptms.chemdah.module.kether.ActionQuest
  *
  * @author sky
  * @since 2021/2/10 6:39 下午

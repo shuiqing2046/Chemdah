@@ -10,7 +10,7 @@ import java.util.concurrent.CompletableFuture
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.conversation.kether.ConversationTalkNPC
+ * ink.ptms.chemdah.module.kether.conversation.ConversationTalkNPC
  *
  * @author sky
  * @since 2021/2/10 6:39 下午
