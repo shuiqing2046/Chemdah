@@ -3,7 +3,6 @@ package ink.ptms.chemdah.core
 import ink.ptms.chemdah.util.InferArea.Companion.toCosition
 import ink.ptms.chemdah.util.Mats.Companion.toMats
 import ink.ptms.chemdah.util.asList
-import io.izzel.taboolib.internal.xseries.XMaterial
 import io.izzel.taboolib.util.Coerce
 
 /**
@@ -16,7 +15,7 @@ import io.izzel.taboolib.util.Coerce
 class Data(val value: Any) {
 
     private val lazyMaterial by lazy {
-        asList().mapNotNull { XMaterial.matchXMaterial(it.trim()).orElse(null) }.toMats()
+        asList().map { it.trim().toLowerCase() }.toMats()
     }
 
     private val lazyPosition by lazy {
