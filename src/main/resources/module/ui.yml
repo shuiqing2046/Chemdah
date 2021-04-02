@@ -27,13 +27,18 @@ default:
       lore:
         - ''
         - '&7 L1:'
-        - '&7 [ {{ ui progress bar [ L1 ] }} &7] {{ ui progress percent [ L1 ] }}%'
+        - '&7 [ {{ ui bar def [ L1 ] }} &7] {{ ui percent [ L1 ] }}%'
         - '&7 L2:'
-        - '&7 [ {{ ui progress bar [ L2 ] }} &7] {{ ui progress percent [ L2 ] }}%'
+        - '&7 [ {{ ui bar def [ L2 ] }} &7] {{ ui percent [ L2 ] }}%'
         - '&7 L3:'
-        - '&7 [ {{ ui progress bar [ L3 ] }} &7] {{ ui progress percent [ L3 ] }}%'
+        - '&7 [ {{ ui bar def [ L3 ] }} &7] {{ ui percent [ L3 ] }}%'
         - ''
-        - '&8{{ ui progress percent [ L1 L2 L3 ] }}% total'
+        - '&8{{ ui percent [ L1 L2 L3 ] exclude [ S1 ] }}% total'
+      bar:
+        def:
+          empty: '&|'
+          fill: '|'
+          size: 35
     filter:
       material: name_tag
       name: '&e&lFilter'

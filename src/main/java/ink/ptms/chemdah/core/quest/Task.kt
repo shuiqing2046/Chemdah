@@ -3,6 +3,7 @@ package ink.ptms.chemdah.core.quest
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.DataContainer
 import ink.ptms.chemdah.core.DataContainer.Companion.data
+import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.objective.other.IAlways
 import ink.ptms.chemdah.core.quest.objective.other.INever
 import org.bukkit.configuration.ConfigurationSection
@@ -30,4 +31,6 @@ class Task(id: String, config: ConfigurationSection, val template: Template) : Q
             goal.put(k, v.data())
         }
     }
+
+    fun isCompleted(profile: PlayerProfile) = objective.hasCompletedSignature(profile, this)
 }

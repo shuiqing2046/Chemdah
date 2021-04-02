@@ -4,17 +4,21 @@ import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.api.HologramAPI
 import ink.ptms.chemdah.api.HologramAPI.createHologram
+import ink.ptms.chemdah.api.event.ObjectiveEvent
 import ink.ptms.chemdah.api.event.PlayerEvent
 import ink.ptms.chemdah.api.event.QuestEvent
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Id
 import ink.ptms.chemdah.core.quest.QuestContainer
+import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.Template
+import ink.ptms.chemdah.core.quest.addon.AddonUI.Companion.ui
 import ink.ptms.chemdah.core.quest.meta.MetaName.Companion.displayName
 import ink.ptms.chemdah.util.*
 import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.kotlin.navigation.Navigation
 import io.izzel.taboolib.kotlin.navigation.pathfinder.NodeEntity
+import io.izzel.taboolib.kotlin.sendScoreboard
 import io.izzel.taboolib.module.inject.PlayerContainer
 import io.izzel.taboolib.module.inject.TListener
 import io.izzel.taboolib.module.inject.TSchedule
@@ -32,6 +36,7 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerCommandPreprocessEvent
 import org.bukkit.event.player.PlayerMoveEvent
+import org.bukkit.event.player.PlayerQuitEvent
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -54,6 +59,9 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
         get() = field.clone()
 
     val message = config.get("message", conf.get("default-track.message"))?.asList()?.colored() ?: emptyList()
+
+    val name = config.getString("name")?.colored()
+    val description = config.get("description")?.asList()?.colored()
 
     val mark = config.getBoolean("mark", conf.getBoolean("default-track.mark.value"))
     val markType = try {
@@ -92,17 +100,28 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
     companion object : Listener {
 
         @PlayerContainer
-        private val trackNavigationHologramMap = ConcurrentHashMap<String, HologramAPI.Hologram<*>>()
+        private val trackNavigationHologramMap = ConcurrentHashMap<String, MutableMap<String, HologramAPI.Hologram<*>>>()
 
-        /**
-         * 任务追踪扩展
-         */
-        fun Template.track() = addon<AddonTrack>("track")
+        @PlayerContainer
+        private val scoreboardBaffle = Baffle.of(100)
+
+        private val playerBaffle = ConcurrentHashMap<String, MutableMap<String, Baffle>>()
 
         /**
          * 任务允许被追踪
          */
-        fun Template.allowTracked() = track() != null
+        fun QuestContainer.allowTracked() = track() != null
+
+        /**
+         * 任务追踪扩展
+         */
+        fun QuestContainer.track(): AddonTrack? {
+            return when (this) {
+                is Template -> addon("track")
+                is Task -> addon("track") ?: template.track()
+                else -> error("out of case")
+            }
+        }
 
         /**
          * 当前任务追踪
@@ -114,6 +133,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                     warning("Quest(${value.path}) not allowed to tracked.")
                     return
                 }
+                // 唤起事件供外部调用
                 PlayerEvent.Track(player, this, value).call().nonCancelled {
                     if (value != null) {
                         persistentDataContainer["quest.track"] = value.id
@@ -122,46 +142,80 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                     }
                 }
             }
-            get() = persistentDataContainer["quest.track"]?.let { ChemdahAPI.getQuestTemplate(it.toString()) }
+            get() = persistentDataContainer["quest.track"]?.run { ChemdahAPI.getQuestTemplate(toString()) }
 
         /**
          * 地标及导航追踪
          */
         @TSchedule(period = 1, async = true)
-        private fun trackMark() {
+        private fun trackTick() {
             Bukkit.getOnlinePlayers().forEach { player ->
-                val trackQuest = player.chemdahProfile.trackQuest ?: return
+                val chemdahProfile = player.chemdahProfile
+                val trackQuest = chemdahProfile.trackQuest ?: return
                 val trackAddon = trackQuest.track() ?: return
-                val center = trackAddon.center
-                // 位于相同世界
-                if (center.world.name == player.world.name) {
-                    // 计算距离
-                    val distance = center.distance(player.location)
-                    // 地标渲染周期
-                    if (trackAddon.mark && trackAddon.markPeriod.hasNext()) {
-                        if (distance > trackAddon.markDistanceMin) {
-                            val direction = player.location.toVector().subtract(center.toVector()).normalize()
-                            val pos = direction.multiply(distance.coerceAtMost(trackAddon.markDistanceMax))
-                            Effects.create(trackAddon.markType, pos.toLocation(center.world))
-                                .offset(doubleArrayOf(trackAddon.markSize, 256.0, trackAddon.markSize))
-                                .count(trackAddon.markCount)
-                                .player(player)
-                                .play()
+                // 记分板刷新周期
+                if (trackAddon.scoreboard && scoreboardBaffle.hasNext(player.name)) {
+                    player.refreshTrackingScoreboard()
+                }
+                // 任务未接受
+                if (chemdahProfile.getQuestById(trackQuest.id) == null) {
+                    player.trackTickMark(trackAddon)
+                    player.trackTickNavigation(trackAddon)
+                } else {
+                    trackQuest.task.forEach sub@{ (_, task) ->
+                        val taskTrack = task.track() ?: return@sub
+                        // 条目尚未完成
+                        if (!task.isCompleted(chemdahProfile)) {
+                            player.trackTickMark(taskTrack)
+                            player.trackTickNavigation(taskTrack)
                         }
                     }
-                    // 导航渲染周期
-                    if (trackAddon.navigation && trackAddon.navigationPeriod.hasNext()) {
-                        if (distance < trackAddon.navigationDistanceMax) {
-                            val pathFinder = Navigation.create(NodeEntity(player.location, 2.0, 1.0, canOpenDoors = true, canPassDoors = true))
-                            val path = pathFinder.findPath(center, distance = trackAddon.navigationDistanceMax.toFloat())
-                            path?.nodes?.forEachIndexed { index, node ->
-                                Tasks.delay(index * 2L) {
-                                    Effects.create(trackAddon.navigationType, node.asBlockPos().toLocation(center.world).toCenterLocation())
-                                        .offset(doubleArrayOf(trackAddon.navigationSizeX, trackAddon.navigationSizeY, trackAddon.navigationSizeX))
-                                        .count(trackAddon.navigationCount)
-                                        .player(player)
-                                        .play()
-                                }
+                }
+            }
+        }
+
+        private fun Player.signatureBaffle(node: String, baffle: Baffle) {
+            val map = playerBaffle.computeIfAbsent(name) { HashMap() }
+            if (!map.containsKey(node)) {
+                map[node] = baffle
+            }
+        }
+
+        private fun Player.trackTickMark(trackAddon: AddonTrack) {
+            val center = trackAddon.center
+            if (center.world.name == world.name) {
+                val distance = center.distance(location)
+                if (distance > trackAddon.markDistanceMin) {
+                    if (trackAddon.mark && trackAddon.markPeriod.hasNext(name)) {
+                        signatureBaffle("${trackAddon.questContainer.path}.mark", trackAddon.markPeriod)
+                        val direction = location.toVector().subtract(center.toVector()).normalize()
+                        val pos = direction.multiply(distance.coerceAtMost(trackAddon.markDistanceMax))
+                        Effects.create(trackAddon.markType, pos.toLocation(center.world))
+                            .offset(doubleArrayOf(trackAddon.markSize, 256.0, trackAddon.markSize))
+                            .count(trackAddon.markCount)
+                            .player(this)
+                            .play()
+                    }
+                }
+            }
+        }
+
+        private fun Player.trackTickNavigation(trackAddon: AddonTrack) {
+            val center = trackAddon.center
+            if (center.world.name == world.name) {
+                val distance = center.distance(location)
+                if (distance < trackAddon.navigationDistanceMax) {
+                    if (trackAddon.navigation && trackAddon.navigationPeriod.hasNext(name)) {
+                        signatureBaffle("${trackAddon.questContainer.path}.navigation", trackAddon.navigationPeriod)
+                        val pathFinder = Navigation.create(NodeEntity(location, 2.0, 1.0, canOpenDoors = true, canPassDoors = true))
+                        val path = pathFinder.findPath(center, distance = trackAddon.navigationDistanceMax.toFloat())
+                        path?.nodes?.forEachIndexed { index, node ->
+                            Tasks.delay(index * 2L) {
+                                Effects.create(trackAddon.navigationType, node.asBlockPos().toLocation(center.world).toCenterLocation())
+                                    .offset(doubleArrayOf(trackAddon.navigationSizeX, trackAddon.navigationSizeY, trackAddon.navigationSizeX))
+                                    .count(trackAddon.navigationCount)
+                                    .player(this)
+                                    .play()
                             }
                         }
                     }
@@ -174,7 +228,9 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
          */
         fun Player.cancelTrackingNavigation() {
             if (trackNavigationHologramMap.containsKey(name)) {
-                trackNavigationHologramMap.remove(name)!!.delete()
+                trackNavigationHologramMap.remove(name)!!.forEach {
+                    it.value.delete()
+                }
             }
         }
 
@@ -182,42 +238,159 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
          * 创建或更新任务追踪（Navigation）
          */
         fun Player.refreshTrackingNavigation() {
+            val chemdahProfile = chemdahProfile
             val trackQuest = chemdahProfile.trackQuest ?: return
             val trackAddon = trackQuest.track() ?: return
+            val quest = chemdahProfile.getQuestById(trackQuest.id)
+            // 未接受任务
+            if (quest == null) {
+                refreshTrackingNavigation(trackQuest, trackAddon, trackQuest.path, true)
+            } else {
+                trackQuest.task.forEach { (_, task) ->
+                    refreshTrackingNavigation(trackQuest, task.track() ?: return@forEach, task.path, !task.isCompleted(chemdahProfile))
+                }
+            }
+        }
+
+        private fun Player.refreshTrackingNavigation(trackQuest: Template, trackAddon: AddonTrack, id: String, allow: Boolean) {
+            val hologramMap = trackNavigationHologramMap.computeIfAbsent(name) { ConcurrentHashMap() }
             val center = trackAddon.center
             // 启用 Navigation 并在相同世界
-            if (trackAddon.navigation && center.world.name == world.name) {
+            if (trackAddon.navigation && center.world.name == world.name && allow) {
                 val distance = center.distance(location)
                 val pos = location.toVector().subtract(center.toVector()).normalize().multiply(trackAddon.navigationDistanceMin)
-                if (trackNavigationHologramMap.containsKey(name)) {
-                    trackNavigationHologramMap[name]!!.also { holo ->
+                if (hologramMap.containsKey(id)) {
+                    hologramMap[id]!!.also { holo ->
                         holo.teleport(pos.toLocation(center.world))
                         holo.edit(trackAddon.navigationContent.map {
                             it.replace("{name}", trackQuest.displayName()).replace("{distance}", Coerce.format(distance).toString())
                         })
                     }
                 } else {
-                    trackNavigationHologramMap[name] = createHologram(pos.toLocation(center.world), trackAddon.navigationContent.map {
+                    hologramMap[id] = createHologram(pos.toLocation(center.world), trackAddon.navigationContent.map {
                         it.replace("{name}", trackQuest.displayName()).replace("{distance}", Coerce.format(distance).toString())
                     })
                 }
             } else {
-                cancelTrackingNavigation()
+                hologramMap.remove(id)?.delete()
             }
         }
 
+        /**
+         * 删除任务追踪
+         */
+        fun Player.cancelTrackingScoreboard() {
+            val trackQuest = chemdahProfile.trackQuest ?: return
+            val trackAddon = trackQuest.track() ?: return
+            // 启用 Scoreboard
+            if (trackAddon.scoreboard) {
+                sendScoreboard(null)
+            }
+        }
+
+        /**
+         * 创建或刷新任务追踪（Scoreboard）
+         */
+        fun Player.refreshTrackingScoreboard() {
+            val trackQuest = chemdahProfile.trackQuest ?: return
+            val trackAddon = trackQuest.track() ?: return
+            // 启用 Scoreboard
+            if (trackAddon.scoreboard) {
+                val quest = chemdahProfile.getQuestById(trackQuest.id)
+                // 尚未接受任务，显示任务总信息
+                val content = if (quest == null) {
+                    trackAddon.scoreboardContent.flatMap {
+                        if (it.isQuestFormat) {
+                            it.content.flatMap { c ->
+                                if (c.contains("{description}")) {
+                                    trackAddon.description ?: trackQuest.ui()?.description ?: emptyList()
+                                } else {
+                                    c.replace("{name}", trackAddon.name ?: trackQuest.displayName()).asList()
+                                }
+                            }
+                        } else {
+                            it.content
+                        }
+                    }
+                } else {
+                    trackAddon.scoreboardContent.flatMap {
+                        if (it.isQuestFormat) {
+                            trackQuest.task.flatMap { (_, task) ->
+                                val taskTrack = task.track()
+                                if (taskTrack != null) {
+                                    it.content.flatMap { c ->
+                                        if (c.contains("{description}")) {
+                                            taskTrack.description ?: trackQuest.ui()?.description ?: emptyList()
+                                        } else {
+                                            c.replace("{name}", taskTrack.name ?: trackQuest.displayName()).asList()
+                                        }
+                                    }
+                                } else {
+                                    emptyList()
+                                }
+                            }
+                        } else {
+                            it.content
+                        }
+                    }
+                }
+                if (content.size > 2) {
+                    sendScoreboard(content[0], *content.toMutableList().run {
+                        removeFirst()
+                        toTypedArray()
+                    })
+                } else {
+                    cancelTrackingScoreboard()
+                }
+            }
+        }
+
+        /**
+         * 条目完成时刷新任务追踪
+         * 已完成的条目不再显示于记分板中
+         */
         @EventHandler
-        private fun e(e: QuestEvent.Unregistered) {
+        private fun onComplete(e: ObjectiveEvent.Complete) {
+            if (e.playerProfile.trackQuest == e.task.template) {
+                e.playerProfile.player.refreshTrackingNavigation()
+                e.playerProfile.player.refreshTrackingScoreboard()
+            }
+        }
+
+        /**
+         * 任务注册时刷新任务追踪
+         * 总内容替换为子内容显示
+         */
+        @EventHandler
+        private fun onRegistered(e: QuestEvent.Registered) {
+            if (e.playerProfile.trackQuest == e.quest.template) {
+                e.playerProfile.player.refreshTrackingNavigation()
+                e.playerProfile.player.refreshTrackingScoreboard()
+            }
+        }
+
+        /**
+         * 任务注销时取消任务追踪
+         */
+        @EventHandler
+        private fun onUnregistered(e: QuestEvent.Unregistered) {
             if (e.playerProfile.trackQuest == e.quest.template) {
                 e.playerProfile.player.cancelTrackingNavigation()
+                e.playerProfile.player.cancelTrackingScoreboard()
             }
         }
 
+        /**
+         * 切换追踪状态时刷新或取消任务追踪
+         * 并给予相关提示
+         */
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        private fun e(e: PlayerEvent.Track) {
+        private fun onTrack(e: PlayerEvent.Track) {
             if (e.trackingQuest != null) {
                 e.player.cancelTrackingNavigation()
+                e.player.cancelTrackingScoreboard()
                 e.player.refreshTrackingNavigation()
+                e.player.refreshTrackingScoreboard()
                 e.trackingQuest.track()!!.message.forEach { message ->
                     TellrawJson.create().append(message.replace("{name}", e.trackingQuest.displayName()))
                         .hoverText(message.replace("{name}", e.trackingQuest.displayName()))
@@ -226,22 +399,33 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                 }
             } else {
                 e.player.cancelTrackingNavigation()
+                e.player.cancelTrackingScoreboard()
                 TLocale.sendTo(e.player, "track-cancel")
             }
         }
 
+        /**
+         * 玩家移动时刷新 Navigation 导航
+         */
         @EventHandler
-        private fun e(e: PlayerMoveEvent) {
+        private fun onMove(e: PlayerMoveEvent) {
             if (e.from.toVector() != e.to.toVector()) {
                 e.player.refreshTrackingNavigation()
             }
         }
 
         @EventHandler
-        private fun e(e: PlayerCommandPreprocessEvent) {
+        private fun onCommand(e: PlayerCommandPreprocessEvent) {
             if (e.message.equals("/ChemdahTrackCancel", true)) {
                 e.isCancelled = true
                 e.player.chemdahProfile.trackQuest = null
+            }
+        }
+
+        @EventHandler
+        private fun onQuit(e: PlayerQuitEvent) {
+            playerBaffle.remove(e.player.name)?.forEach {
+                it.value.reset(e.player.name)
             }
         }
     }

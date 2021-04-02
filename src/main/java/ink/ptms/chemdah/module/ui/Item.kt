@@ -21,9 +21,15 @@ open class Item(val config: ConfigurationSection) {
     open fun getItemStack(player: PlayerProfile, ui: UI, template: Template): ItemStack {
         return itemStackBase.clone().also { item ->
             item.itemMeta = item.itemMeta?.also { meta ->
-                meta.setDisplayName(KetherFunction.parse(meta.displayName))
+                meta.setDisplayName(KetherFunction.parse(meta.displayName) {
+                    sender = player.player
+                    rootFrame().variables().set("@QuestUI", ui)
+                })
                 meta.lore = item.lore?.map { lore ->
-                    KetherFunction.parse(lore)
+                    KetherFunction.parse(lore) {
+                        sender = player.player
+                        rootFrame().variables().set("@QuestUI", ui)
+                    }
                 }
             }
         }

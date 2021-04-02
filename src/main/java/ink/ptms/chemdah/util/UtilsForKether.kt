@@ -8,6 +8,7 @@ import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.core.quest.QuestContainer
 import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.Template
+import ink.ptms.chemdah.module.ui.UI
 import io.izzel.taboolib.cronus.util.StringNumber
 import io.izzel.taboolib.kotlin.kether.ScriptContext
 import io.izzel.taboolib.kotlin.kether.common.api.QuestContext
@@ -53,6 +54,10 @@ fun QuestContext.Frame.getQuest(): Quest {
 
 fun QuestContext.Frame.getQuestContainer(): QuestContainer {
     return variables().get<Any?>("@QuestContainer").orElse(null) as? QuestContainer ?: error("No quest container selected.")
+}
+
+fun QuestContext.Frame.UI(): UI {
+    return variables().get<Any?>("@QuestUI").orElse(null) as? UI ?: error("No quest ui selected.")
 }
 
 fun QuestContext.Frame.getTemplate(): Template {

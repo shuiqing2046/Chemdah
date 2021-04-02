@@ -2,10 +2,7 @@ package ink.ptms.chemdah.core
 
 import ink.ptms.adyeshach.common.util.Tasks
 import ink.ptms.chemdah.core.database.Database
-import ink.ptms.chemdah.core.quest.Idx
-import ink.ptms.chemdah.core.quest.Quest
-import ink.ptms.chemdah.core.quest.QuestDataOperator
-import ink.ptms.chemdah.core.quest.Task
+import ink.ptms.chemdah.core.quest.*
 import ink.ptms.chemdah.core.quest.meta.MetaAlias.Companion.alias
 import ink.ptms.chemdah.core.quest.meta.MetaLabel.Companion.label
 import ink.ptms.chemdah.util.asList
@@ -127,9 +124,19 @@ class PlayerProfile(val uniqueId: UUID) {
     fun isQuestCompleted(value: String) = getQuestCompletedDate(value) > 0L
 
     /**
+     * 通过模板判断该任务是否已经完成
+     */
+    fun isQuestCompleted(template: Template) = isQuestCompleted(template.id)
+
+    /**
      * 通过序号判断该任务的上次完成时间
      */
     fun getQuestCompletedDate(value: String) = persistentDataContainer["quest.complete.$value", 0L].toLong()
+
+    /**
+     * 通过模板判断该任务的上次完成时间
+     */
+    fun getQuestCompletedDate(template: Template) = getQuestCompletedDate(template.id)
 
     /**
      * 执行事件脚本代理

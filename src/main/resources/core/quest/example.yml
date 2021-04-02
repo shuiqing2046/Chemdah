@@ -28,7 +28,7 @@
     addon:stats:
       visible: true
     addon:track:
-      extend: true
+      center: world 0 0 0
   addon:ui:
     icon: iron_pickaxe --noflags
     description:

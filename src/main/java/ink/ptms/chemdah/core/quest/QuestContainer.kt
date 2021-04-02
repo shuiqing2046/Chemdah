@@ -159,4 +159,15 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
         }
         return future
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is QuestContainer) return false
+        if (path != other.path) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return path.hashCode()
+    }
 }
