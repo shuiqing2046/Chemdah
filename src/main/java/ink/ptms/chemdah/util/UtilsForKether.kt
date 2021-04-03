@@ -13,7 +13,6 @@ import io.izzel.taboolib.cronus.util.StringNumber
 import io.izzel.taboolib.kotlin.kether.ScriptContext
 import io.izzel.taboolib.kotlin.kether.common.api.QuestContext
 import io.izzel.taboolib.kotlin.kether.common.util.LocalizedException
-import io.izzel.taboolib.kotlin.kether.inferType
 import io.izzel.taboolib.module.locale.TLocale
 import org.bukkit.entity.Player
 

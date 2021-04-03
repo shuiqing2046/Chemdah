@@ -1,27 +1,22 @@
 package ink.ptms.chemdah.module.kether
 
+import com.google.common.collect.Sets
+import io.izzel.taboolib.kotlin.Tasks
+import io.izzel.taboolib.kotlin.kether.Kether.expects
 import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import io.izzel.taboolib.kotlin.kether.common.api.QuestAction
 import io.izzel.taboolib.kotlin.kether.common.api.QuestContext
-import java.util.concurrent.CompletableFuture
-import io.lumine.xikage.mythicmobs.skills.SkillTrigger
-
-import io.lumine.xikage.mythicmobs.skills.SkillMetadata
-
-import io.lumine.xikage.mythicmobs.mobs.GenericCaster
-
-import io.lumine.xikage.mythicmobs.MythicMobs
-
-import com.google.common.collect.Sets
-import io.izzel.taboolib.kotlin.Tasks
-import io.izzel.taboolib.kotlin.kether.Kether.expects
 import io.izzel.taboolib.kotlin.kether.script
-
+import io.lumine.xikage.mythicmobs.MythicMobs
 import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter
 import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitPlayer
+import io.lumine.xikage.mythicmobs.mobs.GenericCaster
 import io.lumine.xikage.mythicmobs.skills.SkillMechanic
+import io.lumine.xikage.mythicmobs.skills.SkillMetadata
+import io.lumine.xikage.mythicmobs.skills.SkillTrigger
 import org.bukkit.entity.Player
+import java.util.concurrent.CompletableFuture
 
 
 /**
