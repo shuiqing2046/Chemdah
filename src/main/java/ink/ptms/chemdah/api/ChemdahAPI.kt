@@ -7,6 +7,7 @@ import ink.ptms.chemdah.core.conversation.ConversationLoader
 import ink.ptms.chemdah.core.conversation.ConversationManager
 import ink.ptms.chemdah.core.conversation.Session
 import ink.ptms.chemdah.core.conversation.theme.Theme
+import ink.ptms.chemdah.core.database.Database
 import ink.ptms.chemdah.core.quest.Idx
 import ink.ptms.chemdah.core.quest.QuestLoader
 import ink.ptms.chemdah.core.quest.Template

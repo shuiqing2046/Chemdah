@@ -1,5 +1,6 @@
 package ink.ptms.chemdah.core.database
 
+import com.google.common.base.Preconditions
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.api.event.PlayerEvent
@@ -17,6 +18,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import java.util.function.Predicate
 
 /**
  * Chemdah
@@ -25,22 +27,58 @@ import org.bukkit.event.player.PlayerQuitEvent
  * @author sky
  * @since 2021/3/3 4:39 下午
  */
-interface Database {
+abstract class Database {
 
     /**
      * 从数据库拉取玩家数据
      */
-    fun select(player: Player): PlayerProfile
+    abstract fun select(player: Player): PlayerProfile
 
     /**
      * 将玩家数据写入数据库
      */
-    fun update(player: Player, playerProfile: PlayerProfile)
+    abstract fun update(player: Player, playerProfile: PlayerProfile)
 
     /**
      * 释放任务数据
      */
-    fun releaseQuest(player: Player, playerProfile: PlayerProfile, quest: Quest)
+    abstract fun releaseQuest(player: Player, playerProfile: PlayerProfile, quest: Quest)
+
+    /**
+     * 从数据库拉取全局变量
+     */
+    fun selectVariable(key: String): String? {
+        Preconditions.checkState(key.length <= 36, "key.length > 36")
+        return selectVariable0(key)
+    }
+
+    /**
+     * 将全局变量写入数据库
+     */
+    fun updateVariable(key: String, value: String) {
+        Preconditions.checkState(key.length <= 36, "key.length > 36")
+        Preconditions.checkState(value.length <= 64, "value.length > 64")
+        updateVariable(key, value)
+    }
+
+    /**
+     * 释放全局变量
+     */
+    fun releaseVariable(key: String) {
+        Preconditions.checkState(key.length <= 36, "key.length > 36")
+        releaseVariable(key)
+    }
+
+    /**
+     * 获取所有全局变量
+     */
+    abstract fun variables(): List<String>
+
+    protected abstract fun selectVariable0(key: String): String?
+
+    protected abstract fun updateVariable0(key: String, value: String)
+
+    protected abstract fun releaseVariable0(key: String)
 
     @TListener
     companion object : Listener {
@@ -58,7 +96,7 @@ interface Database {
         }
 
         @EventHandler
-        fun e(e: PlayerLoginEvent) {
+        private fun e(e: PlayerLoginEvent) {
             if (INSTANCE is DatabaseError) {
                 e.result = PlayerLoginEvent.Result.KICK_OTHER
                 e.kickMessage = "&4&loERROR! &r&oThe &4&lChemdah&r&o database failed to initialize.".colored()
@@ -66,7 +104,7 @@ interface Database {
         }
 
         @EventHandler
-        fun e(e: PlayerJoinEvent) {
+        private fun e(e: PlayerJoinEvent) {
             Tasks.task(true) {
                 mirrorFuture("Database:select") {
                     INSTANCE.select(e.player).also {
@@ -79,7 +117,7 @@ interface Database {
         }
 
         @EventHandler
-        fun e(e: PlayerQuitEvent) {
+        private fun e(e: PlayerQuitEvent) {
             val playerProfile = ChemdahAPI.playerProfile.remove(e.player.name)
             if (playerProfile?.changed == true) {
                 Tasks.task(true) {
@@ -93,7 +131,7 @@ interface Database {
         }
 
         @TSchedule(period = 200, async = true)
-        fun update200() {
+        private fun update200() {
             Bukkit.getOnlinePlayers().forEach {
                 val playerProfile = it.chemdahProfile
                 if (playerProfile.changed) {

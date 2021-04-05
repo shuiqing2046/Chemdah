@@ -3,6 +3,8 @@ package ink.ptms.chemdah.core.database
 import ink.ptms.chemdah.core.DataContainer
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Quest
+import io.izzel.taboolib.kotlin.kether.inferType
+import io.izzel.taboolib.module.db.local.Local
 import io.izzel.taboolib.module.db.local.LocalPlayer
 import org.bukkit.entity.Player
 
@@ -13,7 +15,9 @@ import org.bukkit.entity.Player
  * @author sky
  * @since 2021/3/5 3:51 下午
  */
-class DatabaseLocal : Database {
+class DatabaseLocal : Database() {
+
+    val data = Local.get().get("data/variables.yml")!!
 
     override fun select(player: Player): PlayerProfile {
         val playerProfile = PlayerProfile(player.uniqueId)
@@ -50,4 +54,16 @@ class DatabaseLocal : Database {
     override fun releaseQuest(player: Player, playerProfile: PlayerProfile, quest: Quest) {
         LocalPlayer.get(player).set("Chemdah.quest.${quest.id}", null)
     }
+
+    override fun selectVariable0(key: String) = data.getString(key)
+
+    override fun updateVariable0(key: String, value: String) {
+        data.set(key, value)
+    }
+
+    override fun releaseVariable0(key: String) {
+        data.set(key, null)
+    }
+
+    override fun variables() = data.getKeys(false).toList()
 }

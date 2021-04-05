@@ -22,7 +22,7 @@ import javax.sql.DataSource
  * @author sky
  * @since 2021/3/5 3:51 下午
  */
-class DatabaseSQL : Database {
+class DatabaseSQL : Database() {
 
     val host = SQLHost(Chemdah.conf.getConfigurationSection("database.source.SQL"), Chemdah.plugin, true)
 
@@ -59,6 +59,14 @@ class DatabaseSQL : Database {
         SQLColumnType.BLOB.toColumn("data")
     )
 
+    val tableVariables = SQLTable(
+        "${name}_variables",
+        SQLColumn.PRIMARY_KEY_ID,
+        SQLColumnType.VARCHAR.toColumn(36, "name").columnOptions(SQLColumnOption.UNIQUE_KEY),
+        SQLColumnType.VARCHAR.toColumn(64, "data"),
+        SQLColumnType.BOOL.toColumn("value")
+    )
+
     val dataSource: DataSource by lazy {
         host.createDataSource()
     }
@@ -68,6 +76,7 @@ class DatabaseSQL : Database {
         tableQuest.create(dataSource)
         tableUserData.create(dataSource)
         tableQuestData.create(dataSource)
+        tableVariables.create(dataSource)
     }
 
     fun getUserId(player: Player): Long {
@@ -233,6 +242,40 @@ class DatabaseSQL : Database {
         tableQuestData.update(Where.equals("id", questDataId))
             .set("data", ByteArray(0))
             .run(dataSource)
+    }
+
+    override fun selectVariable0(key: String): String? {
+        return tableVariables.select(Where.equals("name", key), Where.equals("value", true))
+            .limit(1)
+            .row("data")
+            .to(dataSource)
+            .first {
+                it.getString("data")
+            }
+    }
+
+    override fun updateVariable0(key: String, value: String) {
+        tableVariables.update(Where.equals("name", key))
+            .insertIfAbsent(null, key, value, true)
+            .set("data", value)
+            .set("value", true)
+            .run(dataSource)
+    }
+
+    override fun releaseVariable0(key: String) {
+        tableVariables.update(Where.equals("name", key))
+            .set("data", "")
+            .set("value", false)
+            .run(dataSource)
+    }
+
+    override fun variables(): List<String> {
+        return tableVariables.select(Where.equals("value", true))
+            .row("name")
+            .to(dataSource)
+            .map {
+                it.getString("name")
+            }
     }
 
     companion object {
