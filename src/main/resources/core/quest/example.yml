@@ -19,7 +19,7 @@
 
 10_emerald_ore:
   task:0:
-    objective: block place
+    objective: block break
     condition:
       material: emerald_ore
       position: world 0 0 0 ~ 10 10 10

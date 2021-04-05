@@ -2,7 +2,7 @@ package ink.ptms.chemdah.core.quest.objective
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.quest.Proces
+ * ink.ptms.chemdah.core.quest.Progress
  *
  * @author sky
  * @since 2021/3/3 4:51 下午

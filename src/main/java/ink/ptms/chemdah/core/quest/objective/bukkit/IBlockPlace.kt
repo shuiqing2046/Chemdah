@@ -30,5 +30,8 @@ object IBlockPlace : ObjectiveCountable<BlockPlaceEvent>() {
         addCondition { _, task, e ->
             !task.condition.containsKey("material:against") || task.condition["material:against"]!!.toMaterial().isBlock(e.blockAgainst)
         }
+        addCondition { _, task, e ->
+            !task.condition.containsKey("hand") || task.condition["hand"]!!.asList().any { it.equals(e.hand.name, true) }
+        }
     }
 }

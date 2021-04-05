@@ -99,7 +99,7 @@ abstract class InferArea(val source: String) {
 
     companion object {
 
-        fun String.toCosition(): InferArea {
+        fun String.toInferArea(): InferArea {
             return try {
                 when {
                     ">" in this -> Area(this)

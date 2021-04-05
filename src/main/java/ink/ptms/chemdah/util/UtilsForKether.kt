@@ -13,6 +13,7 @@ import io.izzel.taboolib.cronus.util.StringNumber
 import io.izzel.taboolib.kotlin.kether.ScriptContext
 import io.izzel.taboolib.kotlin.kether.common.api.QuestContext
 import io.izzel.taboolib.kotlin.kether.common.util.LocalizedException
+import io.izzel.taboolib.kotlin.kether.script
 import io.izzel.taboolib.module.locale.TLocale
 import org.bukkit.entity.Player
 
@@ -68,12 +69,15 @@ fun QuestContext.Frame.getTask(): Task {
 }
 
 fun QuestContext.Frame.getSession(): Session {
-    val player = (context() as ScriptContext).sender as? Player ?: error("No player selected.")
-    return player.conversationSession ?: error("No session selected.")
+    return getPlayer().conversationSession ?: error("No session selected.")
 }
 
 fun QuestContext.Frame.getProfile(): PlayerProfile {
-    return ((context() as ScriptContext).sender as? Player ?: error("No player selected.")).chemdahProfile
+    return getPlayer().chemdahProfile
+}
+
+fun QuestContext.Frame.getPlayer(): Player {
+    return script().sender as? Player ?: error("No player selected.")
 }
 
 fun QuestContext.Frame.vars() = HashMap<String, Any?>().also { map ->

@@ -27,5 +27,8 @@ object IBlockBreak : ObjectiveCountable<BlockBreakEvent>() {
         addCondition { _, task, e ->
             !task.condition.containsKey("material") || task.condition["material"]!!.toMaterial().isBlock(e.block)
         }
+        addCondition { _, task, e ->
+            !task.condition.containsKey("exp") || task.condition["exp"]!!.toInt() <= e.expToDrop
+        }
     }
 }

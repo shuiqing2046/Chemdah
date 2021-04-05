@@ -25,6 +25,7 @@ dependencies {
     implementation 'com.sk89q.worldedit:WorldEdit:7:all'
     implementation 'public:Citizens:1.0.0'
     implementation 'public:MythicMobs:1.0.1'
+    implementation 'ink.ptms:Zaphkiel:1.4.2'
     implementation 'ink.ptms.adyeshach:Adyeshach:1.1.9'
     implementation 'ink.ptms.core:v11604:11604:all'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib'

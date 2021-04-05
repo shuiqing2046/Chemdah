@@ -7,7 +7,7 @@ import org.bukkit.event.Event
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.quest.objective.OCountable
+ * ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
  *
  * @author sky
  * @since 2021/3/1 11:53 下午
@@ -22,10 +22,11 @@ abstract class ObjectiveCountable<E : Event> : Objective<E>() {
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun onContinue(profile: PlayerProfile, task: Task, event: Event) {
         super.onContinue(profile, task, event)
         profile.dataOperator(task) {
-            put("amount", get("amount", 0).toInt() + 1)
+            put("amount", get("amount", 0).toInt() + getCount(profile, task, event as E))
         }
     }
 
@@ -38,5 +39,9 @@ abstract class ObjectiveCountable<E : Event> : Objective<E>() {
                 get("amount", 0).toInt().let { a -> a.progress(target, a / target.toDouble()) }
             }
         }
+    }
+
+    open fun getCount(profile: PlayerProfile, task: Task, event: E): Int {
+        return 1
     }
 }

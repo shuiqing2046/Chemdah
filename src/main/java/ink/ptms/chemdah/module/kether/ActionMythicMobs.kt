@@ -1,6 +1,7 @@
 package ink.ptms.chemdah.module.kether
 
 import com.google.common.collect.Sets
+import ink.ptms.chemdah.util.getPlayer
 import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.kotlin.kether.Kether.expects
 import io.izzel.taboolib.kotlin.kether.KetherParser
@@ -32,7 +33,7 @@ class ActionMythicMobs {
 
         override fun process(frame: QuestContext.Frame): CompletableFuture<Void> {
             Tasks.task {
-                val bukkitPlayer = BukkitPlayer(frame.script().sender as? Player ?: error("No player selected."))
+                val bukkitPlayer = BukkitPlayer(frame.getPlayer())
                 MythicMobs.inst().skillManager.runSecondPass()
                 mechanic.executeSkills(
                     SkillMetadata(

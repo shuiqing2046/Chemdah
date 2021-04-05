@@ -2,8 +2,11 @@ package ink.ptms.chemdah.util
 
 import ink.ptms.chemdah.Chemdah
 import ink.ptms.chemdah.api.ChemdahAPI
+import io.izzel.taboolib.Version
 import io.izzel.taboolib.cronus.util.Time
 import io.izzel.taboolib.cronus.util.TimeType
+import io.izzel.taboolib.internal.xseries.XBlock
+import io.izzel.taboolib.internal.xseries.XMaterial
 import io.izzel.taboolib.kotlin.Demand.Companion.toDemand
 import io.izzel.taboolib.kotlin.Mirror
 import io.izzel.taboolib.module.config.TConfig
@@ -11,6 +14,7 @@ import io.izzel.taboolib.util.Coerce
 import io.izzel.taboolib.util.item.ItemBuilder
 import io.izzel.taboolib.util.item.Items
 import org.bukkit.Bukkit
+import org.bukkit.block.Block
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
@@ -86,4 +90,8 @@ fun warning(any: Any?) {
 
 fun mirrorFuture(id: String, func: Mirror.MirrorFuture.() -> Unit) {
     ChemdahAPI.mirror.mirrorFuture(id, func)
+}
+
+fun XMaterial.isBlock(block: Block): Boolean {
+    return XBlock.isSimilar(block, this) && (Version.isAfter(Version.v1_13) || block.data == data)
 }

@@ -1,6 +1,7 @@
 package ink.ptms.chemdah.core
 
-import ink.ptms.chemdah.util.InferArea.Companion.toCosition
+import ink.ptms.chemdah.util.InferArea.Companion.toInferArea
+import ink.ptms.chemdah.util.InferItem.Companion.toInferItem
 import ink.ptms.chemdah.util.Mats.Companion.toMats
 import ink.ptms.chemdah.util.asList
 import io.izzel.taboolib.util.Coerce
@@ -19,7 +20,11 @@ class Data(val value: Any) {
     }
 
     private val lazyPosition by lazy {
-        toString().toCosition()
+        toString().toInferArea()
+    }
+
+    private val lazyItem by lazy {
+        toString().toInferItem()
     }
 
     fun toInt() = Coerce.toInteger(value)
@@ -39,6 +44,8 @@ class Data(val value: Any) {
     fun toPosition() = lazyPosition
 
     fun toMaterial() = lazyMaterial
+
+    fun toItem() = lazyItem
 
     fun asList() = value.asList()
 
