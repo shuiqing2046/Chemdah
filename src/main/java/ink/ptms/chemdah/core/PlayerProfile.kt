@@ -1,6 +1,6 @@
 package ink.ptms.chemdah.core
 
-import ink.ptms.adyeshach.common.util.Tasks
+import ink.ptms.chemdah.api.event.QuestEvent
 import ink.ptms.chemdah.core.database.Database
 import ink.ptms.chemdah.core.quest.*
 import ink.ptms.chemdah.core.quest.meta.MetaAlias.Companion.alias
@@ -8,6 +8,7 @@ import ink.ptms.chemdah.core.quest.meta.MetaLabel.Companion.label
 import ink.ptms.chemdah.util.asList
 import ink.ptms.chemdah.util.namespaceQuest
 import ink.ptms.chemdah.util.print
+import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.kotlin.kether.KetherShell
 import io.izzel.taboolib.util.Coerce
 import org.bukkit.Bukkit
@@ -68,6 +69,7 @@ class PlayerProfile(val uniqueId: UUID) {
         questMap[quest.id] = quest.also {
             it.persistentDataContainer.changed = true
         }
+        QuestEvent.Registered(quest, this).call()
     }
 
     /**
@@ -84,6 +86,7 @@ class PlayerProfile(val uniqueId: UUID) {
                 Database.INSTANCE.releaseQuest(player, this, quest)
             }
         }
+        QuestEvent.Unregistered(quest, this).call()
     }
 
     /**

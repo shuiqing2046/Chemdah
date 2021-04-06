@@ -90,7 +90,7 @@ class DatabaseMongoDB : Database(), Listener {
     fun e(e: PlayerLoginEvent) {
         if (e.player.name == variablesKey) {
             e.result = PlayerLoginEvent.Result.KICK_OTHER
-            e.kickMessage = "&4&loWARNING! &r&oThe &4&lChemdah&r&o blocked this username.".colored()
+            e.kickMessage = "&4&lWARNING! &rThe &4&lChemdah&r blocked this username.".colored()
         }
     }
 }

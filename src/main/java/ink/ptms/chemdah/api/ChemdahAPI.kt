@@ -47,6 +47,12 @@ object ChemdahAPI {
         get() = ChemdahAPI.playerProfile[name]!!
 
     /**
+     * 玩家数据是否加载完成
+     */
+    val Player.isChemdahProfileLoaded: Boolean
+        get() = ChemdahAPI.playerProfile.containsKey(name)
+
+    /**
      * 获取玩家正在进行的会话
      */
     val Player.conversationSession: Session?

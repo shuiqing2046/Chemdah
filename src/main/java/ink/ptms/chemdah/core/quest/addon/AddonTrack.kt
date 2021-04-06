@@ -2,6 +2,7 @@ package ink.ptms.chemdah.core.quest.addon
 
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
+import ink.ptms.chemdah.api.ChemdahAPI.isChemdahProfileLoaded
 import ink.ptms.chemdah.api.HologramAPI
 import ink.ptms.chemdah.api.HologramAPI.createHologram
 import ink.ptms.chemdah.api.event.ObjectiveEvent
@@ -150,7 +151,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
          */
         @TSchedule(period = 1, async = true)
         private fun trackTick() {
-            Bukkit.getOnlinePlayers().forEach { player ->
+            Bukkit.getOnlinePlayers().filter { it.isChemdahProfileLoaded }.forEach { player ->
                 val chemdahProfile = player.chemdahProfile
                 val trackQuest = chemdahProfile.trackQuest ?: return
                 val trackAddon = trackQuest.track() ?: return

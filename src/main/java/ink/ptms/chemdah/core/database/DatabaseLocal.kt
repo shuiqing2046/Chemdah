@@ -3,7 +3,6 @@ package ink.ptms.chemdah.core.database
 import ink.ptms.chemdah.core.DataContainer
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Quest
-import io.izzel.taboolib.kotlin.kether.inferType
 import io.izzel.taboolib.module.db.local.Local
 import io.izzel.taboolib.module.db.local.LocalPlayer
 import org.bukkit.entity.Player

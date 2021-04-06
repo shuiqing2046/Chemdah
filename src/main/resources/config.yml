@@ -4,7 +4,7 @@
 
 
 database:
-  use: SQL
+  use: LOCAL
   source:
     SQL:
       host: localhost

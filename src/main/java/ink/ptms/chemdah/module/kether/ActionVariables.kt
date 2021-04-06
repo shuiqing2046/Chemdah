@@ -1,9 +1,8 @@
 package ink.ptms.chemdah.module.kether
 
-import ink.ptms.adyeshach.common.util.Tasks
 import ink.ptms.chemdah.core.database.Database
-import ink.ptms.chemdah.util.getProfile
 import ink.ptms.chemdah.util.increaseAny
+import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.kotlin.kether.Kether.expects
 import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser

@@ -18,7 +18,6 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.event.player.PlayerQuitEvent
-import java.util.function.Predicate
 
 /**
  * Chemdah
@@ -99,7 +98,7 @@ abstract class Database {
         private fun e(e: PlayerLoginEvent) {
             if (INSTANCE is DatabaseError) {
                 e.result = PlayerLoginEvent.Result.KICK_OTHER
-                e.kickMessage = "&4&loERROR! &r&oThe &4&lChemdah&r&o database failed to initialize.".colored()
+                e.kickMessage = "&4&lERROR! &rThe &4&lChemdah&r database failed to initialize.".colored()
             }
         }
 

@@ -45,6 +45,11 @@ class Quest(val id: String, val profile: PlayerProfile) {
     }
 
     /**
+     * 获取条目
+     */
+    fun getTask(id: String) = tasks.firstOrNull { it.id == id }
+
+    /**
      * 检查任务的所有条目
      * 当所有条目均已完成时任务完成
      */

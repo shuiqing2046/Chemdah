@@ -3,6 +3,7 @@ package ink.ptms.chemdah.core.quest
 import ink.ptms.chemdah.Chemdah
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
+import ink.ptms.chemdah.api.ChemdahAPI.isChemdahProfileLoaded
 import ink.ptms.chemdah.core.quest.addon.Addon
 import ink.ptms.chemdah.core.quest.meta.Meta
 import ink.ptms.chemdah.core.quest.objective.Abstract
@@ -34,7 +35,7 @@ object QuestLoader {
     @TSchedule(period = 20, async = true)
     private fun tick() {
         mirrorFuture("QuestHandler:tick") {
-            Bukkit.getOnlinePlayers().forEach {
+            Bukkit.getOnlinePlayers().filter { it.isChemdahProfileLoaded }.forEach {
                 it.chemdahProfile.also { profile ->
                     // 检测所有有效任务
                     profile.quests.forEach { quest ->

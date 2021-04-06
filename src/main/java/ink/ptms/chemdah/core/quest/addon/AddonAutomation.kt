@@ -3,6 +3,7 @@ package ink.ptms.chemdah.core.quest.addon
 import com.google.common.base.Enums
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
+import ink.ptms.chemdah.api.ChemdahAPI.isChemdahProfileLoaded
 import ink.ptms.chemdah.core.quest.AcceptResult
 import ink.ptms.chemdah.core.quest.Id
 import ink.ptms.chemdah.core.quest.QuestContainer
@@ -139,7 +140,7 @@ class AddonAutomation(source: ConfigurationSection, questContainer: QuestContain
                 return
             }
             mirrorFuture("MetaAutomation") {
-                Bukkit.getOnlinePlayers().forEach { player ->
+                Bukkit.getOnlinePlayers().filter { it.isChemdahProfileLoaded }.forEach { player ->
                     val profile = player.chemdahProfile
                     // 自动接受的任务
                     autoAccept.forEach {

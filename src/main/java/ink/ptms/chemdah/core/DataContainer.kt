@@ -100,7 +100,7 @@ class DataContainer {
     fun toJson() = JsonObject().also {
         map.forEach { (k, v) ->
             it.add(k, JsonPrimitive(0).also { json ->
-                json.reflex("value", v)
+                json.reflex("value", v.value)
             })
         }
     }.toString()

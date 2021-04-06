@@ -4,12 +4,14 @@ import ink.ptms.chemdah.api.event.ObjectiveEvent
 import ink.ptms.chemdah.api.event.QuestEvent
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Id
+import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.core.quest.QuestContainer
 import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.addon.AddonStats.Companion.statsDisplay
 import ink.ptms.chemdah.core.quest.meta.MetaName.Companion.displayName
 import ink.ptms.chemdah.core.quest.objective.Progress
 import ink.ptms.chemdah.util.*
+import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.kotlin.kether.KetherShell
 import io.izzel.taboolib.kotlin.kether.common.api.QuestContext
 import io.izzel.taboolib.module.inject.PlayerContainer
@@ -97,9 +99,9 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
             val op = task.objective.getProgress(profile, task)
             future.complete(
                 Progress(
-                    vars.get().get<Any?>("value") ?: op.value,
-                    vars.get().get<Any?>("target") ?: op.target,
-                    vars.get().get<Any?>("percent").asDouble(op.percent)
+                    vars.get().get<Any?>("value").orElse(op.value),
+                    vars.get().get<Any?>("target").orElse(op.target),
+                    vars.get().get<Any?>("percent").orElse(null).asDouble(op.percent)
                 )
             )
         }
@@ -126,68 +128,19 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
 
         @EventHandler
         private fun e(e: QuestEvent.Registered) {
-            val statsMap = statsMap.computeIfAbsent(e.playerProfile.player.name) { StatsMap() }
-            e.quest.tasks.forEach {
-                if (it.stats()?.visibleAlways == true) {
-                    it.statsDisplay(e.playerProfile).thenApply { bossBar ->
-                        if (bossBar != null) {
-                            statsMap.bossBarAlways[it.path] = bossBar
-                        }
-                    }
-                }
-            }
+            e.quest.refreshStats(e.playerProfile)
         }
 
         @EventHandler
         private fun e(e: QuestEvent.Unregistered) {
-            val statsMap = statsMap.computeIfAbsent(e.playerProfile.player.name) { StatsMap() }
-            e.quest.tasks.forEach {
-                statsMap.bossBar.remove(it.path)?.key?.removeAll()
-                statsMap.bossBarAlways.remove(it.path)?.removeAll()
-            }
+            e.quest.hiddenStats(e.playerProfile)
         }
 
         @EventHandler
         private fun e(e: ObjectiveEvent.Continue) {
-            val stats = e.task.stats() ?: return
-            val statsMap = statsMap.computeIfAbsent(e.playerProfile.player.name) { StatsMap() }
-            mirrorFuture("AddonStats:onContinue") {
-                when {
-                    stats.visible -> {
-                        val bossBar = statsMap.bossBar[e.task.path]
-                        if (bossBar == null) {
-                            e.task.statsDisplay(e.playerProfile).thenApply { bar ->
-                                if (bar != null) {
-                                    statsMap.bossBar[e.task.path] = Pair.of(bar, System.currentTimeMillis() + (stats.stay * 50L))
-                                }
-                                finish()
-                            }
-                        } else {
-                            e.task.getProgress(e.playerProfile).thenApply { progress ->
-                                bossBar.key.progress = progress.percent
-                                bossBar.key.setTitle(stats.getTitle(e.task, progress))
-                                bossBar.value = System.currentTimeMillis() + (stats.stay * 50L)
-                                finish()
-                            }
-                        }
-                    }
-                    stats.visibleAlways -> {
-                        val bossBar = statsMap.bossBarAlways[e.task.path]
-                        if (bossBar == null) {
-                            e.task.statsDisplay(e.playerProfile).thenApply { bar ->
-                                if (bar != null) {
-                                    statsMap.bossBarAlways[e.task.path] = bar
-                                }
-                                finish()
-                            }
-                        } else {
-                            e.task.getProgress(e.playerProfile).thenApply { progress ->
-                                bossBar.progress = progress.percent
-                                bossBar.setTitle(stats.getTitle(e.task, progress))
-                                finish()
-                            }
-                        }
-                    }
+            Tasks.task {
+                if (!e.task.isCompleted(e.playerProfile)) {
+                    e.task.refreshStats(e.playerProfile)
                 }
             }
         }
@@ -229,6 +182,89 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
          */
         fun Task.getProgress(profile: PlayerProfile): CompletableFuture<Progress> {
             return stats()?.getProgress(profile) ?: CompletableFuture.completedFuture(objective.getProgress(profile, this))
+        }
+
+        /**
+         * 隐藏任务进度
+         */
+        fun Quest.hiddenStats(profile: PlayerProfile) {
+            val statsMap = statsMap.computeIfAbsent(profile.player.name) { StatsMap() }
+            tasks.forEach {
+                statsMap.bossBar.remove(it.path)?.key?.removeAll()
+                statsMap.bossBarAlways.remove(it.path)?.removeAll()
+            }
+        }
+
+        /**
+         * 隐藏条目进度
+         */
+        fun Task.hiddenStats(profile: PlayerProfile) {
+            val statsMap = statsMap.computeIfAbsent(profile.player.name) { StatsMap() }
+            statsMap.bossBar.remove(path)?.key?.removeAll()
+            statsMap.bossBarAlways.remove(path)?.removeAll()
+        }
+
+        /**
+         * 刷新任务进度（仅持续显示的）
+         */
+        fun Quest.refreshStats(profile: PlayerProfile) {
+            val statsMap = statsMap.computeIfAbsent(profile.player.name) { StatsMap() }
+            tasks.forEach {
+                if (it.stats()?.visibleAlways == true) {
+                    it.statsDisplay(profile).thenApply { bossBar ->
+                        if (bossBar != null) {
+                            statsMap.bossBarAlways[it.path] = bossBar
+                        }
+                    }
+                }
+            }
+        }
+
+        /**
+         * 刷新条目进度
+         */
+        fun Task.refreshStats(profile: PlayerProfile) {
+            val stats = stats() ?: return
+            val statsMap = statsMap.computeIfAbsent(profile.player.name) { StatsMap() }
+            mirrorFuture("AddonStats:onContinue") {
+                when {
+                    stats.visibleAlways -> {
+                        val bossBar = statsMap.bossBarAlways[path]
+                        if (bossBar == null) {
+                            statsDisplay(profile).thenApply { bar ->
+                                if (bar != null) {
+                                    statsMap.bossBarAlways[path] = bar
+                                }
+                                finish()
+                            }
+                        } else {
+                            getProgress(profile).thenApply { progress ->
+                                bossBar.progress = progress.percent
+                                bossBar.setTitle(stats.getTitle(this@refreshStats, progress))
+                                finish()
+                            }
+                        }
+                    }
+                    stats.visible -> {
+                        val bossBar = statsMap.bossBar[path]
+                        if (bossBar == null) {
+                            statsDisplay(profile).thenApply { bar ->
+                                if (bar != null) {
+                                    statsMap.bossBar[path] = Pair.of(bar, System.currentTimeMillis() + (stats.stay * 50L))
+                                }
+                                finish()
+                            }
+                        } else {
+                            getProgress(profile).thenApply { progress ->
+                                bossBar.key.progress = progress.percent
+                                bossBar.key.setTitle(stats.getTitle(this@refreshStats, progress))
+                                bossBar.value = System.currentTimeMillis() + (stats.stay * 50L)
+                                finish()
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
