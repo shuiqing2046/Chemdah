@@ -34,7 +34,7 @@ class UI {
             val fill = ui.config.getString("bar.$plan.fill", "&a|")!!.colored()
             val size = ui.config.getInt("bar.$plan.size", 35)
             return CompletableFuture.completedFuture((1..size).joinToString("") { i ->
-                if (percent == 0.0) empty else if (percent >= i.toDouble() / size) fill else empty
+                if (percent.isNaN() || percent == 0.0) empty else if (percent >= i.toDouble() / size) fill else empty
             })
         }
     }
@@ -45,7 +45,11 @@ class UI {
             val profile = frame.getProfile()
             val quests = ChemdahAPI.quest.filter { (_, v) -> v.label().any { it in include } && v.label().none { it in exclude } }.values.toList()
             val percent = quests.count { profile.isQuestCompleted(it) } / quests.size.toDouble()
-            return CompletableFuture.completedFuture(Coerce.format(percent * 100).toString())
+            return if (percent.isNaN()) {
+                CompletableFuture.completedFuture("0")
+            } else {
+                CompletableFuture.completedFuture(Coerce.format(percent * 100).toString())
+            }
         }
     }
 
@@ -57,7 +61,7 @@ class UI {
 
         @KetherParser(["ui"], namespace = "chemdah-quest-ui")
         fun parser() = ScriptParser.parser {
-            when (it.expects("bar, percent")) {
+            when (it.expects("bar", "percent")) {
                 "bar" -> UIBar(it.nextToken(), it.next(tokenType), it.run {
                     try {
                         it.mark()

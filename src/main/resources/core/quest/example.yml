@@ -5,38 +5,16 @@
       material: diamond_ore
     goal:
       amount: 10
-    addo:stats:
+    addon:stats:
       visible: true
   addon:ui:
-    icon: iron_pickaxe --noflags
+    icon: iron_pickaxe
     description:
       - '&7Mine &3[10 Diamond Ores] &7anywhere.'
+  agent:start:
+    - tell colored *"&3[Break Diamonds] &7accepted!"
   agent:complete:
     - tell colored *"&3[Break Diamonds] &7completed!"
   meta:
     name: Break Diamonds
-    label: L1
-
-10_emerald_ore:
-  task:0:
-    objective: block break
-    condition:
-      material: emerald_ore
-      position: world 0 0 0 ~ 10 10 10
-    goal:
-      amount: 10
-    addon:stats:
-      visible: true
-    addon:track:
-      center: world 0 0 0
-  addon:ui:
-    icon: iron_pickaxe --noflags
-    description:
-      - '&7Mine &3[10 Emerald Ores] &7at the world center.'
-  addon:track:
-    center: world 0 0 0
-  agent:complete:
-    - tell colored *"&3[Break Emeralds] &7completed!"
-  meta:
-    name: Break Emeralds
     label: L1

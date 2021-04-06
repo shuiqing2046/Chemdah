@@ -4,8 +4,10 @@ import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Template
 import ink.ptms.chemdah.core.quest.addon.AddonUI.Companion.ui
 import ink.ptms.chemdah.core.quest.meta.MetaName.Companion.displayName
+import ink.ptms.chemdah.util.colored
 import ink.ptms.chemdah.util.setIcon
 import org.bukkit.configuration.ConfigurationSection
+import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 
 /**
@@ -27,11 +29,12 @@ open class ItemQuest(config: ConfigurationSection) : Item(config) {
                 meta.setDisplayName(meta.displayName.replace("{name}", template.displayName()))
                 meta.lore = meta.lore?.flatMap { lore ->
                     if (lore.contains("{description}")) {
-                        addonUI?.description?.map { lore.replace("{description}", it) } ?: emptyList()
+                        addonUI?.description?.map { lore.replace("{description}", it.colored()) } ?: emptyList()
                     } else {
                         listOf(lore)
                     }
                 }
+                meta.addItemFlags(*ItemFlag.values())
             }
         }
     }

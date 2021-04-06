@@ -16,7 +16,6 @@ import io.izzel.taboolib.util.item.Items
 import org.bukkit.Bukkit
 import org.bukkit.block.Block
 import org.bukkit.configuration.ConfigurationSection
-import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 
 val conf: TConfig
@@ -70,15 +69,6 @@ fun ItemStack.setIcon(value: String) {
         }
         get(listOf("c", "custom_data_model"))?.let {
             itemBuilder.customModelData(it.asInt())
-        }
-        if (tags.contains("shiny")) {
-            itemBuilder.shiny()
-        }
-        if (tags.contains("unbreakable")) {
-            itemBuilder.unbreakable(true)
-        }
-        if (tags.contains("noflags")) {
-            itemBuilder.flags(*ItemFlag.values())
         }
     }
     itemBuilder.build()

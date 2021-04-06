@@ -48,7 +48,7 @@ object HologramAPI {
         protected abstract fun delete(obj: T)
     }
 
-    class HologramNative : Hologram<AdyArmorStand>() {
+    class HologramAdyeshach : Hologram<AdyArmorStand>() {
 
         override fun create(player: Player, location: Location, line: String): AdyArmorStand {
             return AdyeshachAPI.getEntityManagerPrivate(player).create(EntityTypes.ARMOR_STAND, location) {
@@ -75,7 +75,7 @@ object HologramAPI {
         }
     }
 
-    class HologramAdyeshach : Hologram<io.izzel.taboolib.module.hologram.Hologram>() {
+    class HologramNative : Hologram<io.izzel.taboolib.module.hologram.Hologram>() {
 
         override fun create(player: Player, location: Location, line: String): io.izzel.taboolib.module.hologram.Hologram {
             return THologram.create(location, line).also {

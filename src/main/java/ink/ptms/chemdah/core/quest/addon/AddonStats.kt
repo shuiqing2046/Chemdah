@@ -139,7 +139,9 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
         @EventHandler
         private fun e(e: ObjectiveEvent.Continue) {
             Tasks.task {
-                if (!e.task.isCompleted(e.playerProfile)) {
+                if (e.isCompleted()) {
+                    e.task.hiddenStats(e.playerProfile)
+                } else {
                     e.task.refreshStats(e.playerProfile)
                 }
             }
@@ -213,7 +215,7 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
                 if (it.stats()?.visibleAlways == true) {
                     it.statsDisplay(profile).thenApply { bossBar ->
                         if (bossBar != null) {
-                            statsMap.bossBarAlways[it.path] = bossBar
+                            statsMap.bossBarAlways.put(it.path, bossBar)?.removeAll()
                         }
                     }
                 }
@@ -233,7 +235,7 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
                         if (bossBar == null) {
                             statsDisplay(profile).thenApply { bar ->
                                 if (bar != null) {
-                                    statsMap.bossBarAlways[path] = bar
+                                    statsMap.bossBarAlways.put(path, bar)?.removeAll()
                                 }
                                 finish()
                             }
@@ -250,7 +252,7 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
                         if (bossBar == null) {
                             statsDisplay(profile).thenApply { bar ->
                                 if (bar != null) {
-                                    statsMap.bossBar[path] = Pair.of(bar, System.currentTimeMillis() + (stats.stay * 50L))
+                                    statsMap.bossBar.put(path, Pair.of(bar, System.currentTimeMillis() + (stats.stay * 50L)))?.key?.removeAll()
                                 }
                                 finish()
                             }

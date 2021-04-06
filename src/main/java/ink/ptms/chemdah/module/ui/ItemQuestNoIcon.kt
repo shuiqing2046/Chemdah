@@ -4,6 +4,7 @@ import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Template
 import ink.ptms.chemdah.core.quest.addon.AddonUI.Companion.ui
 import ink.ptms.chemdah.core.quest.meta.MetaName.Companion.displayName
+import ink.ptms.chemdah.util.colored
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.inventory.ItemStack
 
@@ -22,7 +23,7 @@ open class ItemQuestNoIcon(config: ConfigurationSection) : Item(config) {
                 meta.setDisplayName(meta.displayName.replace("{name}", template.displayName()))
                 meta.lore = meta.lore?.flatMap { lore ->
                     if (lore.contains("{description}")) {
-                        template.ui()?.description?.map { lore.replace("{description}", it) } ?: emptyList()
+                        template.ui()?.description?.map { lore.replace("{description}", it.colored()) } ?: emptyList()
                     } else {
                         listOf(lore)
                     }

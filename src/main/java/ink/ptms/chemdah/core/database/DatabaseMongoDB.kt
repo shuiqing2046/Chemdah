@@ -4,9 +4,9 @@ import ink.ptms.chemdah.Chemdah
 import ink.ptms.chemdah.core.DataContainer
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Quest
-import ink.ptms.chemdah.util.colored
 import io.izzel.taboolib.cronus.bridge.CronusBridge
 import io.izzel.taboolib.cronus.bridge.database.IndexType
+import io.izzel.taboolib.module.locale.TLocale
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -90,7 +90,7 @@ class DatabaseMongoDB : Database(), Listener {
     fun e(e: PlayerLoginEvent) {
         if (e.player.name == variablesKey) {
             e.result = PlayerLoginEvent.Result.KICK_OTHER
-            e.kickMessage = "&4&lWARNING! &rThe &4&lChemdah&r blocked this username.".colored()
+            e.kickMessage = TLocale.asString("database-error-username")
         }
     }
 }

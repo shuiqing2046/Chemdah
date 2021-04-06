@@ -25,34 +25,36 @@ default-stats:
   content: '&3[{name}] &7{value}/{target} &f[{percent}%]'
 
 default-track:
-  message: 'Tracking [{name}]... click to cancel.'
+  message: '&7Tracking &3[{name}]&7... Click to cancel.'
   mark:
     value: true
-    type: HAPPY_VILLAGER
-    size: 0
-    count: 1000
+    type: CLOUD
+    size: 0.05
+    count: 500
     distance:
-      min: 16
+      min: 32
       max: 64
-    period: 20
+    period: 2
   navigation:
     value: true
-    type: END_ROD
+    sync: true
+    type: CRIT
     size:
-      x: 0
-      y: 1.5
+      x: 0.2
+      y: 0.2
     count: 20
     content:
-      - '&a[{name}]'
-      - '{distance}m'
+      - '&a[ - {name} - ]'
+      - '({distance}m)'
     distance:
-      min: 6
+      min: 3
       max: 64
-    period: 60
+    period: 40
   scoreboard:
     value: true
     content:
-      - '&6&lTRACKS'
+      - '&6&lCHEMDAH TRACKS'
       - - ''
-        - '{name}'
-        - '{description}'
+        - ' &f{name}:'
+        - ' {description}'
+      - ''

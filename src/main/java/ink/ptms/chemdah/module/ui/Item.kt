@@ -2,6 +2,7 @@ package ink.ptms.chemdah.module.ui
 
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Template
+import ink.ptms.chemdah.util.namespaceQuestUI
 import io.izzel.taboolib.kotlin.kether.KetherFunction
 import io.izzel.taboolib.util.item.Items
 import org.bukkit.configuration.ConfigurationSection
@@ -26,7 +27,7 @@ open class Item(val config: ConfigurationSection) {
                     rootFrame().variables().set("@QuestUI", ui)
                 })
                 meta.lore = item.lore?.map { lore ->
-                    KetherFunction.parse(lore) {
+                    KetherFunction.parse(lore, namespace = namespaceQuestUI) {
                         sender = player.player
                         rootFrame().variables().set("@QuestUI", ui)
                     }

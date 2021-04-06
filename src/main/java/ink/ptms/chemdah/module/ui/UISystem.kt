@@ -32,7 +32,7 @@ object UISystem : Listener, Module {
     }
 
     @EventHandler
-    fun e(e: PlayerQuitEvent) {
+    private fun e(e: PlayerQuitEvent) {
         ui.values.forEach { it.playerFilters.remove(e.player.uniqueId) }
     }
 

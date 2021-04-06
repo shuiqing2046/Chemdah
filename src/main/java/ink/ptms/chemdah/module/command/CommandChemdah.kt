@@ -4,6 +4,7 @@ import ink.ptms.chemdah.api.ChemdahAPI
 import io.izzel.taboolib.module.command.base.BaseCommand
 import io.izzel.taboolib.module.command.base.BaseMainCommand
 import io.izzel.taboolib.module.command.base.SubCommand
+import io.izzel.taboolib.module.locale.TLocale
 import org.bukkit.command.CommandSender
 
 /**
@@ -16,9 +17,9 @@ import org.bukkit.command.CommandSender
 @BaseCommand(name = "chemdah", aliases = ["ch"], permission = "chemdah.command")
 class CommandChemdah : BaseMainCommand() {
 
-    @SubCommand(description = "重载配置文件", priority = 1.0)
+    @SubCommand(description = "@command-reload", priority = 1.0)
     fun reload(sender: CommandSender, args: Array<String>) {
         ChemdahAPI.reloadAll()
-        sender.sendMessage("§c[Chemdah] §7Successful.")
+        TLocale.sendTo(sender, "command-reload-success")
     }
 }

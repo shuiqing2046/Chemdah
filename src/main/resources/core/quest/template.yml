@@ -3,7 +3,7 @@ template:
     objective: block break
     condition:
       material: stone
-      position: world 0 0 0 ~ 10 10 10
+      position: world 0 0 0 > 10 10 10
       $: player sneaking
     goal:
       amount: 10

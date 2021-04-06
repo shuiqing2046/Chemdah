@@ -2,12 +2,14 @@ package ink.ptms.chemdah.module.ui
 
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Template
+import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.module.db.local.SecuredFile
 import io.izzel.taboolib.util.item.Items
 import io.izzel.taboolib.util.item.inventory.ClickEvent
 import io.izzel.taboolib.util.item.inventory.linked.MenuLinked
 import org.bukkit.Sound
 import org.bukkit.entity.Player
+import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 
@@ -80,6 +82,12 @@ class UIMenuFilter(val ui: UI, val profile: PlayerProfile) : MenuLinked<Include>
     override fun generateItem(player: Player, include: Include, index: Int, slot: Int): ItemStack {
         val includes = ui.playerFilters.computeIfAbsent(player.uniqueId) { ArrayList() }
         return if (include.id in includes) include.activeItem else include.normalItem
+    }
+
+    override fun onClose(e: InventoryCloseEvent) {
+        Tasks.delay(1) {
+            ui.open(profile)
+        }
     }
 
     companion object {

@@ -4,7 +4,7 @@
 
 
 default:
-  name: '{name}''s Quests [Pg.{page}]'
+  name: '{name}''s Quests [Pg. {page}]'
   menu:
     quest:
       rows: 6
@@ -109,11 +109,15 @@ default:
         name: '&fL2 quests'
         lore:
           - '&a&lINCLUDED'
+        flags:
+          - HIDE_ATTRIBUTES
       normal:
         material: iron_pickaxe
         name: '&fL2 quests'
         lore:
           - '&7INCLUDE'
+        flags:
+          - HIDE_ATTRIBUTES
     L3:
       active:
         material: stone

@@ -23,6 +23,10 @@ class ObjectiveEvent {
         init {
             async(!Bukkit.isPrimaryThread())
         }
+
+        fun isCompleted(): Boolean {
+            return task.isCompleted(playerProfile) || task.getQuest(playerProfile)?.isCompleted ?: true
+        }
     }
 
     /**

@@ -3,14 +3,15 @@ package ink.ptms.chemdah.core.database
 import com.google.common.base.Preconditions
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
+import ink.ptms.chemdah.api.ChemdahAPI.isChemdahProfileLoaded
 import ink.ptms.chemdah.api.event.PlayerEvent
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Quest
-import ink.ptms.chemdah.util.colored
 import ink.ptms.chemdah.util.mirrorFuture
 import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.module.inject.TListener
 import io.izzel.taboolib.module.inject.TSchedule
+import io.izzel.taboolib.module.locale.TLocale
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -98,7 +99,7 @@ abstract class Database {
         private fun e(e: PlayerLoginEvent) {
             if (INSTANCE is DatabaseError) {
                 e.result = PlayerLoginEvent.Result.KICK_OTHER
-                e.kickMessage = "&4&lERROR! &rThe &4&lChemdah&r database failed to initialize.".colored()
+                e.kickMessage = TLocale.asString("database-error")
             }
         }
 
@@ -131,7 +132,7 @@ abstract class Database {
 
         @TSchedule(period = 200, async = true)
         private fun update200() {
-            Bukkit.getOnlinePlayers().forEach {
+            Bukkit.getOnlinePlayers().filter { it.isChemdahProfileLoaded }.forEach {
                 val playerProfile = it.chemdahProfile
                 if (playerProfile.changed) {
                     mirrorFuture("Database:update") {

@@ -119,19 +119,21 @@ object QuestLoader {
      */
     fun handleEvent(player: Player, event: Event, objective: Objective<Event>) {
         mirrorFuture("QuestHandler:handleEvent:${objective.name}") {
-            player.chemdahProfile.also { profile ->
-                // 通过事件获取所有正在进行的任务条目
-                profile.getTasks(event).forEach { task ->
-                    // 如果含有完成标记，则不在进行该条目
-                    if (objective.hasCompletedSignature(profile, task)) {
-                        return@forEach
-                    }
-                    // 判断条件并进行该条目
-                    objective.checkCondition(profile, task, event).thenAccept { cond ->
-                        if (cond) {
-                            objective.onContinue(profile, task, event)
-                            objective.checkComplete(profile, task)
-                            task.getQuest(profile)?.checkComplete()
+            if (player.isChemdahProfileLoaded) {
+                player.chemdahProfile.also { profile ->
+                    // 通过事件获取所有正在进行的任务条目
+                    profile.getTasks(event).forEach { task ->
+                        // 如果含有完成标记，则不在进行该条目
+                        if (objective.hasCompletedSignature(profile, task)) {
+                            return@forEach
+                        }
+                        // 判断条件并进行该条目
+                        objective.checkCondition(profile, task, event).thenAccept { cond ->
+                            if (cond) {
+                                objective.onContinue(profile, task, event)
+                                objective.checkComplete(profile, task)
+                                task.getQuest(profile)?.checkComplete()
+                            }
                         }
                     }
                 }
