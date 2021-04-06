@@ -14,7 +14,7 @@ import org.bukkit.event.player.PlayerEditBookEvent
 @Dependency("minecraft")
 object IPlayerBook : ObjectiveCountable<PlayerEditBookEvent>() {
 
-    override val name = "player book"
+    override val name = "edit book"
     override val event = PlayerEditBookEvent::class
 
     init {

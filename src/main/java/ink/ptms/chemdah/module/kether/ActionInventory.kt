@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.module.kether
 
-import ink.ptms.chemdah.util.InferItem
-import ink.ptms.chemdah.util.InferItem.Companion.toInferItem
+import ink.ptms.chemdah.util.selector.InferItem
+import ink.ptms.chemdah.util.selector.InferItem.Companion.toInferItem
 import ink.ptms.chemdah.util.getPlayer
 import io.izzel.taboolib.kotlin.kether.Kether.expects
 import io.izzel.taboolib.kotlin.kether.KetherParser
@@ -22,21 +22,21 @@ import java.util.concurrent.CompletableFuture
  */
 class ActionInventory {
 
-    class InventoryTake(val item: InferItem, val amount: Int) : QuestAction<Boolean>() {
+    class InventoryTake(val item: InferItem.Item, val amount: Int) : QuestAction<Boolean>() {
 
         override fun process(frame: QuestContext.Frame): CompletableFuture<Boolean> {
             return CompletableFuture.completedFuture(item.take(frame.getPlayer().inventory, amount))
         }
     }
 
-    class InventoryCheck(val item: InferItem, val amount: Int) : QuestAction<Boolean>() {
+    class InventoryCheck(val item: InferItem.Item, val amount: Int) : QuestAction<Boolean>() {
 
         override fun process(frame: QuestContext.Frame): CompletableFuture<Boolean> {
             return CompletableFuture.completedFuture(item.check(frame.getPlayer().inventory, amount))
         }
     }
 
-    class InventorySlot(val slot: Int, val item: InferItem, val amount: Int) : QuestAction<Boolean>() {
+    class InventorySlot(val slot: Int, val item: InferItem.Item, val amount: Int) : QuestAction<Boolean>() {
 
         override fun process(frame: QuestContext.Frame): CompletableFuture<Boolean> {
             val equipment = frame.getPlayer().inventory.getItem(slot)
@@ -48,7 +48,7 @@ class ActionInventory {
         }
     }
 
-    class InventoryEquipment(val equipment: Equipments, val item: InferItem, val amount: Int) : QuestAction<Boolean>() {
+    class InventoryEquipment(val equipment: Equipments, val item: InferItem.Item, val amount: Int) : QuestAction<Boolean>() {
 
         override fun process(frame: QuestContext.Frame): CompletableFuture<Boolean> {
             val equipment = equipment.getItem(frame.getPlayer())

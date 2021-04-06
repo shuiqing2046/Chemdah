@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.module.kether
 
-import ink.ptms.chemdah.util.InferArea
-import ink.ptms.chemdah.util.InferArea.Companion.toInferArea
+import ink.ptms.chemdah.util.selector.InferArea
+import ink.ptms.chemdah.util.selector.InferArea.Companion.toInferArea
 import ink.ptms.chemdah.util.getPlayer
 import io.izzel.taboolib.kotlin.kether.Kether.expects
 import io.izzel.taboolib.kotlin.kether.KetherParser

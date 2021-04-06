@@ -14,7 +14,7 @@ import org.bukkit.event.player.PlayerPickupArrowEvent
 @Dependency("minecraft")
 object IItemPickArrow : ObjectiveCountable<PlayerPickupArrowEvent>() {
 
-    override val name = "arrow pick"
+    override val name = "pickup arrow"
     override val event = PlayerPickupArrowEvent::class
 
     init {
@@ -25,7 +25,7 @@ object IItemPickArrow : ObjectiveCountable<PlayerPickupArrowEvent>() {
             !task.condition.containsKey("position") || task.condition["position"]!!.toPosition().inside(e.player.location)
         }
         addCondition { _, task, e ->
-            !task.condition.containsKey("item") || task.condition["item"]!!.toItem().match(e.item.itemStack)
+            !task.condition.containsKey("item") || task.condition["item"]!!.toInferItem().isItem(e.item.itemStack)
         }
     }
 }

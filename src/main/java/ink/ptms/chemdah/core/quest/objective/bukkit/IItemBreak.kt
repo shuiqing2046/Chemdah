@@ -25,7 +25,7 @@ object IItemBreak : ObjectiveCountable<PlayerItemBreakEvent>() {
             !task.condition.containsKey("position") || task.condition["position"]!!.toPosition().inside(e.player.location)
         }
         addCondition { _, task, e ->
-            !task.condition.containsKey("item") || task.condition["item"]!!.toItem().match(e.brokenItem)
+            !task.condition.containsKey("item") || task.condition["item"]!!.toInferItem().isItem(e.brokenItem)
         }
     }
 }

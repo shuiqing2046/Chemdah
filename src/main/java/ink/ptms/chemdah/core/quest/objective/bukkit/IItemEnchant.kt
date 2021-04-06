@@ -14,7 +14,7 @@ import org.bukkit.event.enchantment.EnchantItemEvent
 @Dependency("minecraft")
 object IItemEnchant : ObjectiveCountable<EnchantItemEvent>() {
 
-    override val name = "item enchant"
+    override val name = "enchant item"
     override val event = EnchantItemEvent::class
 
     init {
@@ -25,7 +25,7 @@ object IItemEnchant : ObjectiveCountable<EnchantItemEvent>() {
             !task.condition.containsKey("position") || task.condition["position"]!!.toPosition().inside(e.enchantBlock.location)
         }
         addCondition { _, task, e ->
-            !task.condition.containsKey("item") || task.condition["item"]!!.toItem().match(e.item)
+            !task.condition.containsKey("item") || task.condition["item"]!!.toInferItem().isItem(e.item)
         }
         addCondition { _, task, e ->
             !task.condition.containsKey("type") || task.condition["type"]!!.asList().any { e.enchantsToAdd.any { e -> e.key.name.equals(it, true) } }

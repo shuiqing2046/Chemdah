@@ -1,9 +1,10 @@
 package ink.ptms.chemdah.core
 
-import ink.ptms.chemdah.util.InferArea.Companion.toInferArea
-import ink.ptms.chemdah.util.InferItem.Companion.toInferItem
-import ink.ptms.chemdah.util.Mats.Companion.toMats
+import ink.ptms.chemdah.util.selector.InferArea.Companion.toInferArea
+import ink.ptms.chemdah.util.selector.InferItem.Companion.toInferItem
+import ink.ptms.chemdah.util.selector.InferBlock.Companion.toInferBlock
 import ink.ptms.chemdah.util.asList
+import ink.ptms.chemdah.util.selector.InferEntity.Companion.toInferEntity
 import io.izzel.taboolib.util.Coerce
 
 /**
@@ -15,16 +16,20 @@ import io.izzel.taboolib.util.Coerce
  */
 class Data(val value: Any) {
 
-    private val lazyMaterial by lazy {
-        asList().map { it.trim().toLowerCase() }.toMats()
-    }
-
     private val lazyPosition by lazy {
         toString().toInferArea()
     }
 
+    private val lazyEntity by lazy {
+        asList().toInferEntity()
+    }
+
+    private val lazyBlock by lazy {
+        asList().toInferBlock()
+    }
+
     private val lazyItem by lazy {
-        toString().toInferItem()
+        asList().toInferItem()
     }
 
     fun toInt() = Coerce.toInteger(value)
@@ -43,9 +48,11 @@ class Data(val value: Any) {
 
     fun toPosition() = lazyPosition
 
-    fun toMaterial() = lazyMaterial
+    fun toInferEntity() = lazyEntity
 
-    fun toItem() = lazyItem
+    fun toInferBlock() = lazyBlock
+
+    fun toInferItem() = lazyItem
 
     fun asList() = value.asList()
 

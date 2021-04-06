@@ -16,7 +16,7 @@ import org.bukkit.event.inventory.CraftItemEvent
 @Dependency("minecraft")
 object IItemCraft : ObjectiveCountable<CraftItemEvent>() {
 
-    override val name = "item craft"
+    override val name = "craft item"
     override val event = CraftItemEvent::class
 
     init {
@@ -27,10 +27,10 @@ object IItemCraft : ObjectiveCountable<CraftItemEvent>() {
             !task.condition.containsKey("position") || task.condition["position"]!!.toPosition().inside(e.whoClicked.location)
         }
         addCondition { _, task, e ->
-            !task.condition.containsKey("item") || task.condition["item"]!!.toItem().match(e.inventory.result!!)
+            !task.condition.containsKey("item") || task.condition["item"]!!.toInferItem().isItem(e.inventory.result!!)
         }
         addCondition { _, task, e ->
-            !task.condition.containsKey("item:matrix") || task.condition["item:matrix"]!!.toItem().run { e.inventory.matrix.any { item -> match(item) } }
+            !task.condition.containsKey("item:matrix") || task.condition["item:matrix"]!!.toInferItem().run { e.inventory.matrix.any { item -> isItem(item) } }
         }
     }
 }

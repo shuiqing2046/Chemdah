@@ -5,6 +5,7 @@ import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.core.quest.addon.Addon
 import ink.ptms.chemdah.core.quest.meta.Meta
+import ink.ptms.chemdah.core.quest.objective.Abstract
 import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.Objective
 import ink.ptms.chemdah.util.mirrorFuture
@@ -59,7 +60,7 @@ object QuestLoader {
     @TFunction.Init
     private fun register() {
         TabooLibLoader.getPluginClassSafely(Chemdah.plugin).forEach {
-            if (Objective::class.java.isAssignableFrom(it)) {
+            if (Objective::class.java.isAssignableFrom(it) && !it.isAnnotationPresent(Abstract::class.java)) {
                 val objective = CompatKotlin.getInstance(it) as? Objective<Event>
                 if (objective != null) {
                     // 检测依赖环境

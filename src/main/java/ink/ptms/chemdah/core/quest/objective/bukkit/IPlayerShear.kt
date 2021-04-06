@@ -2,33 +2,33 @@ package ink.ptms.chemdah.core.quest.objective.bukkit
 
 import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
-import org.bukkit.event.block.BlockPlaceEvent
+import org.bukkit.event.player.PlayerShearEntityEvent
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.quest.objective.bukkit.IBlockPlace
+ * ink.ptms.chemdah.core.quest.objective.bukkit.IPlayerShear
  *
  * @author sky
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
-object IBlockPlace : ObjectiveCountable<BlockPlaceEvent>() {
+object IPlayerShear : ObjectiveCountable<PlayerShearEntityEvent>() {
 
-    override val name = "block place"
-    override val event = BlockPlaceEvent::class
+    override val name = "player shear"
+    override val event = PlayerShearEntityEvent::class
 
     init {
         handler {
             player
         }
         addCondition { _, task, e ->
-            !task.condition.containsKey("position") || task.condition["position"]!!.toPosition().inside(e.block.location)
+            !task.condition.containsKey("position") || task.condition["position"]!!.toPosition().inside(e.entity.location)
         }
         addCondition { _, task, e ->
-            !task.condition.containsKey("material") || task.condition["material"]!!.toInferBlock().isBlock(e.block)
+            !task.condition.containsKey("entity") || task.condition["entity"]!!.toInferEntity().isEntity(e.entity)
         }
         addCondition { _, task, e ->
-            !task.condition.containsKey("material:against") || task.condition["material:against"]!!.toInferBlock().isBlock(e.blockAgainst)
+            !task.condition.containsKey("item") || task.condition["item"]!!.toInferItem().isItem(e.item)
         }
         addCondition { _, task, e ->
             !task.condition.containsKey("hand") || task.condition["hand"]!!.asList().any { it.equals(e.hand.name, true) }

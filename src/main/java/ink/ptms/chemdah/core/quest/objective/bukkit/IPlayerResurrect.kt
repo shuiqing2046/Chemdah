@@ -2,21 +2,25 @@ package ink.ptms.chemdah.core.quest.objective.bukkit
 
 import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
+import io.izzel.taboolib.cronus.CronusUtils
+import io.izzel.taboolib.internal.xseries.XMaterial
 import org.bukkit.entity.Player
-import org.bukkit.event.entity.EntityPickupItemEvent
+import org.bukkit.event.entity.EntityResurrectEvent
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.quest.objective.bukkit.IItemPick
+ * ink.ptms.chemdah.core.quest.objective.bukkit.IPlayerResurrect
  *
  * @author sky
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
-object IItemPick : ObjectiveCountable<EntityPickupItemEvent>() {
+object IPlayerResurrect : ObjectiveCountable<EntityResurrectEvent>() {
 
-    override val name = "pickup item"
-    override val event = EntityPickupItemEvent::class
+    override val name = "player resurrect"
+    override val event = EntityResurrectEvent::class
+
+    val totem = XMaterial.TOTEM_OF_UNDYING.parseMaterial()
 
     init {
         handler {
@@ -26,7 +30,7 @@ object IItemPick : ObjectiveCountable<EntityPickupItemEvent>() {
             !task.condition.containsKey("position") || task.condition["position"]!!.toPosition().inside(e.entity.location)
         }
         addCondition { _, task, e ->
-            !task.condition.containsKey("item") || task.condition["item"]!!.toInferItem().isItem(e.item.itemStack)
+            !task.condition.containsKey("item") || task.condition["item"]!!.toInferItem().isItem(CronusUtils.getUsingItem(e.entity as Player, totem))
         }
     }
 }

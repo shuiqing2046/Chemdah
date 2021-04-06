@@ -15,6 +15,7 @@ import ink.ptms.chemdah.core.quest.Template
 import ink.ptms.chemdah.core.quest.addon.AddonUI.Companion.ui
 import ink.ptms.chemdah.core.quest.meta.MetaName.Companion.displayName
 import ink.ptms.chemdah.util.*
+import ink.ptms.chemdah.util.selector.InferArea
 import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.kotlin.navigation.Navigation
 import io.izzel.taboolib.kotlin.navigation.pathfinder.NodeEntity

@@ -2,9 +2,7 @@ package ink.ptms.chemdah.core.quest.objective.bukkit
 
 import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
-import org.bukkit.Material
 import org.bukkit.event.player.PlayerItemConsumeEvent
-import org.bukkit.inventory.ItemStack
 
 /**
  * Chemdah
@@ -19,8 +17,6 @@ object IItemConsume : ObjectiveCountable<PlayerItemConsumeEvent>() {
     override val name = "item consume"
     override val event = PlayerItemConsumeEvent::class
 
-    val air = ItemStack(Material.AIR)
-
     init {
         handler {
             player
@@ -29,10 +25,10 @@ object IItemConsume : ObjectiveCountable<PlayerItemConsumeEvent>() {
             !task.condition.containsKey("position") || task.condition["position"]!!.toPosition().inside(e.player.location)
         }
         addCondition { _, task, e ->
-            !task.condition.containsKey("item") || task.condition["item"]!!.toItem().match(e.item)
+            !task.condition.containsKey("item") || task.condition["item"]!!.toInferItem().isItem(e.item)
         }
         addCondition { _, task, e ->
-            !task.condition.containsKey("item:replacement") || task.condition["item:replacement"]!!.toItem().match(e.replacement ?: air)
+            !task.condition.containsKey("item:replacement") || task.condition["item:replacement"]!!.toInferItem().isItem(e.replacement ?: AIR)
         }
     }
 }

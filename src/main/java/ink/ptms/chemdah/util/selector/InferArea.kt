@@ -1,5 +1,6 @@
-package ink.ptms.chemdah.util
+package ink.ptms.chemdah.util.selector
 
+import ink.ptms.chemdah.util.warning
 import io.izzel.taboolib.kotlin.navigation.pathfinder.bukkit.BoundingBox
 import io.izzel.taboolib.util.Coerce
 import org.bukkit.Bukkit
@@ -7,7 +8,7 @@ import org.bukkit.Location
 
 /**
  * Chemdah
- * ink.ptms.chemdah.util.InferArea
+ * ink.ptms.chemdah.util.selector.InferArea
  *
  * @author sky
  * @since 2021/3/2 2:51 下午

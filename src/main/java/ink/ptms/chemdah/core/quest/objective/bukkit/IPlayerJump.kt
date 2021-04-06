@@ -2,20 +2,20 @@ package ink.ptms.chemdah.core.quest.objective.bukkit
 
 import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
-import org.bukkit.event.player.PlayerDropItemEvent
+import io.izzel.taboolib.common.event.PlayerJumpEvent
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.quest.objective.bukkit.IItemDrop
+ * ink.ptms.chemdah.core.quest.objective.bukkit.IPlayerJump
  *
  * @author sky
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
-object IItemDrop : ObjectiveCountable<PlayerDropItemEvent>() {
+object IPlayerJump : ObjectiveCountable<PlayerJumpEvent>() {
 
-    override val name = "drop item"
-    override val event = PlayerDropItemEvent::class
+    override val name = "player jump"
+    override val event = PlayerJumpEvent::class
 
     init {
         handler {
@@ -23,9 +23,6 @@ object IItemDrop : ObjectiveCountable<PlayerDropItemEvent>() {
         }
         addCondition { _, task, e ->
             !task.condition.containsKey("position") || task.condition["position"]!!.toPosition().inside(e.player.location)
-        }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("item") || task.condition["item"]!!.toInferItem().isItem(e.itemDrop.itemStack)
         }
     }
 }
