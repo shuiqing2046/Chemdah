@@ -1,8 +1,8 @@
 package ink.ptms.chemdah.module.kether
 
 import ink.ptms.chemdah.util.getPlayer
-import ink.ptms.chemdah.util.selector.InferArea
-import ink.ptms.chemdah.util.selector.InferArea.Companion.toInferArea
+import ink.ptms.chemdah.core.quest.selector.InferArea
+import ink.ptms.chemdah.core.quest.selector.InferArea.Companion.toInferArea
 import io.izzel.taboolib.kotlin.kether.Kether.expects
 import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
@@ -26,7 +26,7 @@ class ConditionPosition(val area: InferArea) : QuestAction<Boolean>() {
     companion object {
 
         /**
-         * position inside "world 0 0 0 ~ 10 10 10"
+         * position inside "world 0 0 0 > 10 10 10"
          */
         @KetherParser(["position"], namespace = "chemdah")
         fun parser() = ScriptParser.parser {

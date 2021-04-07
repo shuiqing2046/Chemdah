@@ -1,4 +1,4 @@
-package ink.ptms.chemdah.util.selector
+package ink.ptms.chemdah.core.quest.selector
 
 import org.bukkit.Bukkit
 import org.bukkit.Material

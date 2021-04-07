@@ -58,7 +58,7 @@ abstract class Database {
     fun updateVariable(key: String, value: String) {
         Preconditions.checkState(key.length <= 36, "key.length > 36")
         Preconditions.checkState(value.length <= 64, "value.length > 64")
-        updateVariable(key, value)
+        updateVariable0(key, value)
     }
 
     /**
@@ -66,7 +66,7 @@ abstract class Database {
      */
     fun releaseVariable(key: String) {
         Preconditions.checkState(key.length <= 36, "key.length > 36")
-        releaseVariable(key)
+        releaseVariable0(key)
     }
 
     /**

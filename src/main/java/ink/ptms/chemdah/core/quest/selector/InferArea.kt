@@ -1,4 +1,4 @@
-package ink.ptms.chemdah.util.selector
+package ink.ptms.chemdah.core.quest.selector
 
 import ink.ptms.chemdah.util.warning
 import io.izzel.taboolib.kotlin.navigation.pathfinder.bukkit.BoundingBox

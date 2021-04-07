@@ -7,6 +7,7 @@ import ink.ptms.chemdah.core.conversation.ConversationLoader
 import ink.ptms.chemdah.core.conversation.ConversationManager
 import ink.ptms.chemdah.core.conversation.Session
 import ink.ptms.chemdah.core.conversation.theme.Theme
+import ink.ptms.chemdah.core.database.Database
 import ink.ptms.chemdah.core.quest.Idx
 import ink.ptms.chemdah.core.quest.QuestLoader
 import ink.ptms.chemdah.core.quest.Template
@@ -16,6 +17,7 @@ import ink.ptms.chemdah.core.quest.meta.MetaAlias.Companion.alias
 import ink.ptms.chemdah.core.quest.meta.MetaLabel.Companion.label
 import ink.ptms.chemdah.core.quest.objective.Objective
 import ink.ptms.chemdah.module.Module
+import ink.ptms.chemdah.util.increaseAny
 import io.izzel.taboolib.kotlin.Mirror
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
@@ -113,6 +115,33 @@ object ChemdahAPI {
      */
     @Throws(NullPointerException::class)
     fun <T : Module> getModule(kClass: KClass<T>) = Module.modules[kClass.simpleName]!!
+
+    /**
+     * 获取所有全局变量
+     */
+    fun getVariables() = Database.INSTANCE.variables()
+
+    /**
+     * 获取全局变量
+     */
+    fun getVariable(key: String) = Database.INSTANCE.selectVariable(key)
+
+    /**
+     * 设置全局变量
+     */
+    fun setVariable(key: String, value: String?, append: Boolean = false) {
+        when {
+            value == null -> {
+                Database.INSTANCE.releaseVariable(key)
+            }
+            append -> {
+                Database.INSTANCE.updateVariable(key, Database.INSTANCE.selectVariable(key).increaseAny(value).toString())
+            }
+            else -> {
+                Database.INSTANCE.updateVariable(key, value)
+            }
+        }
+    }
 
     /**
      * 1 重载中心配置文件

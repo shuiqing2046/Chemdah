@@ -1,10 +1,10 @@
 package ink.ptms.chemdah.core
 
 import ink.ptms.chemdah.util.asList
-import ink.ptms.chemdah.util.selector.InferArea.Companion.toInferArea
-import ink.ptms.chemdah.util.selector.InferBlock.Companion.toInferBlock
-import ink.ptms.chemdah.util.selector.InferEntity.Companion.toInferEntity
-import ink.ptms.chemdah.util.selector.InferItem.Companion.toInferItem
+import ink.ptms.chemdah.core.quest.selector.InferArea.Companion.toInferArea
+import ink.ptms.chemdah.core.quest.selector.InferBlock.Companion.toInferBlock
+import ink.ptms.chemdah.core.quest.selector.InferEntity.Companion.toInferEntity
+import ink.ptms.chemdah.core.quest.selector.InferItem.Companion.toInferItem
 import io.izzel.taboolib.util.Coerce
 
 /**

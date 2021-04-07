@@ -1,7 +1,7 @@
-package ink.ptms.chemdah.util.selector
+package ink.ptms.chemdah.core.quest.selector
 
 import com.google.common.collect.ImmutableMap
-import ink.ptms.chemdah.util.selector.Flags.Companion.matchFlags
+import ink.ptms.chemdah.core.quest.selector.Flags.Companion.matchFlags
 import io.izzel.taboolib.Version
 import io.izzel.taboolib.kotlin.Reflex.Companion.reflex
 import io.izzel.taboolib.kotlin.Reflex.Companion.reflexInvoke

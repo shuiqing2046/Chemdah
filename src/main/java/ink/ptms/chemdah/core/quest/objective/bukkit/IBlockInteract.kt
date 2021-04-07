@@ -36,5 +36,8 @@ object IBlockInteract : ObjectiveCountable<PlayerInteractEvent>() {
         addCondition { _, task, e ->
             !task.condition.containsKey("hand") || task.condition["hand"]!!.asList().any { it.equals(e.hand?.name, true) }
         }
+        addCondition { _, task, e ->
+            !task.condition.containsKey("item") || task.condition["item"]!!.toInferItem().isItem(e.item!!)
+        }
     }
 }

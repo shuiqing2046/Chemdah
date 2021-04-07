@@ -1,7 +1,6 @@
 package ink.ptms.chemdah.module.kether
 
-import ink.ptms.chemdah.core.database.Database
-import ink.ptms.chemdah.util.increaseAny
+import ink.ptms.chemdah.api.ChemdahAPI
 import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.kotlin.kether.Kether.expects
 import io.izzel.taboolib.kotlin.kether.KetherParser
@@ -26,7 +25,7 @@ class ActionVariables {
 
         override fun process(frame: QuestContext.Frame): CompletableFuture<String?> {
             return frame.newFrame(key).run<Any>().thenApply {
-                Database.INSTANCE.selectVariable(it.toString())
+                ChemdahAPI.getVariable(it.toString())
             }
         }
     }
@@ -35,14 +34,9 @@ class ActionVariables {
 
         override fun process(frame: QuestContext.Frame): CompletableFuture<Void> {
             return frame.newFrame(key).run<Any>().thenAccept { key ->
-                frame.newFrame(value).run<Any>().thenAccept { value ->
+                frame.newFrame(value).run<Any?>().thenAccept { value ->
                     Tasks.task(true) {
-                        if (symbol == Symbol.ADD) {
-                            val nv = Database.INSTANCE.selectVariable(key.toString()).increaseAny(value).toString()
-                            Database.INSTANCE.updateVariable(key.toString(), nv)
-                        } else {
-                            Database.INSTANCE.updateVariable(key.toString(), value.toString())
-                        }
+                        ChemdahAPI.setVariable(key.toString(), value?.toString(), symbol == Symbol.ADD)
                     }
                 }
             }
@@ -52,7 +46,7 @@ class ActionVariables {
     class VariablesKeys : QuestAction<List<String>>() {
 
         override fun process(frame: QuestContext.Frame): CompletableFuture<List<String>> {
-            return CompletableFuture.completedFuture(Database.INSTANCE.variables())
+            return CompletableFuture.completedFuture(ChemdahAPI.getVariables())
         }
     }
 

@@ -1,6 +1,6 @@
-package ink.ptms.chemdah.util.selector
+package ink.ptms.chemdah.core.quest.selector
 
-import ink.ptms.chemdah.util.selector.Flags.Companion.matchFlags
+import ink.ptms.chemdah.core.quest.selector.Flags.Companion.matchFlags
 import ink.ptms.chemdah.util.warning
 import ink.ptms.zaphkiel.ZaphkielAPI
 import io.izzel.taboolib.module.nms.NMS
