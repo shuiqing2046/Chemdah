@@ -17,24 +17,31 @@ import org.bukkit.command.CommandSender
 @BaseCommand(name = "chemdahvariables", aliases = ["chv"], permission = "chemdah.command")
 class CommandChemdahVariables : BaseMainCommand() {
 
+    override fun onTabComplete(sender: CommandSender, command: String, argument: String): List<String>? {
+        return when (argument) {
+            "@command-argument-key" -> ChemdahAPI.getVariables()
+            else -> null
+        }
+    }
+
     @SubCommand(description = "@command-variables-get", arguments = ["@command-argument-key"], priority = 0.0)
     fun get(sender: CommandSender, args: Array<String>) {
         val time = System.currentTimeMillis()
         TLocale.sendTo(sender, "command-variables-change", "${args[0]} §8== §f${ChemdahAPI.getVariable(args[0])} §7(${System.currentTimeMillis() - time}ms)")
     }
 
-    @SubCommand(description = "@command-variables-add", arguments = ["@command-argument-key", "@command-argument-value"], priority = 1.0)
-    fun add(sender: CommandSender, args: Array<String>) {
-        val time = System.currentTimeMillis()
-        ChemdahAPI.setVariable(args[0], args[1])
-        TLocale.sendTo(sender, "command-variables-change", "${args[0]} §8= §f${args[1]} §7(${System.currentTimeMillis() - time}ms)")
-    }
-
-    @SubCommand(description = "@command-variables-set", arguments = ["@command-argument-key", "@command-argument-value"], priority = 1.1)
+    @SubCommand(description = "@command-variables-set", arguments = ["@command-argument-key", "@command-argument-value"], priority = 1.0)
     fun set(sender: CommandSender, args: Array<String>) {
         val time = System.currentTimeMillis()
-        ChemdahAPI.setVariable(args[0], args[1], true)
+        ChemdahAPI.setVariable(args[0], args[1])
         TLocale.sendTo(sender, "command-variables-change", "${args[0]} §8+= §f${args[1]} §7(${System.currentTimeMillis() - time}ms)")
+    }
+
+    @SubCommand(description = "@command-variables-add", arguments = ["@command-argument-key", "@command-argument-value"], priority = 1.1)
+    fun add(sender: CommandSender, args: Array<String>) {
+        val time = System.currentTimeMillis()
+        ChemdahAPI.setVariable(args[0], args[1], true)
+        TLocale.sendTo(sender, "command-variables-change", "${args[0]} §8= §f${args[1]} §7(${System.currentTimeMillis() - time}ms)")
     }
 
     @SubCommand(description = "@command-variables-remove", arguments = ["@command-argument-key"], priority = 1.2)
