@@ -21,14 +21,17 @@ object IPlayerTeleport : ObjectiveCountable<PlayerTeleportEvent>() {
         handler {
             player
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("position") || task.condition["position"]!!.toPosition().inside(e.to)
+        addCondition("position") { e ->
+            toPosition().inside(e.to)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("position:from") || task.condition["position:from"]!!.toPosition().inside(e.from)
+        addCondition("position:to") { e ->
+            toPosition().inside(e.to ?: EMPTY)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("cause") || task.condition["cause"]!!.asList().any { it.equals(e.cause.name, true) }
+        addCondition("position:from") { e ->
+            toPosition().inside(e.from)
+        }
+        addCondition("cause") { e ->
+            asList().any { it.equals(e.cause.name, true) }
         }
     }
 }

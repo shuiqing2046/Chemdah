@@ -58,7 +58,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
         val value = content[0]
     }
 
-    val center = InferArea.Single(config.getString("center").toString()).positions[0]
+    val center = InferArea.Single(config.getString("center").toString(), false).positions[0]
         get() = field.clone()
 
     val message = config.get("message", conf.get("default-track.message"))?.asList()?.colored() ?: emptyList()

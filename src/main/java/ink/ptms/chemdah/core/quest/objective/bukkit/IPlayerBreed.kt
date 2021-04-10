@@ -20,25 +20,28 @@ object IPlayerBreed : ObjectiveCountable<EntityBreedEvent>() {
 
     init {
         handler {
-            if (breeder is Player) breeder as Player else null
+            breeder as? Player
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("position") || task.condition["position"]!!.toPosition().inside(e.entity.location)
+        addCondition("position") {
+            toPosition().inside(it.entity.location)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("entity") || task.condition["entity"]!!.toInferEntity().isEntity(e.entity)
+        addCondition("entity") { 
+            toInferEntity().isEntity(it.entity)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("entity:father") || task.condition["entity:father"]!!.toInferEntity().isEntity(e.father)
+        addCondition("entity:father") {
+            toInferEntity().isEntity(it.father)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("entity:mother") || task.condition["entity:mother"]!!.toInferEntity().isEntity(e.mother)
+        addCondition("entity:mother") {
+            toInferEntity().isEntity(it.mother)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("item") || task.condition["item"]!!.toInferItem().isItem(e.bredWith ?: AIR)
+        addCondition("item") { 
+            toInferItem().isItem(it.bredWith ?: AIR)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("exp") || task.condition["exp"]!!.toInt() < e.experience
+        addCondition("exp") { 
+            toInt() < it.experience
+        }
+        addConditionVariable("exp") {
+            it.experience
         }
     }
 }

@@ -1,5 +1,6 @@
 package ink.ptms.chemdah.core.quest.objective.bukkit
 
+import com.destroystokyo.paper.event.player.PlayerLaunchProjectileEvent
 import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
 import org.bukkit.entity.Player
@@ -13,20 +14,26 @@ import org.bukkit.event.entity.ProjectileLaunchEvent
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
-object IPlayerShoot : ObjectiveCountable<ProjectileLaunchEvent>() {
+object IPlayerShoot : ObjectiveCountable<PlayerLaunchProjectileEvent>() {
 
     override val name = "shoot projectile"
-    override val event = ProjectileLaunchEvent::class
+    override val event = PlayerLaunchProjectileEvent::class
 
     init {
         handler {
-            if (entity.shooter is Player) entity.shooter as Player else null
+            player
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("position") || task.condition["position"]!!.toPosition().inside(e.entity.location)
+        addCondition("position") { e ->
+            toPosition().inside(e.player.location)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("projectile") || task.condition["projectile"]!!.toInferEntity().isEntity(e.entity)
+        addCondition("projectile") { e ->
+            toInferEntity().isEntity(e.projectile)
+        }
+        addCondition("item") { e ->
+            toInferItem().isItem(e.itemStack)
+        }
+        addCondition("consume") { e ->
+            toBoolean() == e.shouldConsume()
         }
     }
 }

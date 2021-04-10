@@ -21,17 +21,20 @@ object IItemEnchant : ObjectiveCountable<EnchantItemEvent>() {
         handler {
             enchanter
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("position") || task.condition["position"]!!.toPosition().inside(e.enchantBlock.location)
+        addCondition("position") { e ->
+            toPosition().inside(e.enchantBlock.location)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("item") || task.condition["item"]!!.toInferItem().isItem(e.item)
+        addCondition("item") { e ->
+            toInferItem().isItem(e.item)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("type") || task.condition["type"]!!.asList().any { e.enchantsToAdd.any { e -> e.key.name.equals(it, true) } }
+        addCondition("type") { e ->
+            asList().any { e.enchantsToAdd.any { e -> e.key.name.equals(it, true) } }
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("cost") || task.condition["cost"]!!.toInt() <= e.expLevelCost
+        addCondition("cost") { e ->
+            toInt() <= e.expLevelCost
+        }
+        addConditionVariable("cost") {
+            it.expLevelCost
         }
     }
 }

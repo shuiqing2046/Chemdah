@@ -21,17 +21,17 @@ object IPlayerShear : ObjectiveCountable<PlayerShearEntityEvent>() {
         handler {
             player
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("position") || task.condition["position"]!!.toPosition().inside(e.entity.location)
+        addCondition("position") { e ->
+            toPosition().inside(e.entity.location)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("entity") || task.condition["entity"]!!.toInferEntity().isEntity(e.entity)
+        addCondition("entity") { e ->
+            toInferEntity().isEntity(e.entity)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("item") || task.condition["item"]!!.toInferItem().isItem(e.item)
+        addCondition("item") { e ->
+            toInferItem().isItem(e.item)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("hand") || task.condition["hand"]!!.asList().any { it.equals(e.hand.name, true) }
+        addCondition("hand") { e ->
+            asList().any { it.equals(e.hand.name, true) }
         }
     }
 }

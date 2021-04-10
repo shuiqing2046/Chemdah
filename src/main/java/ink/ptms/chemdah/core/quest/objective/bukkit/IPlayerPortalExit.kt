@@ -20,13 +20,16 @@ object IPlayerPortalExit : ObjectiveCountable<EntityPortalExitEvent>() {
 
     init {
         handler {
-            if (entity is Player) entity as Player else null
+            entity as? Player
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("position") || task.condition["position"]!!.toPosition().inside(e.to ?: EMPTY)
+        addCondition("position") { e ->
+            toPosition().inside(e.to ?: EMPTY)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("position:from") || task.condition["position:from"]!!.toPosition().inside(e.from)
+        addCondition("position:to") { e ->
+            toPosition().inside(e.to ?: EMPTY)
+        }
+        addCondition("position:from") { e ->
+            toPosition().inside(e.from)
         }
     }
 }

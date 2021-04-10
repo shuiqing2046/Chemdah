@@ -21,23 +21,23 @@ object IBlockInteract : ObjectiveCountable<PlayerInteractEvent>() {
         handler {
             if (clickedBlock != null) player else null
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("position") || task.condition["position"]!!.toPosition().inside(e.clickedBlock!!.location)
+        addCondition("position") { e ->
+            toPosition().inside(e.clickedBlock!!.location)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("material") || task.condition["material"]!!.toInferBlock().isBlock(e.clickedBlock!!)
+        addCondition("material") { e ->
+            toInferBlock().isBlock(e.clickedBlock!!)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("action") || task.condition["action"]!!.asList().any { it.equals(e.action.name, true) }
+        addCondition("action") { e ->
+            asList().any { it.equals(e.action.name, true) }
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("face") || task.condition["face"]!!.asList().any { it.equals(e.blockFace.name, true) }
+        addCondition("face") { e ->
+            asList().any { it.equals(e.blockFace.name, true) }
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("hand") || task.condition["hand"]!!.asList().any { it.equals(e.hand?.name, true) }
+        addCondition("hand") { e ->
+            asList().any { it.equals(e.hand?.name, true) }
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("item") || task.condition["item"]!!.toInferItem().isItem(e.item!!)
+        addCondition("item") { e ->
+            toInferItem().isItem(e.item!!)
         }
     }
 }

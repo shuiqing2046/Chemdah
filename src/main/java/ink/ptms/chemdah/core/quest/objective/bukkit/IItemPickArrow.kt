@@ -21,11 +21,11 @@ object IItemPickArrow : ObjectiveCountable<PlayerPickupArrowEvent>() {
         handler {
             player
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("position") || task.condition["position"]!!.toPosition().inside(e.player.location)
+        addCondition("position") { e ->
+            toPosition().inside(e.player.location)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("item") || task.condition["item"]!!.toInferItem().isItem(e.item.itemStack)
+        addCondition("item") { e ->
+            toInferItem().isItem(e.item.itemStack)
         }
     }
 }

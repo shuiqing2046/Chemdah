@@ -24,13 +24,13 @@ object IPlayerResurrect : ObjectiveCountable<EntityResurrectEvent>() {
 
     init {
         handler {
-            if (entity is Player) entity as Player else null
+            entity as? Player
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("position") || task.condition["position"]!!.toPosition().inside(e.entity.location)
+        addCondition("position") { e ->
+            toPosition().inside(e.entity.location)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("item") || task.condition["item"]!!.toInferItem().isItem(CronusUtils.getUsingItem(e.entity as Player, totem))
+        addCondition("item") { e ->
+            toInferItem().isItem(CronusUtils.getUsingItem(e.entity as Player, totem))
         }
     }
 }

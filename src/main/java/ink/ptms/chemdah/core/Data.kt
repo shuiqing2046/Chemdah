@@ -17,7 +17,11 @@ import io.izzel.taboolib.util.Coerce
 class Data(val value: Any) {
 
     private val lazyPosition by lazy {
-        toString().toInferArea()
+        toString().toInferArea(noWorld = false)
+    }
+
+    private val lazyVector by lazy {
+        toString().toInferArea(noWorld = true)
     }
 
     private val lazyEntity by lazy {
@@ -45,6 +49,8 @@ class Data(val value: Any) {
     fun toByte() = Coerce.toByte(value)
 
     fun toBoolean() = Coerce.toBoolean(value)
+
+    fun toVector() = lazyVector
 
     fun toPosition() = lazyPosition
 

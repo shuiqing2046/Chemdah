@@ -23,14 +23,14 @@ object IItemCraft : ObjectiveCountable<CraftItemEvent>() {
         handler {
             if (Items.nonNull(inventory.result)) whoClicked as Player else null
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("position") || task.condition["position"]!!.toPosition().inside(e.whoClicked.location)
+        addCondition("position") { e ->
+            toPosition().inside(e.whoClicked.location)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("item") || task.condition["item"]!!.toInferItem().isItem(e.inventory.result!!)
+        addCondition("item") { e ->
+            toInferItem().isItem(e.inventory.result!!)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("item:matrix") || task.condition["item:matrix"]!!.toInferItem().run { e.inventory.matrix.any { item -> isItem(item) } }
+        addCondition("item:matrix") { e ->
+            toInferItem().run { e.inventory.matrix.any { item -> isItem(item) } }
         }
     }
 }

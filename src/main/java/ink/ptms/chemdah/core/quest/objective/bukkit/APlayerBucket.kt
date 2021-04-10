@@ -19,26 +19,26 @@ abstract class APlayerBucket<T : PlayerBucketEvent> : ObjectiveCountable<T>() {
         handler {
             player
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("position") || task.condition["position"]!!.toPosition().inside(e.block.location)
+        addCondition("position") {
+            toPosition().inside(it.block.location)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("material") || task.condition["material"]!!.toInferBlock().isBlock(e.block)
+        addCondition("material") {
+            toInferBlock().isBlock(it.block)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("material:clicked") || task.condition["material:clicked"]!!.toInferBlock().isBlock(e.blockClicked)
+        addCondition("material:clicked") {
+            toInferBlock().isBlock(it.blockClicked)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("item") || task.condition["item"]!!.toInferItem().isItem(e.itemStack ?: AIR)
+        addCondition("item") {
+            toInferItem().isItem(it.itemStack ?: AIR)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("item:bucket") || task.condition["item:bucket"]!!.toInferItem().isItem(ItemStack(e.bucket))
+        addCondition("item:bucket") {
+            toInferItem().isItem(ItemStack(it.bucket))
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("face") || task.condition["face"]!!.asList().any { it.equals(e.blockFace.name, true) }
+        addCondition("face") { e ->
+            asList().any { it.equals(e.blockFace.name, true) }
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("hand") || task.condition["hand"]!!.asList().any { it.equals(e.hand.name, true) }
+        addCondition("hand") { e ->
+            asList().any { it.equals(e.hand.name, true) }
         }
     }
 }

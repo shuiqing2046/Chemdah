@@ -22,22 +22,28 @@ object IItemAnvil : ObjectiveCountable<PrepareAnvilEvent>() {
         handler {
             viewers[0] as Player
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("position") || task.condition["position"]!!.toPosition().inside(e.inventory.location ?: EMPTY)
+        addCondition("position") { e ->
+            toPosition().inside(e.inventory.location ?: EMPTY)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("text") || task.condition["text"]!!.toString() in e.inventory.renameText.toString()
+        addCondition("text") { e ->
+            toString() in e.inventory.renameText.toString()
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("cost") || task.condition["cost"]!!.toInt() <= e.inventory.repairCost
+        addCondition("cost") { e ->
+            toInt() <= e.inventory.repairCost
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("item") || task.condition["item"]!!.toInferItem().isItem(e.inventory.result ?: AIR)
+        addCondition("item") { e ->
+            toInferItem().isItem(e.inventory.result ?: AIR)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("item:matrix") || task.condition["item:matrix"]!!.toInferItem().run {
+        addCondition("item:matrix") { e ->
+            toInferItem().run {
                 isItem(e.inventory.firstItem ?: AIR) || isItem(e.inventory.secondItem ?: AIR)
             }
+        }
+        addConditionVariable("text") {
+            it.inventory.renameText.toString()
+        }
+        addConditionVariable("cost") {
+            it.inventory.repairCost
         }
     }
 }

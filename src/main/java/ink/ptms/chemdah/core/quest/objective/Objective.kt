@@ -1,6 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective
 
 import ink.ptms.chemdah.api.event.ObjectiveEvent
+import ink.ptms.chemdah.core.Data
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.AgentType
 import ink.ptms.chemdah.core.quest.Task
@@ -28,9 +29,19 @@ abstract class Objective<E : Event> {
     private val conditions = ArrayList<(PlayerProfile, Task, E) -> Boolean>()
 
     /**
+     * 在条目继续的条件中的额外脚本变量
+     */
+    private val conditionVars = ArrayList<(E) -> Pair<String, Any>>()
+
+    /**
      * 条目完成的条件
      */
     private val goals = ArrayList<(PlayerProfile, Task) -> Boolean>()
+
+    /**
+     * 在条目完成的条件中的额外脚本变量
+     */
+    private val goalVars = ArrayList<(PlayerProfile, Task) -> Pair<String, Any>>()
 
     /**
      * 条件序号
@@ -112,12 +123,22 @@ abstract class Objective<E : Event> {
     }
 
     /**
+     * 添加条目继续的条件
+     * 简化版本
+     */
+    fun addCondition(name: String, func: Data.(E) -> Boolean) {
+        conditions += { _, task, e ->
+            !task.condition.containsKey(name) || func(task.condition[name]!!, e)
+        }
+    }
+
+    /**
      * 检查条目继续的所有条件
      * 当所有条件满足时再检查脚本代理
      */
     open fun checkCondition(profile: PlayerProfile, task: Task, event: E): CompletableFuture<Boolean> {
         return if (conditions.all { it(profile, task, event) }) {
-            profile.checkAgent(task.condition["$"]?.value, event)
+            profile.checkAgent(task.condition["$"]?.value, event, conditionVars.map { it(event) }.toMap())
         } else {
             CompletableFuture.completedFuture(false)
         }
@@ -194,5 +215,19 @@ abstract class Objective<E : Event> {
      */
     open fun getProgress(profile: PlayerProfile, task: Task): Progress {
         return Progress.empty
+    }
+
+    /**
+     * 增加在条目继续的条件中的额外脚本变量
+     */
+    fun addConditionVariable(name: String, func: (E) -> Any) {
+        conditionVars += { name to func(it) }
+    }
+
+    /**
+     * 增加在条目完成的条件中的额外脚本变量
+     */
+    fun addGoalVariable(name: String, func: (PlayerProfile, Task) -> Any) {
+        goalVars += { a, b -> name to func(a, b) }
     }
 }

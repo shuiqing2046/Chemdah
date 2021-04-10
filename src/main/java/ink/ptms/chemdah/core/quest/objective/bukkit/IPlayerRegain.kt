@@ -1,0 +1,49 @@
+package ink.ptms.chemdah.core.quest.objective.bukkit
+
+import ink.ptms.chemdah.core.PlayerProfile
+import ink.ptms.chemdah.core.quest.Task
+import ink.ptms.chemdah.core.quest.objective.Dependency
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable2
+import org.bukkit.entity.Player
+import org.bukkit.event.entity.EntityRegainHealthEvent
+import org.bukkit.event.player.AsyncPlayerChatEvent
+
+/**
+ * Chemdah
+ * ink.ptms.chemdah.core.quest.objective.bukkit.IPlayerChat
+ *
+ * @author sky
+ * @since 2021/3/2 5:09 下午
+ */
+@Dependency("minecraft")
+object IPlayerRegain : ObjectiveCountable2<EntityRegainHealthEvent>() {
+
+    override val name = "health regain"
+    override val event = EntityRegainHealthEvent::class
+
+    init {
+        handler {
+            entity as? Player
+        }
+        addCondition("position") { e ->
+            toPosition().inside(e.entity.location)
+        }
+        addCondition("amount") { e ->
+            toInt() <= e.amount
+        }
+        addCondition("reason") { e ->
+            asList().any { it.equals(e.regainReason.name, true) }
+        }
+        addCondition("fast") { e ->
+            toBoolean() == e.isFastRegen
+        }
+        addConditionVariable("amount") {
+            it.amount
+        }
+    }
+
+    override fun getCount(profile: PlayerProfile, task: Task, event: EntityRegainHealthEvent): Double {
+        return event.amount
+    }
+}

@@ -21,14 +21,17 @@ object IBlockBreak : ObjectiveCountable<BlockBreakEvent>() {
         handler {
             player
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("position") || task.condition["position"]!!.toPosition().inside(e.block.location)
+        addCondition("position") { 
+            toPosition().inside(it.block.location)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("material") || task.condition["material"]!!.toInferBlock().isBlock(e.block)
+        addCondition("material") { 
+            toInferBlock().isBlock(it.block)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("exp") || task.condition["exp"]!!.toInt() <= e.expToDrop
+        addCondition("exp") { 
+            toInt() <= it.expToDrop
+        }
+        addConditionVariable("exp") {
+            it.expToDrop
         }
     }
 }

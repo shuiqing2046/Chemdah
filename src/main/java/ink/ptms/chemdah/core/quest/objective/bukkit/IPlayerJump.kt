@@ -3,6 +3,7 @@ package ink.ptms.chemdah.core.quest.objective.bukkit
 import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
 import io.izzel.taboolib.common.event.PlayerJumpEvent
+import org.bukkit.event.entity.EntityCombustByEntityEvent
 
 /**
  * Chemdah
@@ -21,8 +22,8 @@ object IPlayerJump : ObjectiveCountable<PlayerJumpEvent>() {
         handler {
             player
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("position") || task.condition["position"]!!.toPosition().inside(e.player.location)
+        addCondition("position") { e ->
+            toPosition().inside(e.player.location)
         }
     }
 }

@@ -22,11 +22,11 @@ object IPlayerPressurePlate : ObjectiveCountable<PlayerInteractEvent>() {
         handler {
             if (action == Action.PHYSICAL && clickedBlock?.type?.name?.endsWith("PRESSURE_PLATE") == true) player else null
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("position") || task.condition["position"]!!.toPosition().inside(e.clickedBlock!!.location)
+        addCondition("position") { e ->
+            toPosition().inside(e.clickedBlock!!.location)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("material") || task.condition["material"]!!.toInferBlock().isBlock(e.clickedBlock!!)
+        addCondition("material") { e ->
+            toInferBlock().isBlock(e.clickedBlock!!)
         }
     }
 }

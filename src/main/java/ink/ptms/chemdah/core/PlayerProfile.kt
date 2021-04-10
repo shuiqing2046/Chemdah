@@ -144,12 +144,15 @@ class PlayerProfile(val uniqueId: UUID) {
     /**
      * 执行事件脚本代理
      */
-    fun checkAgent(agent: Any?, event: Event? = null): CompletableFuture<Boolean> {
+    fun checkAgent(agent: Any?, event: Event? = null, variables: Map<String, Any> = emptyMap()): CompletableFuture<Boolean> {
         agent ?: return CompletableFuture.completedFuture(true)
         return try {
             KetherShell.eval(agent.asList(), namespace = namespaceQuest) {
                 this.sender = player
                 this.event = event
+                rootFrame().variables().also {
+                    variables.forEach { (t, u) -> it.set(t, u) }
+                }
             }.thenApply {
                 Coerce.toBoolean(it)
             }

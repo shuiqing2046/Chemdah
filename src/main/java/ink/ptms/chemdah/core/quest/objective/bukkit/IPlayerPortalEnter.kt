@@ -20,10 +20,10 @@ object IPlayerPortalEnter : ObjectiveCountable<EntityPortalEnterEvent>() {
 
     init {
         handler {
-            if (entity is Player) entity as Player else null
+            entity as? Player
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("position") || task.condition["position"]!!.toPosition().inside(e.location)
+        addCondition("position") { e ->
+            toPosition().inside(e.location)
         }
     }
 }

@@ -21,17 +21,17 @@ object IBlockIgnite : ObjectiveCountable<BlockIgniteEvent>() {
         handler {
             player
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("position") || task.condition["position"]!!.toPosition().inside(e.block.location)
+        addCondition("position") { e ->
+            toPosition().inside(e.block.location)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("material") || task.condition["material"]!!.toInferBlock().isBlock(e.block)
+        addCondition("material") { e ->
+            toInferBlock().isBlock(e.block)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("material:igniting") || task.condition["material:igniting"]!!.toInferBlock().isBlock(e.ignitingBlock ?: return@addCondition false)
+        addCondition("material:igniting") { e ->
+            toInferBlock().isBlock(e.ignitingBlock ?: return@addCondition false)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("cause") || task.condition["cause"]!!.asList().any { it.equals(e.cause.name, true) }
+        addCondition("cause") { e ->
+            asList().any { it.equals(e.cause.name, true) }
         }
     }
 }

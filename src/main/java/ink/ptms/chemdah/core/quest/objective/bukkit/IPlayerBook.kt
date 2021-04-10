@@ -21,20 +21,29 @@ object IPlayerBook : ObjectiveCountable<PlayerEditBookEvent>() {
         handler {
             player
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("position") || task.condition["position"]!!.toPosition().inside(e.player.location)
+        addCondition("position") { e ->
+            toPosition().inside(e.player.location)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("signing") || task.condition["signing"]!!.toBoolean() == e.isSigning
+        addCondition("signing") { e ->
+            toBoolean() == e.isSigning
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("page") || task.condition["page"]!!.toInt() <= e.newBookMeta.pageCount
+        addCondition("page") { e ->
+            toInt() <= e.newBookMeta.pageCount
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("title") || task.condition["title"]!!.toString() in e.newBookMeta.title.toString()
+        addCondition("title") { e ->
+            toString() in e.newBookMeta.title.toString()
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("content") || task.condition["content"]!!.toString() in e.newBookMeta.pages.toString()
+        addCondition("content") { e ->
+            toString() in e.newBookMeta.pages.toString()
+        }
+        addConditionVariable("page") {
+            it.newBookMeta.pageCount
+        }
+        addConditionVariable("title") {
+            it.newBookMeta.title.toString()
+        }
+        addConditionVariable("content") {
+            it.newBookMeta.pages.toString()
         }
     }
 }

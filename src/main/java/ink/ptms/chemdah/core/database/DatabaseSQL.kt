@@ -107,7 +107,7 @@ class DatabaseSQL : Database() {
         .row("data")
         .to(dataSource)
         .first {
-            DataContainer.fromJson(it.getBlob("data").binaryStream.readAllBytes().toString(StandardCharsets.UTF_8))
+            DataContainer.fromJson(it.getBlob("data").binaryStream.readBytes().toString(StandardCharsets.UTF_8))
         } ?: DataContainer()
 
     fun getQuest(userId: Long) = tableQuest.select(Where.equals("user", userId), Where.equals("action", true))
@@ -121,7 +121,7 @@ class DatabaseSQL : Database() {
         .row("id", "data")
         .to(dataSource)
         .map {
-            it.getLong("id") to DataContainer.fromJson(it.getBlob("data").binaryStream.readAllBytes().toString(StandardCharsets.UTF_8))
+            it.getLong("id") to DataContainer.fromJson(it.getBlob("data").binaryStream.readBytes().toString(StandardCharsets.UTF_8))
         }.toMap()
 
     fun getQuestDataId(userId: Long, quest: Quest) = tableQuest.select(Where.equals("user", userId), Where.equals("name", quest.id))
