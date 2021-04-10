@@ -1,12 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective.bukkit
 
-import com.destroystokyo.paper.event.player.PlayerPickupExperienceEvent
-import ink.ptms.chemdah.core.PlayerProfile
-import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
-import org.bukkit.event.player.PlayerPickupArrowEvent
-import org.bukkit.event.player.PlayerRecipeDiscoverEvent
 import org.bukkit.event.player.PlayerStatisticIncrementEvent
 
 /**

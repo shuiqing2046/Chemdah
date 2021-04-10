@@ -16,3 +16,4 @@ theme-test:
     other: ' '
     color: '&b&n'
   talking: '    &8...'
+  animation: true

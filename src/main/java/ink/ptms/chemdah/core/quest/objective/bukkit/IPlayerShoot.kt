@@ -3,8 +3,6 @@ package ink.ptms.chemdah.core.quest.objective.bukkit
 import com.destroystokyo.paper.event.player.PlayerLaunchProjectileEvent
 import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
-import org.bukkit.entity.Player
-import org.bukkit.event.entity.ProjectileLaunchEvent
 
 /**
  * Chemdah

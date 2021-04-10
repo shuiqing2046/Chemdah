@@ -153,7 +153,7 @@ object ConversationManager : Listener {
         fun e(e: PlayerInteractAtEntityEvent) {
             if (e.hand == EquipmentSlot.HAND && e.rightClicked is LivingEntity && e.player.conversationSession == null) {
                 val mob = MythicMobs.inst().mobManager.getMythicMobInstance(e.rightClicked) ?: return
-                ChemdahAPI.conversation.values.firstOrNull { it.isNPC("citizens", mob.type.internalName) }?.run {
+                ChemdahAPI.conversation.values.firstOrNull { it.isNPC("mythicmobs", mob.type.internalName) }?.run {
                     e.isCancelled = true
                     open(e.player, e.rightClicked.location.also {
                         it.y += e.rightClicked.height

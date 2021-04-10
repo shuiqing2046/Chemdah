@@ -5,8 +5,6 @@ import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
 import org.bukkit.event.inventory.FurnaceExtractEvent
-import org.bukkit.event.inventory.TradeSelectEvent
-import org.bukkit.event.player.PlayerItemMendEvent
 import org.bukkit.inventory.ItemStack
 
 /**

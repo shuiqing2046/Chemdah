@@ -2,7 +2,6 @@ package ink.ptms.chemdah.core.quest.objective.bukkit
 
 import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
-import io.izzel.taboolib.common.event.PlayerJumpEvent
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityTameEvent
 

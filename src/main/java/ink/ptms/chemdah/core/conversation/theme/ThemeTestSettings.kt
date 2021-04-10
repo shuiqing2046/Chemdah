@@ -16,5 +16,6 @@ data class ThemeTestSettings(
     val selectChar: String = root.getString("select.char", "")!!,
     val selectOther: String = root.getString("select.other", "")!!,
     val selectColor: String = root.getString("select.color", "")!!.colored(),
-    val talking: String = root.getString("talking", "")!!.colored()
+    val talking: String = root.getString("talking", "")!!.colored(),
+    val animation: Boolean = root.getBoolean("animation", true)
 )

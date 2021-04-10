@@ -134,7 +134,7 @@ object ThemeTest : Theme, Listener {
         var d = 0L
         var cancel = false
         session.npcTalking = true
-        message.colored().map { it.toPrinted("_") }.forEachIndexed { messageLine, messageText ->
+        message.colored().map { if (settings.animation) it.toPrinted("_") else listOf(it) }.forEachIndexed { messageLine, messageText ->
             messageText.forEachIndexed { printLine, printText ->
                 Tasks.delay(d++) {
                     if (session.isValid) {

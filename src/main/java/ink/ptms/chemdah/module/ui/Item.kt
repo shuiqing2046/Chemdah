@@ -26,7 +26,7 @@ open class Item(val config: ConfigurationSection) {
                     sender = player.player
                     rootFrame().variables().set("@QuestUI", ui)
                 })
-                meta.lore = item.lore?.map { lore ->
+                meta.lore = meta.lore?.map { lore ->
                     KetherFunction.parse(lore, namespace = namespaceQuestUI) {
                         sender = player.player
                         rootFrame().variables().set("@QuestUI", ui)

@@ -20,6 +20,7 @@ import ink.ptms.chemdah.core.quest.selector.InferArea
 import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.kotlin.navigation.Navigation
 import io.izzel.taboolib.kotlin.navigation.pathfinder.NodeEntity
+import io.izzel.taboolib.kotlin.sendScoreboard
 import io.izzel.taboolib.module.inject.PlayerContainer
 import io.izzel.taboolib.module.inject.TListener
 import io.izzel.taboolib.module.inject.TSchedule

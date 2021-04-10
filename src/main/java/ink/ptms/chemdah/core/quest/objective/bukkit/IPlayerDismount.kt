@@ -3,9 +3,7 @@ package ink.ptms.chemdah.core.quest.objective.bukkit
 import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
 import org.bukkit.entity.Player
-import org.bukkit.event.player.PlayerShearEntityEvent
 import org.spigotmc.event.entity.EntityDismountEvent
-import org.spigotmc.event.entity.EntityMountEvent
 
 /**
  * Chemdah

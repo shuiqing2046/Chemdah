@@ -3,15 +3,13 @@ package ink.ptms.chemdah.core.quest.objective.bukkit
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.objective.Dependency
-import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable2
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityRegainHealthEvent
-import org.bukkit.event.player.AsyncPlayerChatEvent
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.quest.objective.bukkit.IPlayerChat
+ * ink.ptms.chemdah.core.quest.objective.bukkit.IPlayerRegain
  *
  * @author sky
  * @since 2021/3/2 5:09 下午
