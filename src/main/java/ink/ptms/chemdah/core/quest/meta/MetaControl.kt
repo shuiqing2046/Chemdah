@@ -34,15 +34,16 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
             } else {
                 val type = map["type"].toString().toLowerCase()
                 when {
-                    type == "cooldown" -> {
-                        ControlCooldown(map["time"]?.toString()?.toTime() ?: return@forEach, map["group"]?.toString())
-                    }
                     type == "coexist" -> {
                         ControlCoexist(map["alias"].asInt(), map["label"].asMap().map { it.key to it.value.asInt() }.toMap())
                     }
                     type.startsWith("repeat") -> {
-                        val trigger = ControlRepeat.Type.fromName(type.substring("repeat".length).trim())
+                        val trigger = Trigger.fromName(type.substring("repeat".length).trim())
                         ControlRepeat(trigger, map["amount"].asInt(), map["period"]?.toString()?.toTime(), map["group"]?.toString())
+                    }
+                    type.startsWith("cooldown") -> {
+                        val trigger = Trigger.fromName(type.substring("cooldown".length).trim())
+                        ControlCooldown(trigger, map["time"]?.toString()?.toTime() ?: return@forEach, map["group"]?.toString())
                     }
                     else -> {
                         warning("Unrecognized control format: $map")
@@ -84,16 +85,16 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
         }
     }
 
-    class ControlCooldown(val time: Time, val group: String?) : Control() {
+    class ControlCooldown(val type: Trigger, val time: Time, val group: String?) : Control() {
 
         override fun check(profile: PlayerProfile, template: Template): CompletableFuture<Boolean> {
-            val id = "quest.cooldown.${if (group != null) "@$group" else template.id}"
+            val id = "quest.cooldown.${if (group != null) "@$group" else template.id}.${type.name.toLowerCase()}"
             val start = profile.persistentDataContainer[id, 0L].toLong()
             return CompletableFuture.completedFuture(time.`in`(start).isTimeout(start))
         }
 
         override fun signature(profile: PlayerProfile, template: Template) {
-            val id = "quest.cooldown.${if (group != null) "@$group" else template.id}"
+            val id = "quest.cooldown.${if (group != null) "@$group" else template.id}.${type.name.toLowerCase()}"
             profile.persistentDataContainer.put(id, System.currentTimeMillis())
         }
     }
@@ -103,7 +104,7 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
         override fun check(profile: PlayerProfile, template: Template): CompletableFuture<Boolean> {
             if (alias > 0) {
                 val a = template.alias()
-                if (a != null && profile.quests.count { it.template.alias() == a } > alias) {
+                if (a != null && profile.quests.count { it.template.alias() == a } >= alias) {
                     return CompletableFuture.completedFuture(false)
                 }
             }
@@ -117,7 +118,7 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
         }
     }
 
-    class ControlRepeat(val type: Type, val amount: Int, val period: Time?, val group: String?) : Control() {
+    class ControlRepeat(val type: Trigger, val amount: Int, val period: Time?, val group: String?) : Control() {
 
         override fun check(profile: PlayerProfile, template: Template): CompletableFuture<Boolean> {
             val id = "quest.repeat.${if (group != null) "@$group" else template.id}.${type.name.toLowerCase()}"
@@ -140,16 +141,6 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
             } else {
                 // 追加次数
                 profile.persistentDataContainer.put("$id.amount", profile.persistentDataContainer["$id.amount", 0].toInt() + 1)
-            }
-        }
-
-        enum class Type {
-
-            ACCEPT, FAILURE, COMPLETE;
-
-            companion object {
-
-                fun fromName(name: String) = Enums.getIfPresent(Type::class.java, name.toUpperCase()).or(COMPLETE)!!
             }
         }
     }
@@ -183,8 +174,18 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
             return future
         }
 
-        fun signature(profile: PlayerProfile, type: ControlRepeat.Type = ControlRepeat.Type.COMPLETE) {
+        fun signature(profile: PlayerProfile, type: Trigger = Trigger.COMPLETE) {
             control?.filter { it !is ControlRepeat || it.type == type }?.forEach { it.signature(profile, template) }
+        }
+    }
+
+    enum class Trigger {
+
+        ACCEPT, FAILURE, COMPLETE;
+
+        companion object {
+
+            fun fromName(name: String) = Enums.getIfPresent(Trigger::class.java, name.toUpperCase()).or(COMPLETE)!!
         }
     }
 

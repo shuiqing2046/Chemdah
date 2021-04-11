@@ -85,3 +85,13 @@ fun mirrorFuture(id: String, func: Mirror.MirrorFuture.() -> Unit) {
 fun XMaterial.isBlock(block: Block): Boolean {
     return XBlock.isSimilar(block, this) && (Version.isAfter(Version.v1_13) || block.data == data)
 }
+
+fun <T> safely(func: () -> T): T? {
+    try {
+        return func()
+    } catch (ex: NoSuchFieldError) {
+    } catch (ex: NoSuchMethodError) {
+    } catch (ex: NoClassDefFoundError) {
+    }
+    return null
+}

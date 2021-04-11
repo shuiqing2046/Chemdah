@@ -7,6 +7,7 @@ import ink.ptms.chemdah.core.quest.AgentType
 import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.meta.MetaRestart.Companion.restart
 import ink.ptms.chemdah.util.mirrorFuture
+import ink.ptms.chemdah.util.safely
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.event.EventPriority
@@ -138,7 +139,7 @@ abstract class Objective<E : Event> {
      */
     open fun checkCondition(profile: PlayerProfile, task: Task, event: E): CompletableFuture<Boolean> {
         return if (conditions.all { it(profile, task, event) }) {
-            profile.checkAgent(task.condition["$"]?.value, event, conditionVars.map { it(event) }.toMap())
+            profile.checkAgent(task.condition["$"]?.value, event, conditionVars.mapNotNull { safely { it(event) } }.toMap())
         } else {
             CompletableFuture.completedFuture(false)
         }

@@ -28,7 +28,7 @@ enum class AgentType(val namespace: String) {
 
     /**
      * 任务完成之前
-     * 返回的内容决定是否继续逻辑
+     * 返回的内容决定是否继续逻辑    QAWESRDTFGHJKM,.
      */
     QUEST_COMPLETE("quest"),
 
@@ -74,7 +74,7 @@ enum class AgentType(val namespace: String) {
 
         fun String.toAgentType(): AgentType {
             return try {
-                valueOf(toUpperCase())
+                valueOf(toUpperCase().replace(" ", "_"))
             } catch (ignored: Exception) {
                 NONE
             }

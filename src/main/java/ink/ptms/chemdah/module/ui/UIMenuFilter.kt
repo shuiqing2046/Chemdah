@@ -79,7 +79,11 @@ class UIMenuFilter(val ui: UI, val profile: PlayerProfile) : MenuLinked<Include>
         event.clicker.playSound(event.clicker.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 2f)
     }
 
-    override fun generateItem(player: Player, include: Include, index: Int, slot: Int): ItemStack {
+    override fun generateItem(player: Player, element: Include, index: Int, slot: Int): ItemStack? {
+        return null
+    }
+
+    override fun generateItemAsync(player: Player, include: Include, index: Int, slot: Int): ItemStack {
         val includes = ui.playerFilters.computeIfAbsent(player.uniqueId) { ArrayList() }
         return if (include.id in includes) include.activeItem else include.normalItem
     }

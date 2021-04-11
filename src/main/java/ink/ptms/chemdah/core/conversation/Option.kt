@@ -3,6 +3,7 @@ package ink.ptms.chemdah.core.conversation
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.conversation.theme.Theme
 import ink.ptms.chemdah.core.conversation.theme.ThemeTest
+import ink.ptms.chemdah.util.colored
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
 
@@ -16,7 +17,7 @@ import org.bukkit.configuration.file.YamlConfiguration
 data class Option(
     val root: ConfigurationSection,
     val theme: String = root.getString("theme", "test")!!,
-    val title: String = root.getString("title", "NPC")!!
+    val title: String = root.getString("title", "NPC")!!.colored()
 ) {
 
     val instanceTheme: Theme

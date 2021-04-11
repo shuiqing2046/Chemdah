@@ -1,10 +1,10 @@
 package ink.ptms.chemdah.core
 
-import ink.ptms.chemdah.util.asList
 import ink.ptms.chemdah.core.quest.selector.InferArea.Companion.toInferArea
 import ink.ptms.chemdah.core.quest.selector.InferBlock.Companion.toInferBlock
 import ink.ptms.chemdah.core.quest.selector.InferEntity.Companion.toInferEntity
 import ink.ptms.chemdah.core.quest.selector.InferItem.Companion.toInferItem
+import ink.ptms.chemdah.util.asList
 import io.izzel.taboolib.util.Coerce
 
 /**
@@ -17,23 +17,23 @@ import io.izzel.taboolib.util.Coerce
 class Data(val value: Any) {
 
     private val lazyPosition by lazy {
-        toString().toInferArea(noWorld = false)
+        value.toString().toInferArea(noWorld = false)
     }
 
     private val lazyVector by lazy {
-        toString().toInferArea(noWorld = true)
+        value.toString().toInferArea(noWorld = true)
     }
 
     private val lazyEntity by lazy {
-        asList().toInferEntity()
+        value.asList().toInferEntity()
     }
 
     private val lazyBlock by lazy {
-        asList().toInferBlock()
+        value.asList().toInferBlock()
     }
 
     private val lazyItem by lazy {
-        asList().toInferItem()
+        value.asList().toInferItem()
     }
 
     fun toInt() = Coerce.toInteger(value)

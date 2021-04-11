@@ -2,7 +2,6 @@ package ink.ptms.chemdah.core.quest
 
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.DataContainer
-import ink.ptms.chemdah.core.DataContainer.Companion.data
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.objective.other.IAlways
 import ink.ptms.chemdah.core.quest.objective.other.INever
@@ -25,10 +24,10 @@ class Task(id: String, config: ConfigurationSection, val template: Template) : Q
 
     init {
         config.getConfigurationSection("condition")?.getValues(false)?.forEach { (k, v) ->
-            condition.put(k, v.data())
+            condition.put(k, v)
         }
         config.getConfigurationSection("goal")?.getValues(false)?.forEach { (k, v) ->
-            goal.put(k, v.data())
+            goal.put(k, v)
         }
     }
 

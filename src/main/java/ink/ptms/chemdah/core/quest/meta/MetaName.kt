@@ -3,6 +3,7 @@ package ink.ptms.chemdah.core.quest.meta
 import ink.ptms.chemdah.core.quest.Id
 import ink.ptms.chemdah.core.quest.QuestContainer
 import ink.ptms.chemdah.core.quest.Task
+import ink.ptms.chemdah.util.colored
 
 /**
  * Chemdah
@@ -15,7 +16,7 @@ import ink.ptms.chemdah.core.quest.Task
 @MetaType(MetaType.Type.TEXT)
 class MetaName(source: String?, questContainer: QuestContainer) : Meta<String?>(source, questContainer) {
 
-    val displayName = source
+    val displayName = source?.colored()
 
     companion object {
 

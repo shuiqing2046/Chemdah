@@ -15,7 +15,7 @@ import org.bukkit.event.entity.EntityCombustByEntityEvent
 @Dependency("minecraft")
 object IEntityCombust : ObjectiveCountable<EntityCombustByEntityEvent>() {
 
-    override val name = "entity tame"
+    override val name = "entity combust"
     override val event = EntityCombustByEntityEvent::class
 
     init {

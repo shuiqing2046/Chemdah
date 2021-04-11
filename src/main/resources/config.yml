@@ -3,6 +3,8 @@
 #         Powered by TabooLib 5.0         #
 
 
+language: en_US
+
 database:
   use: LOCAL
   source:

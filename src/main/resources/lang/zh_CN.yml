@@ -1,0 +1,52 @@
+
+
+#         Powered by TabooLib 5.0         #
+
+
+theme-test-help:
+  ==: ACTION
+  text: '使用 &e数字键 (1-9) &f选择对话并按下 &eF &f键回复.'
+
+track-cancel: '&7追踪已取消.'
+
+command-reload: '重载配置'
+command-info: '查看玩家信息'
+command-info-header: '&c[Chemdah] &7玩家信息:'
+command-info-body: '&c[Chemdah] &f{0}'
+command-mirror: '打印功耗统计'
+command-mirror-header: '&c[Chemdah] &7正在创建统计...'
+command-mirror-body-child: '&c[Chemdah] &8{0}&f{1} &8[{2} ms] &c[{3} ms] &7{4}%'
+command-mirror-body-parent: '&c[Chemdah] &8{0}&7{1} &8[{2} ms] &c[{3} ms] &7{4}%'
+command-mirror-bottom: '&c[Chemdah] &7---'
+command-quest-accept: '使玩家接受任务'
+command-quest-failure: '使玩家放弃任务'
+command-quest-complete: '使玩家完成任务'
+command-quest-reset: '重置玩家的任务进度'
+command-quest-stop: '取消玩家的任务'
+command-quest-info: '查看玩家的任务'
+command-quest-ui: '使玩家的打开任务页面'
+command-variables-get: '查看玩家变量'
+command-variables-add: '增加变量'
+command-variables-set: '修改变量'
+command-variables-remove: '删除变量'
+command-variables-list: '列出所有变量'
+command-argument-player: '玩家'
+command-argument-quest: '任务'
+command-argument-page: '页数'
+command-argument-ui: '页面'
+command-argument-key: '键'
+command-argument-value: '值'
+command-reload-success: '&c[Chemdah] &7完成.'
+command-player-not-found: '&c[Chemdah] &7玩家离线.'
+command-quest-not-found: '&c[Chemdah] &7任务不存在.'
+command-ui-not-found: '&c[Chemdah] &7任务页面不存在.'
+command-quest-not-accepted: '&c[Chemdah] &7任务未接受.'
+command-quest-info-empty: '&c[Chemdah] &7没有任务.'
+command-quest-info-header: '&c[Chemdah] &7玩家的任务:'
+command-quest-info-body: '&c[Chemdah] &f{0}'
+command-quest-info-bottom: '&c[Chemdah] &7页数: {0} / {1}'
+command-variables-change: '&c[Chemdah] &7{0}'
+command-variables-list-header: '&c[Chemdah] &7变量s: &f{0}'
+
+database-error: '&4&l错误! &r插件 &4&lChemdah&r 的数据库未完成初始化.'
+database-error-username: '&4&l警告! &r插件 &4&lChemdah&r 阻止改用户名进入服务器.'

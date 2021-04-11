@@ -63,7 +63,7 @@ class Quest(val id: String, val profile: PlayerProfile) {
                     if (tasks.all { it.objective.hasCompletedSignature(profile, it) } && QuestEvent.Complete(this@Quest, profile).call().nonCancelled()) {
                         template.agent(profile, AgentType.QUEST_COMPLETE).thenAccept {
                             if (it) {
-                                template.control().signature(profile, MetaControl.ControlRepeat.Type.COMPLETE)
+                                template.control().signature(profile, MetaControl.Trigger.COMPLETE)
                                 profile.unregisterQuest(this@Quest)
                                 profile.persistentDataContainer.put("quest.complete.$id", System.currentTimeMillis())
                             }
@@ -93,7 +93,7 @@ class Quest(val id: String, val profile: PlayerProfile) {
             if (QuestEvent.Failure(this@Quest, profile).call().nonCancelled()) {
                 template.agent(profile, AgentType.QUEST_FAILURE).thenAccept {
                     if (it) {
-                        template.control().signature(profile, MetaControl.ControlRepeat.Type.FAILURE)
+                        template.control().signature(profile, MetaControl.Trigger.FAILURE)
                         profile.unregisterQuest(this@Quest)
                     }
                     finish()

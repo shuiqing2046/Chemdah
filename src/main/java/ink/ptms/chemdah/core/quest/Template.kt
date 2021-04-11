@@ -58,7 +58,7 @@ class Template(id: String, config: ConfigurationSection) : QuestContainer(id, co
             if (it == AcceptResult.SUCCESSFUL) {
                 val quest = Quest(id, profile)
                 val control = control()
-                control.signature(profile, MetaControl.ControlRepeat.Type.ACCEPT)
+                control.signature(profile, MetaControl.Trigger.ACCEPT)
                 profile.registerQuest(quest)
                 QuestEvent.Accepted(quest, profile).call()
                 agent(profile, AgentType.QUEST_START)

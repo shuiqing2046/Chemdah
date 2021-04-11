@@ -8,11 +8,13 @@ import ink.ptms.chemdah.util.colored
 import io.izzel.taboolib.cronus.CronusUtils
 import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.kotlin.toPrinted
+import io.izzel.taboolib.module.inject.TFunction
 import io.izzel.taboolib.module.inject.TListener
 import io.izzel.taboolib.module.locale.TLocale
 import io.izzel.taboolib.module.tellraw.TellrawJson
 import io.izzel.taboolib.util.Coerce
 import io.izzel.taboolib.util.lite.Effects
+import org.bukkit.Bukkit
 import org.bukkit.Particle
 import org.bukkit.Sound
 import org.bukkit.event.EventHandler
@@ -37,13 +39,18 @@ object ThemeTest : Theme, Listener {
     private val effectFreeze = setOf(PotionEffectType.BLINDNESS to 0, PotionEffectType.SLOW to 4)
     private lateinit var settings: ThemeTestSettings
 
+    @TFunction.Cancel
+    fun e() {
+        Bukkit.getOnlinePlayers().forEach { p ->
+            effectFreeze.forEach { p.removePotionEffect(it.first) }
+            effects.remove(p.name)?.forEach { p.addPotionEffect(it) }
+        }
+    }
+
     @EventHandler
     fun e(e: PlayerQuitEvent) {
-        effects.remove(e.player.name)?.run {
-            forEach {
-                e.player.addPotionEffect(it)
-            }
-        }
+        effectFreeze.forEach { e.player.removePotionEffect(it.first) }
+        effects.remove(e.player.name)?.forEach { e.player.addPotionEffect(it) }
     }
 
     @EventHandler
