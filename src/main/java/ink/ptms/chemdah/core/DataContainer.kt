@@ -57,6 +57,11 @@ class DataContainer {
         changed = true
     }
 
+    fun removeAll() {
+        map.clear();
+        changed = true;
+    }
+
     fun merge(meta: DataContainer) {
         map.putAll(meta.map)
         changed = true
