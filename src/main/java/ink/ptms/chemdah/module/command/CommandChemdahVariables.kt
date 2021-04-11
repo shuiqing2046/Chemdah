@@ -14,7 +14,7 @@ import org.bukkit.command.CommandSender
  * @author sky
  * @since 2021/2/11 7:19 下午
  */
-@BaseCommand(name = "chemdahvariables", aliases = ["chv"], permission = "chemdah.command")
+@BaseCommand(name = "chemdahVariables", aliases = ["chv"], permission = "chemdah.command")
 class CommandChemdahVariables : BaseMainCommand() {
 
     override fun onTabComplete(sender: CommandSender, command: String, argument: String): List<String>? {
@@ -34,14 +34,14 @@ class CommandChemdahVariables : BaseMainCommand() {
     fun set(sender: CommandSender, args: Array<String>) {
         val time = System.currentTimeMillis()
         ChemdahAPI.setVariable(args[0], args[1])
-        TLocale.sendTo(sender, "command-variables-change", "${args[0]} §8+= §f${args[1]} §7(${System.currentTimeMillis() - time}ms)")
+        TLocale.sendTo(sender, "command-variables-change", "${args[0]} §8= §f${args[1]} §7(${System.currentTimeMillis() - time}ms)")
     }
 
     @SubCommand(description = "@command-variables-add", arguments = ["@command-argument-key", "@command-argument-value"], priority = 1.1)
     fun add(sender: CommandSender, args: Array<String>) {
         val time = System.currentTimeMillis()
         ChemdahAPI.setVariable(args[0], args[1], true)
-        TLocale.sendTo(sender, "command-variables-change", "${args[0]} §8= §f${args[1]} §7(${System.currentTimeMillis() - time}ms)")
+        TLocale.sendTo(sender, "command-variables-change", "${args[0]} §8+= §f${args[1]} §7(${System.currentTimeMillis() - time}ms)")
     }
 
     @SubCommand(description = "@command-variables-remove", arguments = ["@command-argument-key"], priority = 1.2)

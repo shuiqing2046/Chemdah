@@ -34,12 +34,18 @@ class ActionProfile {
 
         override fun process(frame: QuestContext.Frame): CompletableFuture<Void> {
             return frame.newFrame(key).run<Any>().thenAccept { key ->
-                frame.newFrame(value).run<Any>().thenAccept { value ->
+                frame.newFrame(value).run<Any?>().thenAccept { value ->
                     val persistentDataContainer = frame.getProfile().persistentDataContainer
-                    if (symbol == Symbol.ADD) {
-                        persistentDataContainer[key.toString()] = persistentDataContainer[key.toString()].increaseAny(value)
-                    } else {
-                        persistentDataContainer[key.toString()] = value
+                    when {
+                        value == null -> {
+                            persistentDataContainer.remove(key.toString())
+                        }
+                        symbol == Symbol.ADD -> {
+                            persistentDataContainer[key.toString()] = persistentDataContainer[key.toString()].increaseAny(value)
+                        }
+                        else -> {
+                            persistentDataContainer[key.toString()] = value
+                        }
                     }
                 }
             }

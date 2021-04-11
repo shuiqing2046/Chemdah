@@ -4,6 +4,7 @@ import ink.ptms.chemdah.Chemdah
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.api.ChemdahAPI.isChemdahProfileLoaded
+import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.addon.Addon
 import ink.ptms.chemdah.core.quest.meta.Meta
 import ink.ptms.chemdah.core.quest.objective.Abstract
@@ -19,6 +20,7 @@ import io.izzel.taboolib.module.db.local.SecuredFile
 import io.izzel.taboolib.module.inject.TFunction
 import io.izzel.taboolib.module.inject.TSchedule
 import org.bukkit.Bukkit
+import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import java.io.File
@@ -117,28 +119,32 @@ object QuestLoader {
      * @param event 事件
      * @param objective 条目类型
      */
-    fun handleEvent(player: Player, event: Event, objective: Objective<Event>) {
+    fun <T: Event> handleEvent(player: Player, event: T, objective: Objective<T>) {
         mirrorFuture("QuestHandler:handleEvent:${objective.name}") {
             if (player.isChemdahProfileLoaded) {
                 player.chemdahProfile.also { profile ->
                     // 通过事件获取所有正在进行的任务条目
                     profile.getTasks(event).forEach { task ->
-                        // 如果含有完成标记，则不在进行该条目
-                        if (objective.hasCompletedSignature(profile, task)) {
-                            return@forEach
-                        }
-                        // 判断条件并进行该条目
-                        objective.checkCondition(profile, task, event).thenAccept { cond ->
-                            if (cond) {
-                                objective.onContinue(profile, task, event)
-                                objective.checkComplete(profile, task)
-                                task.getQuest(profile)?.checkComplete()
-                            }
-                        }
+                        handleTask(profile, objective, task, event)
                     }
                 }
             }
             finish()
+        }
+    }
+
+    fun <T : Event> handleTask(profile: PlayerProfile, objective: Objective<T>, task: Task, event: T) {
+        // 如果含有完成标记，则不在进行该条目
+        if (objective.hasCompletedSignature(profile, task)) {
+            return
+        }
+        // 判断条件并进行该条目
+        objective.checkCondition(profile, task, event).thenAccept { cond ->
+            if (cond) {
+                objective.onContinue(profile, task, event)
+                objective.checkComplete(profile, task)
+                task.getQuest(profile)?.checkComplete()
+            }
         }
     }
 

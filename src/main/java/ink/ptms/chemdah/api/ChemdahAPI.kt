@@ -16,6 +16,8 @@ import ink.ptms.chemdah.core.quest.meta.Meta
 import ink.ptms.chemdah.core.quest.meta.MetaAlias.Companion.alias
 import ink.ptms.chemdah.core.quest.meta.MetaLabel.Companion.label
 import ink.ptms.chemdah.core.quest.objective.Objective
+import ink.ptms.chemdah.core.quest.objective.bukkit.EMPTY_EVENT
+import ink.ptms.chemdah.core.quest.objective.other.ITrigger
 import ink.ptms.chemdah.module.Module
 import ink.ptms.chemdah.util.increaseAny
 import io.izzel.taboolib.kotlin.Mirror
@@ -59,6 +61,21 @@ object ChemdahAPI {
      */
     val Player.conversationSession: Session?
        get() = ConversationManager.sessions[name]
+
+    /**
+     * 唤起玩家的 Trigger 类型任务
+     */
+    fun Player.callTrigger(value: String) {
+        val chemdahProfile = chemdahProfile
+        chemdahProfile.quests.forEach { quest ->
+            quest.tasks.forEach { task ->
+                val trigger = task.objective as? ITrigger
+                if (trigger?.getValue(task) == value) {
+                    QuestLoader.handleTask(chemdahProfile, task.objective, task, EMPTY_EVENT)
+                }
+            }
+        }
+    }
 
     /**
      * 获取对话资源

@@ -1,6 +1,7 @@
 package ink.ptms.chemdah.module.command
 
 import ink.ptms.chemdah.api.ChemdahAPI
+import ink.ptms.chemdah.api.ChemdahAPI.callTrigger
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.module.ui.UISystem
 import io.izzel.taboolib.internal.apache.lang3.time.DateFormatUtils
@@ -21,7 +22,7 @@ import kotlin.math.ceil
  * @author sky
  * @since 2021/2/11 7:19 下午
  */
-@BaseCommand(name = "chemdahquest", aliases = ["chq"], permission = "chemdah.command")
+@BaseCommand(name = "chemdahQuest", aliases = ["chq"], permission = "chemdah.command")
 class CommandChemdahQuest : BaseMainCommand() {
 
     override fun onTabComplete(sender: CommandSender, command: String, argument: String): List<String>? {
@@ -105,6 +106,23 @@ class CommandChemdahQuest : BaseMainCommand() {
             return
         }
         playerExact.chemdahProfile.unregisterQuest(quest)
+    }
+
+    @SubCommand(description = "@command-quest-trigger", arguments = ["@command-argument-player", "@command-argument-value"], priority = 1.41)
+    fun trigger(sender: CommandSender, args: Array<String>) {
+        val playerExact = Bukkit.getPlayerExact(args[0])
+        if (playerExact == null) {
+            TLocale.sendTo(sender, "command-player-not-found")
+            return
+        }
+        playerExact.callTrigger(args[1])
+    }
+
+    @SubCommand(description = "@command-quest-trigger-all", arguments = ["@command-argument-value"], priority = 1.42)
+    fun triggerAll(sender: CommandSender, args: Array<String>) {
+        Bukkit.getOnlinePlayers().forEach {
+            it.callTrigger(args[0])
+        }
     }
 
     @SubCommand(description = "@command-quest-info", arguments = ["@command-argument-player", "@command-argument-page?"], priority = 1.5)

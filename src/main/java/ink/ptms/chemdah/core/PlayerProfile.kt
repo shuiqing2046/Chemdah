@@ -97,7 +97,7 @@ class PlayerProfile(val uniqueId: UUID) {
     /**
      * 通过事件获取所有正在进行中的有效条目（有效任务）
      */
-    fun getTasks(event: Event) = quests.flatMap { quest -> quest.tasks.filter { it.objective.event.isInstance(event) } }
+    fun getTasks(event: Event) = quests.flatMap { quest -> quest.tasks.filter { it.objective.isListener && it.objective.event.isInstance(event) } }
 
     /**
      * 通过序号获取正在进行中的有效任务
