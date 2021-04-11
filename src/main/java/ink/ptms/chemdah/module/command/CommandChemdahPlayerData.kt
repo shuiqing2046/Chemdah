@@ -75,13 +75,13 @@ class CommandChemdahPlayerData : BaseMainCommand() {
     }
 
     @SubCommand(description = "@command-variables-remove-all", arguments = ["@command-argument-player"], priority = 1.3)
-    fun removeAll(sender: CommandSender, args: Array<String>) {
+    fun clear(sender: CommandSender, args: Array<String>) {
         val playerExact = Bukkit.getPlayerExact(args[0])
         if (playerExact == null) {
             TLocale.sendTo(sender, "command-player-not-found")
             return
         }
-        playerExact.chemdahProfile.persistentDataContainer.removeAll();
-        TLocale.sendTo(sender, "command-variables-remove-all-ed")
+        playerExact.chemdahProfile.persistentDataContainer.clear();
+        TLocale.sendTo(sender, "command-variables-clear")
     }
 }
