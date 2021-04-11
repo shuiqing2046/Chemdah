@@ -77,8 +77,8 @@ class AddonAutomation(source: ConfigurationSection, questContainer: QuestContain
     val isAutoAccept = source.getBoolean("auto-accept")
 
     val plan = if (source.contains("plan")) {
-        val method = Enums.getIfPresent(RealTime::class.java, source.getString("method").toString().toUpperCase()).or(RealTime.START_IN_MONDAY)
-        val args = source.getString("type").toString().toLowerCase().split(" ")
+        val method = Enums.getIfPresent(RealTime::class.java, source.getString("plan.method").toString().toUpperCase()).or(RealTime.START_IN_MONDAY)
+        val args = source.getString("plan.type").toString().toLowerCase().split(" ")
         val type = when (args[0]) {
             "hour" -> PlanTypeHour(
                 method,
@@ -103,7 +103,7 @@ class AddonAutomation(source: ConfigurationSection, questContainer: QuestContain
             else -> null
         }
         if (type != null) {
-            Plan(type, source.getInt("count", 1), source.getString("group"))
+            Plan(type, source.getInt("plan.count", 1), source.getString("plan.group"))
         } else {
             null
         }
@@ -111,11 +111,15 @@ class AddonAutomation(source: ConfigurationSection, questContainer: QuestContain
         null
     }
 
+    val planGroup = source.getString("plan.group")
+
     companion object {
 
         fun Template.isAutoAccept() = addon<AddonAutomation>("automation")?.isAutoAccept ?: false
 
         fun Template.plan() = addon<AddonAutomation>("automation")?.plan
+
+        fun Template.planGroup() = addon<AddonAutomation>("automation")?.planGroup
 
         @TSchedule(period = 20, async = true)
         fun automation() {
@@ -134,6 +138,12 @@ class AddonAutomation(source: ConfigurationSection, questContainer: QuestContain
                         val group = groups.computeIfAbsent(id) { Group(id, plan) }
                         group.quests.add(quest)
                     }
+                }
+            }
+            ChemdahAPI.quest.forEach { (_, quest) ->
+                val group = quest.planGroup()
+                if (group != null && groups.containsKey("@$group")) {
+                    groups["@$group"]!!.quests.add(quest)
                 }
             }
             if (groups.isEmpty() || autoAccept.isEmpty()) {
