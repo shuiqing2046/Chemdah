@@ -6,6 +6,7 @@ import ink.ptms.chemdah.core.conversation.AgentType.Companion.toAgentType
 import ink.ptms.chemdah.util.asInt
 import ink.ptms.chemdah.util.asList
 import ink.ptms.chemdah.util.asMap
+import ink.ptms.chemdah.util.colored
 import io.izzel.taboolib.module.db.local.SecuredFile
 import io.izzel.taboolib.module.inject.TFunction
 import org.bukkit.configuration.ConfigurationSection
@@ -89,7 +90,7 @@ object ConversationLoader {
                     PlayerReply(
                         it,
                         it["if"]?.toString(),
-                        it["reply"].toString(),
+                        it["reply"].toString().colored(),
                         it["then"]?.asList() ?: emptyList()
                     )
                 })

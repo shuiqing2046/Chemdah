@@ -146,7 +146,7 @@ class AddonAutomation(source: ConfigurationSection, questContainer: QuestContain
                     groups["@$group"]!!.quests.add(quest)
                 }
             }
-            if (groups.isEmpty() || autoAccept.isEmpty()) {
+            if (groups.isEmpty() && autoAccept.isEmpty()) {
                 return
             }
             mirrorFuture("MetaAutomation") {
