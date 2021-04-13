@@ -9,6 +9,7 @@ import ink.ptms.chemdah.core.quest.Id
 import ink.ptms.chemdah.core.quest.QuestContainer
 import ink.ptms.chemdah.core.quest.Template
 import ink.ptms.chemdah.util.mirrorFuture
+import io.izzel.taboolib.internal.apache.lang3.time.DateFormatUtils
 import io.izzel.taboolib.module.inject.TSchedule
 import io.izzel.taboolib.util.Coerce
 import io.izzel.taboolib.util.lite.cooldown.RealTime
@@ -128,6 +129,7 @@ class AddonAutomation(source: ConfigurationSection, questContainer: QuestContain
             }
             val groups = HashMap<String, Group>()
             val autoAccept = ArrayList<Template>()
+            // 优先加载拥有主动逻辑的 Plan 计划
             ChemdahAPI.quest.forEach { (_, quest) ->
                 if (quest.isAutoAccept()) {
                     autoAccept.add(quest)
@@ -140,10 +142,13 @@ class AddonAutomation(source: ConfigurationSection, questContainer: QuestContain
                     }
                 }
             }
+            // 加载没有主动逻辑的被 Plan Group 收录的任务
             ChemdahAPI.quest.forEach { (_, quest) ->
-                val group = quest.planGroup()
-                if (group != null && groups.containsKey("@$group")) {
-                    groups["@$group"]!!.quests.add(quest)
+                if (quest.plan() == null) {
+                    val group = quest.planGroup()
+                    if (group != null && groups.containsKey("@$group")) {
+                        groups["@$group"]!!.quests.add(quest)
+                    }
                 }
             }
             if (groups.isEmpty() && autoAccept.isEmpty()) {
@@ -154,7 +159,7 @@ class AddonAutomation(source: ConfigurationSection, questContainer: QuestContain
                     val profile = player.chemdahProfile
                     // 自动接受的任务
                     autoAccept.forEach {
-                        if (profile.getQuests(it.id).isNotEmpty()) {
+                        if (profile.getQuestById(it.id) == null) {
                             it.acceptTo(profile)
                         }
                     }
