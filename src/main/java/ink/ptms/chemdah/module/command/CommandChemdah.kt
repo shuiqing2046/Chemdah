@@ -41,8 +41,7 @@ class CommandChemdah : BaseMainCommand() {
         TLocale.sendTo(sender, "command-mirror-header")
         TLocale.sendTo(sender, "command-mirror-bottom")
         Tasks.task(true) {
-            println(mirror.dataMap)
-            val collect = mirror.collect() {
+            val collect = mirror.collect {
                 childFormat = TLocale.asString("command-mirror-body-child")
                 parentFormat = TLocale.asString("command-mirror-body-parent")
             }

@@ -16,7 +16,7 @@ database:
       database: test
       table: chemdah
     MongoDB:
-      client: localhost
+      client: 'mongodb://localhost:3308'
       database: test
       collection: chemdah
 

@@ -60,9 +60,18 @@ class ActionInventory {
         }
     }
 
+    class InventoryClose() : QuestAction<Void>() {
+
+        override fun process(frame: QuestContext.Frame): CompletableFuture<Void> {
+            frame.getPlayer().closeInventory()
+            return CompletableFuture.completedFuture(null)
+        }
+    }
+
     companion object {
 
         /**
+         * inventory close
          * inventory check "minecraft:stone" amount 1
          * inventory take "minecraft:stone" amount 1
          * inventory helmet is "minecraft:stone"
@@ -74,7 +83,8 @@ class ActionInventory {
                 "has", "have", "check", "take", "remove",
                 "hand", "mainhand", "offhand",
                 "head", "helmet", "chest", "chestplate", "legs", "leggings", "boots", "feet",
-                "slot"
+                "slot",
+                "close"
             )) {
                 "has", "have", "check" -> InventoryCheck(it.nextToken().toInferItem(), matchAmount(it))
                 "take", "remove" -> InventoryTake(it.nextToken().toInferItem(), matchAmount(it))
@@ -85,6 +95,7 @@ class ActionInventory {
                 "legs", "leggings" -> InventoryEquipment(Equipments.LEGS, matchItem(it), matchAmount(it))
                 "boots", "feet" -> InventoryEquipment(Equipments.FEET, matchItem(it), matchAmount(it))
                 "slot" -> InventorySlot(it.nextInt(), matchItem(it), matchAmount(it))
+                "close" -> InventoryClose()
                 else -> error("out of case")
             }
         }

@@ -8,6 +8,7 @@ import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.module.db.sql.*
 import io.izzel.taboolib.module.db.sql.query.Where
 import io.izzel.taboolib.module.inject.PlayerContainer
+import io.izzel.taboolib.util.Coerce
 import org.bukkit.entity.Player
 import java.nio.charset.StandardCharsets
 import java.util.*
@@ -110,14 +111,14 @@ class DatabaseSQL : Database() {
             DataContainer.fromJson(it.getBlob("data").binaryStream.readBytes().toString(StandardCharsets.UTF_8))
         } ?: DataContainer()
 
-    fun getQuest(userId: Long) = tableQuest.select(Where.equals("user", userId), Where.equals("action", true))
+    fun getQuest(userId: Long) = tableQuest.select(Where.equals("user", userId), Where.equals("value", true))
         .row("name", "data")
         .to(dataSource)
         .map {
             it.getLong("data") to it.getString("name")
         }.toMap()
 
-    fun getQuestData(questId: List<Long>) = tableQuestData.select(Where.`in`("id", questId))
+    fun getQuestData(questId: List<Long>) = tableQuestData.select(Where.`in`("id", *questId.toTypedArray()))
         .row("id", "data")
         .to(dataSource)
         .map {
@@ -138,36 +139,33 @@ class DatabaseSQL : Database() {
 
     fun createUser(player: Player, playerProfile: PlayerProfile): CompletableFuture<Long> {
         val userId = CompletableFuture<Long>()
-        CompletableFuture<Void>().also { future ->
-            tableUserData.insert(null, playerProfile.persistentDataContainer.toJson().toByteArray(StandardCharsets.UTF_8))
-                .to(dataSource)
-                .statement { stmt ->
-                    future.thenApply {
-                        CompletableFuture<Void>().also { future ->
-                            tableUser.insert(null, player.name, player.uniqueId, stmt.generatedKeys.getLong("id"), Date())
-                                .to(dataSource)
-                                .statement { stmt ->
-                                    future.thenApply {
-                                        userId.complete(stmt.generatedKeys.getLong("id"))
-                                    }
-                                }.run()
-                        }.complete(null)
-                    }
-                }.run()
-        }.complete(null)
+        tableUserData.insert(null, playerProfile.persistentDataContainer.toJson().toByteArray(StandardCharsets.UTF_8))
+            .to(dataSource)
+            .statementFinish { s1 ->
+                tableUser.insert(null, player.name, player.uniqueId.toString(), Coerce.toLong(s1.generatedKeys.run {
+                    next()
+                    getObject(1)
+                }), Date())
+                    .to(dataSource)
+                    .statementFinish { s2 ->
+                        userId.complete(Coerce.toLong(s2.generatedKeys.run {
+                            next()
+                            getObject(1)
+                        }))
+                    }.run()
+            }.run()
         return userId
     }
 
     fun createQuest(userId: Long, quest: Quest) {
-        CompletableFuture<Void>().also { future ->
-            tableQuestData.insert(null, quest.persistentDataContainer.toJson().toByteArray(StandardCharsets.UTF_8))
-                .to(dataSource)
-                .statement { stmt ->
-                    future.thenApply {
-                        tableQuest.insert(null, quest.id, stmt.generatedKeys.getLong("id"), userId, true).run(dataSource)
-                    }
-                }
-        }.complete(null)
+        tableQuestData.insert(null, quest.persistentDataContainer.toJson().toByteArray(StandardCharsets.UTF_8))
+            .to(dataSource)
+            .statementFinish { stmt ->
+                tableQuest.insert(null, quest.id, Coerce.toLong(stmt.generatedKeys.run {
+                    next()
+                    getObject(1)
+                }), userId, true).run(dataSource)
+            }.run()
     }
 
     override fun select(player: Player): PlayerProfile {
@@ -216,7 +214,7 @@ class DatabaseSQL : Database() {
                         createQuest(user, quest)
                     } else {
                         tableQuest.update(Where.equals("user", user), Where.equals("name", quest.id))
-                            .set("action", true)
+                            .set("value", true)
                             .run(dataSource)
                         tableQuestData.update(Where.equals("id", questDataId))
                             .set("data", quest.persistentDataContainer.toJson().toByteArray(StandardCharsets.UTF_8))
@@ -237,7 +235,7 @@ class DatabaseSQL : Database() {
             return
         }
         tableQuest.update(Where.equals("user", user), Where.equals("name", quest.id))
-            .set("action", false)
+            .set("value", false)
             .run(dataSource)
         tableQuestData.update(Where.equals("id", questDataId))
             .set("data", ByteArray(0))
