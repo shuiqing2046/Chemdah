@@ -24,7 +24,6 @@ data class Option(
         get() = ChemdahAPI.getConversationTheme(theme) ?: ThemeTest
 
     companion object {
-
         val default = Option(YamlConfiguration().createSection("__option__"))
     }
 }

@@ -146,6 +146,7 @@ object ThemeTest : Theme, Listener {
                 Tasks.delay(d++) {
                     if (session.isValid) {
                         if (session.npcTalking) {
+
                             future.npcTalk(session, message, messageLine, printText, printLine + 1 == messageText.size, canReply)
                         } else if (!cancel) {
                             cancel = true
