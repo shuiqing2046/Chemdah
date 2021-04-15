@@ -31,7 +31,7 @@ object ChemdahAPI {
     val mirror = Mirror()
 
     val conversation = HashMap<String, Conversation>()
-    val conversationTheme = HashMap<String, Theme>()
+    val conversationTheme = HashMap<String, Theme<*>>()
 
     val quest = HashMap<String, Template>()
     val questMeta = HashMap<String, Class<out Meta<*>>>()

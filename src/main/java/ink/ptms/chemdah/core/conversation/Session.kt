@@ -20,12 +20,18 @@ data class Session(
     val variables: MutableMap<String, Any?> = HashMap()
 ) {
 
+    /**
+     * 会话是否有效
+     */
     val isValid: Boolean
         get(): Boolean {
             val session = ConversationManager.sessions[player.name]
             return session != null && session === this && session.conversation === conversation
         }
 
+    /**
+     * 与会话原点的距离
+     */
     val distance: Double
         get() = origin.distance(player.location) - origin.distance(location)
 

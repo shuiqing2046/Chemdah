@@ -4,13 +4,13 @@ import ink.ptms.adyeshach.api.event.AdyeshachEntityInteractEvent
 import ink.ptms.adyeshach.common.entity.type.AdyHuman
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.conversationSession
+import ink.ptms.chemdah.api.event.ConversationEvent
+import ink.ptms.chemdah.core.conversation.theme.ThemeChat
+import ink.ptms.chemdah.util.hidden
 import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.module.config.TConfig
 import io.izzel.taboolib.module.i18n.I18n
-import io.izzel.taboolib.module.inject.PlayerContainer
-import io.izzel.taboolib.module.inject.TInject
-import io.izzel.taboolib.module.inject.TListener
-import io.izzel.taboolib.module.inject.TSchedule
+import io.izzel.taboolib.module.inject.*
 import io.lumine.xikage.mythicmobs.MythicMobs
 import net.citizensnpcs.api.CitizensAPI
 import org.bukkit.Bukkit
@@ -22,7 +22,10 @@ import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerCommandPreprocessEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
+import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.inventory.EquipmentSlot
+import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -34,6 +37,9 @@ import java.util.concurrent.ConcurrentHashMap
  */
 @TListener
 object ConversationManager : Listener {
+
+    private val effects = ConcurrentHashMap<String, List<PotionEffect>>()
+    private val effectFreeze = setOf(PotionEffectType.BLINDNESS to 0, PotionEffectType.SLOW to 4)
 
     @TInject("core/conversation.yml", migrate = true)
     lateinit var conf: TConfig
@@ -59,6 +65,36 @@ object ConversationManager : Listener {
                     session.close(refuse = true)
                 }
             }
+        }
+    }
+
+    @TFunction.Cancel
+    private fun cancel() {
+        Bukkit.getOnlinePlayers().forEach { p ->
+            effectFreeze.forEach { p.removePotionEffect(it.first) }
+            effects.remove(p.name)?.forEach { p.addPotionEffect(it) }
+        }
+    }
+
+    @EventHandler
+    private fun e(e: PlayerQuitEvent) {
+        effectFreeze.forEach { e.player.removePotionEffect(it.first) }
+        effects.remove(e.player.name)?.forEach { e.player.addPotionEffect(it) }
+    }
+
+    @EventHandler
+    private fun e(e: ConversationEvent.Begin) {
+        effects[e.session.player.name] = effectFreeze.mapNotNull { e.session.player.getPotionEffect(it.first) }.filter { it.duration in 10..9999 }
+        effectFreeze.forEach { e.session.player.addPotionEffect(PotionEffect(it.first, 99999, it.second).hidden()) }
+    }
+
+    @EventHandler
+    private fun e(e: ConversationEvent.Closed) {
+        effectFreeze.forEach { e.session.player.removePotionEffect(it.first) }
+        effects.remove(e.session.player.name)?.forEach { e.session.player.addPotionEffect(it) }
+        // 视觉效果
+        if (!e.session.player.hasPotionEffect(PotionEffectType.BLINDNESS)) {
+            e.session.player.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS, 20, 0))
         }
     }
 
@@ -116,12 +152,11 @@ object ConversationManager : Listener {
                     Tasks.task {
                         open(e.player, e.entity.getLocation().also {
                             it.y += e.entity.entityType.entitySize.height
-                        })
-                        e.player.conversationSession?.npcName = if (e.entity is AdyHuman) {
+                        }, npcName = if (e.entity is AdyHuman) {
                             (e.entity as AdyHuman).getName()
                         } else {
                             e.entity.getCustomName()
-                        }
+                        })
                     }
                 }
             }
@@ -139,8 +174,7 @@ object ConversationManager : Listener {
                     e.isCancelled = true
                     open(e.player, e.rightClicked.location.also {
                         it.y += e.rightClicked.height
-                    })
-                    e.player.conversationSession?.npcName = npc.fullName
+                    }, npcName = npc.fullName)
                 }
             }
         }
@@ -157,8 +191,7 @@ object ConversationManager : Listener {
                     e.isCancelled = true
                     open(e.player, e.rightClicked.location.also {
                         it.y += e.rightClicked.height
-                    })
-                    e.player.conversationSession?.npcName = mob.displayName
+                    }, npcName = mob.displayName)
                 }
             }
         }

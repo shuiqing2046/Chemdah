@@ -138,12 +138,10 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
 
         @EventHandler
         private fun e(e: ObjectiveEvent.Continue) {
-            Tasks.task {
-                if (e.isCompleted()) {
-                    e.task.hiddenStats(e.playerProfile)
-                } else {
-                    e.task.refreshStats(e.playerProfile)
-                }
+            if (e.isCompleted()) {
+                e.task.hiddenStats(e.playerProfile)
+            } else {
+                e.task.refreshStats(e.playerProfile)
             }
         }
 

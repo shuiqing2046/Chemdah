@@ -10,16 +10,32 @@ import java.util.concurrent.CompletableFuture
  * @author sky
  * @since 2021/2/10 10:27 上午
  */
-interface Theme {
+abstract class Theme<T : ThemeSettings> {
 
-    fun reloadConfig() {
+    lateinit var settings: T
+
+    open fun reloadConfig() {
     }
 
-    fun reload(session: Session): CompletableFuture<Void>
+    open fun sendEffect(): Boolean {
+        return true
+    }
 
-    fun begin(session: Session): CompletableFuture<Void>
+    open fun allowFarewell(): Boolean {
+        return true
+    }
 
-    fun end(session: Session): CompletableFuture<Void>
+    open fun reload(session: Session): CompletableFuture<Void> {
+        return CompletableFuture.completedFuture(null)
+    }
 
-    fun npcTalk(session: Session, message: List<String>, canReply: Boolean = true): CompletableFuture<Void>
+    open fun begin(session: Session): CompletableFuture<Void> {
+        return npcTalk(session, session.npcSide)
+    }
+
+    open fun end(session: Session): CompletableFuture<Void> {
+        return CompletableFuture.completedFuture(null)
+    }
+
+    abstract fun npcTalk(session: Session, message: List<String>, canReply: Boolean = true): CompletableFuture<Void>
 }

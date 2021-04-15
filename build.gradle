@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'ink.ptms.chemdah'
-version = 'SNAPSHOT 04 14 3'
+version = 'SNAPSHOT 04 15 2'
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
@@ -20,10 +20,7 @@ taboolib {
 repositories {
     mavenCentral()
 }
-tasks.withType(Jar) {
 
-    destinationDir = file("F:/Server/Spigot 1.12.2/plugins")
-}
 dependencies {
     implementation 'com.sk89q.worldedit:WorldEdit:7:all'
     implementation 'public:Citizens:1.0.0'

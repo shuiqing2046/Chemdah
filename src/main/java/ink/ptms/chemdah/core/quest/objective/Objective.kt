@@ -91,16 +91,14 @@ abstract class Objective<E : Event> {
     /**
      * 当条目继续时
      */
-    open fun onContinue(profile: PlayerProfile, task: Task, event: Event) {
-        ObjectiveEvent.Continue(this, task, profile).call()
+    internal open fun onContinue(profile: PlayerProfile, task: Task, event: Event) {
         task.agent(profile, AgentType.TASK_CONTINUE)
     }
 
     /**
      * 当条目完成时
      */
-    open fun onComplete(profile: PlayerProfile, task: Task) {
-        ObjectiveEvent.Complete(this, task, profile).call()
+    internal open fun onComplete(profile: PlayerProfile, task: Task) {
         task.agent(profile, AgentType.TASK_COMPLETE)
         setCompletedSignature(profile, task, true)
     }
@@ -108,8 +106,7 @@ abstract class Objective<E : Event> {
     /**
      * 当条目重置时
      */
-    open fun onReset(profile: PlayerProfile, task: Task) {
-        ObjectiveEvent.Reset(this, task, profile).call()
+    internal open fun onReset(profile: PlayerProfile, task: Task) {
         task.agent(profile, AgentType.TASK_RESET)
         profile.dataOperator(task) {
             clear()
@@ -179,11 +176,13 @@ abstract class Objective<E : Event> {
                 task.restart(profile).thenAccept { reset ->
                     if (reset) {
                         onReset(profile, task)
+                        ObjectiveEvent.Reset(this@Objective, task, profile).call()
                         finish()
                     } else {
                         checkGoal(profile, task).thenAccept {
                             if (it && !hasCompletedSignature(profile, task)) {
                                 onComplete(profile, task)
+                                ObjectiveEvent.Complete(this@Objective, task, profile).call()
                             }
                             finish()
                         }

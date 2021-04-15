@@ -1,7 +1,9 @@
+
+
 #         Powered by TabooLib 5.0         #
 
 
-theme-test:
+theme-chat:
   format:
     - ' {title}:'
     - ''
@@ -15,26 +17,50 @@ theme-test:
     color: '&b&n'
   talking: '    &8...'
   animation: true
-
+  sound:
+    name: ENTITY_ITEM_PICKUP
+    p: 1
+    v: 0
 
 theme-chest:
-  title: "Chest | 对话"
-  npc-icon:
-    id: BOOK
-    data: 0
-    name: '&r {title}'
-    lore:
-      - ' '
-      - ' '
-      - ' &7{npcSide} '
-      - ' '
-      - ' '
-  reply-icon:
-    id: END_CRYSTAL
-    data: 0
-    name: '&r{index}.{text}'
-  layout:
-    npc-slot: 4
-    reply-slot: [19,20,21,22,23,24,25,28,29,30,31,32,33,34]
-
-
+  ui:
+    title: 'Talking with {title}...'
+    rows: 'Math.max(Math.ceil($size / 5.0) + 2, 3)'
+  npc-side:
+    item:
+      material: book
+      name: '&f {title}'
+      lore:
+        - ' '
+        - ' &7{npcSide} '
+        - ' '
+    slot: 10
+  player-side:
+    item:
+      material: paper
+      name: '&7{index}. &f{playerSide}'
+    slot:
+      - 12
+      - 13
+      - 14
+      - 15
+      - 16
+      - 21
+      - 22
+      - 23
+      - 24
+      - 25
+      - 30
+      - 31
+      - 32
+      - 33
+      - 34
+      - 39
+      - 40
+      - 41
+      - 42
+      - 43
+  sound:
+    name: ENTITY_ITEM_PICKUP
+    p: 1
+    v: 0

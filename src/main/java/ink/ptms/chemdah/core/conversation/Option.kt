@@ -2,7 +2,7 @@ package ink.ptms.chemdah.core.conversation
 
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.conversation.theme.Theme
-import ink.ptms.chemdah.core.conversation.theme.ThemeTest
+import ink.ptms.chemdah.core.conversation.theme.ThemeChat
 import ink.ptms.chemdah.util.colored
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
@@ -20,10 +20,11 @@ data class Option(
     val title: String = root.getString("title", "NPC")!!.colored()
 ) {
 
-    val instanceTheme: Theme
-        get() = ChemdahAPI.getConversationTheme(theme) ?: ThemeTest
+    val instanceTheme: Theme<*>
+        get() = ChemdahAPI.getConversationTheme(theme) ?: ThemeChat
 
     companion object {
+
         val default = Option(YamlConfiguration().createSection("__option__"))
     }
 }

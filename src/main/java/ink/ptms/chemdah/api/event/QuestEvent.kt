@@ -7,7 +7,6 @@ import ink.ptms.chemdah.core.quest.QuestContainer
 import ink.ptms.chemdah.core.quest.Template
 import io.izzel.taboolib.module.event.EventCancellable
 import io.izzel.taboolib.module.event.EventNormal
-import org.bukkit.Bukkit
 
 /**
  * Chemdah
@@ -21,80 +20,40 @@ class QuestEvent {
     /**
      * 当任务中当脚本代理执行时
      */
-    class Agent(val questContainer: QuestContainer, val playerProfile: PlayerProfile, val agentType: AgentType): EventCancellable<Agent>() {
-
-        init {
-            async(!Bukkit.isPrimaryThread())
-        }
-    }
+    class Agent(val questContainer: QuestContainer, val playerProfile: PlayerProfile, val agentType: AgentType): EventCancellable<Agent>(true)
 
     /**
      * 当任务进行接受检测时
      */
-    class AcceptCheck(val template: Template, val playerProfile: PlayerProfile): EventCancellable<AcceptCheck>() {
-
-        init {
-            async(!Bukkit.isPrimaryThread())
-        }
-    }
+    class AcceptCheck(val template: Template, val playerProfile: PlayerProfile): EventCancellable<AcceptCheck>(true)
 
     /**
      * 当任务接受后
      */
-    class Accepted(val quest: Quest, val playerProfile: PlayerProfile): EventNormal<Accepted>() {
-
-        init {
-            async(!Bukkit.isPrimaryThread())
-        }
-    }
+    class Accepted(val quest: Quest, val playerProfile: PlayerProfile): EventNormal<Accepted>(true)
 
     /**
      * 当任务完成时
      */
-    class Complete(val quest: Quest, val playerProfile: PlayerProfile): EventCancellable<Complete>() {
-
-        init {
-            async(!Bukkit.isPrimaryThread())
-        }
-    }
+    class Complete(val quest: Quest, val playerProfile: PlayerProfile): EventCancellable<Complete>(true)
 
     /**
      * 当任务失败（放弃）时
      */
-    class Failure(val quest: Quest, val playerProfile: PlayerProfile): EventCancellable<Failure>() {
-
-        init {
-            async(!Bukkit.isPrimaryThread())
-        }
-    }
+    class Failure(val quest: Quest, val playerProfile: PlayerProfile): EventCancellable<Failure>(true)
 
     /**
      * 当任务重置时
      */
-    class Reset(val quest: Quest, val playerProfile: PlayerProfile): EventCancellable<Reset>() {
-
-        init {
-            async(!Bukkit.isPrimaryThread())
-        }
-    }
+    class Reset(val quest: Quest, val playerProfile: PlayerProfile): EventCancellable<Reset>(true)
 
     /**
      * 当任务被注册到玩家数据
      */
-    class Registered(val quest: Quest, val playerProfile: PlayerProfile): EventNormal<Registered>() {
-
-        init {
-            async(!Bukkit.isPrimaryThread())
-        }
-    }
+    class Registered(val quest: Quest, val playerProfile: PlayerProfile): EventNormal<Registered>(true)
 
     /**
      * 当任务从玩家数据中注销
      */
-    class Unregistered(val quest: Quest, val playerProfile: PlayerProfile): EventNormal<Unregistered>() {
-
-        init {
-            async(!Bukkit.isPrimaryThread())
-        }
-    }
+    class Unregistered(val quest: Quest, val playerProfile: PlayerProfile): EventNormal<Unregistered>(true)
 }

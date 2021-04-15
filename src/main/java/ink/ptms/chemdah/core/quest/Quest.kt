@@ -1,6 +1,7 @@
 package ink.ptms.chemdah.core.quest
 
 import ink.ptms.chemdah.api.ChemdahAPI
+import ink.ptms.chemdah.api.event.ObjectiveEvent
 import ink.ptms.chemdah.api.event.QuestEvent
 import ink.ptms.chemdah.core.DataContainer
 import ink.ptms.chemdah.core.PlayerProfile
@@ -112,7 +113,10 @@ class Quest(val id: String, val profile: PlayerProfile) {
             if (QuestEvent.Reset(this@Quest, profile).call().nonCancelled()) {
                 template.agent(profile, AgentType.QUEST_RESET).thenAccept {
                     if (it) {
-                        tasks.forEach { task -> task.objective.onReset(profile, task) }
+                        tasks.forEach { task ->
+                            task.objective.onReset(profile, task)
+                            ObjectiveEvent.Reset(task.objective, task, profile).call()
+                        }
                         persistentDataContainer.clear()
                     }
                     finish()

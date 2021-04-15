@@ -4,6 +4,7 @@ import ink.ptms.chemdah.Chemdah
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.api.ChemdahAPI.isChemdahProfileLoaded
+import ink.ptms.chemdah.api.event.ObjectiveEvent
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.addon.Addon
 import ink.ptms.chemdah.core.quest.meta.Meta
@@ -142,6 +143,7 @@ object QuestLoader {
         objective.checkCondition(profile, task, event).thenAccept { cond ->
             if (cond) {
                 objective.onContinue(profile, task, event)
+                ObjectiveEvent.Continue(objective, task, profile).call()
                 objective.checkComplete(profile, task)
                 task.getQuest(profile)?.checkComplete()
             }

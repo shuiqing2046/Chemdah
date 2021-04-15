@@ -17,7 +17,7 @@ import java.util.concurrent.CompletableFuture
  * @author sky
  * @since 2021/2/10 6:39 下午
  */
-class ConditionPosition(val area: InferArea) : QuestAction<Boolean>() {
+class ActionPosition(val area: InferArea) : QuestAction<Boolean>() {
 
     override fun process(frame: QuestContext.Frame): CompletableFuture<Boolean> {
         return CompletableFuture.completedFuture(area.inside(frame.getPlayer().location))
@@ -31,7 +31,7 @@ class ConditionPosition(val area: InferArea) : QuestAction<Boolean>() {
         @KetherParser(["position"], namespace = "chemdah")
         fun parser() = ScriptParser.parser {
             it.expects("is", "in", "inside")
-            ConditionPosition(it.nextToken().toInferArea())
+            ActionPosition(it.nextToken().toInferArea())
         }
     }
 }

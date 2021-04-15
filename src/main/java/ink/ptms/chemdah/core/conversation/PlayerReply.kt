@@ -1,5 +1,6 @@
 package ink.ptms.chemdah.core.conversation
 
+import ink.ptms.chemdah.util.colored
 import ink.ptms.chemdah.util.extend
 import ink.ptms.chemdah.util.namespaceConversationPlayer
 import ink.ptms.chemdah.util.print
@@ -28,7 +29,7 @@ data class PlayerReply(
         return try {
             KetherFunction.parse(text, namespace = namespaceConversationPlayer) {
                 extend(session.variables)
-            }
+            }.colored()
         } catch (e: Throwable) {
             e.print()
             e.localizedMessage

@@ -28,35 +28,24 @@ import org.bukkit.potion.PotionEffectType
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 
+/**
+ * Chemdah
+ * ink.ptms.chemdah.core.conversation.ThemeChat
+ *
+ * @author sky
+ * @since 2021/2/12 2:08 上午
+ */
 @TListener
-object ThemeTest : Theme, Listener {
+object ThemeChat : Theme<ThemeChatSettings>(), Listener {
 
     init {
-        ChemdahAPI.conversationTheme["test"] = this
-    }
-
-    private val effects = ConcurrentHashMap<String, List<PotionEffect>>()
-    private val effectFreeze = setOf(PotionEffectType.BLINDNESS to 0, PotionEffectType.SLOW to 4)
-    private lateinit var settings: ThemeTestSettings
-
-    @TFunction.Cancel
-    fun e() {
-        Bukkit.getOnlinePlayers().forEach { p ->
-            effectFreeze.forEach { p.removePotionEffect(it.first) }
-            effects.remove(p.name)?.forEach { p.addPotionEffect(it) }
-        }
-    }
-
-    @EventHandler
-    fun e(e: PlayerQuitEvent) {
-        effectFreeze.forEach { e.player.removePotionEffect(it.first) }
-        effects.remove(e.player.name)?.forEach { e.player.addPotionEffect(it) }
+        ChemdahAPI.conversationTheme["chat"] = this
     }
 
     @EventHandler
     fun e(e: PlayerItemHeldEvent) {
         val session = e.player.conversationSession ?: return
-        if (session.conversation.option.theme == "test" && !session.npcTalking) {
+        if (session.conversation.option.theme == "chat" && !session.npcTalking) {
             val replies = session.playerReplyForDisplay
             if (replies.isNotEmpty()) {
                 val index = replies.indexOf(session.playerSide)
@@ -74,7 +63,7 @@ object ThemeTest : Theme, Listener {
     @EventHandler
     fun e(e: PlayerSwapHandItemsEvent) {
         val session = e.player.conversationSession ?: return
-        if (session.conversation.option.theme == "test") {
+        if (session.conversation.option.theme == "chat") {
             e.isCancelled = true
             if (session.npcTalking) {
                 session.npcTalking = false
@@ -93,7 +82,7 @@ object ThemeTest : Theme, Listener {
     @EventHandler
     fun e(e: AsyncPlayerChatEvent) {
         val session = e.player.conversationSession ?: return
-        if (session.conversation.option.theme == "test" && !session.npcTalking && CronusUtils.isInt(e.message)) {
+        if (session.conversation.option.theme == "chat" && !session.npcTalking && CronusUtils.isInt(e.message)) {
             e.isCancelled = true
             session.playerReplyForDisplay.getOrNull(Coerce.toInteger(e.message) - 1)?.run {
                 check(session).thenApply {
@@ -106,7 +95,7 @@ object ThemeTest : Theme, Listener {
     }
 
     override fun reloadConfig() {
-        settings = ThemeTestSettings(ConversationManager.conf.getConfigurationSection("theme-test")!!)
+        settings = ThemeChatSettings(ConversationManager.conf.getConfigurationSection("theme-chat")!!)
     }
 
     override fun reload(session: Session): CompletableFuture<Void> {
@@ -119,21 +108,9 @@ object ThemeTest : Theme, Listener {
     }
 
     override fun begin(session: Session): CompletableFuture<Void> {
-        Effects.create(Particle.CLOUD, session.origin.clone().add(0.0, 1.5, 0.0)).count(5).player(session.player).play()
-        session.player.playSound(session.origin, Sound.ENTITY_ITEM_PICKUP, 1f, 0f)
-        effects[session.player.name] = effectFreeze.mapNotNull { session.player.getPotionEffect(it.first) }.filter { it.duration in 10..9999 }
-        effectFreeze.forEach { session.player.addPotionEffect(PotionEffect(it.first, 99999, it.second)) }
-        return npcTalk(session, session.npcSide)
-    }
-
-    override fun end(session: Session): CompletableFuture<Void> {
-        effectFreeze.forEach { session.player.removePotionEffect(it.first) }
-        effects.remove(session.player.name)?.forEach { session.player.addPotionEffect(it) }
-        // 视觉效果
-        if (!session.player.hasPotionEffect(PotionEffectType.BLINDNESS)) {
-            session.player.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS, 20, 0))
-        }
-        return CompletableFuture.completedFuture(null)
+        Effects.create(Particle.CLOUD, session.origin.clone().add(0.0, 0.5, 0.0)).count(5).player(session.player).play()
+        settings.playSound(session)
+        return super.begin(session)
     }
 
     override fun npcTalk(session: Session, message: List<String>, canReply: Boolean): CompletableFuture<Void> {
@@ -146,7 +123,6 @@ object ThemeTest : Theme, Listener {
                 Tasks.delay(d++) {
                     if (session.isValid) {
                         if (session.npcTalking) {
-
                             future.npcTalk(session, message, messageLine, printText, printLine + 1 == messageText.size, canReply)
                         } else if (!cancel) {
                             cancel = true
@@ -231,6 +207,7 @@ object ThemeTest : Theme, Listener {
                     ex.printStackTrace()
                 }
             }.send(session.player)
+            // 打印完成则结束演示
             if (messageLine + 1 == messages.size && printEnd) {
                 complete(null)
             }
@@ -238,9 +215,5 @@ object ThemeTest : Theme, Listener {
         TLocale.sendTo(session.player, "theme-test-help")
     }
 
-    private fun newJson(): TellrawJson {
-        return TellrawJson.create().also { json ->
-            repeat(100) { json.newLine() }
-        }
-    }
+    private fun newJson() = TellrawJson.create().also { json -> repeat(100) { json.newLine() } }
 }

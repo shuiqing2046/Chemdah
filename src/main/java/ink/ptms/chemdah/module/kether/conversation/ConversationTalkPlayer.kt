@@ -6,6 +6,7 @@ import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import io.izzel.taboolib.kotlin.kether.common.api.QuestAction
 import io.izzel.taboolib.kotlin.kether.common.api.QuestContext
+import io.izzel.taboolib.kotlin.sendHolographic
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -18,15 +19,21 @@ import java.util.concurrent.CompletableFuture
 class ConversationTalkPlayer(val token: String) : QuestAction<Void>() {
 
     override fun process(frame: QuestContext.Frame): CompletableFuture<Void> {
-        return try {
+        try {
             KetherFunction.parse(token, namespace = namespaceConversationPlayer) { extend(frame.vars()) }.run {
                 val session = frame.getSession()
-                session.conversation.option.instanceTheme.npcTalk(session, listOf(colored()), false)
+                val theme = session.conversation.option.instanceTheme
+                if (theme.allowFarewell()) {
+                    theme.npcTalk(session, listOf(colored()), false)
+                } else {
+                    session.player.sendHolographic(session.origin.clone().add(0.0, 0.25, 0.0), "&7$this")
+                    theme.settings.playSound(session)
+                }
             }
         } catch (e: Throwable) {
             e.print()
-            CompletableFuture.completedFuture(null)
         }
+        return CompletableFuture.completedFuture(null)
     }
 
     companion object {

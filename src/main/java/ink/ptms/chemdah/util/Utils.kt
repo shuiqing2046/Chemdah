@@ -17,6 +17,7 @@ import org.bukkit.Bukkit
 import org.bukkit.block.Block
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.inventory.ItemStack
+import org.bukkit.potion.PotionEffect
 
 val conf: TConfig
     get() = Chemdah.conf
@@ -94,4 +95,12 @@ fun <T> safely(func: () -> T): T? {
     } catch (ex: NoClassDefFoundError) {
     }
     return null
+}
+
+fun PotionEffect.hidden(): PotionEffect {
+    return if (Version.isAfter(Version.v1_13)) {
+        withParticles(false).withIcon(false)
+    } else {
+        withParticles(false)
+    }
 }

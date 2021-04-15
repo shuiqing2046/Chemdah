@@ -47,7 +47,7 @@ data class Conversation(
      * @param origin 原点（对话实体的头顶坐标）
      * @param sessionTop 上层会话（继承关系）
      */
-    fun open(player: Player, origin: Location, sessionTop: Session? = null): CompletableFuture<Session> {
+    fun open(player: Player, origin: Location, sessionTop: Session? = null, npcName: String? = null): CompletableFuture<Session> {
         val future = CompletableFuture<Session>()
         mirrorFuture("Conversation:open") {
             val session = sessionTop ?: Session(this@Conversation, player.location.clone(), origin.clone(), player)
@@ -55,6 +55,10 @@ data class Conversation(
             if (ConversationEvent.Pre(this@Conversation, session, sessionTop != null).call().isCancelled) {
                 future.complete(session)
                 finish()
+                return@mirrorFuture
+            }
+            if (npcName != null) {
+                session.npcName = npcName
             }
             // 注册会话
             sessions[player.name] = session
@@ -71,12 +75,10 @@ data class Conversation(
                             sessionTop.close().thenApply {
                                 future.complete(session)
                                 ConversationEvent.Cancelled(this@Conversation, session, true).call()
-                                finish()
                             }
                         } else {
                             future.complete(session)
                             ConversationEvent.Cancelled(this@Conversation, session, false).call()
-                            finish()
                         }
                     } else {
                         // 添加对话内容
@@ -95,9 +97,9 @@ data class Conversation(
                         option.instanceTheme.begin(session).thenAccept {
                             future.complete(session)
                             ConversationEvent.Post(this@Conversation, session, sessionTop != null).call()
-                            finish()
                         }
                     }
+                    finish()
                 }
             }
         }

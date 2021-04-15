@@ -90,7 +90,7 @@ object ConversationLoader {
                     PlayerReply(
                         it,
                         it["if"]?.toString(),
-                        it["reply"].toString().colored(),
+                        it["reply"].toString(),
                         it["then"]?.asList() ?: emptyList()
                     )
                 })
