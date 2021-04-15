@@ -14,7 +14,4 @@ object Chemdah : Plugin() {
 
     override fun allowHotswap() = false
 
-    override fun onEnable() {
-        ChemdahAPI.conversationTheme["chest"] = ThemeChest
-    }
 }

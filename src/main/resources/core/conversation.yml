@@ -16,19 +16,25 @@ theme-test:
   talking: '    &8...'
   animation: true
 
+
 theme-chest:
-  title:
+  title: "Chest | 对话"
+  npc-icon:
     id: BOOK
     data: 0
-    name: " {title}: "
+    name: '&r {title}'
     lore:
       - ' '
       - ' '
-      - ' &f{npcSide} '
+      - ' &7{npcSide} '
       - ' '
       - ' '
+  reply-icon:
+    id: END_CRYSTAL
+    data: 0
+    name: '&r{index}.{text}'
   layout:
-    row-amount: 5
-    list:
-      - '0 111111 '
-      - '  111111 '
+    npc-slot: 4
+    reply-slot: [19,20,21,22,23,24,25,28,29,30,31,32,33,34]
+
+
