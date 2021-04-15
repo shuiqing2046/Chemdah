@@ -22,16 +22,6 @@ import org.bukkit.command.CommandSender
 @BaseCommand(name = "chemdahPlayerData", aliases = ["chpd"], permission = "chemdah.command")
 class CommandChemdahPlayerData : BaseMainCommand() {
 
-    @SubCommand(description = "@command-variables-get", arguments = ["@command-argument-player", "@command-argument-key"], priority = 0.0)
-    fun get(sender: CommandSender, args: Array<String>) {
-        val playerExact = Bukkit.getPlayerExact(args[0])
-        if (playerExact == null) {
-            TLocale.sendTo(sender, "command-player-not-found")
-            return
-        }
-        TLocale.sendTo(sender, "command-variables-change", "${args[1]} §8== §f${playerExact.chemdahProfile.persistentDataContainer[args[0]]}")
-    }
-
     @SubCommand(
         description = "@command-variables-set",
         arguments = ["@command-argument-player", "@command-argument-key", "@command-argument-value"],

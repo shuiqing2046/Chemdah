@@ -9,6 +9,7 @@ import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.util.mirrorFuture
 import io.izzel.taboolib.kotlin.Tasks
+import io.izzel.taboolib.module.inject.TFunction
 import io.izzel.taboolib.module.inject.TListener
 import io.izzel.taboolib.module.inject.TSchedule
 import io.izzel.taboolib.module.locale.TLocale
@@ -142,6 +143,13 @@ abstract class Database {
                         finish()
                     }
                 }
+            }
+        }
+
+        @TFunction.Cancel
+        private fun cancel() {
+            Bukkit.getOnlinePlayers().forEach {
+                INSTANCE.update(it, it.chemdahProfile)
             }
         }
     }

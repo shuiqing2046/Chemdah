@@ -1,5 +1,7 @@
 package ink.ptms.chemdah.module.level
 
+import ink.ptms.chemdah.core.PlayerProfile
+
 /**
  * Chemdah
  * ink.ptms.chemdah.module.level.Level
@@ -7,13 +9,25 @@ package ink.ptms.chemdah.module.level
  * @author sky
  * @since 2021/3/8 11:20 下午
  */
-class Level(val algorithm: Algorithm, experience: Int, level: Int) {
+class Level(val algorithm: Algorithm, level: Int, experience: Int) {
 
     var experience = experience
         private set
 
     var level = level
         private set
+
+    fun toPlayerLevel() = PlayerLevel(level, experience)
+
+    fun setLevel(value: Int) {
+        level = value
+        addExperience(0)
+    }
+
+    fun addLevel(value: Int) {
+        level += value
+        addExperience(0)
+    }
 
     fun setExperience(value: Int) {
         experience = value
@@ -23,6 +37,8 @@ class Level(val algorithm: Algorithm, experience: Int, level: Int) {
     fun addExperience(value: Int) {
         var level = this.level
         if (level >= algorithm.maxLevel) {
+            this.level = algorithm.maxLevel
+            this.experience = algorithm.getExp(level)
             return
         }
         var exp = this.experience + value

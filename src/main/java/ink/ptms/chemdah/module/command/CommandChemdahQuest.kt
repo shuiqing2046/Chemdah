@@ -158,7 +158,7 @@ class CommandChemdahQuest : BaseMainCommand() {
             TLocale.sendTo(sender, "command-player-not-found")
             return
         }
-        val ui = UISystem.ui[args[1]]
+        val ui = UISystem.getUI(args[1])
         if (ui == null) {
             TLocale.sendTo(sender, "command-ui-not-found")
             return

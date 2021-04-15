@@ -31,6 +31,8 @@ object UISystem : Listener, Module {
         register()
     }
 
+    fun getUI(name: String) = ui[name]
+
     @EventHandler
     private fun e(e: PlayerQuitEvent) {
         ui.values.forEach { it.playerFilters.remove(e.player.uniqueId) }
