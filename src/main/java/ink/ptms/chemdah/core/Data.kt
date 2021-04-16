@@ -16,6 +16,8 @@ import io.izzel.taboolib.util.Coerce
  */
 class Data(val value: Any) {
 
+    var changed = false
+
     private val lazyPosition by lazy {
         value.toString().toInferArea(noWorld = false)
     }

@@ -6,15 +6,16 @@ import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Quest
 import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.module.db.sql.*
+import io.izzel.taboolib.module.db.sql.query.JoinWhere
 import io.izzel.taboolib.module.db.sql.query.Where
 import io.izzel.taboolib.module.inject.PlayerContainer
 import io.izzel.taboolib.util.Coerce
 import org.bukkit.entity.Player
-import java.nio.charset.StandardCharsets
 import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 import javax.sql.DataSource
+import kotlin.collections.HashMap
 
 /**
  * Chemdah
@@ -30,42 +31,48 @@ class DatabaseSQL : Database() {
     val name: String
         get() = Chemdah.conf.getString("database.source.SQL.table", "chemdah")!!
 
+    val isServer = Chemdah.conf.getBoolean("database.source.SQL.server")
+
     val tableUser = SQLTable(
         "${name}_user",
         SQLColumn.PRIMARY_KEY_ID,
         SQLColumnType.VARCHAR.toColumn(36, "name").columnOptions(SQLColumnOption.UNIQUE_KEY),
         SQLColumnType.VARCHAR.toColumn(36, "uuid").columnOptions(SQLColumnOption.UNIQUE_KEY),
-        SQLColumnType.INT.toColumn(16, "data"),
         SQLColumnType.DATE.toColumn("time")
     )
 
     val tableUserData = SQLTable(
         "${name}_user_data",
         SQLColumn.PRIMARY_KEY_ID,
-        SQLColumnType.BLOB.toColumn("data")
+        SQLColumnType.INT.toColumn(16, "user").columnOptions(SQLColumnOption.KEY),
+        SQLColumnType.VARCHAR.toColumn(64, "key").columnOptions(SQLColumnOption.KEY),
+        SQLColumnType.VARCHAR.toColumn(64, "value"),
+        SQLColumnType.BOOL.toColumn("mode")
     )
 
     val tableQuest = SQLTable(
         "${name}_quest",
         SQLColumn.PRIMARY_KEY_ID,
-        SQLColumnType.VARCHAR.toColumn(36, "name").columnOptions(SQLColumnOption.KEY),
-        SQLColumnType.INT.toColumn(16, "data"),
         SQLColumnType.INT.toColumn(16, "user").columnOptions(SQLColumnOption.KEY),
-        SQLColumnType.BOOL.toColumn("value")
+        SQLColumnType.VARCHAR.toColumn(36, "quest").columnOptions(SQLColumnOption.KEY),
+        SQLColumnType.BOOL.toColumn("mode")
     )
 
     val tableQuestData = SQLTable(
         "${name}_quest_data",
         SQLColumn.PRIMARY_KEY_ID,
-        SQLColumnType.BLOB.toColumn("data")
+        SQLColumnType.INT.toColumn(16, "quest").columnOptions(SQLColumnOption.KEY),
+        SQLColumnType.VARCHAR.toColumn(64, "key").columnOptions(SQLColumnOption.KEY),
+        SQLColumnType.VARCHAR.toColumn(64, "value"),
+        SQLColumnType.BOOL.toColumn("mode")
     )
 
     val tableVariables = SQLTable(
         "${name}_variables",
         SQLColumn.PRIMARY_KEY_ID,
-        SQLColumnType.VARCHAR.toColumn(36, "name").columnOptions(SQLColumnOption.UNIQUE_KEY),
+        SQLColumnType.VARCHAR.toColumn(64, "name").columnOptions(SQLColumnOption.UNIQUE_KEY),
         SQLColumnType.VARCHAR.toColumn(64, "data"),
-        SQLColumnType.BOOL.toColumn("value")
+        SQLColumnType.BOOL.toColumn("mode")
     )
 
     val dataSource: DataSource by lazy {
@@ -79,6 +86,8 @@ class DatabaseSQL : Database() {
         tableQuestData.create(dataSource)
         tableVariables.create(dataSource)
     }
+
+    fun updateUserTime(userId: Long) = tableUser.update(Where.equals("id", userId)).set("time", Date()).run(dataSource)
 
     fun getUserId(player: Player): Long {
         if (cacheUserId.containsKey(player.name)) {
@@ -95,76 +104,130 @@ class DatabaseSQL : Database() {
         return userId
     }
 
-    fun getUserDataId(userId: Long) = tableUser.select(Where.equals("id", userId))
-        .limit(1)
-        .row("data")
-        .to(dataSource)
-        .first {
-            it.getLong("data")
-        } ?: -1L
-
-    fun getUserData(userId: Long) = tableUserData.select(Where.equals("id", getUserDataId(userId)))
-        .limit(1)
-        .row("data")
-        .to(dataSource)
-        .first {
-            DataContainer.fromJson(it.getBlob("data").binaryStream.readBytes().toString(StandardCharsets.UTF_8))
-        } ?: DataContainer()
-
-    fun getQuest(userId: Long) = tableQuest.select(Where.equals("user", userId), Where.equals("value", true))
-        .row("name", "data")
-        .to(dataSource)
-        .map {
-            it.getLong("data") to it.getString("name")
-        }.toMap()
-
-    fun getQuestData(questId: List<Long>) = tableQuestData.select(Where.`in`("id", *questId.toTypedArray()))
-        .row("id", "data")
-        .to(dataSource)
-        .map {
-            it.getLong("id") to DataContainer.fromJson(it.getBlob("data").binaryStream.readBytes().toString(StandardCharsets.UTF_8))
-        }.toMap()
-
-    fun getQuestDataId(userId: Long, quest: Quest) = tableQuest.select(Where.equals("user", userId), Where.equals("name", quest.id))
-        .limit(1)
-        .row("data")
-        .to(dataSource)
-        .first {
-            it.getLong("data")
-        } ?: -1L
-
-    fun updateUserTime(userId: Long) = tableUser.update(Where.equals("id", userId))
-        .set("time", Date())
-        .run(dataSource)
-
-    fun createUser(player: Player, playerProfile: PlayerProfile): CompletableFuture<Long> {
-        val userId = CompletableFuture<Long>()
-        tableUserData.insert(null, playerProfile.persistentDataContainer.toJson().toByteArray(StandardCharsets.UTF_8))
+    fun getQuestId(player: Player, quest: Quest): Long {
+        val map = cacheQuestId.computeIfAbsent(player.name) { HashMap() }
+        if (map.containsKey(quest.id)) {
+            return map[quest.id]!!
+        }
+        val userId = tableQuest.select(Where.equals("user", getUserId(player)), Where.equals("quest", quest.id))
+            .limit(1)
+            .row("id")
             .to(dataSource)
-            .statementFinish { s1 ->
-                tableUser.insert(null, player.name, player.uniqueId.toString(), Coerce.toLong(s1.generatedKeys.run {
-                    next()
-                    getObject(1)
-                }), Date())
-                    .to(dataSource)
-                    .statementFinish { s2 ->
-                        userId.complete(Coerce.toLong(s2.generatedKeys.run {
-                            next()
-                            getObject(1)
-                        }))
-                    }.run()
-            }.run()
+            .first {
+                it.getLong("id")
+            } ?: return -1L
+        map[quest.id] = userId
         return userId
     }
 
-    fun createQuest(userId: Long, quest: Quest) {
-        tableQuestData.insert(null, quest.persistentDataContainer.toJson().toByteArray(StandardCharsets.UTF_8))
+    fun PlayerProfile.init(): PlayerProfile {
+        tableUserData.select(Where.equals("user", getUserId(player)), Where.equals("mode", 1))
+            .row("key", "value")
+            .to(dataSource)
+            .map {
+                it.getString("key") to it.getString("value")
+            }.forEach {
+                persistentDataContainer.unchanged { put(it.first, it.second) }
+            }
+        val quests = HashMap<String, DataContainer>()
+        tableQuest.select(Where.equals("user", getUserId(player)), Where.equals("mode", 1))
+            .row("quest")
+            .rowOuter(tableQuestData, "key")
+            .rowOuter(tableQuestData, "value")
+            .innerJoin(tableQuestData, JoinWhere.equals(tableQuest, "id", tableQuestData, "quest"))
+            .to(dataSource)
+            .map {
+                it.getString("quest") to (it.getString("key") to it.getString("value"))
+            }.forEach {
+                quests.computeIfAbsent(it.first) { DataContainer() }.unchanged {
+                    put(it.second.first, it.second.second)
+                }
+            }
+        quests.forEach { registerQuest(Quest(it.key, this, it.value)) }
+        return this
+    }
+
+    fun PlayerProfile.update(player: Player) {
+        val id = getUserId(player)
+        val container = persistentDataContainer
+        container.forEach { key, data ->
+            if (data.changed) {
+                tableUserData.update(Where.equals("user", id), Where.equals("key", key))
+                    .insertIfAbsent(null, id, key, data.value, 1)
+                    .set("value", data.value)
+                    .set("mode", 1)
+                    .run(dataSource)
+            }
+        }
+        val released = container.released.toList()
+        container.released.clear()
+        released.forEach {
+            tableUserData.update(Where.equals("user", id), Where.equals("key", it)).set("mode", 0).run(dataSource)
+        }
+    }
+
+    fun PlayerProfile.updateQuest(player: Player) {
+        val id = getUserId(player)
+        quests.forEach { quest ->
+            if (quest.newQuest || quest.persistentDataContainer.changed) {
+                quest.newQuest = false
+                val questId = getQuestId(player, quest)
+                if (questId < 0) {
+                    player.createQuest(id, quest)
+                    return@forEach
+                }
+                val container = quest.persistentDataContainer
+                container.forEach { key, data ->
+                    if (data.changed) {
+                        tableQuestData.update(Where.equals("quest", questId), Where.equals("key", key))
+                            .insertIfAbsent(null, questId, key, data.value, 1)
+                            .set("value", data.value)
+                            .set("mode", 1)
+                            .run(dataSource)
+                    }
+                }
+                val released = container.released.toList()
+                container.released.clear()
+                released.forEach {
+                    tableQuestData.update(Where.equals("quest", questId), Where.equals("key", it)).set("mode", 0).run(dataSource)
+                }
+            }
+        }
+    }
+
+    fun PlayerProfile.createUser(player: Player): CompletableFuture<Long> {
+        val future = CompletableFuture<Long>()
+        tableUser.insert(null, player.name, player.uniqueId.toString(), Date())
             .to(dataSource)
             .statementFinish { stmt ->
-                tableQuest.insert(null, quest.id, Coerce.toLong(stmt.generatedKeys.run {
+                val userId = stmt.generatedKeys.run {
                     next()
-                    getObject(1)
-                }), userId, true).run(dataSource)
+                    Coerce.toLong(getObject(1))
+                }
+                cacheUserId[player.name] = userId
+                persistentDataContainer.forEach { k, v ->
+                    tableUserData.insert(null, userId, k, v.value, 1).run(dataSource)
+                }
+                quests.forEach {
+                    player.createQuest(userId, it)
+                }
+                future.complete(userId)
+            }.run()
+        return future
+    }
+
+    fun Player.createQuest(userId: Long, quest: Quest) {
+        tableQuest.insert(null, userId, quest.id, 1)
+            .to(dataSource)
+            .statementFinish { stmt ->
+                val questId = stmt.generatedKeys.run {
+                    next()
+                    Coerce.toLong(getObject(1))
+                }
+                cacheQuestId.computeIfAbsent(name) { HashMap() }[quest.id] = questId
+                quest.persistentDataContainer.forEach { k, v ->
+                    tableQuestData.insert(null, questId, k, v.value, 1).run(dataSource)
+                }
             }.run()
     }
 
@@ -174,76 +237,37 @@ class DatabaseSQL : Database() {
         if (user == -1L) {
             return playerProfile
         }
-        playerProfile.persistentDataContainer.unchanged {
-            merge(getUserData(user))
-        }
-        val quest = getQuest(user)
-        getQuestData(quest.keys.toList()).forEach { data ->
-            playerProfile.registerQuest(Quest(quest[data.key]!!, playerProfile).also { q ->
-                q.persistentDataContainer.unchanged {
-                    merge(data.value)
-                }
-            })
-        }
         Tasks.task(true) {
             updateUserTime(user)
         }
-        return playerProfile
+        return playerProfile.init()
     }
 
     override fun update(player: Player, playerProfile: PlayerProfile) {
-        val user = getUserId(player)
-        if (user == -1L) {
-            createUser(player, playerProfile).thenApply { userId ->
-                playerProfile.quests.forEach {
-                    createQuest(userId, it)
-                }
-            }
+        val userId = getUserId(player)
+        if (userId == -1L) {
+            playerProfile.createUser(player)
         } else {
-            if (playerProfile.persistentDataContainer.changed) {
-                playerProfile.persistentDataContainer.flush()
-                tableUserData.update(Where.equals("id", getUserDataId(user)))
-                    .set("data", playerProfile.persistentDataContainer.toJson().toByteArray(StandardCharsets.UTF_8))
-                    .run(dataSource)
-            }
-            playerProfile.quests.forEach { quest ->
-                if (quest.persistentDataContainer.changed) {
-                    quest.persistentDataContainer.flush()
-                    val questDataId = getQuestDataId(user, quest)
-                    if (questDataId == -1L) {
-                        createQuest(user, quest)
-                    } else {
-                        tableQuest.update(Where.equals("user", user), Where.equals("name", quest.id))
-                            .set("value", true)
-                            .run(dataSource)
-                        tableQuestData.update(Where.equals("id", questDataId))
-                            .set("data", quest.persistentDataContainer.toJson().toByteArray(StandardCharsets.UTF_8))
-                            .run(dataSource)
-                    }
-                }
-            }
+            playerProfile.update(player)
+            playerProfile.updateQuest(player)
         }
     }
 
     override fun releaseQuest(player: Player, playerProfile: PlayerProfile, quest: Quest) {
-        val user = getUserId(player)
-        if (user == -1L) {
+        val questId = getQuestId(player, quest)
+        if (questId < 0) {
             return
         }
-        val questDataId = getQuestDataId(user, quest)
-        if (questDataId == -1L) {
-            return
-        }
-        tableQuest.update(Where.equals("user", user), Where.equals("name", quest.id))
-            .set("value", false)
+        tableQuest.update(Where.equals("user", getUserId(player)), Where.equals("quest", quest.id))
+            .set("mode", 0)
             .run(dataSource)
-        tableQuestData.update(Where.equals("id", questDataId))
-            .set("data", ByteArray(0))
+        tableQuestData.update(Where.equals("quest", questId))
+            .set("mode", 0)
             .run(dataSource)
     }
 
     override fun selectVariable0(key: String): String? {
-        return tableVariables.select(Where.equals("name", key), Where.equals("value", true))
+        return tableVariables.select(Where.equals("name", key), Where.equals("mode", true))
             .limit(1)
             .row("data")
             .to(dataSource)
@@ -256,19 +280,19 @@ class DatabaseSQL : Database() {
         tableVariables.update(Where.equals("name", key))
             .insertIfAbsent(null, key, value, true)
             .set("data", value)
-            .set("value", true)
+            .set("mode", true)
             .run(dataSource)
     }
 
     override fun releaseVariable0(key: String) {
         tableVariables.update(Where.equals("name", key))
             .set("data", "")
-            .set("value", false)
+            .set("mode", false)
             .run(dataSource)
     }
 
     override fun variables(): List<String> {
-        return tableVariables.select(Where.equals("value", true))
+        return tableVariables.select(Where.equals("mode", true))
             .row("name")
             .to(dataSource)
             .map {
@@ -280,5 +304,8 @@ class DatabaseSQL : Database() {
 
         @PlayerContainer
         private val cacheUserId = ConcurrentHashMap<String, Long>()
+
+        @PlayerContainer
+        private val cacheQuestId = ConcurrentHashMap<String, MutableMap<String, Long>>()
     }
 }

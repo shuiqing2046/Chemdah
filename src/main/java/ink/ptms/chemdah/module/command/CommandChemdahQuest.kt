@@ -22,7 +22,7 @@ import kotlin.math.ceil
  * @author sky
  * @since 2021/2/11 7:19 下午
  */
-@BaseCommand(name = "chemdahQuest", aliases = ["chq"], permission = "chemdah.command")
+@BaseCommand(name = "ChemdahQuest", aliases = ["chq"], permission = "chemdah.command")
 class CommandChemdahQuest : BaseMainCommand() {
 
     override fun onTabComplete(sender: CommandSender, command: String, argument: String): List<String>? {

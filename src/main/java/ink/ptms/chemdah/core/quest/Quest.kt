@@ -18,7 +18,7 @@ import ink.ptms.chemdah.util.mirrorFuture
  * @author sky
  * @since 2021/3/2 12:03 上午
  */
-class Quest(val id: String, val profile: PlayerProfile) {
+class Quest(val id: String, val profile: PlayerProfile, val persistentDataContainer: DataContainer = DataContainer()) {
 
     val template: Template
         get() = ChemdahAPI.getQuestTemplate(id)!!
@@ -38,7 +38,7 @@ class Quest(val id: String, val profile: PlayerProfile) {
     val isTimeout: Boolean
         get() = template.isTimeout(startTime)
 
-    val persistentDataContainer = DataContainer()
+    var newQuest = false
 
     init {
         persistentDataContainer.put("start", System.currentTimeMillis())

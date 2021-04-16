@@ -19,7 +19,7 @@ import org.bukkit.command.CommandSender
  * @author sky
  * @since 2021/2/11 7:19 下午
  */
-@BaseCommand(name = "chemdahPlayerData", aliases = ["chpd"], permission = "chemdah.command")
+@BaseCommand(name = "ChemdahPlayerData", aliases = ["chpd"], permission = "chemdah.command")
 class CommandChemdahPlayerData : BaseMainCommand() {
 
     @SubCommand(

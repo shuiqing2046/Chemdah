@@ -14,7 +14,7 @@ import org.bukkit.command.CommandSender
  * @author sky
  * @since 2021/2/11 7:19 下午
  */
-@BaseCommand(name = "chemdahVariables", aliases = ["chv"], permission = "chemdah.command")
+@BaseCommand(name = "ChemdahVariables", aliases = ["chv"], permission = "chemdah.command")
 class CommandChemdahVariables : BaseMainCommand() {
 
     override fun onTabComplete(sender: CommandSender, command: String, argument: String): List<String>? {

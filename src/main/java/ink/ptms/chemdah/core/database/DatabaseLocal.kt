@@ -1,8 +1,10 @@
 package ink.ptms.chemdah.core.database
 
 import ink.ptms.chemdah.core.DataContainer
+import ink.ptms.chemdah.core.DataContainer.Companion.data
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Quest
+import ink.ptms.chemdah.util.asMap
 import io.izzel.taboolib.module.db.local.Local
 import io.izzel.taboolib.module.db.local.LocalPlayer
 import org.bukkit.entity.Player
@@ -23,12 +25,12 @@ class DatabaseLocal : Database() {
         val data = LocalPlayer.get(player)
         if (data.contains("Chemdah")) {
             playerProfile.persistentDataContainer.unchanged {
-                merge(DataContainer.fromJson(data.getString("Chemdah.data")!!))
+                merge(DataContainer(data.get("Chemdah.data").asMap().mapValues { it.value.data() }))
             }
             data.getConfigurationSection("Chemdah.quest")?.getValues(false)?.forEach { (id, value) ->
                 playerProfile.registerQuest(Quest(id, playerProfile).also { quest ->
                     quest.persistentDataContainer.unchanged {
-                        merge(DataContainer.fromJson(value.toString()))
+                        merge(DataContainer(value.asMap().mapValues { it.value.data() }))
                     }
                 })
             }
@@ -40,12 +42,12 @@ class DatabaseLocal : Database() {
         val data = LocalPlayer.get(player)
         if (playerProfile.persistentDataContainer.changed) {
             playerProfile.persistentDataContainer.flush()
-            data.set("Chemdah.data", playerProfile.persistentDataContainer.toJson())
+            data.set("Chemdah.data", playerProfile.persistentDataContainer.toMap())
         }
         playerProfile.quests.forEach { quest ->
             if (quest.persistentDataContainer.changed) {
                 quest.persistentDataContainer.flush()
-                data.set("Chemdah.quest.${quest.id}", quest.persistentDataContainer.toJson())
+                data.set("Chemdah.quest.${quest.id}", quest.persistentDataContainer.toMap())
             }
         }
     }

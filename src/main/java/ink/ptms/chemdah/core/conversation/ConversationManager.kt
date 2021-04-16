@@ -1,11 +1,11 @@
 package ink.ptms.chemdah.core.conversation
 
 import ink.ptms.adyeshach.api.event.AdyeshachEntityInteractEvent
+import ink.ptms.adyeshach.common.entity.EntityInstance
 import ink.ptms.adyeshach.common.entity.type.AdyHuman
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.conversationSession
 import ink.ptms.chemdah.api.event.ConversationEvent
-import ink.ptms.chemdah.core.conversation.theme.ThemeChat
 import ink.ptms.chemdah.util.hidden
 import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.module.config.TConfig
@@ -50,8 +50,8 @@ object ConversationManager : Listener {
 
     @TSchedule(period = 1, async = true)
     private fun tick() {
-        Bukkit.getOnlinePlayers().forEach {
-            val session = sessions[it.name] ?: return@forEach
+        Bukkit.getOnlinePlayers().forEach { p ->
+            val session = p.conversationSession ?: return@forEach
             if (session.isClosed) {
                 return@forEach
             }
@@ -73,6 +73,7 @@ object ConversationManager : Listener {
         Bukkit.getOnlinePlayers().forEach { p ->
             effectFreeze.forEach { p.removePotionEffect(it.first) }
             effects.remove(p.name)?.forEach { p.addPotionEffect(it) }
+            p.conversationSession?.close(refuse = true)
         }
     }
 
@@ -80,6 +81,7 @@ object ConversationManager : Listener {
     private fun e(e: PlayerQuitEvent) {
         effectFreeze.forEach { e.player.removePotionEffect(it.first) }
         effects.remove(e.player.name)?.forEach { e.player.addPotionEffect(it) }
+        e.player.conversationSession?.close(refuse = true)
     }
 
     @EventHandler
@@ -111,20 +113,6 @@ object ConversationManager : Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    private fun e(e: PlayerInteractAtEntityEvent) {
-        if (e.hand == EquipmentSlot.HAND && e.player.conversationSession == null) {
-            val name = I18n.get().getName(e.rightClicked)
-            ChemdahAPI.conversation.values.firstOrNull { it.isNPC("minecraft", name) }?.run {
-                e.isCancelled = true
-                open(e.player, e.rightClicked.location.also {
-                    it.y += e.rightClicked.height
-                })
-                e.player.conversationSession?.npcName = name
-            }
-        }
-    }
-
     @EventHandler
     private fun e(e: PlayerCommandPreprocessEvent) {
         if (e.message.startsWith("/session")) {
@@ -141,8 +129,42 @@ object ConversationManager : Listener {
         }
     }
 
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    private fun e(e: PlayerInteractAtEntityEvent) {
+        if (e.hand == EquipmentSlot.HAND && e.player.conversationSession == null) {
+            val name = I18n.get().getName(e.rightClicked)
+            ChemdahAPI.conversation.values.firstOrNull { it.isNPC("minecraft", name) }?.run {
+                e.isCancelled = true
+                open(e.player, e.rightClicked.location.also {
+                    it.y += e.rightClicked.height
+                }, npcName = name, npcObject = e.rightClicked)
+            }
+        }
+    }
+
     @TListener(depend = ["Adyeshach"])
     private class CompatAdyeshach : Listener {
+
+        @EventHandler
+        fun e(e: ConversationEvent.Begin) {
+            val npc = e.session.npcObject
+            if (npc is EntityInstance) {
+                npc.setTag("isFreeze", "true")
+                npc.setTag("conversation:${e.session.player.name}", "conversation")
+            }
+        }
+
+        @EventHandler
+        fun e(e: ConversationEvent.Closed) {
+            val npc = e.session.npcObject
+            if (npc is EntityInstance) {
+                npc.removeTag("conversation:${e.session.player.name}")
+                // 若没有玩家在与该 NPC 对话
+                if (npc.getTags().none { it.value == "conversation" }) {
+                    npc.removeTag("isFreeze" )
+                }
+            }
+        }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         fun e(e: AdyeshachEntityInteractEvent) {
@@ -156,7 +178,7 @@ object ConversationManager : Listener {
                             (e.entity as AdyHuman).getName()
                         } else {
                             e.entity.getCustomName()
-                        })
+                        }, npcObject = e.entity)
                     }
                 }
             }
@@ -174,7 +196,7 @@ object ConversationManager : Listener {
                     e.isCancelled = true
                     open(e.player, e.rightClicked.location.also {
                         it.y += e.rightClicked.height
-                    }, npcName = npc.fullName)
+                    }, npcName = npc.fullName, npcObject = npc)
                 }
             }
         }
@@ -191,7 +213,7 @@ object ConversationManager : Listener {
                     e.isCancelled = true
                     open(e.player, e.rightClicked.location.also {
                         it.y += e.rightClicked.height
-                    }, npcName = mob.displayName)
+                    }, npcName = mob.displayName, npcObject = mob)
                 }
             }
         }

@@ -10,9 +10,9 @@ default:
     type: math
     math: |-
       if (level <= 15) {
-          return (2 * level) + 7;
+          2 * level + 7;
       } else if (level <= 30) {
-          return (5 * level) - 38;
+          5 * level - 38;
       } else {
-          return (9 * level) - 158;
+          9 * level - 158;
       }

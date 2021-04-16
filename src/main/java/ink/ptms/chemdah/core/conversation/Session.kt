@@ -36,7 +36,9 @@ data class Session(
         get() = origin.distance(player.location) - origin.distance(location)
 
     val npcSide = ArrayList<String>()
+
     var npcName = ""
+    var npcObject: Any? = null
     var npcTalking = false
 
     var playerSide: PlayerReply? = null

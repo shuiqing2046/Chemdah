@@ -20,7 +20,7 @@ import org.bukkit.command.CommandSender
  * @author sky
  * @since 2021/2/11 7:19 下午
  */
-@BaseCommand(name = "chemdahPlayerLevel", aliases = ["chpl"], permission = "chemdah.command")
+@BaseCommand(name = "ChemdahPlayerLevel", aliases = ["chpl"], permission = "chemdah.command")
 class CommandChemdahPlayerLevel : BaseMainCommand() {
 
     override fun onTabComplete(sender: CommandSender, command: String, argument: String): List<String>? {

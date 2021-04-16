@@ -6,6 +6,7 @@ import io.izzel.taboolib.internal.gson.JsonPrimitive
 import io.izzel.taboolib.kotlin.Reflex.Companion.reflex
 import io.izzel.taboolib.module.nms.nbt.NBTBase
 import io.izzel.taboolib.module.nms.nbt.NBTCompound
+import io.netty.util.internal.ConcurrentSet
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -20,12 +21,10 @@ class DataContainer {
     private val map = ConcurrentHashMap<String, Data>()
     private var locked = false
 
-    var changed = false
-        set(value) {
-            if (!locked) {
-                field = value
-            }
-        }
+    val released = ConcurrentSet<String>()
+
+    val changed: Boolean
+        get() = released.isNotEmpty() || map.any { it.value.changed }
 
     fun unchanged(func: DataContainer.() -> Unit) {
         locked = true
@@ -43,28 +42,35 @@ class DataContainer {
     operator fun get(key: String, def: Any) = map[key] ?: def.data()
 
     operator fun set(key: String, value: Any) {
-        map[key] = value.data()
-        changed = true
+        map[key] = value.data().change()
+        if (!locked) {
+            released.remove(key)
+        }
     }
 
     fun put(key: String, value: Any) {
-        map[key] = value.data()
-        changed = true
+        map[key] = value.data().change()
+        if (!locked) {
+            released.remove(key)
+        }
     }
 
     fun remove(key: String) {
         map.remove(key)
-        changed = true
-    }
-
-    fun merge(meta: DataContainer) {
-        map.putAll(meta.map)
-        changed = true
+        if (!locked) {
+            released.add(key)
+        }
     }
 
     fun clear() {
+        if (!locked) {
+            released.addAll(map.keys)
+        }
         map.clear()
-        changed = true
+    }
+
+    fun merge(meta: DataContainer) {
+        meta.forEach { key, data -> put(key, data) }
     }
 
     fun containsKey(key: String) = map.containsKey(key)
@@ -78,7 +84,10 @@ class DataContainer {
     fun copy() = DataContainer(map)
 
     fun flush(): DataContainer {
-        changed = false
+        map.forEach {
+            it.value.changed = false
+        }
+        released.clear()
         return this
     }
 
@@ -86,9 +95,16 @@ class DataContainer {
         map.entries.forEach {
             if (predicate(it.toPair())) {
                 remove(it.key)
-                changed = true
             }
         }
+    }
+
+    fun forEach(consumer: (String, Data) -> (Unit)) {
+        map.forEach { consumer(it.key, it.value) }
+    }
+
+    fun toMap(): Map<String, Any> {
+        return map.mapValues { it.value.value }
     }
 
     fun toNBT(): NBTCompound {
@@ -104,6 +120,13 @@ class DataContainer {
             })
         }
     }.toString()
+
+    private fun Data.change(): Data {
+        if (!locked) {
+            changed = true
+        }
+        return this
+    }
 
     override fun toString(): String {
         return "DataCenter(map=$map)"

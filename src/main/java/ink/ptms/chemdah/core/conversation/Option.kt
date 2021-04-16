@@ -16,7 +16,7 @@ import org.bukkit.configuration.file.YamlConfiguration
  */
 data class Option(
     val root: ConfigurationSection,
-    val theme: String = root.getString("theme", "test")!!,
+    val theme: String = root.getString("theme", "chat")!!,
     val title: String = root.getString("title", "NPC")!!.colored()
 ) {
 

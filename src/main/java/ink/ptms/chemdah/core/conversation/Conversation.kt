@@ -47,7 +47,7 @@ data class Conversation(
      * @param origin 原点（对话实体的头顶坐标）
      * @param sessionTop 上层会话（继承关系）
      */
-    fun open(player: Player, origin: Location, sessionTop: Session? = null, npcName: String? = null): CompletableFuture<Session> {
+    fun open(player: Player, origin: Location, sessionTop: Session? = null, npcName: String? = null, npcObject: Any? = null): CompletableFuture<Session> {
         val future = CompletableFuture<Session>()
         mirrorFuture("Conversation:open") {
             val session = sessionTop ?: Session(this@Conversation, player.location.clone(), origin.clone(), player)
@@ -59,6 +59,7 @@ data class Conversation(
             }
             if (npcName != null) {
                 session.npcName = npcName
+                session.npcObject = npcObject
             }
             // 注册会话
             sessions[player.name] = session
