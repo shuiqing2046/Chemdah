@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'ink.ptms.chemdah'
-version = 'SNAPSHOT 04 16 1'
+version = 'SNAPSHOT 04 17 3'
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
@@ -23,7 +23,6 @@ repositories {
 
 dependencies {
     implementation 'com.sk89q.worldedit:WorldEdit:7:all'
-    implementation 'public:InternalAPI:1.0.0'
     implementation 'public:Citizens:1.0.0'
     implementation 'public:MythicMobs:1.0.1'
     implementation 'ink.ptms:Zaphkiel:1.4.2'

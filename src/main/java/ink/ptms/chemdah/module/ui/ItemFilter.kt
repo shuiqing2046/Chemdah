@@ -4,6 +4,7 @@ import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Template
 import ink.ptms.chemdah.util.asList
 import org.bukkit.configuration.ConfigurationSection
+import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 
 /**
@@ -31,6 +32,7 @@ open class ItemFilter(config: ConfigurationSection) : Item(config) {
                         lore.asList()
                     }
                 }
+                meta.addItemFlags(*ItemFlag.values())
             }
         }
     }

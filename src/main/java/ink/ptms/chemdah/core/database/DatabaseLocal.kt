@@ -7,6 +7,7 @@ import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.util.asMap
 import io.izzel.taboolib.module.db.local.Local
 import io.izzel.taboolib.module.db.local.LocalPlayer
+import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.entity.Player
 
 /**
@@ -16,23 +17,42 @@ import org.bukkit.entity.Player
  * @author sky
  * @since 2021/3/5 3:51 下午
  */
-class DatabaseLocal : Database() {
+open class DatabaseLocal : Database() {
 
-    val data = Local.get().get("data/variables.yml")!!
+    val namespace = "!!chemdah!!"
 
+    val data by lazy {
+        Local.get().get("data/variables.yml")!!
+    }
+
+    open fun Player.getData(): FileConfiguration {
+        return LocalPlayer.get(player)
+    }
+
+    /**
+     * chemdah:
+     *   data:
+     *     a: b
+     *     c: d
+     *   quest:
+     *     a:
+     *       b: c
+     *     d:
+     *       e: f
+     */
     override fun select(player: Player): PlayerProfile {
         val playerProfile = PlayerProfile(player.uniqueId)
-        val data = LocalPlayer.get(player)
+        val data = player.getData()
         if (data.contains("Chemdah")) {
-            playerProfile.persistentDataContainer.unchanged {
-                data.getConfigurationSection("Chemdah.data")?.getValues(false)?.map {
-                    put(it.key.replace("__point__", "."), it.value)
+            data.getConfigurationSection("Chemdah.data")?.also {
+                playerProfile.persistentDataContainer.unchanged {
+                    merge(DataContainer(it.asMap().map { it.key.replace(namespace, ".") to it.value.data() }.toMap()))
                 }
             }
             data.getConfigurationSection("Chemdah.quest")?.getValues(false)?.forEach { (id, value) ->
                 playerProfile.registerQuest(Quest(id, playerProfile).also { quest ->
                     quest.persistentDataContainer.unchanged {
-                        merge(DataContainer(value.asMap().mapValues { it.value.data() }))
+                        merge(DataContainer(value.asMap().map { it.key.replace(namespace, ".") to it.value.data() }.toMap()))
                     }
                 })
             }
@@ -41,15 +61,29 @@ class DatabaseLocal : Database() {
     }
 
     override fun update(player: Player, playerProfile: PlayerProfile) {
-        val data = LocalPlayer.get(player)
+        val data = player.getData()
         if (playerProfile.persistentDataContainer.changed) {
+            playerProfile.persistentDataContainer.forEach { key, obj ->
+                if (obj.changed) {
+                    data.set("Chemdah.data.${key.replace(".", namespace)}", obj.value)
+                }
+            }
+            playerProfile.persistentDataContainer.released.forEach {
+                data.set("Chemdah.data.${it.replace(".", namespace)}", null)
+            }
             playerProfile.persistentDataContainer.flush()
-            data.set("Chemdah.data", playerProfile.persistentDataContainer.toMap().mapKeys { it.key.replace(".", "__point__") })
         }
         playerProfile.quests.forEach { quest ->
             if (quest.persistentDataContainer.changed) {
+                quest.persistentDataContainer.forEach { key, obj ->
+                    if (obj.changed) {
+                        data.set("Chemdah.quest.${quest.id}.${key.replace(".", namespace)}", obj.value)
+                    }
+                }
+                quest.persistentDataContainer.released.forEach {
+                    data.set("Chemdah.quest.${quest.id}.${it.replace(".", namespace)}", null)
+                }
                 quest.persistentDataContainer.flush()
-                data.set("Chemdah.quest.${quest.id}", quest.persistentDataContainer.toMap())
             }
         }
     }

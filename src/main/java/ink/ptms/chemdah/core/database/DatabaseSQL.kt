@@ -149,8 +149,7 @@ class DatabaseSQL : Database() {
 
     fun PlayerProfile.update(player: Player) {
         val id = getUserId(player)
-        val container = persistentDataContainer
-        container.forEach { key, data ->
+        persistentDataContainer.forEach { key, data ->
             if (data.changed) {
                 tableUserData.update(Where.equals("user", id), Where.equals("key", key))
                     .insertIfAbsent(null, id, key, data.value, 1)
@@ -159,11 +158,10 @@ class DatabaseSQL : Database() {
                     .run(dataSource)
             }
         }
-        val released = container.released.toList()
-        container.released.clear()
-        released.forEach {
+        persistentDataContainer.released.toList().forEach {
             tableUserData.update(Where.equals("user", id), Where.equals("key", it)).set("mode", 0).run(dataSource)
         }
+        persistentDataContainer.flush()
     }
 
     fun PlayerProfile.updateQuest(player: Player) {
@@ -176,8 +174,7 @@ class DatabaseSQL : Database() {
                     player.createQuest(id, quest)
                     return@forEach
                 }
-                val container = quest.persistentDataContainer
-                container.forEach { key, data ->
+                quest.persistentDataContainer.forEach { key, data ->
                     if (data.changed) {
                         tableQuestData.update(Where.equals("quest", questId), Where.equals("key", key))
                             .insertIfAbsent(null, questId, key, data.value, 1)
@@ -186,11 +183,10 @@ class DatabaseSQL : Database() {
                             .run(dataSource)
                     }
                 }
-                val released = container.released.toList()
-                container.released.clear()
-                released.forEach {
+                quest.persistentDataContainer.released.toList().forEach {
                     tableQuestData.update(Where.equals("quest", questId), Where.equals("key", it)).set("mode", 0).run(dataSource)
                 }
+                quest.persistentDataContainer.flush()
             }
         }
     }
@@ -208,6 +204,7 @@ class DatabaseSQL : Database() {
                 persistentDataContainer.forEach { k, v ->
                     tableUserData.insert(null, userId, k, v.value, 1).run(dataSource)
                 }
+                persistentDataContainer.flush()
                 quests.forEach {
                     player.createQuest(userId, it)
                 }
@@ -228,6 +225,7 @@ class DatabaseSQL : Database() {
                 quest.persistentDataContainer.forEach { k, v ->
                     tableQuestData.insert(null, questId, k, v.value, 1).run(dataSource)
                 }
+                quest.persistentDataContainer.flush()
             }.run()
     }
 

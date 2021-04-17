@@ -35,6 +35,7 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
             }
             it to Reflection.instantiateObject(meta, metaType[config, "meta.$it"], this) as Meta<*>
         } else {
+            warning("$it meta not supported.")
             null
         }
     }?.toMap() ?: emptyMap()
@@ -50,6 +51,7 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
             if (addon != null) {
                 addonId to Reflection.instantiateObject(addon, config.getConfigurationSection(it)!!, this) as Addon
             } else {
+                warning("$addonId addon not supported.")
                 null
             }
         }.toMap()

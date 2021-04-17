@@ -51,7 +51,7 @@ object HologramAPI {
     class HologramAdyeshach : Hologram<AdyArmorStand>() {
 
         override fun create(player: Player, location: Location, line: String): AdyArmorStand {
-            return AdyeshachAPI.getEntityManagerPrivate(player).create(EntityTypes.ARMOR_STAND, location) {
+            return AdyeshachAPI.getEntityManagerPrivateTemporary(player).create(EntityTypes.ARMOR_STAND, location) {
                 val npc = it as AdyArmorStand
                 npc.setSmall(true)
                 npc.setMarker(true)

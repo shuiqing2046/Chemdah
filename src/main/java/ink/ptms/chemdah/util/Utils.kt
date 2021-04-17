@@ -101,6 +101,6 @@ fun PotionEffect.hidden(): PotionEffect {
     return if (Version.isAfter(Version.v1_13)) {
         withParticles(false).withIcon(false)
     } else {
-        withParticles(false)
+        this
     }
 }

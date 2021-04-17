@@ -3,6 +3,7 @@ package ink.ptms.chemdah.module.command
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.callTrigger
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
+import ink.ptms.chemdah.core.quest.addon.AddonTrack.Companion.trackQuest
 import ink.ptms.chemdah.module.ui.UISystem
 import io.izzel.taboolib.internal.apache.lang3.time.DateFormatUtils
 import io.izzel.taboolib.kotlin.Indexed
@@ -164,5 +165,20 @@ class CommandChemdahQuest : BaseMainCommand() {
             return
         }
         ui.open(playerExact.chemdahProfile)
+    }
+
+    @SubCommand(description = "@command-quest-track", arguments = ["@command-argument-player", "@command-argument-quest"], priority = 1.7)
+    fun track(sender: CommandSender, args: Array<String>) {
+        val playerExact = Bukkit.getPlayerExact(args[0])
+        if (playerExact == null) {
+            TLocale.sendTo(sender, "command-player-not-found")
+            return
+        }
+        val quest = ChemdahAPI.getQuestTemplate(args[1])
+        if (quest == null) {
+            TLocale.sendTo(sender, "command-quest-not-found")
+            return
+        }
+        playerExact.chemdahProfile.trackQuest = quest
     }
 }
