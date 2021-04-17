@@ -70,7 +70,7 @@ class DataContainer {
     }
 
     fun merge(meta: DataContainer) {
-        meta.forEach { key, data -> put(key, data) }
+        meta.forEach { key, data -> put(key, data.value) }
     }
 
     fun containsKey(key: String) = map.containsKey(key)

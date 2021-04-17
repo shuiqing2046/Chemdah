@@ -1,10 +1,7 @@
 package ink.ptms.chemdah.module.command
 
-import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
-import ink.ptms.chemdah.util.getProfile
 import ink.ptms.chemdah.util.increaseAny
-import io.izzel.taboolib.kotlin.kether.action.bukkit.Symbol
 import io.izzel.taboolib.module.command.base.BaseCommand
 import io.izzel.taboolib.module.command.base.BaseMainCommand
 import io.izzel.taboolib.module.command.base.SubCommand

@@ -1,5 +1,7 @@
 package ink.ptms.chemdah.module
 
+import io.izzel.taboolib.module.inject.TFunction
+
 /**
  * Chemdah
  * ink.ptms.chemdah.module.Module
@@ -17,6 +19,11 @@ interface Module {
 
         fun Module.register() {
             modules[javaClass.simpleName] = this
+        }
+
+        @TFunction.Init
+        fun reload() {
+            modules.values.forEach { it.reload() }
         }
     }
 }

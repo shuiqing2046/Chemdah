@@ -2,6 +2,7 @@ package ink.ptms.chemdah.api.event
 
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Template
+import ink.ptms.chemdah.module.level.LevelOption
 import io.izzel.taboolib.module.event.EventCancellable
 import io.izzel.taboolib.module.event.EventNormal
 import org.bukkit.entity.Player
@@ -28,5 +29,17 @@ class PlayerEvent {
     /**
      * 当玩家追踪任务时
      */
-    class Track(val player: Player, val playerProfile: PlayerProfile, val trackingQuest: Template?): EventCancellable<Track>(true)
+    class Track(val player: Player, val playerProfile: PlayerProfile, val trackingQuest: Template?) : EventCancellable<Track>(true)
+
+    /**
+     * 当玩家的自定义等级数据发生变动
+     */
+    class LevelChange(
+        val player: Player,
+        val option: LevelOption,
+        val oldLevel: Int,
+        val oldExperience: Int,
+        var newLevel: Int,
+        var newExperience: Int,
+    ) : EventCancellable<LevelChange>(true)
 }

@@ -1,6 +1,6 @@
 package ink.ptms.chemdah.module.level
 
-import ink.ptms.chemdah.core.PlayerProfile
+import java.util.concurrent.CompletableFuture
 
 /**
  * Chemdah
@@ -19,48 +19,65 @@ class Level(val algorithm: Algorithm, level: Int, experience: Int) {
 
     fun toPlayerLevel() = PlayerLevel(level, experience)
 
-    fun setLevel(value: Int) {
+    fun setLevel(value: Int): CompletableFuture<Void> {
         level = value
-        addExperience(0)
+        return addExperience(0)
     }
 
-    fun addLevel(value: Int) {
+    fun addLevel(value: Int): CompletableFuture<Void> {
         level += value
-        addExperience(0)
+        return addExperience(0)
     }
 
-    fun setExperience(value: Int) {
+    fun setExperience(value: Int): CompletableFuture<Void> {
         experience = value
-        addExperience(0)
+        return addExperience(0)
     }
 
-    fun addExperience(value: Int) {
-        var level = this.level
+    fun addExperience(value: Int): CompletableFuture<Void> {
         if (level >= algorithm.maxLevel) {
-            this.level = algorithm.maxLevel
-            this.experience = algorithm.getExp(level)
-            return
+            level = algorithm.maxLevel
+            algorithm.getExp(level).thenAccept {
+                experience = it
+            }
+            return CompletableFuture.completedFuture(null)
         }
-        var exp = this.experience + value
-        var expNextLevel = algorithm.getExp(level)
-        while (exp >= expNextLevel) {
-            level += 1
-            exp -= expNextLevel
-            expNextLevel = algorithm.getExp(level)
+        val future = CompletableFuture<Void>()
+        var lvl = level
+        var exp = experience + value
+        var expNextLevel = 0
+        fun getNextLevel() = algorithm.getExp(lvl).thenAccept {
+            expNextLevel = if (it <= 0) Int.MAX_VALUE else it
         }
-        if (level >= algorithm.maxLevel) {
-            this.level = algorithm.maxLevel
-            this.experience = expNextLevel
-        } else {
-            this.level = level
-            this.experience = exp
+        fun finish() {
+            if (lvl >= algorithm.maxLevel) {
+                level = algorithm.maxLevel
+                experience = expNextLevel
+            } else {
+                level = lvl
+                experience = exp
+            }
+            future.complete(null)
         }
+        fun process() {
+            getNextLevel().thenAccept {
+                if (exp >= expNextLevel) {
+                    lvl += 1
+                    exp -= expNextLevel
+                    process()
+                } else {
+                    finish()
+                }
+            }
+        }
+        process()
+        return future
     }
 
     abstract class Algorithm {
 
         abstract val maxLevel: Int
 
-        abstract fun getExp(level: Int): Int
+        abstract fun getExp(level: Int): CompletableFuture<Int>
     }
 }

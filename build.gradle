@@ -23,6 +23,7 @@ repositories {
 
 dependencies {
     implementation 'com.sk89q.worldedit:WorldEdit:7:all'
+    implementation 'public:InternalAPI:1.0.0'
     implementation 'public:Citizens:1.0.0'
     implementation 'public:MythicMobs:1.0.1'
     implementation 'ink.ptms:Zaphkiel:1.4.2'

@@ -3,6 +3,7 @@ package ink.ptms.chemdah.module.command
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.module.level.LevelSystem
 import ink.ptms.chemdah.module.level.LevelSystem.getLevel
+import ink.ptms.chemdah.module.level.LevelSystem.getLevelOption
 import ink.ptms.chemdah.module.level.LevelSystem.setLevel
 import io.izzel.taboolib.kotlin.sendLocale
 import io.izzel.taboolib.module.command.base.BaseCommand
@@ -41,16 +42,19 @@ class CommandChemdahPlayerLevel : BaseMainCommand() {
             TLocale.sendTo(sender, "command-player-not-found")
             return
         }
-        val option = getLevel(args[1])
+        val option = getLevelOption(args[1])
         if (option == null) {
             TLocale.sendTo(sender, "command-level-not-found")
             return
         }
         val profile = playerExact.chemdahProfile
-        val level = option.toLevel(profile.getLevel(args[1]))
-        level.addLevel(Coerce.toInteger(args[2]))
-        profile.setLevel(args[1], level.toPlayerLevel())
-        sender.sendLocale("command-level-change", "§7${args[1]} (LEVEL) §8+= §f${args[2]} §7(Lv.${level.level}, ${level.experience})")
+        val level = option.toLevel(profile.getLevel(option))
+        level.addLevel(Coerce.toInteger(args[2])).thenAccept {
+            profile.setLevel(option, level.toPlayerLevel())
+            profile.getLevel(option).also {
+                sender.sendLocale("command-level-change", "§7${args[1]} (LEVEL) §8+= §f${args[2]} §7(Lv.${it.level}, ${it.experience})")
+            }
+        }
     }
 
     @SubCommand(
@@ -64,16 +68,19 @@ class CommandChemdahPlayerLevel : BaseMainCommand() {
             TLocale.sendTo(sender, "command-player-not-found")
             return
         }
-        val option = getLevel(args[1])
+        val option = getLevelOption(args[1])
         if (option == null) {
             TLocale.sendTo(sender, "command-level-not-found")
             return
         }
         val profile = playerExact.chemdahProfile
-        val level = option.toLevel(profile.getLevel(args[1]))
-        level.setLevel(Coerce.toInteger(args[2]))
-        profile.setLevel(args[1], level.toPlayerLevel())
-        sender.sendLocale("command-level-change", "§7${args[1]} (LEVEL) §8= §f${args[2]} §7(Lv.${level.level}, ${level.experience})")
+        val level = option.toLevel(profile.getLevel(option))
+        level.setLevel(Coerce.toInteger(args[2])).thenAccept {
+            profile.setLevel(option, level.toPlayerLevel())
+            profile.getLevel(option).also {
+                sender.sendLocale("command-level-change", "§7${args[1]} (LEVEL) §8= §f${args[2]} §7(Lv.${it.level}, ${it.experience})")
+            }
+        }
     }
 
     @SubCommand(
@@ -87,16 +94,19 @@ class CommandChemdahPlayerLevel : BaseMainCommand() {
             TLocale.sendTo(sender, "command-player-not-found")
             return
         }
-        val option = getLevel(args[1])
+        val option = getLevelOption(args[1])
         if (option == null) {
             TLocale.sendTo(sender, "command-level-not-found")
             return
         }
         val profile = playerExact.chemdahProfile
-        val level = option.toLevel(profile.getLevel(args[1]))
-        level.addExperience(Coerce.toInteger(args[2]))
-        profile.setLevel(args[1], level.toPlayerLevel())
-        sender.sendLocale("command-level-change", "§7${args[1]} (EXP) §8+= §f${args[2]} §7(Lv.${level.level}, ${level.experience})")
+        val level = option.toLevel(profile.getLevel(option))
+        level.addExperience(Coerce.toInteger(args[2])).thenAccept {
+            profile.setLevel(option, level.toPlayerLevel())
+            profile.getLevel(option).also {
+                sender.sendLocale("command-level-change", "§7${args[1]} (EXP) §8+= §f${args[2]} §7(Lv.${it.level}, ${it.experience})")
+            }
+        }
     }
 
     @SubCommand(
@@ -110,15 +120,18 @@ class CommandChemdahPlayerLevel : BaseMainCommand() {
             TLocale.sendTo(sender, "command-player-not-found")
             return
         }
-        val option = getLevel(args[1])
+        val option = getLevelOption(args[1])
         if (option == null) {
             TLocale.sendTo(sender, "command-level-not-found")
             return
         }
         val profile = playerExact.chemdahProfile
-        val level = option.toLevel(profile.getLevel(args[1]))
-        level.setExperience(Coerce.toInteger(args[2]))
-        profile.setLevel(args[1], level.toPlayerLevel())
-        sender.sendLocale("command-level-change", "§7${args[1]} (EXP) §8= §f${args[2]} §7(Lv.${level.level}, ${level.experience})")
+        val level = option.toLevel(profile.getLevel(option))
+        level.setExperience(Coerce.toInteger(args[2])).thenAccept {
+            profile.setLevel(option, level.toPlayerLevel())
+            profile.getLevel(option).also {
+                sender.sendLocale("command-level-change", "§7${args[1]} (EXP) §8= §f${args[2]} §7(Lv.${it.level}, ${it.experience})")
+            }
+        }
     }
 }

@@ -27,8 +27,8 @@ fun Any?.asInt(def: Int = 0) = Coerce.toInteger(this ?: def)
 fun Any?.asDouble(def: Double = 0.0) = Coerce.toDouble(this ?: def)
 
 fun Any?.asMap() = when (this) {
-    is Map<*, *> -> this.map { (k, v) -> k.toString() to v }.toMap()
-    is ConfigurationSection -> this.getValues(false)
+    is Map<*, *> -> map { (k, v) -> k.toString() to v }.toMap()
+    is ConfigurationSection -> getValues(false)
     else -> emptyMap()
 }
 

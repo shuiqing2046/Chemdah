@@ -173,6 +173,6 @@ object ChemdahAPI {
         ConversationManager.conf.reload()
         ConversationLoader.load()
         QuestLoader.loadTemplate()
-        Module.modules.values.forEach { it.reload() }
+        Module.reload()
     }
 }

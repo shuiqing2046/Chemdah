@@ -1,5 +1,8 @@
 package ink.ptms.chemdah.module.kether
 
+import ink.ptms.chemdah.module.level.LevelSystem
+import ink.ptms.chemdah.module.level.LevelSystem.getLevel
+import ink.ptms.chemdah.module.level.LevelSystem.setLevel
 import ink.ptms.chemdah.util.getProfile
 import ink.ptms.chemdah.util.increaseAny
 import io.izzel.taboolib.kotlin.kether.Kether.expects
@@ -10,6 +13,7 @@ import io.izzel.taboolib.kotlin.kether.common.api.ParsedAction
 import io.izzel.taboolib.kotlin.kether.common.api.QuestAction
 import io.izzel.taboolib.kotlin.kether.common.api.QuestContext
 import io.izzel.taboolib.kotlin.kether.common.loader.types.ArgTypes
+import io.izzel.taboolib.util.Coerce
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -59,6 +63,65 @@ class ActionProfile {
         }
     }
 
+    class ProfileLevelSet(val key: ParsedAction<*>, val type: LevelType, val value: ParsedAction<*>, val symbol: Symbol) : QuestAction<Void>() {
+
+        override fun process(frame: QuestContext.Frame): CompletableFuture<Void> {
+            return frame.newFrame(key).run<Any>().thenAccept { key ->
+                frame.newFrame(value).run<Any>().thenAccept { value ->
+                    val option = LevelSystem.getLevelOption(key.toString())
+                    if (option != null) {
+                        val playerProfile = frame.getProfile()
+                        val playerLevel = option.toLevel(playerProfile.getLevel(option))
+                        if (symbol == Symbol.ADD) {
+                            if (type == LevelType.LEVEL) {
+                                playerLevel.addLevel(Coerce.toInteger(value)).thenAccept {
+                                    playerProfile.setLevel(option, playerLevel.toPlayerLevel())
+                                }
+                            } else {
+                                playerLevel.addExperience(Coerce.toInteger(value)).thenAccept {
+                                    playerProfile.setLevel(option, playerLevel.toPlayerLevel())
+                                }
+                            }
+                        } else {
+                            if (type == LevelType.LEVEL) {
+                                playerLevel.setLevel(Coerce.toInteger(value)).thenAccept {
+                                    playerProfile.setLevel(option, playerLevel.toPlayerLevel())
+                                }
+                            } else {
+                                playerLevel.setExperience(Coerce.toInteger(value)).thenAccept {
+                                    playerProfile.setLevel(option, playerLevel.toPlayerLevel())
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    class ProfileLevelGet(val key: ParsedAction<*>, val type: LevelType) : QuestAction<Int>() {
+
+        override fun process(frame: QuestContext.Frame): CompletableFuture<Int> {
+            return frame.newFrame(key).run<Any>().thenApply {
+                val option = LevelSystem.getLevelOption(it.toString())
+                if (option != null) {
+                    if (type == LevelType.LEVEL) {
+                        frame.getProfile().getLevel(option).level
+                    } else {
+                        frame.getProfile().getLevel(option).experience
+                    }
+                } else {
+                    -1
+                }
+            }
+        }
+    }
+
+    enum class LevelType {
+
+        LEVEL, EXP
+    }
+
     companion object {
 
         /**
@@ -66,11 +129,15 @@ class ActionProfile {
          * profile data *key to *value
          * profile data *key add *value
          * profile data keys
-         * profile data changed
+         *
+         * profile level *default level
+         * profile level *default level to *100
+         * profile level *default exp
+         * profile level *default exp add *100
          */
         @KetherParser(["profile"], namespace = "chemdah")
         fun parser() = ScriptParser.parser {
-            when (it.expects("data")) {
+            when (it.expects("data", "level")) {
                 "data" -> {
                     try {
                         it.mark()
@@ -90,6 +157,25 @@ class ActionProfile {
                             it.reset()
                             ProfileDataGet(key)
                         }
+                    }
+                }
+                "level" -> {
+                    val key = it.next(ArgTypes.ACTION)
+                    val type = when (it.expects("level", "exp")) {
+                        "level" -> LevelType.LEVEL
+                        "exp" -> LevelType.EXP
+                        else -> error("out of case")
+                    }
+                    try {
+                        it.mark()
+                        when (it.expects("to", "add", "increase")) {
+                            "to" -> ProfileLevelSet(key, type, it.next(ArgTypes.ACTION), Symbol.SET)
+                            "add", "increase" -> ProfileLevelSet(key, type, it.next(ArgTypes.ACTION), Symbol.ADD)
+                            else -> error("out of case")
+                        }
+                    } catch (ex: Throwable) {
+                        it.reset()
+                        ProfileLevelGet(key, type)
                     }
                 }
                 else -> error("out of case")

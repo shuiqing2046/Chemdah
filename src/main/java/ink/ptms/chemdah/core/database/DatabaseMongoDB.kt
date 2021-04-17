@@ -42,7 +42,9 @@ class DatabaseMongoDB : Database(), Listener {
         val data = bridge.get(player.uniqueId.toString())
         if (data.contains("Chemdah")) {
             playerProfile.persistentDataContainer.unchanged {
-                merge(DataContainer(data.get("Chemdah.data").asMap().mapValues { it.value.data() }))
+                data.getConfigurationSection("Chemdah.data")?.getValues(false)?.map {
+                    put(it.key.replace("__point__", "."), it.value)
+                }
             }
             data.getConfigurationSection("Chemdah.quest")?.getValues(false)?.forEach { (id, value) ->
                 playerProfile.registerQuest(Quest(id, playerProfile).also { quest ->
@@ -59,7 +61,7 @@ class DatabaseMongoDB : Database(), Listener {
         val data = bridge.get(player.uniqueId.toString())
         if (playerProfile.persistentDataContainer.changed) {
             playerProfile.persistentDataContainer.flush()
-            data.set("Chemdah.data", playerProfile.persistentDataContainer.toMap())
+            data.set("Chemdah.data", playerProfile.persistentDataContainer.toMap().mapKeys { it.key.replace(".", "__point__") })
         }
         playerProfile.quests.forEach { quest ->
             if (quest.persistentDataContainer.changed) {

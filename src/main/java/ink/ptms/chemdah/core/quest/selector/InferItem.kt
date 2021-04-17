@@ -1,5 +1,6 @@
 package ink.ptms.chemdah.core.quest.selector
 
+import ink.ptms.chemdah.api.event.single.InferItemHookEvent
 import ink.ptms.chemdah.core.quest.selector.Flags.Companion.matchFlags
 import ink.ptms.chemdah.util.warning
 import ink.ptms.zaphkiel.ZaphkielAPI
@@ -8,6 +9,7 @@ import io.izzel.taboolib.util.Reflection
 import io.izzel.taboolib.util.item.Items
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.inventory.meta.PotionMeta
 
 /**
@@ -55,11 +57,15 @@ class InferItem(val items: List<Item>) {
                     else -> if (it.key.startsWith("nbt.")) {
                         NMS.handle().loadNBT(item).getDeep(it.key.substring("nbt.".length))?.asString().equals(it.value, true)
                     } else {
-                        warning("$material[${it.key}=${it.value}] not supported.")
-                        false
+                        matchMetaData(item, meta, it.key, it.value)
                     }
                 }
             }
+        }
+
+        open fun matchMetaData(item: ItemStack, itemMeta: ItemMeta, key: String, value: String): Boolean {
+            warning("$material[$key=$value] not supported.")
+            return false
         }
 
         open fun check(inventory: Inventory, amount: Int): Boolean {
@@ -75,41 +81,21 @@ class InferItem(val items: List<Item>) {
 
     class ZaphkielItem(material: String, flags: List<Flags>, data: Map<String, String>) : Item(material, flags, data) {
 
+        fun ItemStack.zaphkielId(): String {
+            val itemStream = ZaphkielAPI.read(this)
+            return if (itemStream.isExtension()) itemStream.getZaphkielName() else "@vanilla"
+        }
+
         override fun match(item: ItemStack): Boolean {
             return matchFlags(item.zaphkielId()) && matchMetaData(item)
         }
 
-        override fun matchMetaData(item: ItemStack): Boolean {
-            val meta = item.itemMeta
-            return data.all {
-                when (it.key) {
-                    "name" -> it.value in Items.getName(item)
-                    "lore" -> meta?.lore?.toString()?.contains(it.value) == true
-                    "enchant", "enchants", "enchantment" -> meta.enchants.any { e -> e.key.name.contains(it.value) }
-                    "potion", "potions" -> if (meta is PotionMeta) {
-                        meta.basePotionData.type.name.equals(it.value, true) || meta.customEffects.any { e -> e.type.name.equals(it.value, true) }
-                    } else {
-                        false
-                    }
-                    else -> when {
-                        it.key.startsWith("nbt.") -> {
-                            NMS.handle().loadNBT(item).getDeep(it.key.substring("nbt.".length))?.asString().equals(it.value, true)
-                        }
-                        it.key.startsWith("data.") -> {
-                            ZaphkielAPI.read(item).getZaphkielData()[it.key.substring("data.".length)]?.asString().equals(it.value, true)
-                        }
-                        else -> {
-                            warning("$material[${it.key}=${it.value}] not supported.")
-                            false
-                        }
-                    }
-                }
+        override fun matchMetaData(item: ItemStack, itemMeta: ItemMeta, key: String, value: String): Boolean {
+            return if (key.startsWith("data.")) {
+                ZaphkielAPI.read(item).getZaphkielData()[key.substring("data.".length)]?.asString().equals(value, true)
+            } else {
+                super.matchMetaData(item, itemMeta, key, value)
             }
-        }
-
-        fun ItemStack.zaphkielId(): String {
-            val itemStream = ZaphkielAPI.read(this)
-            return if (itemStream.isExtension()) itemStream.getZaphkielName() else "@vanilla"
         }
     }
 
@@ -129,18 +115,16 @@ class InferItem(val items: List<Item>) {
             } else {
                 type = this
             }
-            val item = when {
-                type.startsWith("zaphkiel:") -> {
-                    type = type.substring("zaphkiel:".length)
-                    ZaphkielItem::class.java
+            val indexOfType = type.indexOf(':')
+            val item = if (indexOfType in 0..(type.length - 2)) {
+                type = type.substring(indexOfType + 1)
+                when (val namespace = type.substring(0, indexOfType)) {
+                    "minecraft" -> MinecraftItem::class.java
+                    "zaphkiel" -> ZaphkielItem::class.java
+                    else -> InferItemHookEvent(namespace, MinecraftItem::class.java).itemClass
                 }
-                type.startsWith("minecraft:") -> {
-                    type = type.substring("minecraft:".length)
-                    MinecraftItem::class.java
-                }
-                else -> {
-                    MinecraftItem::class.java
-                }
+            } else {
+                MinecraftItem::class.java
             }
             return Reflection.instantiateObject(item, type.matchFlags(flag), flag, data) as Item
         }
