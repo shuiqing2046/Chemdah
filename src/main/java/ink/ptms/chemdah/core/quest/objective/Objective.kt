@@ -92,14 +92,14 @@ abstract class Objective<E : Event> {
      * 当条目继续时
      */
     internal open fun onContinue(profile: PlayerProfile, task: Task, event: Event) {
-        task.agent(profile, AgentType.TASK_CONTINUE)
+        task.agent(profile, AgentType.TASK_CONTINUE, task.getQuest(profile))
     }
 
     /**
      * 当条目完成时
      */
     internal open fun onComplete(profile: PlayerProfile, task: Task) {
-        task.agent(profile, AgentType.TASK_COMPLETE)
+        task.agent(profile, AgentType.TASK_COMPLETE, task.getQuest(profile))
         setCompletedSignature(profile, task, true)
     }
 
@@ -107,7 +107,7 @@ abstract class Objective<E : Event> {
      * 当条目重置时
      */
     internal open fun onReset(profile: PlayerProfile, task: Task) {
-        task.agent(profile, AgentType.TASK_RESET)
+        task.agent(profile, AgentType.TASK_RESET, task.getQuest(profile))
         profile.dataOperator(task) {
             clear()
         }

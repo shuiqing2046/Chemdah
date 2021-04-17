@@ -51,9 +51,15 @@ object ChemdahAPI {
         get() = ChemdahAPI.playerProfile[name]!!
 
     /**
-     * 玩家数据是否加载完成
+     * 玩家数据已经加载完成
      */
     val Player.isChemdahProfileLoaded: Boolean
+        get() = ChemdahAPI.playerProfile.containsKey(name)
+
+    /**
+     * 玩家数据尚未加载完成
+     */
+    val Player.nonChemdahProfileLoaded: Boolean
         get() = ChemdahAPI.playerProfile.containsKey(name)
 
     /**

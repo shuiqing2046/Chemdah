@@ -3,6 +3,7 @@ package ink.ptms.chemdah.module.kether
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.quest.addon.AddonStats.Companion.hiddenStats
 import ink.ptms.chemdah.core.quest.addon.AddonStats.Companion.refreshStats
+import ink.ptms.chemdah.util.asList
 import ink.ptms.chemdah.util.getProfile
 import ink.ptms.chemdah.util.increaseAny
 import io.izzel.taboolib.kotlin.kether.Kether.expects
@@ -13,6 +14,7 @@ import io.izzel.taboolib.kotlin.kether.common.api.ParsedAction
 import io.izzel.taboolib.kotlin.kether.common.api.QuestAction
 import io.izzel.taboolib.kotlin.kether.common.api.QuestContext
 import io.izzel.taboolib.kotlin.kether.common.loader.types.ArgTypes
+import java.lang.Exception
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -143,7 +145,7 @@ class ActionQuest {
         }
     }
 
-    class QuestStats(val quest: ParsedAction<*>, val task: ParsedAction<*>, val action: Action) : QuestAction<Void>() {
+    class QuestStats(val quest: ParsedAction<*>, val task: ParsedAction<*>?, val action: Action) : QuestAction<Void>() {
 
         enum class Action {
 
@@ -152,17 +154,44 @@ class ActionQuest {
 
         override fun process(frame: QuestContext.Frame): CompletableFuture<Void> {
             return frame.newFrame(quest).run<Any>().thenAccept { quest ->
-                frame.newFrame(task).run<Any>().thenAccept { task ->
-                    val profile = frame.getProfile()
+                val profile = frame.getProfile()
+                if (task == null) {
                     profile.getQuestById(quest.toString())?.run {
-                        getTask(task.toString())?.run {
-                            when (action) {
-                                Action.HIDDEN -> hiddenStats(profile)
-                                Action.REFRESH -> refreshStats(profile)
+                        when (action) {
+                            Action.HIDDEN -> hiddenStats(profile)
+                            Action.REFRESH -> refreshStats(profile)
+                        }
+                    }
+                } else {
+                    frame.newFrame(task).run<Any>().thenAccept { task ->
+                        profile.getQuestById(quest.toString())?.run {
+                            if (task.toString() == "all") {
+                                tasks.forEach {
+                                    when (action) {
+                                        Action.HIDDEN -> it.hiddenStats(profile)
+                                        Action.REFRESH -> it.refreshStats(profile)
+                                    }
+                                }
+                            } else {
+                                getTask(task.toString())?.run {
+                                    when (action) {
+                                        Action.HIDDEN -> hiddenStats(profile)
+                                        Action.REFRESH -> refreshStats(profile)
+                                    }
+                                }
                             }
                         }
                     }
                 }
+            }
+        }
+    }
+
+    class QuestTasks(val quest: ParsedAction<*>) : QuestAction<List<String>>() {
+
+        override fun process(frame: QuestContext.Frame): CompletableFuture<List<String>> {
+            return frame.newFrame(quest).run<Any>().thenApply { quest ->
+                ChemdahAPI.getQuestTemplate(quest.toString())?.task?.keys?.toList() ?: emptyList()
             }
         }
     }
@@ -187,10 +216,12 @@ class ActionQuest {
          *
          * quest stats *quest hidden *1
          * quest stats *quest refresh *1
+         *
+         * quest tasks *quest
          */
         @KetherParser(["quest"], namespace = "chemdah")
         fun parser1() = ScriptParser.parser {
-            when (it.expects("accept", "accept-check", "accepted", "complete", "completed", "failure", "reset", "stop", "cancel", "stats", "data")) {
+            when (it.expects("accept", "accept-check", "accepted", "complete", "completed", "failure", "reset", "stop", "cancel", "stats", "tasks", "data")) {
                 "accept" -> QuestAccept(it.next(ArgTypes.ACTION), false)
                 "accept-check" -> QuestAccept(it.next(ArgTypes.ACTION), true)
                 "accepted" -> QuestAccepted(it.next(ArgTypes.ACTION))
@@ -199,14 +230,22 @@ class ActionQuest {
                 "failure" -> QuestActions(it.next(ArgTypes.ACTION), QuestActions.Action.FAILURE)
                 "reset" -> QuestActions(it.next(ArgTypes.ACTION), QuestActions.Action.RESET)
                 "stop", "cancel" -> QuestActions(it.next(ArgTypes.ACTION), QuestActions.Action.STOP)
+                "tasks" -> QuestTasks(it.next(ArgTypes.ACTION))
                 "stats" -> {
-                    val quest = it.next(ArgTypes.ACTION)
                     val action = when (it.expects("refresh", "hide", "hidden")) {
                         "refresh" -> QuestStats.Action.REFRESH
                         "hide", "hidden" -> QuestStats.Action.HIDDEN
                         else -> error("out of case")
                     }
-                    val task = it.next(ArgTypes.ACTION)
+                    val quest = it.next(ArgTypes.ACTION)
+                    val task = try {
+                        it.mark()
+                        it.expect("task")
+                        it.next(ArgTypes.ACTION)
+                    } catch (ex: Exception) {
+                        it.reset()
+                        null
+                    }
                     QuestStats(quest, task, action)
                 }
                 "data" -> {

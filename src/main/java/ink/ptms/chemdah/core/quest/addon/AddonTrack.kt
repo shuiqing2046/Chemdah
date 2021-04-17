@@ -3,6 +3,7 @@ package ink.ptms.chemdah.core.quest.addon
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.api.ChemdahAPI.isChemdahProfileLoaded
+import ink.ptms.chemdah.api.ChemdahAPI.nonChemdahProfileLoaded
 import ink.ptms.chemdah.api.HologramAPI
 import ink.ptms.chemdah.api.HologramAPI.createHologram
 import ink.ptms.chemdah.api.event.ObjectiveEvent
@@ -156,7 +157,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                     return
                 }
                 // 唤起事件供外部调用
-                PlayerEvent.Track(player, this, value).call().nonCancelled {
+                PlayerEvent.Track(player, this, value ?: trackQuest, value == null).call().nonCancelled {
                     if (value != null) {
                         persistentDataContainer["quest.track"] = value.id
                     } else {
@@ -267,7 +268,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
          * 创建或更新任务追踪（Navigation）
          */
         fun Player.refreshTrackingNavigation() {
-            if (!isChemdahProfileLoaded) {
+            if (nonChemdahProfileLoaded) {
                 return
             }
             val chemdahProfile = chemdahProfile
@@ -318,11 +319,10 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
         /**
          * 删除任务追踪
          */
-        fun Player.cancelTrackingScoreboard() {
-            if (!isChemdahProfileLoaded) {
+        fun Player.cancelTrackingScoreboard(quest: Template?) {
+            if (nonChemdahProfileLoaded || quest == null) {
                 return
             }
-            val quest = chemdahProfile.trackQuest ?: return
             if (chemdahProfile.getQuestById(quest.id) == null) {
                 // 启用 Scoreboard 追踪
                 if (quest.track()?.scoreboard == true) {
@@ -340,7 +340,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
          * 创建或刷新任务追踪（Scoreboard）
          */
         fun Player.refreshTrackingScoreboard() {
-            if (!isChemdahProfileLoaded) {
+            if (nonChemdahProfileLoaded) {
                 return
             }
             mirrorFuture("AddonTrack:refreshTrackingScoreboard") {
@@ -388,7 +388,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                 if (content.size > 2) {
                     Scoreboards.display(this@refreshTrackingScoreboard, *content.colored().mapIndexed { index, s -> "§${chars[index]}$s" }.toTypedArray())
                 } else {
-                    cancelTrackingScoreboard()
+                    cancelTrackingScoreboard(quest)
                 }
                 finish()
             }
@@ -403,7 +403,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
             Tasks.delay(40) {
                 if (e.playerProfile.trackQuest != null) {
                     e.player.cancelTrackingNavigation()
-                    e.player.cancelTrackingScoreboard()
+                    e.player.cancelTrackingScoreboard(e.playerProfile.trackQuest!!)
                     e.player.refreshTrackingNavigation()
                     e.player.refreshTrackingScoreboard()
                 }
@@ -450,23 +450,23 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
          */
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         private fun onTrack(e: PlayerEvent.Track) {
-            if (e.trackingQuest != null) {
+            if (e.cancel) {
                 e.player.cancelTrackingNavigation()
-                e.player.cancelTrackingScoreboard()
+                e.player.cancelTrackingScoreboard(e.trackingQuest)
+                TLocale.sendTo(e.player, "track-cancel")
+            } else {
+                e.player.cancelTrackingNavigation()
+                e.player.cancelTrackingScoreboard(e.trackingQuest)
                 Tasks.delay(1) {
                     e.player.refreshTrackingNavigation()
                     e.player.refreshTrackingScoreboard()
-                    (e.trackingQuest.track()?.message ?: defaultMessage).forEach { message ->
+                    (e.trackingQuest!!.track()?.message ?: defaultMessage).forEach { message ->
                         TellrawJson.create().append(message.replace("{name}", e.trackingQuest.displayName()))
                             .hoverText(message.replace("{name}", e.trackingQuest.displayName()))
                             .clickCommand("/ChemdahTrackCancel")
                             .send(e.player)
                     }
                 }
-            } else {
-                e.player.cancelTrackingNavigation()
-                e.player.cancelTrackingScoreboard()
-                TLocale.sendTo(e.player, "track-cancel")
             }
         }
 

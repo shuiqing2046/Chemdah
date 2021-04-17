@@ -29,7 +29,7 @@ class PlayerEvent {
     /**
      * 当玩家追踪任务时
      */
-    class Track(val player: Player, val playerProfile: PlayerProfile, val trackingQuest: Template?) : EventCancellable<Track>(true)
+    class Track(val player: Player, val playerProfile: PlayerProfile, val trackingQuest: Template?, val cancel: Boolean) : EventCancellable<Track>(true)
 
     /**
      * 当玩家的自定义等级数据发生变动
