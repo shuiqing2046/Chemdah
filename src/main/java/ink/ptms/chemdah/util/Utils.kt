@@ -14,6 +14,7 @@ import io.izzel.taboolib.util.Coerce
 import io.izzel.taboolib.util.item.ItemBuilder
 import io.izzel.taboolib.util.item.Items
 import org.bukkit.Bukkit
+import org.bukkit.Location
 import org.bukkit.block.Block
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.inventory.ItemStack
@@ -103,4 +104,12 @@ fun PotionEffect.hidden(): PotionEffect {
     } else {
         this
     }
+}
+
+fun Location.toCenter(): Location {
+    val loc = clone()
+    loc.x = blockX + 0.5
+    loc.y = blockY + 0.5
+    loc.z = blockZ + 0.5
+    return loc
 }

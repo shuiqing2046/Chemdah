@@ -238,7 +238,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                                 val path = pathFinder.findPath(center, distance = trackAddon.navigationDistanceMax.toFloat())
                                 path?.nodes?.forEachIndexed { index, node ->
                                     Tasks.delay(index.toLong()) {
-                                        Effects.create(trackAddon.navigationType, node.asBlockPos().toLocation(center.world).toCenterLocation())
+                                        Effects.create(trackAddon.navigationType, node.asBlockPos().toLocation(center.world).toCenter())
                                             .offset(doubleArrayOf(trackAddon.navigationSizeX, trackAddon.navigationSizeY, trackAddon.navigationSizeX))
                                             .count(trackAddon.navigationCount)
                                             .player(this@trackTickNavigation)
