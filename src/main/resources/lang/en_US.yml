@@ -57,7 +57,7 @@ command-quest-info-body: '&c[Chemdah] &f{0}'
 command-quest-info-bottom: '&c[Chemdah] &7Page: {0} / {1}'
 command-variables-change: '&c[Chemdah] &7{0}'
 command-variables-list-header: '&c[Chemdah] &7Variables: &f{0}'
-command-variables-remove-all-ed: "&c[Chemdah] &7Deleted."
+command-variables-remove-all-ed: '&c[Chemdah] &7Deleted.'
 command-level-change: '&c[Chemdah] &7{0}'
 
 database-error: '&4&lERROR! &rThe &4&lChemdah&r database failed to initialize.'

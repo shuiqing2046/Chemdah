@@ -6,10 +6,8 @@ import io.izzel.taboolib.module.inject.TInject
 
 object Chemdah : Plugin() {
 
-    @TInject(migrate = true, locale = "language")
+    @TInject(migrate = true)
     lateinit var conf: TConfig
         private set
-
-    override fun allowHotswap() = false
 
 }

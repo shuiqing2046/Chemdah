@@ -57,7 +57,7 @@ command-quest-info-body: '&c[Chemdah] &f{0}'
 command-quest-info-bottom: '&c[Chemdah] &7页数: {0} / {1}'
 command-variables-change: '&c[Chemdah] &7{0}'
 command-variables-list-header: '&c[Chemdah] &7变量s: &f{0}'
-command-variables-remove-all-ed: "&c[Chemdah] &f已删除"
+command-variables-remove-all-ed: '&c[Chemdah] &f已删除'
 command-level-change: '&c[Chemdah] &7{0}'
 
 database-error: '&4&l错误! &r插件 &4&lChemdah&r 的数据库未完成初始化.'
