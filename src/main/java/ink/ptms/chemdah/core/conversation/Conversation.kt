@@ -2,13 +2,11 @@ package ink.ptms.chemdah.core.conversation
 
 import ink.ptms.chemdah.api.event.ConversationEvent
 import ink.ptms.chemdah.core.conversation.ConversationManager.sessions
-import ink.ptms.chemdah.util.extend
-import ink.ptms.chemdah.util.mirrorFuture
-import ink.ptms.chemdah.util.namespaceConversationNPC
-import ink.ptms.chemdah.util.print
+import ink.ptms.chemdah.util.*
 import io.izzel.taboolib.kotlin.kether.KetherFunction
 import io.izzel.taboolib.kotlin.kether.KetherShell
 import io.izzel.taboolib.util.Coerce
+import io.netty.util.concurrent.CompleteFuture
 import org.bukkit.Location
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
@@ -65,46 +63,70 @@ data class Conversation(
             sessions[player.name] = session
             // 重置会话
             session.reload()
-            // 执行脚本代理
-            agent(session, AgentType.BEGIN).thenApply {
-                // 重置会话展示
-                session.reloadTheme().thenApply {
-                    // 判断是否被脚本代理否取消对话
-                    if (Coerce.toBoolean(session.variables["@Cancelled"])) {
-                        // 仅关闭上层会话，只有会话开启才能被关闭
-                        if (sessionTop != null) {
-                            sessionTop.close().thenApply {
+            // 判定条件
+            checkCondition(session).thenApply {
+                // 执行脚本代理
+                agent(session, AgentType.BEGIN).thenApply {
+                    // 重置会话展示
+                    session.reloadTheme().thenApply {
+                        // 判断是否被脚本代理否取消对话
+                        if (Coerce.toBoolean(session.variables["@Cancelled"])) {
+                            // 仅关闭上层会话，只有会话开启才能被关闭
+                            if (sessionTop != null) {
+                                sessionTop.close().thenApply {
+                                    future.complete(session)
+                                    ConversationEvent.Cancelled(this@Conversation, session, true).call()
+                                }
+                            } else {
                                 future.complete(session)
-                                ConversationEvent.Cancelled(this@Conversation, session, true).call()
+                                ConversationEvent.Cancelled(this@Conversation, session, false).call()
                             }
                         } else {
-                            future.complete(session)
-                            ConversationEvent.Cancelled(this@Conversation, session, false).call()
-                        }
-                    } else {
-                        // 添加对话内容
-                        session.npcSide.addAll(npcSide.map {
-                            try {
-                                KetherFunction.parse(it, namespace = namespaceConversationNPC) {
-                                    extend(session.variables)
+                            // 添加对话内容
+                            session.npcSide.addAll(npcSide.map {
+                                try {
+                                    KetherFunction.parse(it, namespace = namespaceConversationNPC) {
+                                        extend(session.variables)
+                                    }
+                                } catch (e: Throwable) {
+                                    e.print()
+                                    e.localizedMessage
                                 }
-                            } catch (e: Throwable) {
-                                e.print()
-                                e.localizedMessage
+                            })
+                            ConversationEvent.Begin(this@Conversation, session, sessionTop != null).call()
+                            // 渲染对话
+                            option.instanceTheme.begin(session).thenAccept {
+                                future.complete(session)
+                                ConversationEvent.Post(this@Conversation, session, sessionTop != null).call()
                             }
-                        })
-                        ConversationEvent.Begin(this@Conversation, session, sessionTop != null).call()
-                        // 渲染对话
-                        option.instanceTheme.begin(session).thenAccept {
-                            future.complete(session)
-                            ConversationEvent.Post(this@Conversation, session, sessionTop != null).call()
                         }
+                        finish()
                     }
-                    finish()
                 }
             }
         }
         return future
+    }
+
+    fun checkCondition(session: Session): CompletableFuture<Boolean> {
+        return CompletableFuture<Boolean>().also { future ->
+            if (condition == null) {
+                future.complete(true)
+                return@also
+            }
+            try {
+                KetherShell.eval(condition.asList().toMutableList().also {
+                    it.add("agent")
+                }, namespace = namespaceConversationNPC) {
+                    extend(session.variables)
+                }.thenApply {
+                    future.complete(Coerce.toBoolean(it))
+                }
+            } catch (e: Throwable) {
+                future.complete(false)
+                e.print()
+            }
+        }
     }
 
     /**
@@ -112,22 +134,22 @@ data class Conversation(
      * 会在运行结束后将所有变量覆盖写入会话
      *
      * @param session 会话实例
-     * @param agentType 脚本代理类型
+     * @param type 脚本代理类型
      */
-    fun agent(session: Session, agentType: AgentType): CompletableFuture<Void> {
+    fun agent(session: Session, type: AgentType): CompletableFuture<Void> {
         val future = CompletableFuture<Void>()
         mirrorFuture("Conversation:agent") {
-            if (ConversationEvent.Agent(this@Conversation, session, agentType).call().isCancelled) {
+            if (ConversationEvent.Agent(this@Conversation, session, type).call().isCancelled) {
                 future.complete(null)
                 finish()
             }
-            val agents = agent.filter { it.type == agentType }
+            val agents = agent.filter { it.type == type }
             fun process(cur: Int) {
                 if (cur < agents.size) {
                     try {
                         KetherShell.eval(agents[cur].action.toMutableList().also {
                             it.add("agent")
-                        }, namespace = agentType.namespaceAll()) {
+                        }, namespace = type.namespaceAll()) {
                             extend(session.variables)
                         }.thenApply {
                             if (Coerce.toBoolean(session.variables["@Cancelled"])) {

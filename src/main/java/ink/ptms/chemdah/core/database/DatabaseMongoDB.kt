@@ -1,11 +1,8 @@
 package ink.ptms.chemdah.core.database
 
 import ink.ptms.chemdah.Chemdah
-import ink.ptms.chemdah.core.DataContainer
-import ink.ptms.chemdah.core.DataContainer.Companion.data
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Quest
-import ink.ptms.chemdah.util.asMap
 import io.izzel.taboolib.cronus.bridge.CronusBridge
 import io.izzel.taboolib.cronus.bridge.database.IndexType
 import io.izzel.taboolib.module.locale.TLocale

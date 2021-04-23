@@ -28,7 +28,7 @@ enum class AgentType(val namespace: String) {
 
     /**
      * 任务完成之前
-     * 返回的内容决定是否继续逻辑    QAWESRDTFGHJKM,.
+     * 返回的内容决定是否继续逻辑
      */
     QUEST_COMPLETE("quest"),
 

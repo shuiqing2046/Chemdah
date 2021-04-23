@@ -62,7 +62,7 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
     protected val agentList = config.getKeys(false)
         .filter { it.startsWith("agent:") }
         .map {
-            val args = it.substring("agent:".length).split("&").map { a -> a.trim() }
+            val args = it.substring("agent:".length).split("@").map { a -> a.trim() }
             val type = when (this) {
                 is Template -> "quest_${args[0]}"
                 is Task -> "task_${args[0]}"
@@ -71,9 +71,9 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
             Agent(
                 type.toAgentType(),
                 config.get(it)!!.asList(),
-                args.getOrNull(1).asInt()
+                args.getOrNull(1)
             )
-        }.sortedByDescending { it.priority }
+        }
 
     /**
      * 当前节点

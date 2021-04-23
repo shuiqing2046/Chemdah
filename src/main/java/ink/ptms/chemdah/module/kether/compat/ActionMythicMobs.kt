@@ -1,4 +1,4 @@
-package ink.ptms.chemdah.module.kether
+package ink.ptms.chemdah.module.kether.compat
 
 import com.google.common.collect.Sets
 import ink.ptms.chemdah.util.getPlayer
@@ -20,7 +20,7 @@ import java.util.concurrent.CompletableFuture
 
 /**
  * Chemdah
- * ink.ptms.chemdah.module.kether.ActionMythicMobs
+ * ink.ptms.chemdah.module.kether.compat.ActionMythicMobs
  *
  * @author sky
  * @since 2021/2/10 6:39 下午
@@ -59,7 +59,7 @@ class ActionMythicMobs {
          * mm cast skill_name
          * mm cast skill_name with api
          */
-        @KetherParser(["mythicmobs", "mm"], namespace = "chemdah")
+        @KetherParser(["mythicmobs", "mm"])
         fun parser() = ScriptParser.parser {
             when (it.expects("cast")) {
                 "cast" -> {

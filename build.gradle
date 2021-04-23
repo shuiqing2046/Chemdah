@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'ink.ptms.chemdah'
-version = 'SNAPSHOT 04 20 1'
+version = 'SNAPSHOT 04 23 1'
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
@@ -23,7 +23,26 @@ repositories {
 
 dependencies {
     implementation 'com.sk89q.worldedit:WorldEdit:7:all'
+    implementation 'public:Team:1.0.0:3'
+    implementation 'public:Team:1.0.0:4'
+    implementation 'public:Team:1.0.0:5'
+    implementation 'public:Team:1.0.0:6'
+    implementation 'public:Team:1.0.0:7'
+    implementation 'public:Team:1.0.0:8'
+    implementation 'public:Team:1.0.0:9'
+    implementation 'public:Team:1.0.0:10'
+    implementation 'public:Team2:1.0.0:1'
+    implementation 'public:Team2:1.0.0:2'
+    implementation 'public:Team2:1.0.0:3'
+    implementation 'public:MMOLib:1.0.0'
+    implementation 'public:MMOCore:1.0.0'
+    implementation 'public:MMOItems:1.0.0'
+    implementation 'public:Parties:1.0.0'
+    implementation 'public:QuantumRPG:1.0.0'
+    implementation 'public:RankCraft:1.0.0'
+    implementation 'public:RPGItems:1.0.0'
     implementation 'public:Citizens:1.0.0'
+    implementation 'public:MythicLib:1.0.0'
     implementation 'public:MythicMobs:1.0.1'
     implementation 'ink.ptms:Zaphkiel:1.4.2'
     implementation 'ink.ptms:Sandalphon:1.2.8'

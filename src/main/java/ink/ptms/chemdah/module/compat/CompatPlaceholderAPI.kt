@@ -1,7 +1,6 @@
 package ink.ptms.chemdah.module.compat
 
 import ink.ptms.chemdah.Chemdah
-import ink.ptms.chemdah.util.namespaceQuest
 import io.izzel.taboolib.kotlin.kether.KetherFunction
 import io.izzel.taboolib.module.compat.PlaceholderHook
 import io.izzel.taboolib.module.inject.THook

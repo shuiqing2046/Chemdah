@@ -1,4 +1,4 @@
-package ink.ptms.chemdah.module.kether
+package ink.ptms.chemdah.module.kether.compat
 
 import com.sk89q.worldedit.WorldEdit
 import com.sk89q.worldedit.bukkit.BukkitWorld
@@ -29,7 +29,7 @@ import java.util.concurrent.CompletableFuture
 
 /**
  * Chemdah
- * ink.ptms.chemdah.module.kether.ActionSchematic
+ * ink.ptms.chemdah.module.kether.compat.ActionSchematic
  *
  * @author sky
  * @since 2021/2/10 6:39 下午
@@ -93,7 +93,7 @@ class ActionSchematic(
          * schematic *ship at location *world *0 *0 *0 ignore air
          * schematic *ship at location *world *0 *0 *0 rotation random array [ *0 *90 *180 *270 ] ignore air
          */
-        @KetherParser(["schematic", "schem"], namespace = "chemdah")
+        @KetherParser(["schematic", "schem"])
         fun parser() = ScriptParser.parser {
             val name = it.next(ArgTypes.ACTION)
             it.expects("at", "on", "to")

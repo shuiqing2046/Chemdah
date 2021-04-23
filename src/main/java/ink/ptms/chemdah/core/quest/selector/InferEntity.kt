@@ -1,11 +1,13 @@
 package ink.ptms.chemdah.core.quest.selector
 
+import ink.ptms.chemdah.api.event.single.InferEntityHookEvent
 import ink.ptms.chemdah.core.quest.selector.Flags.Companion.matchFlags
 import ink.ptms.chemdah.util.warning
 import io.izzel.taboolib.module.i18n.I18n
 import io.izzel.taboolib.util.Coerce
 import io.izzel.taboolib.util.Reflection
 import io.lumine.xikage.mythicmobs.MythicMobs
+import net.citizensnpcs.api.CitizensAPI
 
 /**
  * Chemdah
@@ -18,7 +20,7 @@ class InferEntity(val entities: List<Entity>) {
 
     fun isEntity(entity: org.bukkit.entity.Entity?) = entity != null && entities.any { it.match(entity) }
 
-    abstract class Entity(val name: String, val flags: List<Flags>, val data: Map<String, String>) {
+    open class Entity(val name: String, val flags: List<Flags>, val data: Map<String, String>) {
 
         open fun match(entity: org.bukkit.entity.Entity) = matchFlags(entity.type.name.toLowerCase()) && matchData(entity)
 
@@ -37,7 +39,30 @@ class InferEntity(val entities: List<Entity>) {
         }
     }
 
-    class MinecraftEntity(material: String, flags: List<Flags>, data: Map<String, String>) : Entity(material, flags, data)
+    class CitizensEntity(material: String, flags: List<Flags>, data: Map<String, String>) : Entity(material, flags, data) {
+
+        override fun match(entity: org.bukkit.entity.Entity): Boolean {
+            return matchFlags(entity.citizensId()) && matchData(entity)
+        }
+
+        override fun matchData(entity: org.bukkit.entity.Entity): Boolean {
+            val npc = CitizensAPI.getNPCRegistry().getNPC(entity)
+            return data.all {
+                when (it.key) {
+                    "type" -> it.value.equals(npc.entity.type.name, true)
+                    "name" -> it.value in npc.fullName
+                    else -> {
+                        warning("$name[${it.key}=${it.value}] not supported.")
+                        false
+                    }
+                }
+            }
+        }
+
+        fun org.bukkit.entity.Entity.citizensId(): String {
+            return CitizensAPI.getNPCRegistry().getNPC(this)?.id?.toString() ?: "@vanilla"
+        }
+    }
 
     class MythicMobsEntity(material: String, flags: List<Flags>, data: Map<String, String>) : Entity(material, flags, data) {
 
@@ -80,20 +105,20 @@ class InferEntity(val entities: List<Entity>) {
             } else {
                 type = this
             }
-            val item = when {
-                type.startsWith("mythicmobs:") -> {
-                    type = type.substring("mythicmobs:".length)
-                    MythicMobsEntity::class.java
+            val indexOfType = type.indexOf(':')
+            val entity = if (indexOfType in 0..(type.length - 2)) {
+                val entity = when (val namespace = type.substring(0, indexOfType)) {
+                    "minecraft" -> Entity::class.java
+                    "citizen", "citizens" -> CitizensEntity::class.java
+                    "mythicmob", "mythicmobs" -> MythicMobsEntity::class.java
+                    else -> InferEntityHookEvent(namespace, Entity::class.java).itemClass
                 }
-                type.startsWith("minecraft:") -> {
-                    type = type.substring("minecraft:".length)
-                    MinecraftEntity::class.java
-                }
-                else -> {
-                    MinecraftEntity::class.java
-                }
+                type = type.substring(indexOfType + 1)
+                entity
+            } else {
+                Entity::class.java
             }
-            return Reflection.instantiateObject(item, type.matchFlags(flag), flag, data) as Entity
+            return Reflection.instantiateObject(entity, type.matchFlags(flag), flag, data) as Entity
         }
     }
 }

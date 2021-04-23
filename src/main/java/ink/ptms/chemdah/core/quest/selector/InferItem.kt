@@ -3,7 +3,6 @@ package ink.ptms.chemdah.core.quest.selector
 import ink.ptms.chemdah.api.event.single.InferItemHookEvent
 import ink.ptms.chemdah.core.quest.selector.Flags.Companion.matchFlags
 import ink.ptms.chemdah.util.warning
-import ink.ptms.zaphkiel.ZaphkielAPI
 import io.izzel.taboolib.module.nms.NMS
 import io.izzel.taboolib.util.Reflection
 import io.izzel.taboolib.util.item.Items
@@ -36,7 +35,7 @@ class InferItem(val items: List<Item>) {
         return Items.takeItem(inventory, { items.any { item -> item.match(it) } }, amount)
     }
 
-    abstract class Item(val material: String, val flags: List<Flags>, val data: Map<String, String>) {
+    open class Item(val material: String, val flags: List<Flags>, val data: Map<String, String>) {
 
         open fun match(item: ItemStack) = matchFlags(item.type.name.toLowerCase()) && matchMetaData(item)
 
@@ -77,28 +76,6 @@ class InferItem(val items: List<Item>) {
         }
     }
 
-    class MinecraftItem(material: String, flags: List<Flags>, data: Map<String, String>) : Item(material, flags, data)
-
-    class ZaphkielItem(material: String, flags: List<Flags>, data: Map<String, String>) : Item(material, flags, data) {
-
-        fun ItemStack.zaphkielId(): String {
-            val itemStream = ZaphkielAPI.read(this)
-            return if (itemStream.isExtension()) itemStream.getZaphkielName() else "@vanilla"
-        }
-
-        override fun match(item: ItemStack): Boolean {
-            return matchFlags(item.zaphkielId()) && matchMetaData(item)
-        }
-
-        override fun matchMetaData(item: ItemStack, itemMeta: ItemMeta, key: String, value: String): Boolean {
-            return if (key.startsWith("data.")) {
-                ZaphkielAPI.read(item).getZaphkielData()[key.substring("data.".length)]?.asString().equals(value, true)
-            } else {
-                super.matchMetaData(item, itemMeta, key, value)
-            }
-        }
-    }
-
     companion object {
 
         fun List<String>.toInferItem() = InferItem(map { it.toInferItem() })
@@ -118,14 +95,13 @@ class InferItem(val items: List<Item>) {
             val indexOfType = type.indexOf(':')
             val item = if (indexOfType in 0..(type.length - 2)) {
                 val item = when (val namespace = type.substring(0, indexOfType)) {
-                    "minecraft" -> MinecraftItem::class.java
-                    "zaphkiel" -> ZaphkielItem::class.java
-                    else -> InferItemHookEvent(namespace, MinecraftItem::class.java).itemClass
+                    "minecraft" -> Item::class.java
+                    else -> InferItemHookEvent(namespace, Item::class.java).itemClass
                 }
                 type = type.substring(indexOfType + 1)
                 item
             } else {
-                MinecraftItem::class.java
+                Item::class.java
             }
             return Reflection.instantiateObject(item, type.matchFlags(flag), flag, data) as Item
         }

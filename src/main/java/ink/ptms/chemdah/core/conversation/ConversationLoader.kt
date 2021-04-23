@@ -98,13 +98,13 @@ object ConversationLoader {
             root.getKeys(false)
                 .filter { it.startsWith("agent:") }
                 .map {
-                    val args = it.substring("agent:".length).split("&").map { a -> a.trim() }
+                    val args = it.substring("agent:".length).split("@").map { a -> a.trim() }
                     Agent(
                         args[0].toAgentType(),
                         root.get(it)!!.asList(),
-                        args.getOrNull(1).asInt()
+                        args.getOrNull(1)
                     )
-                }.sortedByDescending { it.priority },
+                },
             option
         )
     }

@@ -135,7 +135,7 @@ class ActionProfile {
          * profile level *default exp
          * profile level *default exp add *100
          */
-        @KetherParser(["profile"], namespace = "chemdah")
+        @KetherParser(["profile"])
         fun parser() = ScriptParser.parser {
             when (it.expects("data", "level")) {
                 "data" -> {

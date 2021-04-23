@@ -27,7 +27,7 @@ class ActionTrigger(val trigger: String) : QuestAction<Void>() {
         /**
          * trigger def
          */
-        @KetherParser(["trigger"], namespace = "chemdah")
+        @KetherParser(["trigger"])
         fun parser() = ScriptParser.parser {
             ActionTrigger(it.nextToken())
         }

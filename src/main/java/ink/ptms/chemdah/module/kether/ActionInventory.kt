@@ -77,7 +77,7 @@ class ActionInventory {
          * inventory helmet is "minecraft:stone"
          * inventory slot 9 is "minecraft:stone"
          */
-        @KetherParser(["inventory"], namespace = "chemdah")
+        @KetherParser(["inventory"])
         fun parser() = ScriptParser.parser {
             when (it.expects(
                 "has", "have", "check", "take", "remove",

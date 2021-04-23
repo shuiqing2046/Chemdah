@@ -10,5 +10,5 @@ package ink.ptms.chemdah.core.conversation
 data class Agent(
     val type: AgentType,
     val action: List<String>,
-    val priority: Int
+    val restrict: String?
 )

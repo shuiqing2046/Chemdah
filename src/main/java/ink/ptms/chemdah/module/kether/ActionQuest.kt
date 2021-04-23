@@ -3,7 +3,6 @@ package ink.ptms.chemdah.module.kether
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.quest.addon.AddonStats.Companion.hiddenStats
 import ink.ptms.chemdah.core.quest.addon.AddonStats.Companion.refreshStats
-import ink.ptms.chemdah.util.asList
 import ink.ptms.chemdah.util.getProfile
 import ink.ptms.chemdah.util.increaseAny
 import io.izzel.taboolib.kotlin.kether.Kether.expects
@@ -14,7 +13,6 @@ import io.izzel.taboolib.kotlin.kether.common.api.ParsedAction
 import io.izzel.taboolib.kotlin.kether.common.api.QuestAction
 import io.izzel.taboolib.kotlin.kether.common.api.QuestContext
 import io.izzel.taboolib.kotlin.kether.common.loader.types.ArgTypes
-import java.lang.Exception
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -201,7 +199,7 @@ class ActionQuest {
         /**
          * quests
          */
-        @KetherParser(["quests"], namespace = "chemdah")
+        @KetherParser(["quests"])
         fun parser0() = ScriptParser.parser {
             Quests()
         }
@@ -219,7 +217,7 @@ class ActionQuest {
          *
          * quest tasks *quest
          */
-        @KetherParser(["quest"], namespace = "chemdah")
+        @KetherParser(["quest"])
         fun parser1() = ScriptParser.parser {
             when (it.expects("accept", "accept-check", "accepted", "complete", "completed", "failure", "reset", "stop", "cancel", "stats", "tasks", "data")) {
                 "accept" -> QuestAccept(it.next(ArgTypes.ACTION), false)

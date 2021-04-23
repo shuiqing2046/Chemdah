@@ -1,8 +1,6 @@
 package ink.ptms.chemdah.module.kether.quest
 
 import ink.ptms.chemdah.core.quest.Task
-import ink.ptms.chemdah.core.quest.Template
-import ink.ptms.chemdah.util.getQuest
 import ink.ptms.chemdah.util.getQuestContainer
 import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser

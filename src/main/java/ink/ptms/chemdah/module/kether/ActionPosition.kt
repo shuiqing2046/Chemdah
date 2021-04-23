@@ -28,7 +28,7 @@ class ActionPosition(val area: InferArea) : QuestAction<Boolean>() {
         /**
          * position inside "world 0 0 0 > 10 10 10"
          */
-        @KetherParser(["position"], namespace = "chemdah")
+        @KetherParser(["position"])
         fun parser() = ScriptParser.parser {
             it.expects("is", "in", "inside")
             ActionPosition(it.nextToken().toInferArea())
