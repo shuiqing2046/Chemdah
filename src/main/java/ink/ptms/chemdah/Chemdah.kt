@@ -9,5 +9,4 @@ object Chemdah : Plugin() {
     @TInject(migrate = true)
     lateinit var conf: TConfig
         private set
-
 }

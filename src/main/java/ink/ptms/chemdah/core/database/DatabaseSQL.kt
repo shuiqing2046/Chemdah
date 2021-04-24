@@ -166,7 +166,7 @@ class DatabaseSQL : Database() {
 
     fun PlayerProfile.updateQuest(player: Player) {
         val id = getUserId(player)
-        quests.forEach { quest ->
+        getQuests().forEach { quest ->
             if (quest.newQuest || quest.persistentDataContainer.changed) {
                 quest.newQuest = false
                 val questId = getQuestId(player, quest)
@@ -205,7 +205,7 @@ class DatabaseSQL : Database() {
                     tableUserData.insert(null, userId, k, v.value, 1).run(dataSource)
                 }
                 persistentDataContainer.flush()
-                quests.forEach {
+                getQuests().forEach {
                     player.createQuest(userId, it)
                 }
                 future.complete(userId)

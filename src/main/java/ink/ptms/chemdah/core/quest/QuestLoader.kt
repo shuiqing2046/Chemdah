@@ -4,7 +4,7 @@ import ink.ptms.chemdah.Chemdah
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.api.ChemdahAPI.isChemdahProfileLoaded
-import ink.ptms.chemdah.api.event.ObjectiveEvent
+import ink.ptms.chemdah.api.event.collect.ObjectiveEvents
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.addon.Addon
 import ink.ptms.chemdah.core.quest.meta.Meta
@@ -40,7 +40,7 @@ object QuestLoader {
             Bukkit.getOnlinePlayers().filter { it.isChemdahProfileLoaded }.forEach {
                 it.chemdahProfile.also { profile ->
                     // 检测所有有效任务
-                    profile.quests.forEach { quest ->
+                    profile.getQuests().forEach { quest ->
                         // 检测超时
                         if (quest.isTimeout) {
                             quest.failureQuest()
@@ -142,7 +142,7 @@ object QuestLoader {
         objective.checkCondition(profile, task, event).thenAccept { cond ->
             if (cond) {
                 objective.onContinue(profile, task, event)
-                ObjectiveEvent.Continue(objective, task, profile).call()
+                ObjectiveEvents.Continue(objective, task, profile).call()
                 objective.checkComplete(profile, task)
                 task.getQuest(profile)?.checkComplete()
             }

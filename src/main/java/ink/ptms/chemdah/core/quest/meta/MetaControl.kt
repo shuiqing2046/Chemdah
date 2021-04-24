@@ -104,11 +104,11 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
         override fun check(profile: PlayerProfile, template: Template): CompletableFuture<Boolean> {
             if (alias > 0) {
                 val a = template.alias()
-                if (a != null && profile.quests.count { it.template.alias() == a } >= alias) {
+                if (a != null && profile.getQuests().count { it.template.alias() == a } >= alias) {
                     return CompletableFuture.completedFuture(false)
                 }
             }
-            if (label.any { label -> profile.quests.count { label.key in it.template.label() } > label.value }) {
+            if (label.any { label -> profile.getQuests().count { label.key in it.template.label() } > label.value }) {
                 return CompletableFuture.completedFuture(false)
             }
             return CompletableFuture.completedFuture(true)

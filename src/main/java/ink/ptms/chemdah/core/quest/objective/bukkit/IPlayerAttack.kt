@@ -16,6 +16,7 @@ object IPlayerAttack : AEntityDamage<EntityDamageByEntityEvent>() {
 
     override val name = "player attack"
     override val event = EntityDamageByEntityEvent::class
+    override val isAsync = true
 
     init {
         handler {

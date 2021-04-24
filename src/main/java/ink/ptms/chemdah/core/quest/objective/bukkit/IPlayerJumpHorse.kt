@@ -17,6 +17,7 @@ object IPlayerJumpHorse : ObjectiveCountable<HorseJumpEvent>() {
 
     override val name = "horse jump"
     override val event = HorseJumpEvent::class
+    override val isAsync = true
 
     init {
         handler {

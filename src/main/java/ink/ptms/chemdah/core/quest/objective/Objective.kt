@@ -1,6 +1,6 @@
 package ink.ptms.chemdah.core.quest.objective
 
-import ink.ptms.chemdah.api.event.ObjectiveEvent
+import ink.ptms.chemdah.api.event.collect.ObjectiveEvents
 import ink.ptms.chemdah.core.Data
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.AgentType
@@ -176,13 +176,13 @@ abstract class Objective<E : Event> {
                 task.restart(profile).thenAccept { reset ->
                     if (reset) {
                         onReset(profile, task)
-                        ObjectiveEvent.Reset(this@Objective, task, profile).call()
+                        ObjectiveEvents.Reset(this@Objective, task, profile).call()
                         finish()
                     } else {
                         checkGoal(profile, task).thenAccept {
                             if (it && !hasCompletedSignature(profile, task)) {
                                 onComplete(profile, task)
-                                ObjectiveEvent.Complete(this@Objective, task, profile).call()
+                                ObjectiveEvents.Complete(this@Objective, task, profile).call()
                             }
                             finish()
                         }

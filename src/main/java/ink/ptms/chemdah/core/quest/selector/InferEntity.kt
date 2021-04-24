@@ -1,6 +1,6 @@
 package ink.ptms.chemdah.core.quest.selector
 
-import ink.ptms.chemdah.api.event.single.InferEntityHookEvent
+import ink.ptms.chemdah.api.event.InferEntityHookEvent
 import ink.ptms.chemdah.core.quest.selector.Flags.Companion.matchFlags
 import ink.ptms.chemdah.util.warning
 import io.izzel.taboolib.module.i18n.I18n

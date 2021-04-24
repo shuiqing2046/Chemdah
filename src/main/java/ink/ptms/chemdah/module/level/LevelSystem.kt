@@ -1,6 +1,6 @@
 package ink.ptms.chemdah.module.level
 
-import ink.ptms.chemdah.api.event.PlayerEvent
+import ink.ptms.chemdah.api.event.collect.PlayerEvents
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.module.Module
 import ink.ptms.chemdah.module.Module.Companion.register
@@ -48,7 +48,7 @@ object LevelSystem : Module, Listener {
 
     fun PlayerProfile.setLevel(node: LevelOption, level: Int, experience: Int) {
         val p = getLevel(node)
-        val event = PlayerEvent.LevelChange(player, node, p.level, p.experience, level, experience).call()
+        val event = PlayerEvents.LevelChange(player, node, p.level, p.experience, level, experience).call()
         if (event.nonCancelled()) {
             persistentDataContainer["module.level.${node.id}.level"] = event.newLevel
             persistentDataContainer["module.level.${node.id}.experience"] = event.newExperience
@@ -63,7 +63,7 @@ object LevelSystem : Module, Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    private fun e(e: PlayerEvent.LevelChange) {
+    private fun e(e: PlayerEvents.LevelChange) {
         if (e.newLevel > e.oldLevel) {
             ((e.oldLevel + 1)..e.newLevel).forEach { level ->
                 e.option.getReward(level)?.eval(e.player, level)

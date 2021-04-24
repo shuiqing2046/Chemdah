@@ -1,4 +1,4 @@
-package ink.ptms.chemdah.api.event
+package ink.ptms.chemdah.api.event.collect
 
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.AgentType
@@ -10,17 +10,23 @@ import io.izzel.taboolib.module.event.EventNormal
 
 /**
  * Chemdah
- * ink.ptms.chemdah.api.event.QuestEvent
+ * ink.ptms.chemdah.api.event.collect.QuestEvents
  *
  * @author sky
  * @since 2021/2/21 1:07 上午
  */
-class QuestEvent {
+class QuestEvents {
 
     /**
      * 当任务中当脚本代理执行时
      */
-    class Agent(val questContainer: QuestContainer, val playerProfile: PlayerProfile, val agentType: AgentType): EventCancellable<Agent>(true)
+    class Agent(val questContainer: QuestContainer, val playerProfile: PlayerProfile, val agentType: AgentType, val restrict: String): EventCancellable<Agent>(true)
+
+    /**
+     * 当玩家的任务列表被获取时
+     * 通过修改这个属性来动态编辑玩家的任务列表
+     */
+    class Collect(val quests: MutableList<Quest>, val playerProfile: PlayerProfile) : EventNormal<Collect>(true)
 
     /**
      * 当任务进行接受检测时

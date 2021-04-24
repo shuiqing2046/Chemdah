@@ -1,4 +1,4 @@
-package ink.ptms.chemdah.api.event
+package ink.ptms.chemdah.api.event.collect
 
 import ink.ptms.chemdah.core.conversation.AgentType
 import ink.ptms.chemdah.core.conversation.Conversation
@@ -9,12 +9,12 @@ import org.bukkit.inventory.Inventory
 
 /**
  * Chemdah
- * ink.ptms.chemdah.api.event.ConversationEvent
+ * ink.ptms.chemdah.api.event.collect.ConversationEvents
  *
  * @author sky
  * @since 2021/2/21 1:07 上午
  */
-class ConversationEvent {
+class ConversationEvents {
 
     /**
      * 当对话中当脚本代理执行时

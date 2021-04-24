@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.core.quest
 
 import ink.ptms.chemdah.api.ChemdahAPI
-import ink.ptms.chemdah.api.event.QuestEvent
+import ink.ptms.chemdah.api.event.collect.QuestEvents
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.AgentType.Companion.toAgentType
 import ink.ptms.chemdah.core.quest.addon.Addon
@@ -112,10 +112,17 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
      */
     fun getQuest(profile: PlayerProfile): Quest? {
         return when (this) {
-            is Template -> profile.quests.firstOrNull { it.id == id }
+            is Template -> profile.getQuests().firstOrNull { it.id == id }
             is Task -> template.getQuest(profile)
             else -> null
         }
+    }
+
+    /**
+     * 获取有效的脚本代理列表
+     */
+    fun getAgentList(agentType: AgentType, restrict: String = "self"): List<Agent> {
+        return agentList.filter { it.type == agentType && (it.restrict == "*" || it.restrict == "all" || it.restrict == restrict) }
     }
 
     /**
@@ -125,14 +132,14 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
      * @param profile 玩家数据
      * @param agentType 脚本代理类型
      */
-    fun agent(profile: PlayerProfile, agentType: AgentType, quest: Quest? = null): CompletableFuture<Boolean> {
+    fun agent(profile: PlayerProfile, agentType: AgentType, quest: Quest? = null, restrict: String = "self"): CompletableFuture<Boolean> {
         val future = CompletableFuture<Boolean>()
         mirrorFuture("QuestContainer:agent") {
-            if (QuestEvent.Agent(this@QuestContainer, profile, agentType).call().isCancelled) {
+            if (QuestEvents.Agent(this@QuestContainer, profile, agentType, restrict).call().isCancelled) {
                 future.complete(false)
                 finish()
             }
-            val agent = agentList.filter { it.type == agentType }
+            val agent = getAgentList(agentType, restrict)
             fun process(cur: Int) {
                 if (cur < agent.size) {
                     try {

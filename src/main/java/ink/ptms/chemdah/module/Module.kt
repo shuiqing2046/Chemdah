@@ -11,7 +11,8 @@ import io.izzel.taboolib.module.inject.TFunction
  */
 interface Module {
 
-    fun reload()
+    open fun reload() {
+    }
 
     companion object {
 

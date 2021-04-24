@@ -6,9 +6,9 @@ import ink.ptms.chemdah.api.ChemdahAPI.isChemdahProfileLoaded
 import ink.ptms.chemdah.api.ChemdahAPI.nonChemdahProfileLoaded
 import ink.ptms.chemdah.api.HologramAPI
 import ink.ptms.chemdah.api.HologramAPI.createHologram
-import ink.ptms.chemdah.api.event.ObjectiveEvent
-import ink.ptms.chemdah.api.event.PlayerEvent
-import ink.ptms.chemdah.api.event.QuestEvent
+import ink.ptms.chemdah.api.event.collect.ObjectiveEvents
+import ink.ptms.chemdah.api.event.collect.PlayerEvents
+import ink.ptms.chemdah.api.event.collect.QuestEvents
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Id
 import ink.ptms.chemdah.core.quest.QuestContainer
@@ -157,7 +157,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                     return
                 }
                 // 唤起事件供外部调用
-                PlayerEvent.Track(player, this, value ?: trackQuest, value == null).call().nonCancelled {
+                PlayerEvents.Track(player, this, value ?: trackQuest, value == null).call().nonCancelled {
                     if (value != null) {
                         persistentDataContainer["quest.track"] = value.id
                     } else {
@@ -399,7 +399,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
          * 不知道原因
          */
         @EventHandler
-        private fun onSelect(e: PlayerEvent.Selected) {
+        private fun onSelect(e: PlayerEvents.Selected) {
             Tasks.delay(40) {
                 if (e.playerProfile.trackQuest != null) {
                     e.player.cancelTrackingNavigation()
@@ -415,7 +415,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
          * 已完成的条目不再显示于记分板中
          */
         @EventHandler
-        private fun onComplete(e: ObjectiveEvent.Complete) {
+        private fun onComplete(e: ObjectiveEvents.Complete) {
             if (e.playerProfile.trackQuest == e.task.template) {
                 e.playerProfile.player.refreshTrackingNavigation()
                 e.playerProfile.player.refreshTrackingScoreboard()
@@ -427,7 +427,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
          * 总内容替换为子内容显示
          */
         @EventHandler
-        private fun onRegistered(e: QuestEvent.Registered) {
+        private fun onRegistered(e: QuestEvents.Registered) {
             if (e.playerProfile.trackQuest == e.quest.template) {
                 e.playerProfile.player.refreshTrackingNavigation()
                 e.playerProfile.player.refreshTrackingScoreboard()
@@ -438,7 +438,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
          * 任务注销时取消任务追踪
          */
         @EventHandler
-        private fun onUnregistered(e: QuestEvent.Unregistered) {
+        private fun onUnregistered(e: QuestEvents.Unregistered) {
             if (e.playerProfile.trackQuest == e.quest.template) {
                 e.playerProfile.trackQuest = null
             }
@@ -449,7 +449,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
          * 并给予相关提示
          */
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        private fun onTrack(e: PlayerEvent.Track) {
+        private fun onTrack(e: PlayerEvents.Track) {
             if (e.cancel) {
                 e.player.cancelTrackingNavigation()
                 e.player.cancelTrackingScoreboard(e.trackingQuest)

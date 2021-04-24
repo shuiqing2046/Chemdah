@@ -25,7 +25,7 @@ import java.util.concurrent.CompletableFuture
  * @author sky
  * @since 2021/2/10 6:39 下午
  */
-class ActionMythicMobs {
+class ActionMythic {
 
     class MythicMobsCast(val mechanic: SkillMechanic, val trigger: SkillTrigger) : QuestAction<Void>() {
 

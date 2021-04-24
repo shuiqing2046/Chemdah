@@ -1,4 +1,4 @@
-package ink.ptms.chemdah.api.event
+package ink.ptms.chemdah.api.event.collect
 
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Task
@@ -7,12 +7,12 @@ import io.izzel.taboolib.module.event.EventNormal
 
 /**
  * Chemdah
- * ink.ptms.chemdah.api.event.ObjectiveEvent
+ * ink.ptms.chemdah.api.event.collect.ObjectiveEvents
  *
  * @author sky
  * @since 2021/2/21 1:07 上午
  */
-class ObjectiveEvent {
+class ObjectiveEvents {
 
     /**
      * 当条目继续时

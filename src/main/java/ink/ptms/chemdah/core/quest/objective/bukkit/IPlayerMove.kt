@@ -16,6 +16,7 @@ object IPlayerMove : ObjectiveCountable<PlayerMoveEvent>() {
 
     override val name = "player move"
     override val event = PlayerMoveEvent::class
+    override val isAsync = true
 
     init {
         handler {

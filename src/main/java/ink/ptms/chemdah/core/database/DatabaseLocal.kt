@@ -73,7 +73,7 @@ open class DatabaseLocal : Database() {
             }
             playerProfile.persistentDataContainer.flush()
         }
-        playerProfile.quests.forEach { quest ->
+        playerProfile.getQuests().forEach { quest ->
             if (quest.persistentDataContainer.changed) {
                 quest.persistentDataContainer.forEach { key, obj ->
                     if (obj.changed) {

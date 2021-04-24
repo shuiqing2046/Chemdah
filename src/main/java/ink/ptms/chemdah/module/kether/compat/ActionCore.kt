@@ -17,9 +17,9 @@ import java.util.concurrent.CompletableFuture
  * @author sky
  * @since 2021/4/23 8:52 下午
  */
-class ActionMMOCore {
+class ActionCore {
 
-    class CoreClass(val action: (PlayerData) -> (Any)) : QuestAction<Any>() {
+    class Base(val action: (PlayerData) -> (Any)) : QuestAction<Any>() {
 
         override fun process(frame: QuestContext.Frame): CompletableFuture<Any> {
             return CompletableFuture.completedFuture(action(MMOCore.plugin.dataProvider.dataManager.get(frame.getPlayer())))
@@ -37,7 +37,7 @@ class ActionMMOCore {
         fun parser() = ScriptParser.parser {
             when (it.expects("class", "skill", "attribute", "level", "exp", "experience", "mana", "stamina")) {
                 "class" -> {
-                    CoreClass(when (it.expects("id", "name")) {
+                    Base(when (it.expects("id", "name")) {
                         "id" -> { clazz: PlayerData -> clazz.profess.id }
                         "name" -> { clazz: PlayerData -> clazz.profess.name }
                         "point" -> { clazz: PlayerData -> clazz.classPoints }
@@ -45,28 +45,28 @@ class ActionMMOCore {
                     })
                 }
                 "skill" -> {
-                    CoreClass(when (it.expects("point")) {
+                    Base(when (it.expects("point")) {
                         "point" -> { clazz: PlayerData -> clazz.skillPoints }
                         else -> error("out of case")
                     })
                 }
                 "attribute" -> {
-                    CoreClass(when (it.expects("point")) {
+                    Base(when (it.expects("point")) {
                         "point" -> { clazz: PlayerData -> clazz.attributePoints }
                         else -> error("out of case")
                     })
                 }
                 "level" -> {
-                    CoreClass { clazz -> clazz.level }
+                    Base { clazz -> clazz.level }
                 }
                 "experience", "exp" -> {
-                    CoreClass { clazz -> clazz.experience }
+                    Base { clazz -> clazz.experience }
                 }
                 "mana" -> {
-                    CoreClass { clazz -> clazz.mana }
+                    Base { clazz -> clazz.mana }
                 }
                 "stamina" -> {
-                    CoreClass { clazz -> clazz.stamina }
+                    Base { clazz -> clazz.stamina }
                 }
                 else -> error("out of case")
             }

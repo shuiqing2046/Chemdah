@@ -133,22 +133,22 @@ class CommandChemdahQuest : BaseMainCommand() {
             TLocale.sendTo(sender, "command-player-not-found")
             return
         }
-        if (playerExact.chemdahProfile.quests.isEmpty()) {
+        val quests = playerExact.chemdahProfile.getQuests(openAPI = true)
+        if (quests.isEmpty()) {
             TLocale.sendTo(sender, "command-quest-info-empty")
             return
         } else {
             TLocale.sendTo(sender, "command-quest-info-header")
             val page = Coerce.toInteger(args.getOrNull(2) ?: 0)
-            val quests = Indexed.subList(playerExact.chemdahProfile.quests.toList(), page * 5, (page + 1) * 5 - 1)
-            quests.forEach { quest ->
-                TLocale.sendTo(sender, "command-quest-info-body", "  §n${quest.id}:")
+            Indexed.subList(quests, page * 5, (page + 1) * 5 - 1).forEach { quest ->
+                TLocale.sendTo(sender, "command-quest-info-body", "  §n${quest.id}:§r ${if (quest.isOwner(playerExact)) "§8(Share)" else ""}")
                 TLocale.sendTo(sender, "command-quest-info-body", "    §7Start in ${DateFormatUtils.format(quest.startTime, "yyyy/MM/dd HH:mm:ss")}")
                 TLocale.sendTo(sender, "command-quest-info-body", "    §7Data:")
                 quest.persistentDataContainer.entries().forEach { e ->
                     TLocale.sendTo(sender, "command-quest-info-body", "      §7${e.key.replace(".", "§f.§7")} §8= §f${e.value.value}")
                 }
             }
-            TLocale.sendTo(sender, "command-quest-info-bottom", (page + 1), ceil(playerExact.chemdahProfile.quests.size / 5.0).toInt())
+            TLocale.sendTo(sender, "command-quest-info-bottom", (page + 1), ceil(quests.size / 5.0).toInt())
         }
     }
 

@@ -8,13 +8,10 @@ import ink.ptms.chemdah.core.conversation.ConversationManager
 import ink.ptms.chemdah.core.conversation.Session
 import ink.ptms.chemdah.core.conversation.theme.Theme
 import ink.ptms.chemdah.core.database.Database
-import ink.ptms.chemdah.core.quest.Idx
 import ink.ptms.chemdah.core.quest.QuestLoader
 import ink.ptms.chemdah.core.quest.Template
 import ink.ptms.chemdah.core.quest.addon.Addon
 import ink.ptms.chemdah.core.quest.meta.Meta
-import ink.ptms.chemdah.core.quest.meta.MetaAlias.Companion.alias
-import ink.ptms.chemdah.core.quest.meta.MetaLabel.Companion.label
 import ink.ptms.chemdah.core.quest.objective.Objective
 import ink.ptms.chemdah.core.quest.objective.bukkit.EMPTY_EVENT
 import ink.ptms.chemdah.core.quest.objective.other.ITrigger
@@ -73,7 +70,7 @@ object ChemdahAPI {
      */
     fun Player.callTrigger(value: String) {
         val chemdahProfile = chemdahProfile
-        chemdahProfile.quests.forEach { quest ->
+        chemdahProfile.getQuests(openAPI = true).forEach { quest ->
             quest.tasks.forEach { task ->
                 val trigger = task.objective as? ITrigger
                 if (trigger?.getValue(task) == value) {
@@ -97,23 +94,6 @@ object ChemdahAPI {
      * 获取任务模板
      */
     fun getQuestTemplate(id: String) = quest[id]
-
-    /**
-     * 通过序号、别名或标签获取所有符合要求的任务模板
-     */
-    fun getQuestTemplate(value: String, idx: Idx = Idx.ID): List<Template> {
-        return when (idx) {
-            Idx.ID -> {
-                quest.filterValues { it.id == value }.values.toList()
-            }
-            Idx.ID_ALIAS -> {
-                quest.filterValues { it.id == value || it.alias() == value }.values.toList()
-            }
-            Idx.LABEL -> {
-                quest.filterValues { value in it.label() }.values.toList()
-            }
-        }
-    }
 
     /**
      * 获取任务元数据

@@ -1,13 +1,12 @@
 package ink.ptms.chemdah.core.quest.addon
 
-import ink.ptms.chemdah.api.event.ObjectiveEvent
-import ink.ptms.chemdah.api.event.QuestEvent
+import ink.ptms.chemdah.api.event.collect.ObjectiveEvents
+import ink.ptms.chemdah.api.event.collect.QuestEvents
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Id
 import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.core.quest.QuestContainer
 import ink.ptms.chemdah.core.quest.Task
-import ink.ptms.chemdah.core.quest.addon.AddonStats.Companion.statsDisplay
 import ink.ptms.chemdah.core.quest.meta.MetaName.Companion.displayName
 import ink.ptms.chemdah.core.quest.objective.Progress
 import ink.ptms.chemdah.util.*
@@ -81,7 +80,7 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
             future.complete(Progress.empty)
             return future
         }
-        val quest = profile.quests.firstOrNull { it.id == task.template.id }
+        val quest = profile.getQuests(openAPI = true).firstOrNull { it.id == task.template.id }
         if (quest == null) {
             warning("Quest(${questContainer.node}) not accepted.")
             future.complete(Progress.empty)
@@ -126,17 +125,17 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
         }
 
         @EventHandler
-        private fun e(e: QuestEvent.Registered) {
+        private fun e(e: QuestEvents.Registered) {
             e.quest.refreshStats(e.playerProfile)
         }
 
         @EventHandler
-        private fun e(e: QuestEvent.Unregistered) {
+        private fun e(e: QuestEvents.Unregistered) {
             e.quest.hiddenStats(e.playerProfile)
         }
 
         @EventHandler
-        private fun e(e: ObjectiveEvent.Continue) {
+        private fun e(e: ObjectiveEvents.Continue) {
             if (e.isCompleted()) {
                 e.task.hiddenStats(e.playerProfile)
             } else {

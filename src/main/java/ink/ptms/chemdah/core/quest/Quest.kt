@@ -1,8 +1,8 @@
 package ink.ptms.chemdah.core.quest
 
 import ink.ptms.chemdah.api.ChemdahAPI
-import ink.ptms.chemdah.api.event.ObjectiveEvent
-import ink.ptms.chemdah.api.event.QuestEvent
+import ink.ptms.chemdah.api.event.collect.ObjectiveEvents
+import ink.ptms.chemdah.api.event.collect.QuestEvents
 import ink.ptms.chemdah.core.DataContainer
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.meta.MetaControl
@@ -10,6 +10,7 @@ import ink.ptms.chemdah.core.quest.meta.MetaControl.Companion.control
 import ink.ptms.chemdah.core.quest.meta.MetaRestart.Companion.restart
 import ink.ptms.chemdah.core.quest.meta.MetaTimeout.Companion.isTimeout
 import ink.ptms.chemdah.util.mirrorFuture
+import org.bukkit.entity.Player
 
 /**
  * Chemdah
@@ -38,12 +39,20 @@ class Quest(val id: String, val profile: PlayerProfile, val persistentDataContai
     val isTimeout: Boolean
         get() = template.isTimeout(startTime)
 
+    /**
+     * 是否为新的任务，擅自修改这个属性会导致数据出错
+     */
     var newQuest = false
 
     init {
         persistentDataContainer.put("start", System.currentTimeMillis())
         profile.persistentDataContainer.remove("quest.complete.$id")
     }
+
+    /**
+     * 判断该玩家是否为该任务的拥有者
+     */
+    fun isOwner(player: Player) = profile.uniqueId == player.uniqueId
 
     /**
      * 获取条目
@@ -61,7 +70,7 @@ class Quest(val id: String, val profile: PlayerProfile, val persistentDataContai
                     resetQuest()
                     finish()
                 } else {
-                    if (tasks.all { it.objective.hasCompletedSignature(profile, it) } && QuestEvent.Complete(this@Quest, profile).call().nonCancelled()) {
+                    if (tasks.all { it.objective.hasCompletedSignature(profile, it) } && QuestEvents.Complete(this@Quest, profile).call().nonCancelled()) {
                         template.agent(profile, AgentType.QUEST_COMPLETE, this@Quest).thenAccept {
                             if (it) {
                                 template.control().signature(profile, MetaControl.Trigger.COMPLETE)
@@ -91,7 +100,7 @@ class Quest(val id: String, val profile: PlayerProfile, val persistentDataContai
      */
     fun failureQuest() {
         mirrorFuture("Quest:failure") {
-            if (QuestEvent.Failure(this@Quest, profile).call().nonCancelled()) {
+            if (QuestEvents.Failure(this@Quest, profile).call().nonCancelled()) {
                 template.agent(profile, AgentType.QUEST_FAILURE, this@Quest).thenAccept {
                     if (it) {
                         template.control().signature(profile, MetaControl.Trigger.FAILURE)
@@ -110,12 +119,12 @@ class Quest(val id: String, val profile: PlayerProfile, val persistentDataContai
      */
     fun resetQuest() {
         mirrorFuture("Quest:reset") {
-            if (QuestEvent.Reset(this@Quest, profile).call().nonCancelled()) {
+            if (QuestEvents.Reset(this@Quest, profile).call().nonCancelled()) {
                 template.agent(profile, AgentType.QUEST_RESET, this@Quest).thenAccept {
                     if (it) {
                         tasks.forEach { task ->
                             task.objective.onReset(profile, task)
-                            ObjectiveEvent.Reset(task.objective, task, profile).call()
+                            ObjectiveEvents.Reset(task.objective, task, profile).call()
                         }
                         persistentDataContainer.clear()
                     }

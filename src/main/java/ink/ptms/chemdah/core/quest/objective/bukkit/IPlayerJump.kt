@@ -16,6 +16,7 @@ object IPlayerJump : ObjectiveCountable<PlayerJumpEvent>() {
 
     override val name = "player jump"
     override val event = PlayerJumpEvent::class
+    override val isAsync = true
 
     init {
         handler {

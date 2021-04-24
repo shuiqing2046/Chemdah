@@ -5,7 +5,7 @@ import ink.ptms.adyeshach.common.entity.EntityInstance
 import ink.ptms.adyeshach.common.entity.type.AdyHuman
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.conversationSession
-import ink.ptms.chemdah.api.event.ConversationEvent
+import ink.ptms.chemdah.api.event.collect.ConversationEvents
 import ink.ptms.chemdah.util.hidden
 import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.module.config.TConfig
@@ -85,13 +85,13 @@ object ConversationManager : Listener {
     }
 
     @EventHandler
-    private fun e(e: ConversationEvent.Begin) {
+    private fun e(e: ConversationEvents.Begin) {
         effects[e.session.player.name] = effectFreeze.mapNotNull { e.session.player.getPotionEffect(it.first) }.filter { it.duration in 10..9999 }
         effectFreeze.forEach { e.session.player.addPotionEffect(PotionEffect(it.first, 99999, it.second).hidden()) }
     }
 
     @EventHandler
-    private fun e(e: ConversationEvent.Closed) {
+    private fun e(e: ConversationEvents.Closed) {
         effectFreeze.forEach { e.session.player.removePotionEffect(it.first) }
         effects.remove(e.session.player.name)?.forEach { e.session.player.addPotionEffect(it) }
         // 视觉效果
@@ -146,7 +146,7 @@ object ConversationManager : Listener {
     private class CompatAdyeshach : Listener {
 
         @EventHandler
-        fun e(e: ConversationEvent.Begin) {
+        fun e(e: ConversationEvents.Begin) {
             val npc = e.session.npcObject
             if (npc is EntityInstance) {
                 npc.setTag("isFreeze", "true")
@@ -155,7 +155,7 @@ object ConversationManager : Listener {
         }
 
         @EventHandler
-        fun e(e: ConversationEvent.Closed) {
+        fun e(e: ConversationEvents.Closed) {
             val npc = e.session.npcObject
             if (npc is EntityInstance) {
                 npc.removeTag("conversation:${e.session.player.name}")

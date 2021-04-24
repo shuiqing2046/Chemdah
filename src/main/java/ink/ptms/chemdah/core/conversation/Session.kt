@@ -1,6 +1,6 @@
 package ink.ptms.chemdah.core.conversation
 
-import ink.ptms.chemdah.api.event.ConversationEvent
+import ink.ptms.chemdah.api.event.collect.ConversationEvents
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import java.util.concurrent.CompletableFuture
@@ -56,7 +56,7 @@ data class Session(
             conversation.option.instanceTheme.end(this).thenApply {
                 future.complete(null)
                 ConversationManager.sessions.remove(player.name)
-                ConversationEvent.Closed(this).call()
+                ConversationEvents.Closed(this).call()
             }
         }
         return future

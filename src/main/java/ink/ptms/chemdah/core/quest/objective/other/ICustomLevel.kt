@@ -1,6 +1,6 @@
 package ink.ptms.chemdah.core.quest.objective.other
 
-import ink.ptms.chemdah.api.event.PlayerEvent
+import ink.ptms.chemdah.api.event.collect.PlayerEvents
 import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
 import ink.ptms.chemdah.module.level.LevelSystem
@@ -20,10 +20,10 @@ import ink.ptms.chemdah.module.level.LevelSystem.getLevel
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
-object ICustomLevel : ObjectiveCountable<PlayerEvent.LevelChange>() {
+object ICustomLevel : ObjectiveCountable<PlayerEvents.LevelChange>() {
 
     override val name = "custom level"
-    override val event = PlayerEvent.LevelChange::class
+    override val event = PlayerEvents.LevelChange::class
     override val isListener = true
 
     init {

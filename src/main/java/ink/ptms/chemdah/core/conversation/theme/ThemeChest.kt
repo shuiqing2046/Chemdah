@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.core.conversation.theme
 
 import ink.ptms.chemdah.api.ChemdahAPI
-import ink.ptms.chemdah.api.event.ConversationEvent
+import ink.ptms.chemdah.api.event.collect.ConversationEvents
 import ink.ptms.chemdah.core.conversation.ConversationManager
 import ink.ptms.chemdah.core.conversation.PlayerReply
 import ink.ptms.chemdah.core.conversation.Session
@@ -66,7 +66,7 @@ object ThemeChest : Theme<ThemeChestSetting>(), Listener {
                         }
                         it.setItem(settings.npcSlot, settings.npcItem.buildItem(session, message))
                         // 唤起事件
-                        ConversationEvent.ChestThemeBuild(session, message, canReply, it)
+                        ConversationEvents.ChestThemeBuild(session, message, canReply, it)
                     }.click { e ->
                         replies.getOrNull(settings.playerSlot.indexOf(e.rawSlot))?.run {
                             check(session).thenAccept { check ->

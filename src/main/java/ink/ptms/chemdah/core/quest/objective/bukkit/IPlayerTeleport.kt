@@ -16,6 +16,7 @@ object IPlayerTeleport : ObjectiveCountable<PlayerTeleportEvent>() {
 
     override val name = "player teleport"
     override val event = PlayerTeleportEvent::class
+    override val isAsync = true
 
     init {
         handler {

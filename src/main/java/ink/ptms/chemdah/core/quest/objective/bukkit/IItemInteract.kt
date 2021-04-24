@@ -18,6 +18,7 @@ object IItemInteract : ObjectiveCountable<PlayerInteractEvent>() {
 
     override val name = "item interact"
     override val event = PlayerInteractEvent::class
+    override val isAsync = true
 
     init {
         handler {

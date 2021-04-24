@@ -1,6 +1,6 @@
 package ink.ptms.chemdah.core
 
-import ink.ptms.chemdah.api.event.QuestEvent
+import ink.ptms.chemdah.api.event.collect.QuestEvents
 import ink.ptms.chemdah.core.database.Database
 import ink.ptms.chemdah.core.quest.*
 import ink.ptms.chemdah.core.quest.meta.MetaAlias.Companion.alias
@@ -36,20 +36,14 @@ class PlayerProfile(val uniqueId: UUID) {
     /**
      * 玩家是否在线
      */
-    val playerOnline: Boolean
+    val isPlayerOnline: Boolean
         get() = Bukkit.getPlayer(uniqueId) != null
-
-    /**
-     * 所有正在进行中的有效任务
-     */
-    val quests: Collection<Quest>
-        get() = questMap.filterValues { it.isValid }.values
 
     /**
      * 任务或玩家数据是否发生变动
      */
     val changed: Boolean
-        get() = persistentDataContainer.changed || quests.any { it.newQuest || it.persistentDataContainer.changed }
+        get() = persistentDataContainer.changed || getQuests().any { it.newQuest || it.persistentDataContainer.changed }
 
     /**
      * 持久化数据储存容器
@@ -69,7 +63,7 @@ class PlayerProfile(val uniqueId: UUID) {
         questMap[quest.id] = quest
         if (quest.isValid) {
             quest.newQuest = true
-            QuestEvent.Registered(quest, this).call()
+            QuestEvents.Registered(quest, this).call()
         }
     }
 
@@ -87,7 +81,7 @@ class PlayerProfile(val uniqueId: UUID) {
                 Database.INSTANCE.releaseQuest(player, this, quest)
             }
         }
-        QuestEvent.Unregistered(quest, this).call()
+        QuestEvents.Unregistered(quest, this).call()
     }
 
     /**
@@ -98,27 +92,26 @@ class PlayerProfile(val uniqueId: UUID) {
     /**
      * 通过事件获取所有正在进行中的有效条目（有效任务）
      */
-    fun getTasks(event: Event) = quests.flatMap { quest -> quest.tasks.filter { it.objective.isListener && it.objective.event.isInstance(event) } }
+    fun getTasks(event: Event): List<Task> {
+        return getQuests(openAPI = true).flatMap { quest -> quest.tasks.filter { it.objective.isListener && it.objective.event.isInstance(event) } }
+    }
 
     /**
      * 通过序号获取正在进行中的有效任务
      */
-    fun getQuestById(value: String) = getQuests(value, Idx.ID).firstOrNull()
+    fun getQuestById(value: String, openAPI: Boolean = false): Quest? {
+        return getQuests(openAPI).firstOrNull { it.id == value }
+    }
 
     /**
-     * 通过序号、别名或标签获取所有符合要求且正在进行中的有效任务
+     * 获取所有正在进行中的有效任务
+     * @param openAPI 是否启用开放 API，即允许第三方直接修改这个结果
      */
-    fun getQuests(value: String, idx: Idx = Idx.ID): List<Quest> {
-        return when (idx) {
-            Idx.ID -> {
-                quests.filter { it.id == value }
-            }
-            Idx.ID_ALIAS -> {
-                quests.filter { it.id == value || it.template.alias() == value }
-            }
-            Idx.LABEL -> {
-                quests.filter { value in it.template.label() }
-            }
+    fun getQuests(openAPI: Boolean = false): List<Quest> {
+        return if (openAPI) {
+            QuestEvents.Collect(questMap.values.filter { it.isValid }.toMutableList(), this).call().quests
+        } else {
+            questMap.values.filter { it.isValid }
         }
     }
 

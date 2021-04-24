@@ -1,7 +1,8 @@
 package ink.ptms.chemdah.core.quest.selector
 
-import ink.ptms.chemdah.api.event.single.InferItemHookEvent
+import ink.ptms.chemdah.api.event.InferItemHookEvent
 import ink.ptms.zaphkiel.ZaphkielAPI
+import io.izzel.taboolib.kotlin.getCompound
 import io.izzel.taboolib.module.inject.TListener
 import io.izzel.taboolib.util.Coerce
 import net.mmogroup.mmolib.MMOLib
@@ -36,6 +37,9 @@ class InferItemHooks : Listener {
             }
             "qrpg", "quantumrpg" -> {
                 e.itemClass = ItemQuantumRPG::class.java
+            }
+            "pxrpg" -> {
+                e.itemClass = ItemPxRPG::class.java
             }
         }
     }
@@ -129,6 +133,58 @@ class InferItemHooks : Listener {
         override fun matchMetaData(item: ItemStack, itemMeta: ItemMeta, key: String, value: String): Boolean {
             return when (key) {
                 "level" -> item.quantumLevel() <= Coerce.toInteger(value)
+                else -> super.matchMetaData(item, itemMeta, key, value)
+            }
+        }
+    }
+
+    class ItemPxRPG(material: String, flags: List<Flags>, data: Map<String, String>) : InferItem.Item(material, flags, data) {
+
+        fun ItemStack.pxId(): String {
+            return getCompound().getDeep("pxrpg.id")?.asString() ?: "@vanilla"
+        }
+
+        fun ItemStack.pxName(): String {
+            return getCompound().getDeep("pxrpg.name")?.asString() ?: "@vanilla"
+        }
+
+        fun ItemStack.pxAuthor(): String {
+            return getCompound().getDeep("pxrpg.authorName")?.asString() ?: "@vanilla"
+        }
+
+        fun ItemStack.pxQuality(): String {
+            return getCompound().getDeep("pxrpg.itemQuality")?.asString() ?: "@vanilla"
+        }
+
+        fun ItemStack.pxType(): String {
+            return getCompound().getDeep("pxrpg.itemType")?.asString() ?: "@vanilla"
+        }
+
+        fun ItemStack.pxTemplate(): String {
+            return getCompound().getDeep("pxrpg.template")?.asString() ?: "@vanilla"
+        }
+
+        fun ItemStack.pxLevel(): Int {
+            return getCompound().getDeep("pxrpg.level")?.asInt() ?: -1
+        }
+
+        fun ItemStack.pxBind(): String {
+            return getCompound().getDeep("pxrpg.bind")?.asString() ?: "@vanilla"
+        }
+
+        override fun match(item: ItemStack): Boolean {
+            return matchFlags(item.pxId()) && matchMetaData(item)
+        }
+
+        override fun matchMetaData(item: ItemStack, itemMeta: ItemMeta, key: String, value: String): Boolean {
+            return when (key) {
+                "name" -> item.pxName().contains(value)
+                "author" -> item.pxAuthor().equals(value, true)
+                "quality" -> item.pxQuality().equals(value, true)
+                "type" -> item.pxType().equals(value, true)
+                "template" -> item.pxTemplate().equals(value, true)
+                "level" -> item.pxLevel() <= Coerce.toInteger(value)
+                "bind" -> item.pxBind().equals(value, true)
                 else -> super.matchMetaData(item, itemMeta, key, value)
             }
         }

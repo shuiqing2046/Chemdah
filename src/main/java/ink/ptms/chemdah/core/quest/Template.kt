@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.core.quest
 
 import ink.ptms.chemdah.api.ChemdahAPI
-import ink.ptms.chemdah.api.event.QuestEvent
+import ink.ptms.chemdah.api.event.collect.QuestEvents
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.meta.Meta
 import ink.ptms.chemdah.core.quest.meta.MetaControl
@@ -60,7 +60,7 @@ class Template(id: String, config: ConfigurationSection) : QuestContainer(id, co
                 val control = control()
                 control.signature(profile, MetaControl.Trigger.ACCEPT)
                 profile.registerQuest(quest)
-                QuestEvent.Accepted(quest, profile).call()
+                QuestEvents.Accepted(quest, profile).call()
                 agent(profile, AgentType.QUEST_START)
             } else {
                 agent(profile, AgentType.QUEST_ACCEPT_CANCELLED)
@@ -80,7 +80,7 @@ class Template(id: String, config: ConfigurationSection) : QuestContainer(id, co
                 finish()
                 return@mirrorFuture
             }
-            if (QuestEvent.AcceptCheck(this@Template, profile).call().isCancelled) {
+            if (QuestEvents.AcceptCheck(this@Template, profile).call().isCancelled) {
                 future.complete(AcceptResult.CANCELLED_BY_EVENT)
                 finish()
                 return@mirrorFuture

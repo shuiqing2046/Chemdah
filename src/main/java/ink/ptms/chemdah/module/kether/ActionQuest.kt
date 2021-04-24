@@ -24,10 +24,10 @@ import java.util.concurrent.CompletableFuture
  */
 class ActionQuest {
 
-    class Quests : QuestAction<List<String>>() {
+    class Quests(val self: Boolean) : QuestAction<List<String>>() {
 
         override fun process(frame: QuestContext.Frame): CompletableFuture<List<String>> {
-            return CompletableFuture.completedFuture(frame.getProfile().quests.map { it.id })
+            return CompletableFuture.completedFuture(frame.getProfile().getQuests(openAPI = !self).map { it.id })
         }
     }
 
@@ -201,7 +201,14 @@ class ActionQuest {
          */
         @KetherParser(["quests"])
         fun parser0() = ScriptParser.parser {
-            Quests()
+            try {
+                it.mark()
+                it.expect("self")
+                Quests(true)
+            } catch (ex: Exception) {
+                it.reset()
+                Quests(false)
+            }
         }
 
         /**

@@ -33,7 +33,9 @@ class CommandChemdah : BaseMainCommand() {
         playerExact.chemdahProfile.persistentDataContainer.entries().forEach { e ->
             TLocale.sendTo(sender, "command-info-body", "    §7${e.key.replace(".", "§f.§7")} §8= §f${e.value.value}")
         }
-        TLocale.sendTo(sender, "command-info-body", "  §7Quests: §f${playerExact.chemdahProfile.quests.map { it.id }.toList()}")
+        val quests = playerExact.chemdahProfile.getQuests(openAPI = true)
+        TLocale.sendTo(sender, "command-info-body", "  §7Quests: §f${quests.filter { it.isOwner(playerExact) }.map { it.id }.toList()}")
+        TLocale.sendTo(sender, "command-info-body", "  §7Quests (Share): §f${quests.filter { !it.isOwner(playerExact) }.map { it.id }.toList()}")
     }
 
     @SubCommand(description = "@command-mirror", priority = 1.1)

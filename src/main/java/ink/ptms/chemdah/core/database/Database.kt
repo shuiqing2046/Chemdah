@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.api.ChemdahAPI.isChemdahProfileLoaded
-import ink.ptms.chemdah.api.event.PlayerEvent
+import ink.ptms.chemdah.api.event.collect.PlayerEvents
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.util.mirrorFuture
@@ -111,7 +111,7 @@ abstract class Database {
                 mirrorFuture("Database:select") {
                     INSTANCE.select(e.player).also {
                         ChemdahAPI.playerProfile[e.player.name] = it
-                        PlayerEvent.Selected(e.player, it).call()
+                        PlayerEvents.Selected(e.player, it).call()
                     }
                     finish()
                 }
@@ -125,7 +125,7 @@ abstract class Database {
                 Tasks.task(true) {
                     mirrorFuture("Database:update") {
                         INSTANCE.update(e.player, playerProfile)
-                        PlayerEvent.Updated(e.player, playerProfile).call()
+                        PlayerEvents.Updated(e.player, playerProfile).call()
                         finish()
                     }
                 }
@@ -139,7 +139,7 @@ abstract class Database {
                 if (playerProfile.changed) {
                     mirrorFuture("Database:update") {
                         INSTANCE.update(it, playerProfile)
-                        PlayerEvent.Updated(it, playerProfile).call()
+                        PlayerEvents.Updated(it, playerProfile).call()
                         finish()
                     }
                 }

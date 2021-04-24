@@ -1,4 +1,4 @@
-package ink.ptms.chemdah.api.event
+package ink.ptms.chemdah.api.event.collect
 
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Template
@@ -9,12 +9,12 @@ import org.bukkit.entity.Player
 
 /**
  * Chemdah
- * ink.ptms.chemdah.api.event.PlayerEvent
+ * ink.ptms.chemdah.api.event.collect.PlayerEvents
  *
  * @author sky
  * @since 2021/3/7 1:31 上午
  */
-class PlayerEvent {
+class PlayerEvents {
 
     /**
      * 当玩家数据加载完成时

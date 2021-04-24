@@ -23,12 +23,7 @@ repositories {
 
 dependencies {
     implementation 'com.sk89q.worldedit:WorldEdit:7:all'
-    implementation 'public:Team:1.0.0:3'
-    implementation 'public:Team:1.0.0:4'
-    implementation 'public:Team:1.0.0:5'
-    implementation 'public:Team:1.0.0:6'
     implementation 'public:Team:1.0.0:7'
-    implementation 'public:Team:1.0.0:8'
     implementation 'public:Team:1.0.0:9'
     implementation 'public:Team:1.0.0:10'
     implementation 'public:Team2:1.0.0:1'
