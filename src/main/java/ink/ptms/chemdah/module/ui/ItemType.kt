@@ -15,7 +15,12 @@ enum class ItemType(val priority: Int) {
     /**
      * 任务正在进行中
      */
-    QUEST_STARTED(10),
+    QUEST_STARTED(11),
+
+    /**
+     * 任务正在进行中
+     */
+    QUEST_STARTED_SHARED(10),
 
     /**
      * 任务可以开始

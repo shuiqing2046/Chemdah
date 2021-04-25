@@ -4,7 +4,6 @@ import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.api.ChemdahAPI.conversationSession
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.conversation.Session
-import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.core.quest.QuestContainer
 import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.Template
@@ -46,10 +45,6 @@ fun String.colored(): String {
 
 fun List<String>.colored(): List<String> {
     return TLocale.Translate.setColored(this)
-}
-
-fun QuestContext.Frame.getQuest(): Quest {
-    return variables().get<Any?>("@Quest").orElse(null) as? Quest ?: error("No quest selected.")
 }
 
 fun QuestContext.Frame.getQuestContainer(): QuestContainer {

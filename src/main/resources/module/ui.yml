@@ -61,6 +61,19 @@ default:
           LUCK: 1
         flags:
           - HIDE_ENCHANTS
+      started-shared:
+        material: orange_stained_glass_pane
+        name: '&6&l{name} &7(Shared)'
+        lore:
+          - '&eStarted...'
+          - ''
+          - '{description}'
+          - ''
+          - '&8CLICK TO TRACK'
+        enchant:
+          LUCK: 1
+        flags:
+          - HIDE_ENCHANTS
       can-start:
         material: lime_stained_glass_pane
         name: '&a&l{name}'

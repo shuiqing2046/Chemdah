@@ -2,9 +2,10 @@ package ink.ptms.chemdah.core
 
 import ink.ptms.chemdah.api.event.collect.QuestEvents
 import ink.ptms.chemdah.core.database.Database
-import ink.ptms.chemdah.core.quest.*
-import ink.ptms.chemdah.core.quest.meta.MetaAlias.Companion.alias
-import ink.ptms.chemdah.core.quest.meta.MetaLabel.Companion.label
+import ink.ptms.chemdah.core.quest.Quest
+import ink.ptms.chemdah.core.quest.QuestDataOperator
+import ink.ptms.chemdah.core.quest.Task
+import ink.ptms.chemdah.core.quest.Template
 import ink.ptms.chemdah.util.asList
 import ink.ptms.chemdah.util.namespaceQuest
 import ink.ptms.chemdah.util.print
@@ -90,16 +91,9 @@ class PlayerProfile(val uniqueId: UUID) {
     fun <T> dataOperator(task: Task, func: QuestDataOperator.() -> T) = func.invoke(QuestDataOperator(this, task))
 
     /**
-     * 通过事件获取所有正在进行中的有效条目（有效任务）
-     */
-    fun getTasks(event: Event): List<Task> {
-        return getQuests(openAPI = true).flatMap { quest -> quest.tasks.filter { it.objective.isListener && it.objective.event.isInstance(event) } }
-    }
-
-    /**
      * 通过序号获取正在进行中的有效任务
      */
-    fun getQuestById(value: String, openAPI: Boolean = false): Quest? {
+    fun getQuestById(value: String, openAPI: Boolean = true): Quest? {
         return getQuests(openAPI).firstOrNull { it.id == value }
     }
 
@@ -154,5 +148,12 @@ class PlayerProfile(val uniqueId: UUID) {
             e.print()
             CompletableFuture.completedFuture(false)
         }
+    }
+
+    /**
+     * 通过事件获取所有正在进行中的有效条目（有效任务）
+     */
+    fun tasks(event: Event, func: (Quest, Task) -> Unit) {
+        getQuests(openAPI = true).forEach { q -> q.tasks.filter { it.objective.isListener && it.objective.event.isInstance(event) }.forEach { func(q, it) } }
     }
 }

@@ -2,7 +2,6 @@ package ink.ptms.chemdah.core.quest.addon
 
 import ink.ptms.chemdah.core.quest.Id
 import ink.ptms.chemdah.core.quest.QuestContainer
-import ink.ptms.chemdah.core.quest.Template
 import org.bukkit.configuration.ConfigurationSection
 
 /**
@@ -26,9 +25,14 @@ class AddonParty(config: ConfigurationSection, questContainer: QuestContainer) :
     val shareOnlyLeader = config.getBoolean("share-only-leader")
 
     /**
-     * 队员是否可以替你完成这个条目
+     * 队员是否可以替你进行这个条目
      */
     val canContinue = config.getBoolean("continue")
+
+    /**
+     * 队员是否可以替你完成这个任务
+     */
+    val canComplete = config.getBoolean("complete")
 
     companion object {
 

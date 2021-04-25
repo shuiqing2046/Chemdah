@@ -1,8 +1,10 @@
 package ink.ptms.chemdah.api.event.collect
 
 import ink.ptms.chemdah.core.PlayerProfile
+import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.objective.Objective
+import io.izzel.taboolib.module.event.EventCancellable
 import io.izzel.taboolib.module.event.EventNormal
 
 /**
@@ -17,20 +19,35 @@ class ObjectiveEvents {
     /**
      * 当条目继续时
      */
-    class Continue(val objective: Objective<*>, val task: Task, val playerProfile: PlayerProfile): EventNormal<Continue>(true) {
+    class Continue {
 
-        fun isCompleted(): Boolean {
-            return task.isCompleted(playerProfile) || task.getQuest(playerProfile)?.isCompleted ?: true
+        class Pre(val objective: Objective<*>, val task: Task, val quest: Quest, val playerProfile: PlayerProfile): EventCancellable<Pre>(true)
+
+        class Post(val objective: Objective<*>, val task: Task, val quest: Quest, val playerProfile: PlayerProfile): EventNormal<Post>(true) {
+
+            fun isCompleted(): Boolean {
+                return task.isCompleted(playerProfile) || quest.isCompleted
+            }
         }
     }
 
     /**
      * 当条目完成时
      */
-    class Complete(val objective: Objective<*>, val task: Task, val playerProfile: PlayerProfile): EventNormal<Complete>(true)
+    class Complete {
+
+        class Pre(val objective: Objective<*>, val task: Task, val quest: Quest, val playerProfile: PlayerProfile): EventCancellable<Pre>(true)
+
+        class Post(val objective: Objective<*>, val task: Task, val quest: Quest, val playerProfile: PlayerProfile): EventNormal<Post>(true)
+    }
 
     /**
      * 当条目重置时
      */
-    class Reset(val objective: Objective<*>, val task: Task, val playerProfile: PlayerProfile): EventNormal<Reset>(true)
+    class Reset {
+
+        class Pre(val objective: Objective<*>, val task: Task, val quest: Quest, val playerProfile: PlayerProfile): EventCancellable<Pre>(true)
+
+        class Post(val objective: Objective<*>, val task: Task, val quest: Quest, val playerProfile: PlayerProfile): EventNormal<Post>(true)
+    }
 }

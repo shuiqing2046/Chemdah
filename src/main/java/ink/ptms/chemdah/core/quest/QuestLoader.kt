@@ -37,8 +37,8 @@ object QuestLoader {
     @TSchedule(period = 20, async = true)
     private fun tick() {
         mirrorFuture("QuestHandler:tick") {
-            Bukkit.getOnlinePlayers().filter { it.isChemdahProfileLoaded }.forEach {
-                it.chemdahProfile.also { profile ->
+            Bukkit.getOnlinePlayers().filter { it.isChemdahProfileLoaded }.forEach { player ->
+                player.chemdahProfile.also { profile ->
                     // 检测所有有效任务
                     profile.getQuests().forEach { quest ->
                         // 检测超时
@@ -47,7 +47,7 @@ object QuestLoader {
                         } else {
                             // 检查条目自动完成
                             quest.tasks.forEach { task ->
-                                task.objective.checkComplete(profile, task)
+                                task.objective.checkComplete(profile, task, quest)
                             }
                             // 检查任务自动完成
                             quest.checkComplete()
@@ -119,32 +119,31 @@ object QuestLoader {
      * @param event 事件
      * @param objective 条目类型
      */
-    fun <T: Event> handleEvent(player: Player, event: T, objective: Objective<T>) {
+    fun <T : Event> handleEvent(player: Player, event: T, objective: Objective<T>) {
         mirrorFuture("QuestHandler:handleEvent:${objective.name}") {
             if (player.isChemdahProfileLoaded) {
                 player.chemdahProfile.also { profile ->
                     // 通过事件获取所有正在进行的任务条目
-                    profile.getTasks(event).forEach { task ->
-                        handleTask(profile, objective, task, event)
-                    }
+                    profile.tasks(event) { quest, task -> handleTask(profile, task, quest, event) }
                 }
             }
             finish()
         }
     }
 
-    fun <T : Event> handleTask(profile: PlayerProfile, objective: Objective<T>, task: Task, event: T) {
+    @Suppress("UNCHECKED_CAST")
+    fun <T : Event> handleTask(profile: PlayerProfile, task: Task, quest: Quest, event: T) {
+        val objective: Objective<T> = task.objective as Objective<T>
         // 如果含有完成标记，则不在进行该条目
         if (objective.hasCompletedSignature(profile, task)) {
             return
         }
         // 判断条件并进行该条目
         objective.checkCondition(profile, task, event).thenAccept { cond ->
-            if (cond) {
-                objective.onContinue(profile, task, event)
-                ObjectiveEvents.Continue(objective, task, profile).call()
-                objective.checkComplete(profile, task)
-                task.getQuest(profile)?.checkComplete()
+            if (cond && ObjectiveEvents.Continue.Pre(objective, task, quest, profile).call().nonCancelled()) {
+                objective.onContinue(profile, task, quest, event)
+                objective.checkComplete(profile, task, quest)
+                quest.checkComplete()
             }
         }
     }

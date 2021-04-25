@@ -60,8 +60,8 @@ class Template(id: String, config: ConfigurationSection) : QuestContainer(id, co
                 val control = control()
                 control.signature(profile, MetaControl.Trigger.ACCEPT)
                 profile.registerQuest(quest)
-                QuestEvents.Accepted(quest, profile).call()
                 agent(profile, AgentType.QUEST_START)
+                QuestEvents.Accept.Post(quest, profile).call()
             } else {
                 agent(profile, AgentType.QUEST_ACCEPT_CANCELLED)
             }
@@ -75,12 +75,12 @@ class Template(id: String, config: ConfigurationSection) : QuestContainer(id, co
     fun checkAccept(profile: PlayerProfile): CompletableFuture<AcceptResult> {
         val future = CompletableFuture<AcceptResult>()
         mirrorFuture("Template:checkAccept") {
-            if (profile.getQuestById(id) != null) {
+            if (profile.getQuestById(id, openAPI = false) != null) {
                 future.complete(AcceptResult.ALREADY_EXISTS)
                 finish()
                 return@mirrorFuture
             }
-            if (QuestEvents.AcceptCheck(this@Template, profile).call().isCancelled) {
+            if (QuestEvents.Accept.Pre(this@Template, profile).call().isCancelled) {
                 future.complete(AcceptResult.CANCELLED_BY_EVENT)
                 finish()
                 return@mirrorFuture

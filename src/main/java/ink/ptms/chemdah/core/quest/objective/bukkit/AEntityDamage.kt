@@ -1,6 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective.bukkit
 
 import ink.ptms.chemdah.core.PlayerProfile
+import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.objective.Abstract
 import ink.ptms.chemdah.core.quest.objective.Objective
@@ -55,8 +56,8 @@ abstract class AEntityDamage<E : EntityDamageEvent> : Objective<E>() {
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun onContinue(profile: PlayerProfile, task: Task, event: Event) {
-        super.onContinue(profile, task, event)
+    override fun onContinue(profile: PlayerProfile, task: Task, quest: Quest, event: Event) {
+        super.onContinue(profile, task, quest, event)
         profile.dataOperator(task) {
             put("damage", get("damage", 0).toDouble() + getDamage(profile, task, event as E))
         }

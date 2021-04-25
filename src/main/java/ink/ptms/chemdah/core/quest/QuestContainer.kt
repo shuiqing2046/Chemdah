@@ -110,10 +110,10 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
     /**
      * 获取正在进行中的所属任务
      */
-    fun getQuest(profile: PlayerProfile): Quest? {
+    fun getQuest(profile: PlayerProfile, openAPI: Boolean = false): Quest? {
         return when (this) {
-            is Template -> profile.getQuests().firstOrNull { it.id == id }
-            is Task -> template.getQuest(profile)
+            is Template -> profile.getQuests(openAPI).firstOrNull { it.id == id }
+            is Task -> template.getQuest(profile, openAPI)
             else -> null
         }
     }
@@ -132,7 +132,7 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
      * @param profile 玩家数据
      * @param agentType 脚本代理类型
      */
-    fun agent(profile: PlayerProfile, agentType: AgentType, quest: Quest? = null, restrict: String = "self"): CompletableFuture<Boolean> {
+    fun agent(profile: PlayerProfile, agentType: AgentType, restrict: String = "self"): CompletableFuture<Boolean> {
         val future = CompletableFuture<Boolean>()
         mirrorFuture("QuestContainer:agent") {
             if (QuestEvents.Agent(this@QuestContainer, profile, agentType, restrict).call().isCancelled) {
@@ -146,7 +146,6 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
                         KetherShell.eval(agent[cur].action, namespace = agentType.namespaceAll()) {
                             sender = profile.player
                             rootFrame().variables().also { vars ->
-                                vars.set("@Quest", quest)
                                 vars.set("@QuestContainer", this@QuestContainer)
                             }
                         }.thenApply {

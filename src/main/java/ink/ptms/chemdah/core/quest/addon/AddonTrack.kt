@@ -17,6 +17,7 @@ import ink.ptms.chemdah.core.quest.Template
 import ink.ptms.chemdah.core.quest.addon.AddonUI.Companion.ui
 import ink.ptms.chemdah.core.quest.meta.MetaName.Companion.displayName
 import ink.ptms.chemdah.core.quest.selector.InferArea
+import ink.ptms.chemdah.module.party.PartySystem.getMembers
 import ink.ptms.chemdah.util.*
 import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.kotlin.navigation.Navigation
@@ -415,10 +416,12 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
          * 已完成的条目不再显示于记分板中
          */
         @EventHandler
-        private fun onComplete(e: ObjectiveEvents.Complete) {
-            if (e.playerProfile.trackQuest == e.task.template) {
-                e.playerProfile.player.refreshTrackingNavigation()
-                e.playerProfile.player.refreshTrackingScoreboard()
+        private fun onComplete(e: ObjectiveEvents.Complete.Post) {
+            e.quest.getMembers(self = true).forEach {
+                if (it.chemdahProfile.trackQuest == e.task.template) {
+                    it.refreshTrackingNavigation()
+                    it.refreshTrackingScoreboard()
+                }
             }
         }
 

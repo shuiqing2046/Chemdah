@@ -3,7 +3,6 @@ package ink.ptms.chemdah.core.conversation
 import ink.ptms.chemdah.Chemdah
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.conversation.AgentType.Companion.toAgentType
-import ink.ptms.chemdah.util.asInt
 import ink.ptms.chemdah.util.asList
 import ink.ptms.chemdah.util.asMap
 import io.izzel.taboolib.module.db.local.SecuredFile

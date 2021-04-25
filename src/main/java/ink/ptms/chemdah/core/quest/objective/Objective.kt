@@ -4,6 +4,7 @@ import ink.ptms.chemdah.api.event.collect.ObjectiveEvents
 import ink.ptms.chemdah.core.Data
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.AgentType
+import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.meta.MetaRestart.Companion.restart
 import ink.ptms.chemdah.util.mirrorFuture
@@ -91,23 +92,23 @@ abstract class Objective<E : Event> {
     /**
      * 当条目继续时
      */
-    internal open fun onContinue(profile: PlayerProfile, task: Task, event: Event) {
-        task.agent(profile, AgentType.TASK_CONTINUE, task.getQuest(profile))
+    internal open fun onContinue(profile: PlayerProfile, task: Task, quest: Quest, event: Event) {
+        task.agent(quest.profile, AgentType.TASK_CONTINUE)
     }
 
     /**
      * 当条目完成时
      */
-    internal open fun onComplete(profile: PlayerProfile, task: Task) {
-        task.agent(profile, AgentType.TASK_COMPLETE, task.getQuest(profile))
+    internal open fun onComplete(profile: PlayerProfile, task: Task, quest: Quest) {
+        task.agent(quest.profile, AgentType.TASK_COMPLETE)
         setCompletedSignature(profile, task, true)
     }
 
     /**
      * 当条目重置时
      */
-    internal open fun onReset(profile: PlayerProfile, task: Task) {
-        task.agent(profile, AgentType.TASK_RESET, task.getQuest(profile))
+    internal open fun onReset(profile: PlayerProfile, task: Task, quest: Quest) {
+        task.agent(quest.profile, AgentType.TASK_RESET)
         profile.dataOperator(task) {
             clear()
         }
@@ -170,19 +171,23 @@ abstract class Objective<E : Event> {
      * 优先检测重置条件
      * 满足时则不会完成条目
      */
-    open fun checkComplete(profile: PlayerProfile, task: Task) {
+    open fun checkComplete(profile: PlayerProfile, task: Task, quest: Quest) {
         if (!hasCompletedSignature(profile, task)) {
             mirrorFuture("Objective:checkComplete") {
-                task.restart(profile).thenAccept { reset ->
-                    if (reset) {
-                        onReset(profile, task)
-                        ObjectiveEvents.Reset(this@Objective, task, profile).call()
+                task.restart(profile).thenAccept { r ->
+                    if (r) {
+                        if (ObjectiveEvents.Reset.Pre(this@Objective, task, quest, profile).call().nonCancelled()) {
+                            onReset(profile, task, quest)
+                            ObjectiveEvents.Reset.Post(this@Objective, task, quest, profile).call()
+                        }
                         finish()
                     } else {
                         checkGoal(profile, task).thenAccept {
                             if (it && !hasCompletedSignature(profile, task)) {
-                                onComplete(profile, task)
-                                ObjectiveEvents.Complete(this@Objective, task, profile).call()
+                                if (ObjectiveEvents.Complete.Pre(this@Objective, task, quest, profile).call().nonCancelled()) {
+                                    onComplete(profile, task, quest)
+                                    ObjectiveEvents.Complete.Post(this@Objective, task, quest, profile).call()
+                                }
                             }
                             finish()
                         }

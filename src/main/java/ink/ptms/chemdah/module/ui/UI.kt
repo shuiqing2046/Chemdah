@@ -45,6 +45,7 @@ class UI(val config: ConfigurationSection) {
         items[ItemType.INFO] = Item(config.getConfigurationSection("item.info")!!)
         items[ItemType.FILTER] = ItemFilter(config.getConfigurationSection("item.filter")!!)
         items[ItemType.QUEST_STARTED] = ItemQuest(config.getConfigurationSection("item.quest.started")!!)
+        items[ItemType.QUEST_STARTED_SHARED] = ItemQuest(config.getConfigurationSection("item.quest.started-shared")!!)
         items[ItemType.QUEST_CAN_START] = ItemQuest(config.getConfigurationSection("item.quest.can-start")!!)
         items[ItemType.QUEST_CANNOT_START] = ItemQuestNoIcon(config.getConfigurationSection("item.quest.cannot-start")!!)
         items[ItemType.QUEST_COMPLETE] = ItemQuestNoIcon(config.getConfigurationSection("item.quest.completed")!!)
@@ -76,9 +77,15 @@ class UI(val config: ConfigurationSection) {
                 val quest = quests[cur]
                 val ui = quest.ui()
                 // 正在进行该任务
-                if (playerProfile.getQuestById(quest.id) != null) {
-                    collect.add(UITemplate(quest, ItemType.QUEST_STARTED))
-                    process(cur + 1)
+                val questById = playerProfile.getQuestById(quest.id)
+                if (questById != null) {
+                    if (questById.isOwner(playerProfile.player)) {
+                        collect.add(UITemplate(quest, ItemType.QUEST_STARTED))
+                        process(cur + 1)
+                    } else {
+                        collect.add(UITemplate(quest, ItemType.QUEST_STARTED_SHARED))
+                        process(cur + 1)
+                    }
                 } else {
                     // 任务接受条件判断
                     quest.checkAccept(playerProfile).thenAccept { cond ->

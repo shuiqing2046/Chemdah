@@ -29,26 +29,25 @@ class MetaRestart(source: Any?, questContainer: QuestContainer) : Meta<Any?>(sou
          * 检查任务是否满足重置条件
          */
         fun QuestContainer.restart(profile: PlayerProfile): CompletableFuture<Boolean> {
-            val future = CompletableFuture<Boolean>()
-            mirrorFuture("AddonRestart:checkRestart") {
-                val reset = meta<MetaRestart>("restart")?.restart
-                if (reset == null || reset.isEmpty()) {
-                    future.complete(false)
-                    finish()
-                } else {
-                    KetherShell.eval(reset, namespace = namespaceQuest) {
-                        sender = profile.player
-                        rootFrame().variables().also { vars ->
-                            vars.set("@Quest", getQuest(profile))
-                            vars.set("@QuestContainer", this@restart)
-                        }
-                    }.thenApply {
-                        future.complete(Coerce.toBoolean(it))
+            return CompletableFuture<Boolean>().also { future ->
+                mirrorFuture("AddonRestart:checkRestart") {
+                    val reset = meta<MetaRestart>("restart")?.restart
+                    if (reset == null || reset.isEmpty()) {
+                        future.complete(false)
                         finish()
+                    } else {
+                        KetherShell.eval(reset, namespace = namespaceQuest) {
+                            sender = profile.player
+                            rootFrame().variables().also { vars ->
+                                vars.set("@QuestContainer", this@restart)
+                            }
+                        }.thenApply {
+                            future.complete(Coerce.toBoolean(it))
+                            finish()
+                        }
                     }
                 }
             }
-            return future
         }
     }
 }

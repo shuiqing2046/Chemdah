@@ -2,7 +2,6 @@ package ink.ptms.chemdah.api.event
 
 import ink.ptms.chemdah.module.party.Party
 import io.izzel.taboolib.module.event.EventNormal
-import org.bukkit.entity.Player
 
 /**
  * Chemdah

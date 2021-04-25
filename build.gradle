@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'ink.ptms.chemdah'
-version = 'SNAPSHOT 04 23 1'
+version = 'SNAPSHOT 04 25 1'
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
@@ -29,12 +29,13 @@ dependencies {
     implementation 'public:Team2:1.0.0:1'
     implementation 'public:Team2:1.0.0:2'
     implementation 'public:Team2:1.0.0:3'
+    implementation 'public:CustomGo:1.0.0'
     implementation 'public:MMOLib:1.0.0'
     implementation 'public:MMOCore:1.0.0'
     implementation 'public:MMOItems:1.0.0'
     implementation 'public:Parties:1.0.0'
+    implementation 'public:NexEngine:1.0.0'
     implementation 'public:QuantumRPG:1.0.0'
-    implementation 'public:RankCraft:1.0.0'
     implementation 'public:RPGItems:1.0.0'
     implementation 'public:Citizens:1.0.0'
     implementation 'public:MythicLib:1.0.0'

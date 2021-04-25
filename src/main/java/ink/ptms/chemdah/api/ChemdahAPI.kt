@@ -74,7 +74,7 @@ object ChemdahAPI {
             quest.tasks.forEach { task ->
                 val trigger = task.objective as? ITrigger
                 if (trigger?.getValue(task) == value) {
-                    QuestLoader.handleTask(chemdahProfile, task.objective, task, EMPTY_EVENT)
+                    QuestLoader.handleTask(chemdahProfile, task, quest, EMPTY_EVENT)
                 }
             }
         }

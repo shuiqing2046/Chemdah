@@ -15,6 +15,8 @@ interface Party {
 
     interface PartyInfo {
 
+        fun isLeader(player: Player) = getLeader()?.uniqueId == player.uniqueId
+
         fun getLeader(): Player?
 
         fun getMembers(): List<Player>

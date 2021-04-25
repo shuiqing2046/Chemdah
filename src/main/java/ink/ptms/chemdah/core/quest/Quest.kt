@@ -70,12 +70,13 @@ class Quest(val id: String, val profile: PlayerProfile, val persistentDataContai
                     resetQuest()
                     finish()
                 } else {
-                    if (tasks.all { it.objective.hasCompletedSignature(profile, it) } && QuestEvents.Complete(this@Quest, profile).call().nonCancelled()) {
-                        template.agent(profile, AgentType.QUEST_COMPLETE, this@Quest).thenAccept {
+                    if (tasks.all { it.objective.hasCompletedSignature(profile, it) } && QuestEvents.Complete.Pre(this@Quest, profile).call().nonCancelled()) {
+                        template.agent(profile, AgentType.QUEST_COMPLETE).thenAccept {
                             if (it) {
                                 template.control().signature(profile, MetaControl.Trigger.COMPLETE)
                                 profile.unregisterQuest(this@Quest)
                                 profile.persistentDataContainer.put("quest.complete.$id", System.currentTimeMillis())
+                                QuestEvents.Complete.Post(this@Quest, profile).call()
                             }
                             finish()
                         }
@@ -100,11 +101,12 @@ class Quest(val id: String, val profile: PlayerProfile, val persistentDataContai
      */
     fun failureQuest() {
         mirrorFuture("Quest:failure") {
-            if (QuestEvents.Failure(this@Quest, profile).call().nonCancelled()) {
-                template.agent(profile, AgentType.QUEST_FAILURE, this@Quest).thenAccept {
+            if (QuestEvents.Failure.Pre(this@Quest, profile).call().nonCancelled()) {
+                template.agent(profile, AgentType.QUEST_FAILURE).thenAccept {
                     if (it) {
                         template.control().signature(profile, MetaControl.Trigger.FAILURE)
                         profile.unregisterQuest(this@Quest)
+                        QuestEvents.Failure.Post(this@Quest, profile).call()
                     }
                     finish()
                 }
@@ -119,14 +121,17 @@ class Quest(val id: String, val profile: PlayerProfile, val persistentDataContai
      */
     fun resetQuest() {
         mirrorFuture("Quest:reset") {
-            if (QuestEvents.Reset(this@Quest, profile).call().nonCancelled()) {
-                template.agent(profile, AgentType.QUEST_RESET, this@Quest).thenAccept {
+            if (QuestEvents.Reset.Pre(this@Quest, profile).call().nonCancelled()) {
+                template.agent(profile, AgentType.QUEST_RESET).thenAccept {
                     if (it) {
                         tasks.forEach { task ->
-                            task.objective.onReset(profile, task)
-                            ObjectiveEvents.Reset(task.objective, task, profile).call()
+                            if (ObjectiveEvents.Reset.Pre(task.objective, task, this@Quest, profile).call().nonCancelled()) {
+                                task.objective.onReset(profile, task, this@Quest)
+                                ObjectiveEvents.Reset.Post(task.objective, task, this@Quest, profile).call()
+                            }
                         }
                         persistentDataContainer.clear()
+                        QuestEvents.Reset.Post(this@Quest, profile).call()
                     }
                     finish()
                 }

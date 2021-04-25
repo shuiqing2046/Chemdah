@@ -158,7 +158,7 @@ class AddonAutomation(source: ConfigurationSection, questContainer: QuestContain
                     val profile = player.chemdahProfile
                     // 自动接受的任务
                     autoAccept.forEach {
-                        if (profile.getQuestById(it.id) == null) {
+                        if (profile.getQuestById(it.id, openAPI = false) == null) {
                             it.acceptTo(profile)
                         }
                     }

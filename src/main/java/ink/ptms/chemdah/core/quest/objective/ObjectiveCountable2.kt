@@ -1,6 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective
 
 import ink.ptms.chemdah.core.PlayerProfile
+import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.objective.Progress.Companion.progress
 import io.izzel.taboolib.util.Coerce
@@ -30,8 +31,8 @@ abstract class ObjectiveCountable2<E : Event> : Objective<E>() {
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun onContinue(profile: PlayerProfile, task: Task, event: Event) {
-        super.onContinue(profile, task, event)
+    override fun onContinue(profile: PlayerProfile, task: Task, quest: Quest, event: Event) {
+        super.onContinue(profile, task, quest, event)
         profile.dataOperator(task) {
             put("amount", get("amount", 0).toDouble() + getCount(profile, task, event as E))
         }

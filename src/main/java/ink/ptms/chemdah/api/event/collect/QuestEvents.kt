@@ -29,29 +29,44 @@ class QuestEvents {
     class Collect(val quests: MutableList<Quest>, val playerProfile: PlayerProfile) : EventNormal<Collect>(true)
 
     /**
-     * 当任务进行接受检测时
+     * 当任务接受时
      */
-    class AcceptCheck(val template: Template, val playerProfile: PlayerProfile): EventCancellable<AcceptCheck>(true)
+    class Accept {
 
-    /**
-     * 当任务接受后
-     */
-    class Accepted(val quest: Quest, val playerProfile: PlayerProfile): EventNormal<Accepted>(true)
+        class Pre(val quest: Template, val playerProfile: PlayerProfile): EventCancellable<Pre>(true)
+
+        class Post(val quest: Quest, val playerProfile: PlayerProfile): EventNormal<Post>(true)
+    }
 
     /**
      * 当任务完成时
      */
-    class Complete(val quest: Quest, val playerProfile: PlayerProfile): EventCancellable<Complete>(true)
+    class Complete {
+
+        class Pre(val quest: Quest, val playerProfile: PlayerProfile): EventCancellable<Pre>(true)
+
+        class Post(val quest: Quest, val playerProfile: PlayerProfile): EventNormal<Post>(true)
+    }
 
     /**
      * 当任务失败（放弃）时
      */
-    class Failure(val quest: Quest, val playerProfile: PlayerProfile): EventCancellable<Failure>(true)
+    class Failure {
+
+        class Pre(val quest: Quest, val playerProfile: PlayerProfile): EventCancellable<Pre>(true)
+
+        class Post(val quest: Quest, val playerProfile: PlayerProfile): EventNormal<Post>(true)
+    }
 
     /**
      * 当任务重置时
      */
-    class Reset(val quest: Quest, val playerProfile: PlayerProfile): EventCancellable<Reset>(true)
+    class Reset {
+
+        class Pre(val quest: Quest, val playerProfile: PlayerProfile): EventCancellable<Pre>(true)
+
+        class Post(val quest: Quest, val playerProfile: PlayerProfile): EventNormal<Post>(true)
+    }
 
     /**
      * 当任务被注册到玩家数据

@@ -56,7 +56,7 @@ class CommandChemdahQuest : BaseMainCommand() {
             TLocale.sendTo(sender, "command-player-not-found")
             return
         }
-        val quest = playerExact.chemdahProfile.getQuestById(args[1])
+        val quest = playerExact.chemdahProfile.getQuestById(args[1], openAPI = false)
         if (quest == null) {
             TLocale.sendTo(sender, "command-quest-not-accepted")
             return
@@ -71,7 +71,7 @@ class CommandChemdahQuest : BaseMainCommand() {
             TLocale.sendTo(sender, "command-player-not-found")
             return
         }
-        val quest = playerExact.chemdahProfile.getQuestById(args[1])
+        val quest = playerExact.chemdahProfile.getQuestById(args[1], openAPI = false)
         if (quest == null) {
             TLocale.sendTo(sender, "command-quest-not-accepted")
             return
@@ -86,7 +86,7 @@ class CommandChemdahQuest : BaseMainCommand() {
             TLocale.sendTo(sender, "command-player-not-found")
             return
         }
-        val quest = playerExact.chemdahProfile.getQuestById(args[1])
+        val quest = playerExact.chemdahProfile.getQuestById(args[1], openAPI = false)
         if (quest == null) {
             TLocale.sendTo(sender, "command-quest-not-accepted")
             return
@@ -101,7 +101,7 @@ class CommandChemdahQuest : BaseMainCommand() {
             TLocale.sendTo(sender, "command-player-not-found")
             return
         }
-        val quest = playerExact.chemdahProfile.getQuestById(args[1])
+        val quest = playerExact.chemdahProfile.getQuestById(args[1], openAPI = false)
         if (quest == null) {
             TLocale.sendTo(sender, "command-quest-not-accepted")
             return

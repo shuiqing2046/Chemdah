@@ -1,5 +1,6 @@
 package ink.ptms.chemdah.core.quest.addon
 
+import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.api.event.collect.ObjectiveEvents
 import ink.ptms.chemdah.api.event.collect.QuestEvents
 import ink.ptms.chemdah.core.PlayerProfile
@@ -9,6 +10,7 @@ import ink.ptms.chemdah.core.quest.QuestContainer
 import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.meta.MetaName.Companion.displayName
 import ink.ptms.chemdah.core.quest.objective.Progress
+import ink.ptms.chemdah.module.party.PartySystem.getMembers
 import ink.ptms.chemdah.util.*
 import io.izzel.taboolib.kotlin.kether.KetherShell
 import io.izzel.taboolib.kotlin.kether.common.api.QuestContext
@@ -90,7 +92,6 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
         KetherShell.eval(agent, namespace = namespaceQuest) {
             sender = profile.player
             vars.set(rootFrame().variables().also { vars ->
-                vars.set("@Quest", quest)
                 vars.set("@QuestContainer", task)
             })
         }.thenApply {
@@ -126,20 +127,28 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
 
         @EventHandler
         private fun e(e: QuestEvents.Registered) {
-            e.quest.refreshStats(e.playerProfile)
+            e.quest.getMembers(self = true).forEach {
+                e.quest.refreshStats(it.chemdahProfile)
+            }
         }
 
         @EventHandler
         private fun e(e: QuestEvents.Unregistered) {
-            e.quest.hiddenStats(e.playerProfile)
+            e.quest.getMembers(self = true).forEach {
+                e.quest.hiddenStats(it.chemdahProfile)
+            }
         }
 
         @EventHandler
-        private fun e(e: ObjectiveEvents.Continue) {
+        private fun e(e: ObjectiveEvents.Continue.Post) {
             if (e.isCompleted()) {
-                e.task.hiddenStats(e.playerProfile)
+                e.quest.getMembers(self = true).forEach {
+                    e.task.hiddenStats(it.chemdahProfile)
+                }
             } else {
-                e.task.refreshStats(e.playerProfile)
+                e.quest.getMembers(self = true).forEach {
+                    e.task.refreshStats(it.chemdahProfile)
+                }
             }
         }
 
