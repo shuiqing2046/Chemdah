@@ -13,6 +13,8 @@ import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.serverct.ersha.dungeon.DungeonPlus
+import org.serverct.ersha.dungeon.internal.manager.GroupManager
 import sky_bai.bukkit.baiteam.BaiTeam
 import su.nightexpress.quantumrpg.api.QuantumAPI
 import su.nightexpress.quantumrpg.modules.list.party.PartyManager
@@ -38,6 +40,7 @@ class PartyHook : Listener {
             "PxTeam" -> PxTeamHook
             "Parties" -> PartiesHook
             "QuantumRPG", "PRORPG" -> QuantumHook
+            "DungeonPlus" -> DungeonPlusHook
             else -> return
         }
     }
@@ -159,6 +162,23 @@ class PartyHook : Listener {
 
                 override fun getMembers(): List<Player> {
                     return team.members.filter { !it.isLeader }.mapNotNull { it.player }
+                }
+            }
+        }
+    }
+
+    object DungeonPlusHook : Party {
+
+        override fun getParty(player: Player): Party.PartyInfo? {
+            val team = DungeonPlus.groupManager.getGroup(player) ?: return null
+            return object : Party.PartyInfo {
+
+                override fun getLeader(): Player {
+                    return team.leader
+                }
+
+                override fun getMembers(): List<Player> {
+                    return team.players.filter { it.uniqueId != team.leader.uniqueId }
                 }
             }
         }

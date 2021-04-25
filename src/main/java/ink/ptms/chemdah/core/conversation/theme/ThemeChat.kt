@@ -205,7 +205,7 @@ object ThemeChat : Theme<ThemeChatSettings>(), Listener {
                 complete(null)
             }
         }
-        TLocale.sendTo(session.player, "theme-test-help")
+        TLocale.sendTo(session.player, "theme-chat-help")
     }
 
     private fun newJson() = TellrawJson.create().also { json -> repeat(100) { json.newLine() } }
