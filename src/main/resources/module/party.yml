@@ -5,4 +5,4 @@
 
 default:
   # BaiTeam, CustomGo, iTeamPro, NyTeam, PxTeam, Parties, QuantumRPG
-  plugin: Parties
+  plugin: none
