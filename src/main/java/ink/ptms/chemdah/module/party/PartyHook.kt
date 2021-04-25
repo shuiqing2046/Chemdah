@@ -131,7 +131,8 @@ class PartyHook : Listener {
     object PartiesHook : Party {
 
         override fun getParty(player: Player): Party.PartyInfo? {
-            val team = Parties.getApi().getParty(player.uniqueId) ?: return null
+            val id = Parties.getApi().getPartyPlayer(player.uniqueId)?.partyId ?: return null
+            val team = Parties.getApi().getParty(id) ?: return null
             return object : Party.PartyInfo {
 
                 override fun getLeader(): Player? {

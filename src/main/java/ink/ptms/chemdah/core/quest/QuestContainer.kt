@@ -71,7 +71,7 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
             Agent(
                 type.toAgentType(),
                 config.get(it)!!.asList(),
-                args.getOrNull(1)
+                args.getOrNull(1) ?: "self"
             )
         }
 

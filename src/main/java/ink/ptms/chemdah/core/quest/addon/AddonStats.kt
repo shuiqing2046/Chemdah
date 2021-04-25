@@ -141,14 +141,15 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
 
         @EventHandler
         private fun e(e: ObjectiveEvents.Continue.Post) {
-            if (e.isCompleted()) {
-                e.quest.getMembers(self = true).forEach {
-                    e.task.hiddenStats(it.chemdahProfile)
-                }
-            } else {
-                e.quest.getMembers(self = true).forEach {
-                    e.task.refreshStats(it.chemdahProfile)
-                }
+            e.quest.getMembers(self = true).forEach {
+                e.task.refreshStats(it.chemdahProfile)
+            }
+        }
+
+        @EventHandler
+        private fun e(e: ObjectiveEvents.Complete.Post) {
+            e.quest.getMembers(self = true).forEach {
+                e.task.hiddenStats(it.chemdahProfile)
             }
         }
 

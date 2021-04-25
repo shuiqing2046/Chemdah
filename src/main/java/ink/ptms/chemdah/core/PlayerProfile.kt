@@ -7,6 +7,7 @@ import ink.ptms.chemdah.core.quest.QuestDataOperator
 import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.Template
 import ink.ptms.chemdah.util.asList
+import ink.ptms.chemdah.util.mirrorFinish
 import ink.ptms.chemdah.util.namespaceQuest
 import ink.ptms.chemdah.util.print
 import io.izzel.taboolib.kotlin.Tasks
@@ -103,7 +104,10 @@ class PlayerProfile(val uniqueId: UUID) {
      */
     fun getQuests(openAPI: Boolean = false): List<Quest> {
         return if (openAPI) {
-            QuestEvents.Collect(questMap.values.filter { it.isValid }.toMutableList(), this).call().quests
+            val time = System.nanoTime()
+            val quests = QuestEvents.Collect(questMap.values.filter { it.isValid }.toMutableList(), this).call().quests
+            mirrorFinish("PlayerProfile:openAPI", time)
+            quests
         } else {
             questMap.values.filter { it.isValid }
         }

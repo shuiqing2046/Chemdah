@@ -23,12 +23,7 @@ class ObjectiveEvents {
 
         class Pre(val objective: Objective<*>, val task: Task, val quest: Quest, val playerProfile: PlayerProfile): EventCancellable<Pre>(true)
 
-        class Post(val objective: Objective<*>, val task: Task, val quest: Quest, val playerProfile: PlayerProfile): EventNormal<Post>(true) {
-
-            fun isCompleted(): Boolean {
-                return task.isCompleted(playerProfile) || quest.isCompleted
-            }
-        }
+        class Post(val objective: Objective<*>, val task: Task, val quest: Quest, val playerProfile: PlayerProfile): EventNormal<Post>(true)
     }
 
     /**

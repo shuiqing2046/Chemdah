@@ -57,7 +57,7 @@ object ChemdahAPI {
      * 玩家数据尚未加载完成
      */
     val Player.nonChemdahProfileLoaded: Boolean
-        get() = ChemdahAPI.playerProfile.containsKey(name)
+        get() = !ChemdahAPI.playerProfile.containsKey(name)
 
     /**
      * 获取玩家正在进行的会话

@@ -141,7 +141,7 @@ class CommandChemdahQuest : BaseMainCommand() {
             TLocale.sendTo(sender, "command-quest-info-header")
             val page = Coerce.toInteger(args.getOrNull(2) ?: 0)
             Indexed.subList(quests, page * 5, (page + 1) * 5 - 1).forEach { quest ->
-                TLocale.sendTo(sender, "command-quest-info-body", "  §n${quest.id}:§r ${if (quest.isOwner(playerExact)) "§8(Share)" else ""}")
+                TLocale.sendTo(sender, "command-quest-info-body", "  §n${quest.id}:§r ${if (!quest.isOwner(playerExact)) "§8(Share)" else ""}")
                 TLocale.sendTo(sender, "command-quest-info-body", "    §7Start in ${DateFormatUtils.format(quest.startTime, "yyyy/MM/dd HH:mm:ss")}")
                 TLocale.sendTo(sender, "command-quest-info-body", "    §7Data:")
                 quest.persistentDataContainer.entries().forEach { e ->

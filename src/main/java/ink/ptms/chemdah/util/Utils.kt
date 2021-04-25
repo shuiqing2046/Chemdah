@@ -9,6 +9,7 @@ import io.izzel.taboolib.internal.xseries.XBlock
 import io.izzel.taboolib.internal.xseries.XMaterial
 import io.izzel.taboolib.kotlin.Demand.Companion.toDemand
 import io.izzel.taboolib.kotlin.Mirror
+import io.izzel.taboolib.kotlin.MirrorData
 import io.izzel.taboolib.module.config.TConfig
 import io.izzel.taboolib.util.Coerce
 import io.izzel.taboolib.util.item.ItemBuilder
@@ -82,6 +83,10 @@ fun warning(any: Any?) {
 
 fun mirrorFuture(id: String, func: Mirror.MirrorFuture.() -> Unit) {
     ChemdahAPI.mirror.mirrorFuture(id, func)
+}
+
+fun mirrorFinish(id: String, time: Long) {
+    ChemdahAPI.mirror.dataMap.computeIfAbsent(id) { MirrorData() }.finish(time)
 }
 
 fun XMaterial.isBlock(block: Block): Boolean {

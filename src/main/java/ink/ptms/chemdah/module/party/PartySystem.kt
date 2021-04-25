@@ -1,6 +1,7 @@
 package ink.ptms.chemdah.module.party
 
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
+import ink.ptms.chemdah.api.ChemdahAPI.isChemdahProfileLoaded
 import ink.ptms.chemdah.api.event.PartyHookEvent
 import ink.ptms.chemdah.api.event.collect.ObjectiveEvents
 import ink.ptms.chemdah.api.event.collect.QuestEvents
@@ -39,20 +40,14 @@ object PartySystem : Module, Listener {
         val player = profile.player
         // 获取 Party 组件
         val partyAddon = template.party()
-        if (partyAddon != null) {
-            // 获取玩家所在队伍
-            val team = player.getParty()
-            if (team != null) {
-                // 判断是否共享任务
-                if (partyAddon.share && (!partyAddon.shareOnlyLeader || team.isLeader(player))) {
-                    members.addAll(player.getPartyMembers())
-                }
-            }
+        // 是否共享任务
+        if (partyAddon?.share == true && (!partyAddon.shareOnlyLeader || player.getParty()?.isLeader(player) == true)) {
+            members.addAll(player.getPartyMembers())
         }
-        if (!self) {
+        if (self) {
             members.add(player)
         }
-        return members
+        return members.filter { it.isChemdahProfileLoaded }.toSet()
     }
 
     /**
@@ -83,13 +78,15 @@ object PartySystem : Module, Listener {
     }
 
     fun shareQuests(quests: MutableList<Quest>, sharer: Player, leader: Boolean = false) {
-        sharer.chemdahProfile.getQuests().forEach { quest ->
-            val partyAddon = quest.template.party() ?: return@forEach
-            // 是否分享任务
-            if (partyAddon.share && (!partyAddon.shareOnlyLeader || leader)) {
-                // 是否已拥有该任务
-                if (quests.none { it.id == quest.id }) {
-                    quests.add(quest)
+        if (sharer.isChemdahProfileLoaded) {
+            sharer.chemdahProfile.getQuests().forEach { quest ->
+                val partyAddon = quest.template.party() ?: return@forEach
+                // 是否分享任务
+                if (partyAddon.share && (!partyAddon.shareOnlyLeader || leader)) {
+                    // 是否已拥有该任务
+                    if (quests.none { it.id == quest.id }) {
+                        quests.add(quest)
+                    }
                 }
             }
         }
@@ -120,6 +117,13 @@ object PartySystem : Module, Listener {
     fun e(e: QuestEvents.Failure.Post) {
         e.quest.profile.player.getPartyMembers().forEach { member ->
             e.quest.template.agent(member.chemdahProfile, AgentType.QUEST_FAILURE, "party")
+        }
+    }
+
+    @EventHandler
+    fun e(e: QuestEvents.Accept.Post) {
+        e.quest.profile.player.getPartyMembers().forEach { member ->
+            e.quest.template.agent(member.chemdahProfile, AgentType.QUEST_START, "party")
         }
     }
 

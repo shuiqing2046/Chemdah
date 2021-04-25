@@ -74,7 +74,10 @@ class UIMenu(val ui: UI, val profile: PlayerProfile, val templates: List<UITempl
 
     override fun onClick(event: ClickEvent, template: UITemplate) {
         // 当任务为正在进行或可以开始时
-        if (template.itemType == ItemType.QUEST_STARTED || template.itemType == ItemType.QUEST_CAN_START) {
+        if (template.itemType == ItemType.QUEST_STARTED
+            || template.itemType == ItemType.QUEST_STARTED_SHARED
+            || template.itemType == ItemType.QUEST_CAN_START
+        ) {
             // 当任务允许被追踪时才会关闭界面
             if (template.template.allowTracked()) {
                 // 追踪任务

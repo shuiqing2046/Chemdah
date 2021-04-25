@@ -62,8 +62,8 @@ default:
         flags:
           - HIDE_ENCHANTS
       started-shared:
-        material: orange_stained_glass_pane
-        name: '&6&l{name} &7(Shared)'
+        material: purple_stained_glass_pane
+        name: '&d&l{name} &5(Shared)'
         lore:
           - '&eStarted...'
           - ''

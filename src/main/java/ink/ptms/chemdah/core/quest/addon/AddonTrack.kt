@@ -10,10 +10,7 @@ import ink.ptms.chemdah.api.event.collect.ObjectiveEvents
 import ink.ptms.chemdah.api.event.collect.PlayerEvents
 import ink.ptms.chemdah.api.event.collect.QuestEvents
 import ink.ptms.chemdah.core.PlayerProfile
-import ink.ptms.chemdah.core.quest.Id
-import ink.ptms.chemdah.core.quest.QuestContainer
-import ink.ptms.chemdah.core.quest.Task
-import ink.ptms.chemdah.core.quest.Template
+import ink.ptms.chemdah.core.quest.*
 import ink.ptms.chemdah.core.quest.addon.AddonUI.Companion.ui
 import ink.ptms.chemdah.core.quest.meta.MetaName.Companion.displayName
 import ink.ptms.chemdah.core.quest.selector.InferArea
@@ -22,6 +19,7 @@ import ink.ptms.chemdah.util.*
 import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.kotlin.navigation.Navigation
 import io.izzel.taboolib.kotlin.navigation.pathfinder.NodeEntity
+import io.izzel.taboolib.kotlin.sendScoreboard
 import io.izzel.taboolib.module.inject.PlayerContainer
 import io.izzel.taboolib.module.inject.TListener
 import io.izzel.taboolib.module.inject.TSchedule
@@ -29,9 +27,7 @@ import io.izzel.taboolib.module.locale.TLocale
 import io.izzel.taboolib.module.tellraw.TellrawJson
 import io.izzel.taboolib.util.Baffle
 import io.izzel.taboolib.util.Coerce
-import io.izzel.taboolib.util.Features
 import io.izzel.taboolib.util.lite.Effects
-import io.izzel.taboolib.util.lite.Scoreboards
 import org.bukkit.Bukkit
 import org.bukkit.Particle
 import org.bukkit.configuration.ConfigurationSection
@@ -96,6 +92,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
     val navigationPeriod = Baffle.of(config.getInt("navigation-option.period", conf.getInt("default-track.navigation.period")))
 
     val scoreboard = config.getBoolean("scoreboard", conf.getBoolean("default-track.scoreboard.value"))
+    val scoreboardSize = config.getInt("scoreboard-size", conf.getInt("default-track.scoreboard.size"))
     val scoreboardContent = config.getList("scoreboard-content")?.run {
         filterNotNull().map {
             ScoreboardContent(it.asList().colored())
@@ -109,7 +106,13 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
         private val trackNavigationHologramMap = ConcurrentHashMap<String, MutableMap<String, HologramAPI.Hologram<*>>>()
 
         @PlayerContainer
+        private val acceptedQuestsMap = ConcurrentHashMap<String, List<Quest>>()
+
+        @PlayerContainer
         private val scoreboardBaffle = Baffle.of(100)
+
+        @PlayerContainer
+        private val refreshBaffle = Baffle.of(20)
 
         private val playerBaffle = ConcurrentHashMap<String, MutableMap<String, Baffle>>()
 
@@ -125,6 +128,10 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
 
         private val defaultMessage by lazy {
             conf.get("default-track.message")?.asList()?.colored() ?: emptyList()
+        }
+
+        private val defaultSize by lazy {
+            conf.getInt("default-track.scoreboard.size")
         }
 
         /**
@@ -176,8 +183,12 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
             Bukkit.getOnlinePlayers().filter { it.isChemdahProfileLoaded }.forEach { player ->
                 val chemdahProfile = player.chemdahProfile
                 val quest = chemdahProfile.trackQuest ?: return@forEach
+                // 缓存任务
+                if (refreshBaffle.hasNext(player.name)) {
+                    acceptedQuestsMap[player.name] = chemdahProfile.getQuests(openAPI = true)
+                }
                 // 若任务未接受则追踪任务整体
-                if (chemdahProfile.getQuestById(quest.id) == null) {
+                if (acceptedQuestsMap[player.name]?.any { it.id == quest.id } == true) {
                     val track = quest.track() ?: return@forEach
                     player.trackTickMark(track)
                     player.trackTickNavigation(track)
@@ -327,12 +338,12 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
             if (chemdahProfile.getQuestById(quest.id) == null) {
                 // 启用 Scoreboard 追踪
                 if (quest.track()?.scoreboard == true) {
-                    Features.displayScoreboard(this)
+                    sendScoreboard("")
                 }
             } else {
                 // 任意子条目启用 Scoreboard 追踪
                 if (quest.task.any { it.value.track()?.scoreboard == true }) {
-                    Features.displayScoreboard(this)
+                    sendScoreboard("")
                 }
             }
         }
@@ -354,7 +365,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                             it.content.flatMap { contentLine ->
                                 if (contentLine.contains("{description}")) {
                                     val description = track.description ?: quest.ui()?.description ?: emptyList()
-                                    description.split().map { descriptionLine -> contentLine.replace("{description}", descriptionLine) }
+                                    description.split(track.scoreboardSize).map { descriptionLine -> contentLine.replace("{description}", descriptionLine) }
                                 } else {
                                     contentLine.replace("{name}", track.name ?: quest.displayName()).asList()
                                 }
@@ -372,7 +383,8 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                                     it.content.flatMap { contentLine ->
                                         if (contentLine.contains("{description}")) {
                                             val description = taskTrack.description ?: quest.ui()?.description ?: emptyList()
-                                            description.split().map { d -> contentLine.replace("{description}", d) }
+                                            val size = quest.track()?.scoreboardSize ?: defaultSize
+                                            description.split(size).map { d -> contentLine.replace("{description}", d) }
                                         } else {
                                             contentLine.replace("{name}", taskTrack.name ?: task.displayName()).asList()
                                         }
@@ -387,7 +399,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                     }
                 }
                 if (content.size > 2) {
-                    Scoreboards.display(this@refreshTrackingScoreboard, *content.colored().mapIndexed { index, s -> "§${chars[index]}$s" }.toTypedArray())
+                    sendScoreboard(*content.colored().mapIndexed { index, s -> "§${chars[index]}$s" }.toTypedArray())
                 } else {
                     cancelTrackingScoreboard(quest)
                 }
@@ -426,6 +438,22 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
         }
 
         /**
+         * 任务注销时取消任务追踪
+         */
+        @EventHandler
+        private fun onUnregistered(e: QuestEvents.Unregistered) {
+            // 如果我在追踪这个任务
+            if (e.playerProfile.trackQuest == e.quest.template) {
+                // 我和我的队友都会取消这个任务的追踪
+                e.quest.getMembers(self = true).forEach {
+                    if (it.chemdahProfile.trackQuest == e.quest.template) {
+                        it.chemdahProfile.trackQuest = null
+                    }
+                }
+            }
+        }
+
+        /**
          * 任务注册时刷新任务追踪
          * 总内容替换为子内容显示
          */
@@ -434,16 +462,6 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
             if (e.playerProfile.trackQuest == e.quest.template) {
                 e.playerProfile.player.refreshTrackingNavigation()
                 e.playerProfile.player.refreshTrackingScoreboard()
-            }
-        }
-
-        /**
-         * 任务注销时取消任务追踪
-         */
-        @EventHandler
-        private fun onUnregistered(e: QuestEvents.Unregistered) {
-            if (e.playerProfile.trackQuest == e.quest.template) {
-                e.playerProfile.trackQuest = null
             }
         }
 
@@ -499,18 +517,18 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
             e.player.cancelTrackingNavigation()
         }
 
-        private fun List<String>.split() = colored().flatMap { line ->
-            if (line.length > 38) {
+        private fun List<String>.split(size: Int) = colored().flatMap { line ->
+            if (line.length > size) {
                 val arr = ArrayList<String>()
                 var s = line
-                while (s.length > 38) {
-                    val c = s.substring(0, 38)
+                while (s.length > size) {
+                    val c = s.substring(0, size)
                     val i = c.lastIndexOf("§")
                     arr.add(c)
                     s = if (i != -1 && i + 2 < c.length) {
-                        s.substring(i, i + 2) + s.substring(38)
+                        s.substring(i, i + 2) + s.substring(size)
                     } else {
-                        s.substring(38)
+                        s.substring(size)
                     }
                 }
                 arr.add(s)

@@ -101,7 +101,7 @@ object ConversationLoader {
                     Agent(
                         args[0].toAgentType(),
                         root.get(it)!!.asList(),
-                        args.getOrNull(1)
+                        args.getOrNull(1) ?: "self"
                     )
                 },
             option
