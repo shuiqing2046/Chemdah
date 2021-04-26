@@ -4,5 +4,5 @@
 
 
 default:
-  # BaiTeam, CustomGo, DungeonPlus, iTeamPro, NyTeam, PxTeam, Parties, QuantumRPG
+  # BaiTeam, CustomGo, DungeonPlus, FriendsPremium, iTeamPro, mcMMO, MMOCore, NyTeam, PxTeam, Parties, QuantumRPG
   plugin: none

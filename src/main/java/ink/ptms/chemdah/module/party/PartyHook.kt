@@ -4,17 +4,19 @@ import cn.mcres.iTeamPro.manager.TeamManager
 import com.alessiodp.parties.api.Parties
 import com.github.Shawhoi.nyteam.NyTeam
 import com.pxpmc.team.TeamMain
+import de.HyChrod.Party.Utilities.PartyAPI
 import fw.teams.Fwteam
 import ink.ptms.chemdah.api.event.PartyHookEvent
 import io.izzel.taboolib.kotlin.Reflex.Companion.reflex
 import io.izzel.taboolib.kotlin.Reflex.Companion.static
 import io.izzel.taboolib.module.inject.TListener
+import net.Indyuce.mmocore.MMOCore
+import net.Indyuce.mmocore.api.player.PlayerData
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.serverct.ersha.dungeon.DungeonPlus
-import org.serverct.ersha.dungeon.internal.manager.GroupManager
 import sky_bai.bukkit.baiteam.BaiTeam
 import su.nightexpress.quantumrpg.api.QuantumAPI
 import su.nightexpress.quantumrpg.modules.list.party.PartyManager
@@ -35,12 +37,15 @@ class PartyHook : Listener {
         e.party = when (e.plugin) {
             "BaiTeam" -> BaiTeamHook
             "CustomGo" -> CustomGoHook
+            "DungeonPlus" -> DungeonPlusHook
+            "FriendsPremium" -> FriendsPremiumHook
             "iTeamPro" -> ITeamProHook
+            "mcMMO" -> McMMOHook
+            "MMOCore" -> MMOCoreHook
             "NyTeam" -> NyTeamHook
             "PxTeam" -> PxTeamHook
             "Parties" -> PartiesHook
             "QuantumRPG", "PRORPG" -> QuantumHook
-            "DungeonPlus" -> DungeonPlusHook
             else -> return
         }
     }
@@ -56,7 +61,7 @@ class PartyHook : Listener {
                 }
 
                 override fun getMembers(): List<Player> {
-                    return team.members.toList()
+                    return team.members.filter { it.uniqueId != team.leader.uniqueId }.toList()
                 }
             }
         }
@@ -74,7 +79,7 @@ class PartyHook : Listener {
                 }
 
                 override fun getMembers(): List<Player> {
-                    return team.reflex<Set<UUID>>("plist")!!.mapNotNull { Bukkit.getPlayer(it) }.toList()
+                    return team.reflex<Set<UUID>>("plist")!!.filter { it != team.reflex<UUID>("leader")!! }.mapNotNull { Bukkit.getPlayer(it) }
                 }
             }
         }
@@ -91,7 +96,7 @@ class PartyHook : Listener {
                 }
 
                 override fun getMembers(): List<Player> {
-                    return team.members
+                    return team.members.filter { it.uniqueId != team.leader.uniqueId }
                 }
             }
         }
@@ -108,7 +113,7 @@ class PartyHook : Listener {
                 }
 
                 override fun getMembers(): List<Player> {
-                    return team.teamMate.mapNotNull { Bukkit.getPlayerExact(it) }
+                    return team.teamMate.filter { it != team.teamCaptain }.mapNotNull { Bukkit.getPlayerExact(it) }
                 }
             }
         }
@@ -125,7 +130,7 @@ class PartyHook : Listener {
                 }
 
                 override fun getMembers(): List<Player> {
-                    return team.teamList
+                    return team.teamList.filter { it.uniqueId != team.captain.uniqueId }
                 }
             }
         }
@@ -143,7 +148,7 @@ class PartyHook : Listener {
                 }
 
                 override fun getMembers(): List<Player> {
-                    return team.onlineMembers.mapNotNull { Bukkit.getPlayer(it.playerUUID) }
+                    return team.onlineMembers.filter { team.leader != it.playerUUID }.mapNotNull { Bukkit.getPlayer(it.playerUUID) }
                 }
             }
         }
@@ -179,6 +184,59 @@ class PartyHook : Listener {
 
                 override fun getMembers(): List<Player> {
                     return team.players.filter { it.uniqueId != team.leader.uniqueId }
+                }
+            }
+        }
+    }
+
+    object FriendsPremiumHook : Party {
+
+        override fun getParty(player: Player): Party.PartyInfo? {
+            val team = PartyAPI.getParty(player.uniqueId) ?: return null
+            return object : Party.PartyInfo {
+
+                override fun getLeader(): Player? {
+                    return Bukkit.getPlayer(team.all.firstOrNull { team.isLeader(it) }?.uuid ?: return null)
+                }
+
+                override fun getMembers(): List<Player> {
+                    return team.all.filter { !team.isLeader(it) }.mapNotNull { Bukkit.getPlayer(it.uuid) }
+                }
+            }
+        }
+    }
+
+    object McMMOHook : Party {
+
+        override fun getParty(player: Player): Party.PartyInfo? {
+            val team = com.gmail.nossr50.party.PartyManager.getParty(player) ?: return null
+            return object : Party.PartyInfo {
+
+                override fun getLeader(): Player? {
+                    return Bukkit.getPlayer(team.leader.uniqueId)
+                }
+
+                override fun getMembers(): List<Player> {
+                    return team.onlineMembers.filter { it.uniqueId != team.leader.uniqueId }
+                }
+            }
+        }
+    }
+
+    object MMOCoreHook : Party {
+
+        override fun getParty(player: Player): Party.PartyInfo? {
+            val teams = MMOCore.plugin.partyManager.reflex<Set<net.Indyuce.mmocore.api.player.social.Party>>("parties")!!
+            val team = teams.firstOrNull { team -> team.members.reflex<List<PlayerData>>("members")!!.any { it.uniqueId == player.uniqueId } } ?: return null
+            val members = team.reflex<List<PlayerData>>("members")!!
+            return object : Party.PartyInfo {
+
+                override fun getLeader(): Player? {
+                    return team.owner.player
+                }
+
+                override fun getMembers(): List<Player> {
+                    return members.filter { it.uniqueId != team.owner.uniqueId }.map { it.player }
                 }
             }
         }

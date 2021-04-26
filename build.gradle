@@ -19,10 +19,12 @@ taboolib {
 
 repositories {
     mavenCentral()
+    maven { url = 'https://raw.githubusercontent.com/HyChrod/FriendsAPI/repository' }
 }
 
 dependencies {
     implementation 'com.sk89q.worldedit:WorldEdit:7:all'
+    implementation 'de.HyChrod:FriendsAPI:1.1.0.9.1'
     implementation 'public:Team:1.0.0:7'
     implementation 'public:Team:1.0.0:9'
     implementation 'public:Team:1.0.0:10'
@@ -30,6 +32,7 @@ dependencies {
     implementation 'public:Team2:1.0.0:2'
     implementation 'public:Team2:1.0.0:3'
     implementation 'public:CustomGo:1.0.0'
+    implementation 'public:mcMMO:1.0.0'
     implementation 'public:MMOLib:1.0.0'
     implementation 'public:MMOCore:1.0.0'
     implementation 'public:MMOItems:1.0.0'
