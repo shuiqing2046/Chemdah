@@ -37,7 +37,7 @@ class ActionCore {
         fun parser() = ScriptParser.parser {
             when (it.expects("class", "skill", "attribute", "level", "exp", "experience", "mana", "stamina")) {
                 "class" -> {
-                    Base(when (it.expects("id", "name")) {
+                    Base(when (it.expects("id", "name", "point")) {
                         "id" -> { clazz: PlayerData -> clazz.profess.id }
                         "name" -> { clazz: PlayerData -> clazz.profess.name }
                         "point" -> { clazz: PlayerData -> clazz.classPoints }
