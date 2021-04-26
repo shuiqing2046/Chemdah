@@ -1,5 +1,6 @@
 package ink.ptms.chemdah.core.quest.selector
 
+import github.july_summer.julyitems.api.JItemAPI
 import ink.ptms.chemdah.api.event.InferItemHookEvent
 import ink.ptms.zaphkiel.ZaphkielAPI
 import io.izzel.taboolib.kotlin.getCompound
@@ -40,6 +41,9 @@ class InferItemHooks : Listener {
             }
             "pxrpg" -> {
                 e.itemClass = ItemPxRPG::class.java
+            }
+            "julyitem", "julyitems" -> {
+                e.itemClass = ItemJulyItems::class.java
             }
         }
     }
@@ -187,6 +191,21 @@ class InferItemHooks : Listener {
                 "bind" -> item.pxBind().equals(value, true)
                 else -> super.matchMetaData(item, itemMeta, key, value)
             }
+        }
+    }
+
+    class ItemJulyItems(material: String, flags: List<Flags>, data: Map<String, String>) : InferItem.Item(material, flags, data) {
+
+        fun ItemStack.julyName(): String {
+            return JItemAPI.getInstance().toJItem(this)?.itemId ?: "@vanilla"
+        }
+
+        fun ItemStack.quantumLevel(): Int {
+            return ItemStats.getLevel(this)
+        }
+
+        override fun match(item: ItemStack): Boolean {
+            return matchFlags(item.julyName()) && matchMetaData(item)
         }
     }
 }

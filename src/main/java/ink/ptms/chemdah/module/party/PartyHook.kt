@@ -5,6 +5,8 @@ import com.alessiodp.parties.api.Parties
 import com.github.Shawhoi.nyteam.NyTeam
 import com.pxpmc.team.TeamMain
 import de.HyChrod.Party.Utilities.PartyAPI
+import de.erethon.dungeonsxl.DungeonsXL
+import de.simonsator.partyandfriends.spigot.api.pafplayers.PAFPlayerManager
 import fw.teams.Fwteam
 import ink.ptms.chemdah.api.event.PartyHookEvent
 import io.izzel.taboolib.kotlin.Reflex.Companion.reflex
@@ -38,6 +40,7 @@ class PartyHook : Listener {
             "BaiTeam" -> BaiTeamHook
             "CustomGo" -> CustomGoHook
             "DungeonPlus" -> DungeonPlusHook
+            "DungeonXL" -> DungeonXLHook
             "FriendsPremium" -> FriendsPremiumHook
             "iTeamPro" -> ITeamProHook
             "mcMMO" -> McMMOHook
@@ -45,6 +48,7 @@ class PartyHook : Listener {
             "NyTeam" -> NyTeamHook
             "PxTeam" -> PxTeamHook
             "Parties" -> PartiesHook
+            "PartyAndFriends" -> PartyAndFriendsHook
             "QuantumRPG", "PRORPG" -> QuantumHook
             else -> return
         }
@@ -154,6 +158,24 @@ class PartyHook : Listener {
         }
     }
 
+    object PartyAndFriendsHook : Party {
+
+        override fun getParty(player: Player): Party.PartyInfo? {
+            val p = PAFPlayerManager.getInstance().getPlayer(player.uniqueId)
+            val team = de.simonsator.partyandfriends.spigot.api.party.PartyManager.getInstance().getParty(p) ?: return null
+            return object : Party.PartyInfo {
+
+                override fun getLeader(): Player? {
+                    return Bukkit.getPlayer(team.leader.uniqueId)
+                }
+
+                override fun getMembers(): List<Player> {
+                    return team.allPlayers.filter { it.uniqueId != team.leader.uniqueId }.mapNotNull { Bukkit.getPlayer(it.uniqueId) }
+                }
+            }
+        }
+    }
+
     object QuantumHook : Party {
 
         override fun getParty(player: Player): Party.PartyInfo? {
@@ -184,6 +206,23 @@ class PartyHook : Listener {
 
                 override fun getMembers(): List<Player> {
                     return team.players.filter { it.uniqueId != team.leader.uniqueId }
+                }
+            }
+        }
+    }
+
+    object DungeonXLHook : Party {
+
+        override fun getParty(player: Player): Party.PartyInfo? {
+            val team = DungeonsXL.getInstance().getPlayerGroup(player) ?: return null
+            return object : Party.PartyInfo {
+
+                override fun getLeader(): Player {
+                    return team.leader
+                }
+
+                override fun getMembers(): List<Player> {
+                    return team.members.onlinePlayers.filter { it.uniqueId != team.leader.uniqueId }
                 }
             }
         }
