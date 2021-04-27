@@ -16,6 +16,7 @@ import io.izzel.taboolib.module.inject.TListener
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import java.util.concurrent.ConcurrentHashMap
 
 @TListener
 object PartySystem : Module, Listener {
@@ -24,8 +25,20 @@ object PartySystem : Module, Listener {
     lateinit var conf: TConfig
         private set
 
+    private val hooks = ConcurrentHashMap<String, Party>()
+
     val hook: Party?
-        get() = PartyHookEvent(conf.getString("default.plugin", "")!!).call().party
+        get() {
+            val id = conf.getString("default.plugin", "")!!
+            if (hooks.containsKey(id)) {
+                return hooks[id]
+            }
+            val party = PartyHookEvent(conf.getString("default.plugin", "")!!).call().party
+            if (party != null) {
+                hooks[id] = party
+            }
+            return party
+        }
 
     init {
         register()
