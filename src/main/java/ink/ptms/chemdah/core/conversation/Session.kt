@@ -7,7 +7,7 @@ import java.util.concurrent.CompletableFuture
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.conversation.TalkSession
+ * ink.ptms.chemdah.core.conversation.Session
  *
  * @author sky
  * @since 2021/2/9 6:59 下午

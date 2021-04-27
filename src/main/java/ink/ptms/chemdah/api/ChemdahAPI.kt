@@ -39,7 +39,7 @@ object ChemdahAPI {
 
     /**
      * 获取已经缓存的玩家数据
-     * 如玩家不存在则会直接抛出 NullPointerException 异常
+     * 如玩家数据不存在则会直接抛出 NullPointerException 异常
      *
      * @throws NullPointerException
      */
@@ -101,7 +101,7 @@ object ChemdahAPI {
     fun getQuestMeta(id: String) = questMeta[id]
 
     /**
-     * 获取任务扩展
+     * 获取任务扩展（组件）
      */
     fun getQuestAddon(id: String) = questAddon[id]
 
@@ -111,7 +111,7 @@ object ChemdahAPI {
     fun getQuestObjective(id: String) = questObjective[id]
 
     /**
-     * 获取已注册的模块
+     * 获取插件功能模块
      * 如模块不存在则会直接抛出 NullPointerException 异常
      *
      * @throws NullPointerException
@@ -131,6 +131,7 @@ object ChemdahAPI {
 
     /**
      * 设置全局变量
+     * @param append 是否追加模式
      */
     fun setVariable(key: String, value: String?, append: Boolean = false) {
         when {

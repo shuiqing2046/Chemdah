@@ -27,10 +27,10 @@ object HologramAPI {
             }
         }
 
-        fun edit(content: List<String>) {
+        fun update(content: List<String>) {
             content.forEachIndexed { index, line ->
                 if (index < map.size) {
-                    edit(map[index]!!, line)
+                    update(map[index]!!, line)
                 }
             }
         }
@@ -41,7 +41,7 @@ object HologramAPI {
 
         protected abstract fun create(player: Player, location: Location, line: String): T
 
-        protected abstract fun edit(obj: T, line: String)
+        protected abstract fun update(obj: T, line: String)
 
         protected abstract fun teleport(obj: T, location: Location)
 
@@ -62,7 +62,7 @@ object HologramAPI {
             } as AdyArmorStand
         }
 
-        override fun edit(obj: AdyArmorStand, line: String) {
+        override fun update(obj: AdyArmorStand, line: String) {
             obj.setCustomName(line)
         }
 
@@ -83,7 +83,7 @@ object HologramAPI {
             }
         }
 
-        override fun edit(obj: io.izzel.taboolib.module.hologram.Hologram, line: String) {
+        override fun update(obj: io.izzel.taboolib.module.hologram.Hologram, line: String) {
             obj.flash(line)
         }
 

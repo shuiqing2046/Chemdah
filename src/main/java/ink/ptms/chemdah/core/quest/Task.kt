@@ -16,7 +16,7 @@ import org.bukkit.configuration.ConfigurationSection
  */
 class Task(id: String, config: ConfigurationSection, val template: Template) : QuestContainer(id, config) {
 
-    val objective = if (config.contains("objective")) ChemdahAPI.questObjective[config.getString("objective")] ?: INever else IAlways
+    val objective = if (config.contains("objective")) ChemdahAPI.getQuestObjective(config.getString("objective")!!) ?: INever else IAlways
     val condition = DataContainer()
     val goal = DataContainer()
 

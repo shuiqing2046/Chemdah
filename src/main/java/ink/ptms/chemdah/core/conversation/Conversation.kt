@@ -52,6 +52,7 @@ data class Conversation(
             if (ConversationEvents.Pre(this@Conversation, session, sessionTop != null).call().isCancelled) {
                 future.complete(session)
                 finish()
+                ConversationEvents.Cancelled(this@Conversation, session, true).call()
                 return@mirrorFuture
             }
             if (npcName != null) {
@@ -63,44 +64,50 @@ data class Conversation(
             // 重置会话
             session.reload()
             // 判定条件
-            checkCondition(session).thenApply {
-                // 执行脚本代理
-                agent(session, AgentType.BEGIN).thenApply {
-                    // 重置会话展示
-                    session.reloadTheme().thenApply {
-                        // 判断是否被脚本代理否取消对话
-                        if (Coerce.toBoolean(session.variables["@Cancelled"])) {
-                            // 仅关闭上层会话，只有会话开启才能被关闭
-                            if (sessionTop != null) {
-                                sessionTop.close().thenApply {
+            checkCondition(session).thenApply { condition ->
+                if (condition) {
+                    // 执行脚本代理
+                    agent(session, AgentType.BEGIN).thenApply {
+                        // 重置会话展示
+                        session.reloadTheme().thenApply {
+                            // 判断是否被脚本代理否取消对话
+                            if (Coerce.toBoolean(session.variables["@Cancelled"])) {
+                                // 仅关闭上层会话，只有会话开启才能被关闭
+                                if (sessionTop != null) {
+                                    sessionTop.close().thenApply {
+                                        future.complete(session)
+                                        ConversationEvents.Cancelled(this@Conversation, session, true).call()
+                                    }
+                                } else {
                                     future.complete(session)
-                                    ConversationEvents.Cancelled(this@Conversation, session, true).call()
+                                    ConversationEvents.Cancelled(this@Conversation, session, false).call()
                                 }
                             } else {
-                                future.complete(session)
-                                ConversationEvents.Cancelled(this@Conversation, session, false).call()
-                            }
-                        } else {
-                            // 添加对话内容
-                            session.npcSide.addAll(npcSide.map {
-                                try {
-                                    KetherFunction.parse(it, namespace = namespaceConversationNPC) {
-                                        extend(session.variables)
+                                // 添加对话内容
+                                session.npcSide.addAll(npcSide.map {
+                                    try {
+                                        KetherFunction.parse(it, namespace = namespaceConversationNPC) {
+                                            extend(session.variables)
+                                        }
+                                    } catch (e: Throwable) {
+                                        e.print()
+                                        e.localizedMessage
                                     }
-                                } catch (e: Throwable) {
-                                    e.print()
-                                    e.localizedMessage
+                                })
+                                ConversationEvents.Begin(this@Conversation, session, sessionTop != null).call()
+                                // 渲染对话
+                                option.instanceTheme.begin(session).thenAccept {
+                                    future.complete(session)
+                                    ConversationEvents.Post(this@Conversation, session, sessionTop != null).call()
                                 }
-                            })
-                            ConversationEvents.Begin(this@Conversation, session, sessionTop != null).call()
-                            // 渲染对话
-                            option.instanceTheme.begin(session).thenAccept {
-                                future.complete(session)
-                                ConversationEvents.Post(this@Conversation, session, sessionTop != null).call()
                             }
+                            finish()
                         }
-                        finish()
                     }
+                } else {
+                    future.complete(session)
+                    finish()
+                    ConversationEvents.Cancelled(this@Conversation, session, false).call()
                 }
             }
         }

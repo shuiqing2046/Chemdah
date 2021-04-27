@@ -61,7 +61,7 @@ object QuestLoader {
 
     @Suppress("UNCHECKED_CAST")
     @TFunction.Init
-    private fun register() {
+    private fun registerAll() {
         TabooLibLoader.getPluginClassSafely(Chemdah.plugin).forEach {
             if (Objective::class.java.isAssignableFrom(it) && !it.isAnnotationPresent(Abstract::class.java)) {
                 val objective = CompatKotlin.getInstance(it) as? Objective<Event>
@@ -78,23 +78,7 @@ object QuestLoader {
                             return@forEach
                         }
                     }
-                    ChemdahAPI.questObjective[objective.name] = objective
-                    // 是否注册监听器
-                    if (objective.isListener) {
-                        // 对该条目注册独立监听器
-                        SingleListener.listen(objective.event.java, objective.priority, objective.ignoreCancelled) { e ->
-                            // 获取该监听器中的玩家对象
-                            objective.handler(e)?.run {
-                                if (objective.isAsync) {
-                                    Tasks.task(true) {
-                                        handleEvent(this, e, objective)
-                                    }
-                                } else {
-                                    handleEvent(this, e, objective)
-                                }
-                            }
-                        }
-                    }
+                    objective.register()
                 }
             } else if (it.isAnnotationPresent(Id::class.java)) {
                 val id = it.getAnnotation(Id::class.java).id
@@ -109,6 +93,29 @@ object QuestLoader {
             }
         }
         loadTemplate()
+    }
+
+    /**
+     * 注册任务目标
+     */
+    fun <T : Event> Objective<T>.register() {
+        ChemdahAPI.questObjective[name] = this
+        // 是否注册监听器
+        if (isListener) {
+            // 对该条目注册独立监听器
+            SingleListener.listen(event.java, priority, ignoreCancelled) { e ->
+                // 获取该监听器中的玩家对象
+                handler(e)?.run {
+                    if (isAsync) {
+                        Tasks.task(true) {
+                            handleEvent(this, e, this@register)
+                        }
+                    } else {
+                        handleEvent(this, e, this@register)
+                    }
+                }
+            }
+        }
     }
 
     /**

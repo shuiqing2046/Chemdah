@@ -312,7 +312,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                     if (hologramMap.containsKey(id)) {
                         hologramMap[id]!!.also { holo ->
                             holo.teleport(pos)
-                            holo.edit(trackAddon.navigationContent.map {
+                            holo.update(trackAddon.navigationContent.map {
                                 it.replace("{name}", name).replace("{distance}", Coerce.format(distance).toString())
                             })
                         }
