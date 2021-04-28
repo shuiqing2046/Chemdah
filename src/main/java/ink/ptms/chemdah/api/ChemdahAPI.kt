@@ -17,15 +17,20 @@ import ink.ptms.chemdah.core.quest.objective.bukkit.EMPTY_EVENT
 import ink.ptms.chemdah.core.quest.objective.other.ITrigger
 import ink.ptms.chemdah.module.Module
 import ink.ptms.chemdah.util.increaseAny
+import ink.ptms.chemdah.util.warning
 import io.izzel.taboolib.kotlin.Mirror
+import io.izzel.taboolib.kotlin.kether.Workspace
+import io.izzel.taboolib.module.inject.TSchedule
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
+import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.KClass
 
 object ChemdahAPI {
 
     val mirror = Mirror()
+    val workspace = Workspace(File(Chemdah.plugin.dataFolder, "module/script"), namespace = listOf("chemdah"))
 
     val conversation = HashMap<String, Conversation>()
     val conversationTheme = HashMap<String, Theme<*>>()
@@ -161,5 +166,15 @@ object ChemdahAPI {
         ConversationLoader.load()
         QuestLoader.loadTemplate()
         Module.reload()
+    }
+
+    @TSchedule
+    private fun workspace() {
+        try {
+            workspace.loadAll()
+        } catch (e: Exception) {
+            warning("[Chemdah] An error occurred while loading the script")
+            e.printStackTrace()
+        }
     }
 }
