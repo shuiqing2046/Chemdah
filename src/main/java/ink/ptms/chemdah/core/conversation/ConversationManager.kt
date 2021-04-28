@@ -48,6 +48,8 @@ object ConversationManager : Listener {
     @PlayerContainer
     val sessions = ConcurrentHashMap<String, Session>()
 
+    fun getConversation(namespace: String, name: String) = ChemdahAPI.conversation.values.firstOrNull { it.isNPC(namespace, name) }
+
     @TSchedule(period = 1, async = true)
     private fun tick() {
         Bukkit.getOnlinePlayers().forEach { p ->
@@ -133,12 +135,10 @@ object ConversationManager : Listener {
     private fun e(e: PlayerInteractAtEntityEvent) {
         if (e.hand == EquipmentSlot.HAND && e.player.conversationSession == null) {
             val name = I18n.get().getName(e.rightClicked)
-            ChemdahAPI.conversation.values.firstOrNull { it.isNPC("minecraft", name) }?.run {
-                e.isCancelled = true
-                open(e.player, e.rightClicked.location.also {
-                    it.y += e.rightClicked.height
-                }, npcName = name, npcObject = e.rightClicked)
-            }
+            val conversation = getConversation("minecraft", name) ?: return
+            val origin = e.rightClicked.location.add(0.0, e.rightClicked.height, 0.0)
+            conversation.open(e.player, origin, npcName = name, npcObject = e.rightClicked)
+            e.isCancelled = true
         }
     }
 
@@ -161,7 +161,7 @@ object ConversationManager : Listener {
                 npc.removeTag("conversation:${e.session.player.name}")
                 // 若没有玩家在与该 NPC 对话
                 if (npc.getTags().none { it.value == "conversation" }) {
-                    npc.removeTag("isFreeze" )
+                    npc.removeTag("isFreeze")
                 }
             }
         }
@@ -169,16 +169,18 @@ object ConversationManager : Listener {
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         fun e(e: AdyeshachEntityInteractEvent) {
             if (e.isMainHand && e.player.conversationSession == null) {
-                ChemdahAPI.conversation.values.firstOrNull { it.isNPC("adyeshach", e.entity.id) }?.run {
+                getConversation("adyeshach", e.entity.id)?.run {
                     e.isCancelled = true
                     Tasks.task {
-                        open(e.player, e.entity.getLocation().also {
-                            it.y += e.entity.entityType.entitySize.height
-                        }, npcName = if (e.entity is AdyHuman) {
-                            (e.entity as AdyHuman).getName()
-                        } else {
-                            e.entity.getCustomName()
-                        }, npcObject = e.entity)
+                        open(
+                            e.player, e.entity.getLocation().also {
+                                it.y += e.entity.entityType.entitySize.height
+                            }, npcName = if (e.entity is AdyHuman) {
+                                (e.entity as AdyHuman).getName()
+                            } else {
+                                e.entity.getCustomName()
+                            }, npcObject = e.entity
+                        )
                     }
                 }
             }
@@ -192,7 +194,7 @@ object ConversationManager : Listener {
         fun e(e: PlayerInteractAtEntityEvent) {
             if (e.hand == EquipmentSlot.HAND && e.rightClicked.hasMetadata("NPC") && e.player.conversationSession == null) {
                 val npc = CitizensAPI.getNPCRegistry().getNPC(e.rightClicked) ?: return
-                ChemdahAPI.conversation.values.firstOrNull { it.isNPC("citizens", npc.id.toString()) }?.run {
+                getConversation("citizens", npc.id.toString())?.run {
                     e.isCancelled = true
                     open(e.player, e.rightClicked.location.also {
                         it.y += e.rightClicked.height
@@ -209,7 +211,7 @@ object ConversationManager : Listener {
         fun e(e: PlayerInteractAtEntityEvent) {
             if (e.hand == EquipmentSlot.HAND && e.rightClicked is LivingEntity && e.player.conversationSession == null) {
                 val mob = MythicMobs.inst().mobManager.getMythicMobInstance(e.rightClicked) ?: return
-                ChemdahAPI.conversation.values.firstOrNull { it.isNPC("mythicmobs", mob.type.internalName) }?.run {
+                getConversation("mythicmobs", mob.type.internalName)?.run {
                     e.isCancelled = true
                     open(e.player, e.rightClicked.location.also {
                         it.y += e.rightClicked.height
