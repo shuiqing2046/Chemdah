@@ -1,5 +1,6 @@
 package ink.ptms.chemdah.core.quest.selector
 
+import com.ssomar.executableitems.api.ExecutableItemsAPI
 import github.july_summer.julyitems.api.JItemAPI
 import ink.ptms.chemdah.api.event.InferItemHookEvent
 import ink.ptms.zaphkiel.ZaphkielAPI
@@ -26,7 +27,7 @@ class InferItemHooks : Listener {
 
     @EventHandler
     fun e(e: InferItemHookEvent) {
-        when (e.id) {
+        when (e.id.toLowerCase()) {
             "zaphkiel" -> {
                 e.itemClass = ItemZaphkiel::class.java
             }
@@ -44,6 +45,9 @@ class InferItemHooks : Listener {
             }
             "julyitem", "julyitems" -> {
                 e.itemClass = ItemJulyItems::class.java
+            }
+            "eitems", "executableitems" -> {
+                e.itemClass = ItemExecutableItems::class.java
             }
         }
     }
@@ -206,6 +210,17 @@ class InferItemHooks : Listener {
 
         override fun match(item: ItemStack): Boolean {
             return matchFlags(item.julyName()) && matchMetaData(item)
+        }
+    }
+
+    class ItemExecutableItems(material: String, flags: List<Flags>, data: Map<String, String>) : InferItem.Item(material, flags, data) {
+
+        fun ItemStack.executableId(): String {
+            return ExecutableItemsAPI.getExecutableItemConfig(this)?.identification ?: "@vanilla"
+        }
+
+        override fun match(item: ItemStack): Boolean {
+            return matchFlags(item.executableId()) && matchMetaData(item)
         }
     }
 }

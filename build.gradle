@@ -48,6 +48,7 @@ dependencies {
     implementation 'public:MythicLib:1.0.0'
     implementation 'public:MythicMobs:1.0.1'
     implementation 'public:DungeonPlus:1.0.0'
+    implementation 'public:ExecutableItems:1.0.0'
     implementation 'ink.ptms:Zaphkiel:1.4.2'
     implementation 'ink.ptms:Sandalphon:1.2.8'
     implementation 'ink.ptms.adyeshach:Adyeshach:1.1.9'
