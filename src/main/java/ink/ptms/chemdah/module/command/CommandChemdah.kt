@@ -4,10 +4,12 @@ import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.api.ChemdahAPI.mirror
 import io.izzel.taboolib.kotlin.Tasks
+import io.izzel.taboolib.kotlin.sendLocale
 import io.izzel.taboolib.module.command.base.BaseCommand
 import io.izzel.taboolib.module.command.base.BaseMainCommand
 import io.izzel.taboolib.module.command.base.SubCommand
 import io.izzel.taboolib.module.locale.TLocale
+import io.izzel.taboolib.util.Coerce
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 
@@ -38,17 +40,18 @@ class CommandChemdah : BaseMainCommand() {
         TLocale.sendTo(sender, "command-info-body", "  §7Quests (Share): §f${quests.filter { !it.isOwner(playerExact) }.map { it.id }.toList()}")
     }
 
-    @SubCommand(description = "@command-mirror", priority = 1.1)
+    @SubCommand(description = "@command-mirror", arguments = ["@command-argument-reset?"], priority = 1.1)
     fun mirror(sender: CommandSender, args: Array<String>) {
-        TLocale.sendTo(sender, "command-mirror-header")
-        TLocale.sendTo(sender, "command-mirror-bottom")
-        Tasks.task(true) {
-            val collect = mirror.collect {
-                childFormat = TLocale.asString("command-mirror-body-child")
-                parentFormat = TLocale.asString("command-mirror-body-parent")
-            }
-            collect.print(sender, collect.getTotal(), 0)
+        if (Coerce.toBoolean(args.getOrNull(0) ?: false)) {
+            mirror.dataMap.clear()
+            sender.sendLocale("command-mirror-reset")
+        } else {
+            TLocale.sendTo(sender, "command-mirror-header")
             TLocale.sendTo(sender, "command-mirror-bottom")
+            Tasks.task(true) {
+                mirror.collectAndReport(sender)
+                TLocale.sendTo(sender, "command-mirror-bottom")
+            }
         }
     }
 

@@ -5,13 +5,13 @@ plugins {
 }
 
 group = 'ink.ptms.chemdah'
-version = 'SNAPSHOT 04 28 1'
+version = 'SNAPSHOT 04 29 1'
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
 taboolib {
-    tabooLibVersion = '5.63'
+    tabooLibVersion = '5.64'
     loaderVersion = '2.12'
     classifier = null
     builtin = true
