@@ -129,7 +129,7 @@ class AddonAutomation(source: ConfigurationSection, questContainer: QuestContain
             val groups = HashMap<String, Group>()
             val autoAccept = ArrayList<Template>()
             // 优先加载拥有主动逻辑的 Plan 计划
-            ChemdahAPI.quest.forEach { (_, quest) ->
+            ChemdahAPI.questTemplate.forEach { (_, quest) ->
                 if (quest.isAutoAccept()) {
                     autoAccept.add(quest)
                 } else {
@@ -142,7 +142,7 @@ class AddonAutomation(source: ConfigurationSection, questContainer: QuestContain
                 }
             }
             // 加载没有主动逻辑的被 Plan Group 收录的任务
-            ChemdahAPI.quest.forEach { (_, quest) ->
+            ChemdahAPI.questTemplate.forEach { (_, quest) ->
                 if (quest.plan() == null) {
                     val group = quest.planGroup()
                     if (group != null && groups.containsKey("@$group")) {

@@ -52,7 +52,7 @@ default-track:
     period: 40
   scoreboard:
     value: true
-    size: 64
+    length: 64
     content:
       - '&6&lCHEMDAH TRACKS'
       - - ''

@@ -27,7 +27,7 @@ class UI {
 
         override fun process(frame: QuestContext.Frame): CompletableFuture<String> {
             val profile = frame.getProfile()
-            val quests = ChemdahAPI.quest.filter { (_, v) -> v.label().any { it in include } && v.label().none { it in exclude } }.values.toList()
+            val quests = ChemdahAPI.questTemplate.filter { (_, v) -> v.label().any { it in include } && v.label().none { it in exclude } }.values.toList()
             val percent = quests.count { profile.isQuestCompleted(it) } / quests.size.toDouble()
             val ui = frame.UI()
             val empty = ui.config.getString("bar.$plan.empty", "&8|")!!.colored()
@@ -43,7 +43,7 @@ class UI {
 
         override fun process(frame: QuestContext.Frame): CompletableFuture<String> {
             val profile = frame.getProfile()
-            val quests = ChemdahAPI.quest.filter { (_, v) -> v.label().any { it in include } && v.label().none { it in exclude } }.values.toList()
+            val quests = ChemdahAPI.questTemplate.filter { (_, v) -> v.label().any { it in include } && v.label().none { it in exclude } }.values.toList()
             val percent = quests.count { profile.isQuestCompleted(it) } / quests.size.toDouble()
             return if (percent.isNaN()) {
                 CompletableFuture.completedFuture("0")

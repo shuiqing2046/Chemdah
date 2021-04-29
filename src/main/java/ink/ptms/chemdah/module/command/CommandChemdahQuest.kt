@@ -28,7 +28,7 @@ class CommandChemdahQuest : BaseMainCommand() {
 
     override fun onTabComplete(sender: CommandSender, command: String, argument: String): List<String>? {
         return when (argument) {
-            "@command-argument-quest" -> ChemdahAPI.quest.keys.toList()
+            "@command-argument-quest" -> ChemdahAPI.questTemplate.keys.toList()
             "@command-argument-ui" -> UISystem.ui.keys.toList()
             else -> null
         }

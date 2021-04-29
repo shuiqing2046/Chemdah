@@ -104,6 +104,10 @@ object QuestLoader {
         if (isListener) {
             // 对该条目注册独立监听器
             SingleListener.listen(event.java, priority, ignoreCancelled) { e ->
+                // 若该事件未被任何任务使用
+                if (ChemdahAPI.questTemplate.none { t -> t.value.task.none { it.value.objective == this } }) {
+                    return@listen
+                }
                 // 获取该监听器中的玩家对象
                 handler(e)?.run {
                     if (isAsync) {
@@ -161,9 +165,9 @@ object QuestLoader {
         if (!file.exists()) {
             Chemdah.plugin.saveResource("core/quest/example.yml", true)
         }
-        ChemdahAPI.quest.clear()
-        ChemdahAPI.quest.putAll(loadTemplate(file).map { it.id to it })
-        println("[Chemdah] ${ChemdahAPI.quest.size} template loaded.")
+        ChemdahAPI.questTemplate.clear()
+        ChemdahAPI.questTemplate.putAll(loadTemplate(file).map { it.id to it })
+        println("[Chemdah] ${ChemdahAPI.questTemplate.size} template loaded.")
     }
 
     fun loadTemplate(file: File): List<Template> {

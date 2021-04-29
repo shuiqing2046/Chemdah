@@ -1,5 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective.bukkit
 
+import ink.ptms.chemdah.core.PlayerProfile
+import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
 import org.bukkit.event.player.PlayerStatisticIncrementEvent
@@ -51,5 +53,9 @@ object IPlayerStatistic : ObjectiveCountable<PlayerStatisticIncrementEvent>() {
         addConditionVariable("value:previous") {
             it.previousValue
         }
+    }
+
+    override fun getCount(profile: PlayerProfile, task: Task, event: PlayerStatisticIncrementEvent): Int {
+        return event.newValue - event.previousValue
     }
 }

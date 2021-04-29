@@ -92,7 +92,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
     val navigationPeriod = Baffle.of(config.getInt("navigation-option.period", conf.getInt("default-track.navigation.period")))
 
     val scoreboard = config.getBoolean("scoreboard", conf.getBoolean("default-track.scoreboard.value"))
-    val scoreboardSize = config.getInt("scoreboard-size", conf.getInt("default-track.scoreboard.size"))
+    val scoreboardLength = config.getInt("scoreboard-length", defaultLength)
     val scoreboardContent = config.getList("scoreboard-content")?.run {
         filterNotNull().map {
             ScoreboardContent(it.asList().colored())
@@ -130,8 +130,8 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
             conf.get("default-track.message")?.asList()?.colored() ?: emptyList()
         }
 
-        private val defaultSize by lazy {
-            conf.getInt("default-track.scoreboard.size")
+        private val defaultLength by lazy {
+            conf.getInt("default-track.scoreboard.length")
         }
 
         /**
@@ -365,7 +365,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                             it.content.flatMap { contentLine ->
                                 if (contentLine.contains("{description}")) {
                                     val description = track.description ?: quest.ui()?.description ?: emptyList()
-                                    description.split(track.scoreboardSize).map { descriptionLine -> contentLine.replace("{description}", descriptionLine) }
+                                    description.split(track.scoreboardLength).map { descriptionLine -> contentLine.replace("{description}", descriptionLine) }
                                 } else {
                                     contentLine.replace("{name}", track.name ?: quest.displayName()).asList()
                                 }
@@ -383,7 +383,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                                     it.content.flatMap { contentLine ->
                                         if (contentLine.contains("{description}")) {
                                             val description = taskTrack.description ?: quest.ui()?.description ?: emptyList()
-                                            val size = quest.track()?.scoreboardSize ?: defaultSize
+                                            val size = quest.track()?.scoreboardLength ?: defaultLength
                                             description.split(size).map { d -> contentLine.replace("{description}", d) }
                                         } else {
                                             contentLine.replace("{name}", taskTrack.name ?: task.displayName()).asList()

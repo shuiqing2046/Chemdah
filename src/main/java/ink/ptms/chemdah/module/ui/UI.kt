@@ -71,7 +71,7 @@ class UI(val config: ConfigurationSection) {
         val includePlayer = playerFilters.computeIfAbsent(playerProfile.uniqueId) { ArrayList() }
         val include = include.map { it.id }.filter { it in includePlayer || includePlayer.isEmpty() }
         // 筛选任务列表
-        val quests = ChemdahAPI.quest.filter { (_, v) -> v.label().any { it in include } && v.label().none { it in exclude } }.values.toList()
+        val quests = ChemdahAPI.questTemplate.filter { (_, v) -> v.label().any { it in include } && v.label().none { it in exclude } }.values.toList()
         fun process(cur: Int) {
             if (cur < quests.size) {
                 val quest = quests[cur]

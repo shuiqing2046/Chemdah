@@ -35,9 +35,9 @@ object ChemdahAPI {
     val conversation = HashMap<String, Conversation>()
     val conversationTheme = HashMap<String, Theme<*>>()
 
-    val quest = HashMap<String, Template>()
     val questMeta = HashMap<String, Class<out Meta<*>>>()
     val questAddon = HashMap<String, Class<out Addon>>()
+    val questTemplate = HashMap<String, Template>()
     val questObjective = HashMap<String, Objective<out Event>>()
 
     val playerProfile = ConcurrentHashMap<String, PlayerProfile>()
@@ -98,7 +98,7 @@ object ChemdahAPI {
     /**
      * 获取任务模板
      */
-    fun getQuestTemplate(id: String) = quest[id]
+    fun getQuestTemplate(id: String) = questTemplate[id]
 
     /**
      * 获取任务元数据

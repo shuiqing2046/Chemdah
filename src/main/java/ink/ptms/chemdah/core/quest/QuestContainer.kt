@@ -76,6 +76,18 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
         }
 
     /**
+     * 返回所有组件名称
+     */
+    val addons: Set<String>
+        get() = addonMap.keys
+
+    /**
+     * 返回所有脚本代理类型
+     */
+    val agents: List<String>
+        get() = agentList.map { "${it.type.name} @ ${it.restrict}" }
+
+    /**
      * 当前节点
      * 任务则返回任务序号，条目则返回条目序号
      */
