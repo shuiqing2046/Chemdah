@@ -25,7 +25,7 @@ import javax.script.SimpleBindings
  * @since 2021/2/12 2:08 上午
  */
 @TListener
-object ThemeChest : Theme<ThemeChestSetting>(), Listener {
+class ThemeChest : Theme<ThemeChestSetting>(), Listener {
 
     init {
         ChemdahAPI.conversationTheme["chest"] = this

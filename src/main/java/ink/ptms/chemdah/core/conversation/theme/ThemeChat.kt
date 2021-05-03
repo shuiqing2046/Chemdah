@@ -6,20 +6,27 @@ import ink.ptms.chemdah.core.conversation.ConversationManager
 import ink.ptms.chemdah.core.conversation.Session
 import ink.ptms.chemdah.util.colored
 import io.izzel.taboolib.cronus.CronusUtils
+import io.izzel.taboolib.kotlin.Reflex.Companion.reflexInvoke
 import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.kotlin.toPrinted
+import io.izzel.taboolib.module.inject.PlayerContainer
 import io.izzel.taboolib.module.inject.TListener
 import io.izzel.taboolib.module.locale.TLocale
+import io.izzel.taboolib.module.packet.Packet
+import io.izzel.taboolib.module.packet.TPacket
 import io.izzel.taboolib.module.tellraw.TellrawJson
+import io.izzel.taboolib.util.Baffle
 import io.izzel.taboolib.util.Coerce
 import io.izzel.taboolib.util.lite.Effects
 import org.bukkit.Particle
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerItemHeldEvent
 import org.bukkit.event.player.PlayerSwapHandItemsEvent
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
 
 /**
  * Chemdah
@@ -29,12 +36,32 @@ import java.util.concurrent.CompletableFuture
  * @since 2021/2/12 2:08 上午
  */
 @TListener
-object ThemeChat : Theme<ThemeChatSettings>(), Listener {
+class ThemeChat : Theme<ThemeChatSettings>(), Listener {
 
     init {
         ChemdahAPI.conversationTheme["chat"] = this
     }
 
+    val baffle = Baffle.of(100, TimeUnit.MILLISECONDS)
+
+    /**
+     * 屏蔽其他插件在对话过程中发送的动作栏信息
+     * 例如 SkillAPI
+     */
+    @TPacket(type = TPacket.Type.SEND)
+    fun e(player: Player, packet: Packet): Boolean {
+        if (packet.equals("PacketPlayOutChat") && packet.read("b")!!.toString() == "GAME_INFO") {
+            if (player.conversationSession != null && packet.read("a").reflexInvoke<String>("getText") != TLocale.asString(player, "theme-chat-help")) {
+                return false
+            }
+        }
+        return true
+    }
+
+    /**
+     * 取消这个行为会出现客户端显示不同步的错误
+     * 以及无法 mc 无法重复切换相同物品栏
+     */
     @EventHandler
     fun e(e: PlayerItemHeldEvent) {
         val session = e.player.conversationSession ?: return
@@ -205,7 +232,7 @@ object ThemeChat : Theme<ThemeChatSettings>(), Listener {
                 complete(null)
             }
         }
-        TLocale.sendTo(session.player, "theme-chat-help")
+        TLocale.Display.sendActionBar(session.player, TLocale.asString(session.player, "theme-chat-help"))
     }
 
     private fun newJson() = TellrawJson.create().also { json -> repeat(100) { json.newLine() } }

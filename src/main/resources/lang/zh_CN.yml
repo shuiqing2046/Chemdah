@@ -3,9 +3,7 @@
 #         Powered by TabooLib 5.0         #
 
 
-theme-chat-help:
-  ==: ACTION
-  text: '使用 &e数字键 (1-9) &f选择对话并按下 &eF &f键回复.'
+theme-chat-help: '使用 &e数字键 (1-9) &f选择对话并按下 &eF &f键回复.'
 
 track-cancel: '&7追踪已取消.'
 

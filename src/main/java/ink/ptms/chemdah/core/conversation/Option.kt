@@ -21,7 +21,7 @@ data class Option(
 ) {
 
     val instanceTheme: Theme<*>
-        get() = ChemdahAPI.getConversationTheme(theme) ?: ThemeChat
+        get() = ChemdahAPI.getConversationTheme(theme) ?: error("theme $theme not supported.")
 
     companion object {
 
