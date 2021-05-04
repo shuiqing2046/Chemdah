@@ -60,7 +60,14 @@ class ActionSkillAPI {
                     }
                 }
                 "level" -> {
-                    Base { data: PlayerData -> data.mainClass.level }
+                    try {
+                        it.mark()
+                        it.expect("maxed")
+                        Base { data: PlayerData -> data.mainClass.isLevelMaxed }
+                    } catch (ex: Exception) {
+                        it.reset()
+                        Base { data: PlayerData -> data.mainClass.level }
+                    }
                 }
                 "experience", "exp" -> {
                     Base(when (it.expects("total", "required")) {
