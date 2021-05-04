@@ -52,20 +52,18 @@ class ActionSkillAPI {
                     })
                 }
                 "attribute" -> {
-                    Base(when (it.expects("point")) {
-                        "point" -> { data: PlayerData -> data.attributePoints }
-                        else -> error("out of case")
-                    })
+                    val attribute = it.nextToken()
+                    if (attribute == "point") {
+                        Base { data: PlayerData -> data.attributePoints }
+                    } else {
+                        Base { data: PlayerData -> data.getAttribute(attribute) }
+                    }
                 }
                 "level" -> {
-                    Base(when (it.expects("level", "maxLevel")) {
-                        "level" -> { data: PlayerData -> data.mainClass.level }
-                        "maxLevel" -> { data: PlayerData -> data.mainClass.isLevelMaxed }
-                        else -> error("ouf of case")
-                    })
+                    Base { data: PlayerData -> data.mainClass.level }
                 }
                 "experience", "exp" -> {
-                    Base(when (it.expects("total", "require")) {
+                    Base(when (it.expects("total", "required")) {
                         "total" -> { data: PlayerData -> data.mainClass.totalExp }
                         "require" -> { data: PlayerData -> data.mainClass.requiredExp }
                         else -> error("ouf of case")
@@ -75,7 +73,8 @@ class ActionSkillAPI {
                     Base { data -> data.mainClass.mana }
                 }
                 "cast" -> {
-                    Base { data -> data.cast(it.nextToken()) }
+                    val skill = it.nextToken()
+                    Base { data -> data.cast(skill) }
                 }
                 else -> error("out of case")
             }
