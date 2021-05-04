@@ -13,11 +13,14 @@ import java.util.concurrent.CompletableFuture
 /**
  * Chemdah
  * ink.ptms.chemdah.module.kether.compat.ActionSkillAPI
+ *
  * @author Peng_Lx
  * @since 2021/5/4 16:03 下午
  */
 class ActionSkillAPI {
+
     class Base(val action: (PlayerData) -> (Any)) : QuestAction<Any>() {
+
         override fun process(frame: QuestContext.Frame): CompletableFuture<Any> {
             return CompletableFuture.completedFuture(action(SkillAPI.getPlayerData(frame.getPlayer())))
         }
@@ -29,46 +32,50 @@ class ActionSkillAPI {
          * skillapi class id
          * skillapi class name
          * skillapi level
+         * skillapi cast skill1
          */
         @KetherParser(["skillapi"])
         fun parser() = ScriptParser.parser {
-            when (it.expects("class", "skills", "attribute", "level", "exp", "experience", "mana")) {
+            when (it.expects("class", "skills", "attribute", "level", "exp", "experience", "mana", "cast")) {
                 "class" -> {
                     Base(
                         when (it.expects("main", "size")) {
-                            "main" -> { clazz: PlayerData -> clazz.mainClass}
-                            "size" -> { clazz: PlayerData -> clazz.classes.size}
+                            "main" -> { data: PlayerData -> data.mainClass }
+                            "size" -> { data: PlayerData -> data.classes.size }
                             else -> error("out of case")
                         })
                 }
                 "skills" -> {
                     Base(when (it.expects("point")) {
-                        "point" -> { clazz: PlayerData -> clazz.mainClass.points}
+                        "point" -> { data: PlayerData -> data.mainClass.points }
                         else -> error("out of case")
                     })
                 }
                 "attribute" -> {
-                    Base(when (it.expects("point")){
-                        "point" -> { clazz: PlayerData -> clazz.attributePoints}
+                    Base(when (it.expects("point")) {
+                        "point" -> { data: PlayerData -> data.attributePoints }
                         else -> error("out of case")
                     })
                 }
                 "level" -> {
                     Base(when (it.expects("level", "maxLevel")) {
-                        "level" -> { clazz: PlayerData -> clazz.mainClass.level}
-                        "maxLevel" -> { clazz: PlayerData -> clazz.mainClass.isLevelMaxed}
+                        "level" -> { data: PlayerData -> data.mainClass.level }
+                        "maxLevel" -> { data: PlayerData -> data.mainClass.isLevelMaxed }
                         else -> error("ouf of case")
                     })
                 }
-                "experience", "exp" ->{
+                "experience", "exp" -> {
                     Base(when (it.expects("total", "require")) {
-                        "total" -> { clazz: PlayerData -> clazz.mainClass.totalExp}
-                        "require" -> { clazz: PlayerData -> clazz.mainClass.requiredExp}
+                        "total" -> { data: PlayerData -> data.mainClass.totalExp }
+                        "require" -> { data: PlayerData -> data.mainClass.requiredExp }
                         else -> error("ouf of case")
                     })
                 }
                 "mana" -> {
-                    Base { clazz -> clazz.mainClass.mana}
+                    Base { data -> data.mainClass.mana }
+                }
+                "cast" -> {
+                    Base { data -> data.cast(it.nextToken()) }
                 }
                 else -> error("out of case")
             }
