@@ -28,73 +28,53 @@ import javax.script.SimpleBindings
 class ThemeChest : Theme<ThemeChestSetting>(), Listener {
 
     init {
-        ChemdahAPI.conversationTheme["chest"] = this
+        register("chest")
     }
 
-    override fun reloadConfig() {
-        settings = ThemeChestSetting(ConversationManager.conf.getConfigurationSection("theme-chest")!!)
-    }
-
-    override fun sendEffect(): Boolean {
-        return Version.isAfter(Version.v1_13)
+    override fun createConfig(): ThemeChestSetting {
+        return ThemeChestSetting(ConversationManager.conf.getConfigurationSection("theme-chest")!!)
     }
 
     override fun allowFarewell(): Boolean {
         return false
     }
 
-    override fun begin(session: Session): CompletableFuture<Void> {
-        settings.playSound(session)
-        return super.begin(session)
-    }
-
-    override fun npcTalk(session: Session, message: List<String>, canReply: Boolean): CompletableFuture<Void> {
-        val future = CompletableFuture<Void>()
+    override fun onDisplay(session: Session, message: List<String>, canReply: Boolean): CompletableFuture<Void> {
         var end = false
-        session.npcTalking = true
-        session.conversation.playerSide.checked(session).thenAccept { replies ->
-            try {
-                MenuBuilder.builder()
-                    .lockHand()
-                    .title(settings.title.toTitle(session))
-                    .rows(rows(replies.size))
-                    .buildAsync {
-                        replies.forEachIndexed { index, playerReply ->
-                            if (index < settings.playerSlot.size) {
-                                it.setItem(settings.playerSlot[index], settings.playerItem.buildItem(session, playerReply, index + 1))
-                            }
+        return session.createDisplay { replies ->
+            MenuBuilder.builder()
+                .lockHand()
+                .title(settings.title.toTitle(session))
+                .rows(rows(replies.size))
+                .buildAsync {
+                    replies.forEachIndexed { index, playerReply ->
+                        if (index < settings.playerSlot.size) {
+                            it.setItem(settings.playerSlot[index], settings.playerItem.buildItem(session, playerReply, index + 1))
                         }
-                        it.setItem(settings.npcSlot, settings.npcItem.buildItem(session, message))
-                        // 唤起事件
-                        ConversationEvents.ChestThemeBuild(session, message, canReply, it)
-                    }.click { e ->
-                        replies.getOrNull(settings.playerSlot.indexOf(e.rawSlot))?.run {
-                            check(session).thenAccept { check ->
-                                if (check) {
-                                    end = true
-                                    select(session).thenAccept {
-                                        // 若未进行页面切换则关闭页面
-                                        if (session.player.openInventory.topInventory == e.inventory) {
-                                            session.player.closeInventory()
-                                        }
+                    }
+                    it.setItem(settings.npcSlot, settings.npcItem.buildItem(session, message))
+                    // 唤起事件
+                    ConversationEvents.ChestThemeBuild(session, message, canReply, it)
+                }.click { e ->
+                    replies.getOrNull(settings.playerSlot.indexOf(e.rawSlot))?.run {
+                        check(session).thenAccept { check ->
+                            if (check) {
+                                end = true
+                                select(session).thenAccept {
+                                    // 若未进行页面切换则关闭页面
+                                    if (session.player.openInventory.topInventory == e.inventory) {
+                                        session.player.closeInventory()
                                     }
                                 }
                             }
                         }
-                    }.close {
-                        if (!end) {
-                            session.close(refuse = true)
-                        }
-                    }.open(session.player)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-            future.complete(null)
+                    }
+                }.close {
+                    if (!end) {
+                        session.close(refuse = true)
+                    }
+                }.open(session.player)
         }
-        future.thenAccept {
-            session.npcTalking = false
-        }
-        return future
     }
 
 
@@ -104,7 +84,7 @@ class ThemeChest : Theme<ThemeChestSetting>(), Listener {
             setIcon(icon)
         }
         itemMeta = itemMeta.also { meta ->
-            meta.setDisplayName(meta.displayName.replace("{index}", index.toString()).replace("{playerSide}", reply.text(session)))
+            meta.setDisplayName(meta.displayName.replace("{index}", index.toString()).replace("{playerSide}", reply.build(session)))
         }
         return this
     }

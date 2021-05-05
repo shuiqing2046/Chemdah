@@ -69,7 +69,7 @@ data class Conversation(
                     // 执行脚本代理
                     agent(session, AgentType.BEGIN).thenApply {
                         // 重置会话展示
-                        session.reloadTheme().thenApply {
+                        session.resetTheme().thenApply {
                             // 判断是否被脚本代理否取消对话
                             if (Coerce.toBoolean(session.variables["@Cancelled"])) {
                                 // 仅关闭上层会话，只有会话开启才能被关闭
@@ -96,7 +96,7 @@ data class Conversation(
                                 })
                                 ConversationEvents.Begin(this@Conversation, session, sessionTop != null).call()
                                 // 渲染对话
-                                option.instanceTheme.begin(session).thenAccept {
+                                option.instanceTheme.onBegin(session).thenAccept {
                                     future.complete(session)
                                     ConversationEvents.Post(this@Conversation, session, sessionTop != null).call()
                                 }

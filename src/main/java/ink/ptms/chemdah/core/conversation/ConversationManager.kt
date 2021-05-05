@@ -130,8 +130,11 @@ object ConversationManager : Listener {
             }
             if (args.size == 2 && args[0] == "reply") {
                 val session = e.player.conversationSession ?: return
-                session.conversation.playerSide.checked(session).thenApply { replies ->
-                    replies.firstOrNull { it.uuid.toString() == args[1] }?.select(session)
+                val reply = session.conversation.playerSide.reply.firstOrNull { it.uuid.toString() == args[1] } ?: return
+                reply.check(session).thenApply { cond ->
+                    if (cond) {
+                        reply.select(session)
+                    }
                 }
             }
         }

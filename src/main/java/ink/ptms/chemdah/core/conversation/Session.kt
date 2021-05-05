@@ -53,7 +53,7 @@ data class Session(
     fun close(refuse: Boolean = false): CompletableFuture<Void> {
         val future = CompletableFuture<Void>()
         conversation.agent(this, if (refuse) AgentType.REFUSE else AgentType.END).thenApply {
-            conversation.option.instanceTheme.end(this).thenApply {
+            conversation.option.instanceTheme.onClose(this).thenApply {
                 future.complete(null)
                 ConversationManager.sessions.remove(player.name)
                 ConversationEvents.Closed(this).call()
@@ -73,9 +73,9 @@ data class Session(
     /**
      * 重置会话展示
      */
-    fun reloadTheme(): CompletableFuture<Void> {
+    fun resetTheme(): CompletableFuture<Void> {
         val future = CompletableFuture<Void>()
-        conversation.option.instanceTheme.reload(this).thenApply {
+        conversation.option.instanceTheme.onReset(this).thenApply {
             future.complete(null)
         }
         return future

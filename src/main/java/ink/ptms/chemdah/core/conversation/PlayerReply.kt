@@ -25,7 +25,7 @@ data class PlayerReply(
     val uuid: UUID = UUID.randomUUID()
 ) {
 
-    fun text(session: Session): String {
+    fun build(session: Session): String {
         return try {
             KetherFunction.parse(text, namespace = namespaceConversationPlayer) {
                 extend(session.variables)

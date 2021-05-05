@@ -1,6 +1,5 @@
 package ink.ptms.chemdah.core.conversation.theme
 
-import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.conversationSession
 import ink.ptms.chemdah.core.conversation.ConversationManager
 import ink.ptms.chemdah.core.conversation.Session
@@ -9,7 +8,6 @@ import io.izzel.taboolib.cronus.CronusUtils
 import io.izzel.taboolib.kotlin.Reflex.Companion.reflexInvoke
 import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.kotlin.toPrinted
-import io.izzel.taboolib.module.inject.PlayerContainer
 import io.izzel.taboolib.module.inject.TListener
 import io.izzel.taboolib.module.locale.TLocale
 import io.izzel.taboolib.module.packet.Packet
@@ -39,7 +37,7 @@ import java.util.concurrent.TimeUnit
 class ThemeChat : Theme<ThemeChatSettings>(), Listener {
 
     init {
-        ChemdahAPI.conversationTheme["chat"] = this
+        register("chat")
     }
 
     val baffle = Baffle.of(100, TimeUnit.MILLISECONDS)
@@ -73,7 +71,7 @@ class ThemeChat : Theme<ThemeChatSettings>(), Listener {
                 if (select != index) {
                     session.playerSide = replies[select]
                     CompletableFuture<Void>().run {
-                        npcTalk(session, session.npcSide, session.npcSide.size, "", printEnd = true, canReply = true)
+                        npcTalk(session, session.npcSide, "", session.npcSide.size, end = true, canReply = true)
                     }
                 }
             }
@@ -114,11 +112,11 @@ class ThemeChat : Theme<ThemeChatSettings>(), Listener {
         }
     }
 
-    override fun reloadConfig() {
-        settings = ThemeChatSettings(ConversationManager.conf.getConfigurationSection("theme-chat")!!)
+    override fun createConfig(): ThemeChatSettings {
+        return ThemeChatSettings(ConversationManager.conf.getConfigurationSection("theme-chat")!!)
     }
 
-    override fun reload(session: Session): CompletableFuture<Void> {
+    override fun onReset(session: Session): CompletableFuture<Void> {
         val future = CompletableFuture<Void>()
         session.conversation.playerSide.checked(session).thenApply {
             session.playerSide = it.getOrNull(session.player.inventory.heldItemSlot.coerceAtMost(it.size - 1))
@@ -127,26 +125,25 @@ class ThemeChat : Theme<ThemeChatSettings>(), Listener {
         return future
     }
 
-    override fun begin(session: Session): CompletableFuture<Void> {
+    override fun onBegin(session: Session): CompletableFuture<Void> {
         Effects.create(Particle.CLOUD, session.origin.clone().add(0.0, 0.5, 0.0)).count(5).player(session.player).play()
-        settings.playSound(session)
-        return super.begin(session)
+        return super.onBegin(session)
     }
 
-    override fun npcTalk(session: Session, message: List<String>, canReply: Boolean): CompletableFuture<Void> {
+    override fun onDisplay(session: Session, message: List<String>, canReply: Boolean): CompletableFuture<Void> {
         val future = CompletableFuture<Void>()
         var d = 0L
         var cancel = false
         session.npcTalking = true
-        message.colored().map { if (settings.animation) it.toPrinted("_") else listOf(it) }.forEachIndexed { messageLine, messageText ->
+        message.colored().map { if (settings.animation) it.toPrinted("_") else listOf(it) }.forEachIndexed { index, messageText ->
             messageText.forEachIndexed { printLine, printText ->
                 Tasks.delay(d++) {
                     if (session.isValid) {
                         if (session.npcTalking) {
-                            future.npcTalk(session, message, messageLine, printText, printLine + 1 == messageText.size, canReply)
+                            future.npcTalk(session, message, printText, index, printLine + 1 == messageText.size, canReply)
                         } else if (!cancel) {
                             cancel = true
-                            future.npcTalk(session, session.npcSide, session.npcSide.size, "", printEnd = true, canReply = true)
+                            future.npcTalk(session, session.npcSide, "", session.npcSide.size, end = true, canReply = true)
                             future.complete(null)
                         }
                     } else if (!cancel) {
@@ -165,14 +162,7 @@ class ThemeChat : Theme<ThemeChatSettings>(), Listener {
         return future
     }
 
-    fun CompletableFuture<Void>.npcTalk(
-        session: Session,
-        messages: List<String>,
-        messageLine: Int,
-        printText: String,
-        printEnd: Boolean,
-        canReply: Boolean
-    ) {
+    fun CompletableFuture<Void>.npcTalk(session: Session, messages: List<String>, message: String, index: Int, end: Boolean, canReply: Boolean) {
         session.conversation.playerSide.checked(session).thenApply { replies ->
             newJson().also { json ->
                 try {
@@ -184,8 +174,8 @@ class ThemeChat : Theme<ThemeChatSettings>(), Listener {
                             it.contains("{npcSide}") -> {
                                 messages.colored().forEachIndexed { i, fully ->
                                     when {
-                                        messageLine > i -> json.append(it.replace("{npcSide}", fully)).newLine()
-                                        messageLine == i -> json.append(it.replace("{npcSide}", printText)).newLine()
+                                        index > i -> json.append(it.replace("{npcSide}", fully)).newLine()
+                                        index == i -> json.append(it.replace("{npcSide}", message)).newLine()
                                         else -> json.newLine()
                                     }
                                 }
@@ -195,8 +185,8 @@ class ThemeChat : Theme<ThemeChatSettings>(), Listener {
                                 session.playerReplyForDisplay.addAll(replies)
                                 if (canReply) {
                                     replies.forEachIndexed { n, reply ->
-                                        if (messageLine + 1 >= messages.size && printEnd) {
-                                            val text = reply.text(session)
+                                        if (index + 1 >= messages.size && end) {
+                                            val text = reply.build(session)
                                             if (session.playerSide == reply) {
                                                 json.append(it.replace("{select}", settings.selectChar).replace("{playerSide}", "${settings.selectColor}$text"))
                                                     .hoverText(text)
@@ -228,7 +218,7 @@ class ThemeChat : Theme<ThemeChatSettings>(), Listener {
                 }
             }.send(session.player)
             // 打印完成则结束演示
-            if (messageLine + 1 == messages.size && printEnd) {
+            if (index + 1 == messages.size && end) {
                 complete(null)
             }
         }
