@@ -86,13 +86,13 @@ object ConversationLoader {
             root.getList("player")?.run {
                 PlayerSide(mapNotNull { it.asMap() }.map {
                     PlayerReply(
-                        it,
+                        it.toMutableMap(),
                         it["if"]?.toString(),
                         it["reply"].toString(),
-                        it["then"]?.asList() ?: emptyList()
+                        it["then"]?.asList()?.toMutableList() ?: ArrayList()
                     )
-                })
-            } ?: PlayerSide(emptyList()),
+                }.toMutableList())
+            } ?: PlayerSide(ArrayList()),
             root.getString("condition"),
             root.getKeys(false)
                 .filter { it.startsWith("agent:") }
@@ -103,7 +103,7 @@ object ConversationLoader {
                         root.get(it)!!.asList(),
                         args.getOrNull(1) ?: "self"
                     )
-                },
+                }.toMutableList(),
             option
         )
     }

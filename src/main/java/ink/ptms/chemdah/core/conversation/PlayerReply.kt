@@ -18,10 +18,10 @@ import java.util.concurrent.CompletableFuture
  * @since 2021/2/9 6:23 下午
  */
 data class PlayerReply(
-    val root: Map<String, Any>,
-    val condition: String?,
-    val text: String,
-    val action: List<String>,
+    val root: MutableMap<String, Any>,
+    var condition: String?,
+    var text: String,
+    val action: MutableList<String>,
     val uuid: UUID = UUID.randomUUID()
 ) {
 
@@ -41,7 +41,7 @@ data class PlayerReply(
             CompletableFuture.completedFuture(true)
         } else {
             try {
-                KetherShell.eval(condition, namespace = namespaceConversationPlayer) {
+                KetherShell.eval(condition!!, namespace = namespaceConversationPlayer) {
                     extend(session.variables)
                 }.thenApply {
                     Coerce.toBoolean(it)

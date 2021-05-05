@@ -10,7 +10,7 @@ import java.util.concurrent.CompletableFuture
  * @since 2021/2/9 6:23 下午
  */
 data class PlayerSide(
-    val reply: List<PlayerReply>
+    val reply: MutableList<PlayerReply>
 ) {
 
     fun checked(session: Session): CompletableFuture<List<PlayerReply>> {

@@ -23,11 +23,11 @@ data class Conversation(
     val id: String,
     val file: File?,
     val root: ConfigurationSection,
-    val npcId: Trigger,
-    val npcSide: List<String>,
+    var npcId: Trigger,
+    val npcSide: MutableList<String>,
     val playerSide: PlayerSide,
-    val condition: String?,
-    val agent: List<Agent>,
+    var condition: String?,
+    val agent: MutableList<Agent>,
     val option: Option,
 ) {
 
@@ -37,7 +37,7 @@ data class Conversation(
      *
      * 目前仅支持 chat 风格
      */
-    val isForceDisplay = root.getBoolean("force-display")
+    var isForceDisplay = root.getBoolean("force-display")
 
     fun isNPC(namespace: String, id: String): Boolean {
         return npcId.id.any { it.namespace.equals(namespace, true) && it.value == id }
@@ -129,7 +129,7 @@ data class Conversation(
                 return@also
             }
             try {
-                KetherShell.eval(condition.asList().toMutableList().also {
+                KetherShell.eval(condition!!.asList().toMutableList().also {
                     it.add("agent")
                 }, namespace = namespaceConversationNPC) {
                     extend(session.variables)
