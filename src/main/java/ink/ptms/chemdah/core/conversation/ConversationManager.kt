@@ -60,7 +60,7 @@ object ConversationManager : Listener {
     private fun tick() {
         Bukkit.getOnlinePlayers().forEach { p ->
             val session = p.conversationSession ?: return@forEach
-            if (session.isClosed) {
+            if (session.isClosed || session.conversation.isForceDisplay) {
                 return@forEach
             }
             // 远离或背对对话单位
@@ -112,7 +112,7 @@ object ConversationManager : Listener {
     private fun e(e: EntityDamageEvent) {
         if (e.entity is Player) {
             val session = sessions[e.entity.name] ?: return
-            if (!session.isClosed) {
+            if (!session.isClosed && !session.conversation.isForceDisplay) {
                 session.isClosed = true
                 Tasks.task {
                     session.close(refuse = true)
