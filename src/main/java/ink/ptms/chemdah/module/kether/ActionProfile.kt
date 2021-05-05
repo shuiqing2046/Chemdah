@@ -25,30 +25,39 @@ import java.util.concurrent.CompletableFuture
  */
 class ActionProfile {
 
-    class ProfileDataGet(val key: ParsedAction<*>) : QuestAction<Any?>() {
+    class ProfileDataGet(val key: ParsedAction<*>, val default: ParsedAction<*> = ParsedAction.noop<Any>()) : QuestAction<Any>() {
 
-        override fun process(frame: QuestContext.Frame): CompletableFuture<Any?> {
+        override fun process(frame: QuestContext.Frame): CompletableFuture<Any> {
             return frame.newFrame(key).run<Any>().thenApply {
-                frame.getProfile().persistentDataContainer[it.toString()]?.value
+                frame.newFrame(default).run<Any>().thenApply { def ->
+                    frame.getProfile().persistentDataContainer[it.toString()]?.value ?: def
+                }
             }
         }
     }
 
-    class ProfileDataSet(val key: ParsedAction<*>, val value: ParsedAction<*>, val symbol: Symbol) : QuestAction<Void>() {
+    class ProfileDataSet(
+        val key: ParsedAction<*>,
+        val value: ParsedAction<*>,
+        val symbol: Symbol,
+        val default: ParsedAction<*> = ParsedAction.noop<Any>()
+    ) : QuestAction<Void>() {
 
         override fun process(frame: QuestContext.Frame): CompletableFuture<Void> {
             return frame.newFrame(key).run<Any>().thenAccept { key ->
-                frame.newFrame(value).run<Any?>().thenAccept { value ->
-                    val persistentDataContainer = frame.getProfile().persistentDataContainer
-                    when {
-                        value == null -> {
-                            persistentDataContainer.remove(key.toString())
-                        }
-                        symbol == Symbol.ADD -> {
-                            persistentDataContainer[key.toString()] = persistentDataContainer[key.toString()].increaseAny(value)
-                        }
-                        else -> {
-                            persistentDataContainer[key.toString()] = value
+                frame.newFrame(value).run<Any>().thenAccept { value ->
+                    frame.newFrame(default).run<Any>().thenAccept { def ->
+                        val persistentDataContainer = frame.getProfile().persistentDataContainer
+                        when {
+                            value == null -> {
+                                persistentDataContainer.remove(key.toString())
+                            }
+                            symbol == Symbol.ADD -> {
+                                persistentDataContainer[key.toString()] = (persistentDataContainer[key.toString()] ?: def).increaseAny(value)
+                            }
+                            else -> {
+                                persistentDataContainer[key.toString()] = value
+                            }
                         }
                     }
                 }
@@ -150,12 +159,29 @@ class ActionProfile {
                             it.mark()
                             when (it.expects("to", "add", "increase")) {
                                 "to" -> ProfileDataSet(key, it.next(ArgTypes.ACTION), Symbol.SET)
-                                "add", "increase" -> ProfileDataSet(key, it.next(ArgTypes.ACTION), Symbol.ADD)
+                                "add", "increase" -> {
+                                    val value = it.next(ArgTypes.ACTION)
+                                    try {
+                                        it.mark()
+                                        it.expect("default")
+                                        ProfileDataSet(key, value, Symbol.ADD, it.next(ArgTypes.ACTION))
+                                    } catch (ex: Throwable) {
+                                        it.reset()
+                                        ProfileDataSet(key, value, Symbol.ADD)
+                                    }
+                                }
                                 else -> error("out of case")
                             }
                         } catch (ex: Throwable) {
                             it.reset()
-                            ProfileDataGet(key)
+                            try {
+                                it.mark()
+                                it.expect("default")
+                                ProfileDataGet(key, it.next(ArgTypes.ACTION))
+                            } catch (ex: Throwable) {
+                                it.reset()
+                                ProfileDataGet(key)
+                            }
                         }
                     }
                 }

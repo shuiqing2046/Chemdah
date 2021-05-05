@@ -138,13 +138,13 @@ object ChemdahAPI {
      * 设置全局变量
      * @param append 是否追加模式
      */
-    fun setVariable(key: String, value: String?, append: Boolean = false) {
+    fun setVariable(key: String, value: String?, append: Boolean = false, default: String? = null) {
         when {
             value == null -> {
                 Database.INSTANCE.releaseVariable(key)
             }
             append -> {
-                Database.INSTANCE.updateVariable(key, Database.INSTANCE.selectVariable(key).increaseAny(value).toString())
+                Database.INSTANCE.updateVariable(key, (Database.INSTANCE.selectVariable(key) ?: default).increaseAny(value).toString())
             }
             else -> {
                 Database.INSTANCE.updateVariable(key, value)

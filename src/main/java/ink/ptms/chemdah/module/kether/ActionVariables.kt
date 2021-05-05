@@ -21,22 +21,31 @@ import java.util.concurrent.CompletableFuture
  */
 class ActionVariables {
 
-    class VariablesGet(val key: ParsedAction<*>) : QuestAction<String?>() {
+    class VariablesGet(val key: ParsedAction<*>, val default: ParsedAction<*> = ParsedAction.noop<Any>()) : QuestAction<Any>() {
 
-        override fun process(frame: QuestContext.Frame): CompletableFuture<String?> {
+        override fun process(frame: QuestContext.Frame): CompletableFuture<Any> {
             return frame.newFrame(key).run<Any>().thenApply {
-                ChemdahAPI.getVariable(it.toString())
+                frame.newFrame(default).run<Any>().thenApply { def ->
+                    ChemdahAPI.getVariable(it.toString()) ?: def
+                }
             }
         }
     }
 
-    class VariablesSet(val key: ParsedAction<*>, val value: ParsedAction<*>, val symbol: Symbol) : QuestAction<Void>() {
+    class VariablesSet(
+        val key: ParsedAction<*>,
+        val value: ParsedAction<*>,
+        val symbol: Symbol,
+        val default: ParsedAction<*> = ParsedAction.noop<Any>()
+    ) : QuestAction<Void>() {
 
         override fun process(frame: QuestContext.Frame): CompletableFuture<Void> {
             return frame.newFrame(key).run<Any>().thenAccept { key ->
-                frame.newFrame(value).run<Any?>().thenAccept { value ->
-                    Tasks.task(true) {
-                        ChemdahAPI.setVariable(key.toString(), value?.toString(), symbol == Symbol.ADD)
+                frame.newFrame(value).run<Any>().thenAccept { value ->
+                    frame.newFrame(default).run<Any>().thenAccept { def ->
+                        Tasks.task(true) {
+                            ChemdahAPI.setVariable(key.toString(), value?.toString(), symbol == Symbol.ADD, default = def?.toString())
+                        }
                     }
                 }
             }
@@ -65,12 +74,29 @@ class ActionVariables {
                     it.mark()
                     when (it.expects("to", "add", "increase")) {
                         "to" -> VariablesSet(key, it.next(ArgTypes.ACTION), Symbol.SET)
-                        "add", "increase" -> VariablesSet(key, it.next(ArgTypes.ACTION), Symbol.ADD)
+                        "add", "increase" -> {
+                            val value = it.next(ArgTypes.ACTION)
+                            try {
+                                it.mark()
+                                it.expect("default")
+                                VariablesSet(key, value, Symbol.ADD, it.next(ArgTypes.ACTION))
+                            } catch (ex: Throwable) {
+                                it.reset()
+                                VariablesSet(key, value, Symbol.ADD)
+                            }
+                        }
                         else -> error("out of case")
                     }
                 } catch (ex: Throwable) {
                     it.reset()
-                    VariablesGet(key)
+                    try {
+                        it.mark()
+                        it.expect("default")
+                        VariablesGet(key, it.next(ArgTypes.ACTION))
+                    } catch (ex: Throwable) {
+                        it.reset()
+                        VariablesGet(key)
+                    }
                 }
             }
         }
