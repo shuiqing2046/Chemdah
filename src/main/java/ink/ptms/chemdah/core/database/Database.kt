@@ -121,7 +121,7 @@ abstract class Database {
         @EventHandler
         private fun e(e: PlayerQuitEvent) {
             val playerProfile = ChemdahAPI.playerProfile.remove(e.player.name)
-            if (playerProfile?.changed == true) {
+            if (playerProfile?.isDataChanged == true) {
                 Tasks.task(true) {
                     mirrorFuture("Database:update") {
                         INSTANCE.update(e.player, playerProfile)
@@ -136,7 +136,7 @@ abstract class Database {
         private fun update200() {
             Bukkit.getOnlinePlayers().filter { it.isChemdahProfileLoaded }.forEach {
                 val playerProfile = it.chemdahProfile
-                if (playerProfile.changed) {
+                if (playerProfile.isDataChanged) {
                     mirrorFuture("Database:update") {
                         INSTANCE.update(it, playerProfile)
                         PlayerEvents.Updated(it, playerProfile).call()

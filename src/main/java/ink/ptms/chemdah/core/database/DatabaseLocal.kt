@@ -62,25 +62,25 @@ open class DatabaseLocal : Database() {
 
     override fun update(player: Player, playerProfile: PlayerProfile) {
         val data = player.getData()
-        if (playerProfile.persistentDataContainer.changed) {
+        if (playerProfile.persistentDataContainer.isChanged) {
             playerProfile.persistentDataContainer.forEach { key, obj ->
                 if (obj.changed) {
                     data.set("Chemdah.data.${key.replace(".", namespace)}", obj.value)
                 }
             }
-            playerProfile.persistentDataContainer.released.forEach {
+            playerProfile.persistentDataContainer.drops.forEach {
                 data.set("Chemdah.data.${it.replace(".", namespace)}", null)
             }
             playerProfile.persistentDataContainer.flush()
         }
         playerProfile.getQuests().forEach { quest ->
-            if (quest.persistentDataContainer.changed) {
+            if (quest.persistentDataContainer.isChanged) {
                 quest.persistentDataContainer.forEach { key, obj ->
                     if (obj.changed) {
                         data.set("Chemdah.quest.${quest.id}.${key.replace(".", namespace)}", obj.value)
                     }
                 }
-                quest.persistentDataContainer.released.forEach {
+                quest.persistentDataContainer.drops.forEach {
                     data.set("Chemdah.quest.${quest.id}.${it.replace(".", namespace)}", null)
                 }
                 quest.persistentDataContainer.flush()

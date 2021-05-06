@@ -24,10 +24,10 @@ class Task(id: String, config: ConfigurationSection, val template: Template) : Q
 
     init {
         config.getConfigurationSection("condition")?.getValues(false)?.forEach { (k, v) ->
-            condition.put(k, v)
+            condition[k] = v
         }
         config.getConfigurationSection("goal")?.getValues(false)?.forEach { (k, v) ->
-            goal.put(k, v)
+            goal[k] = v
         }
     }
 

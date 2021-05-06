@@ -95,7 +95,7 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
 
         override fun signature(profile: PlayerProfile, template: Template) {
             val id = "quest.cooldown.${if (group != null) "@$group" else template.id}.${type.name.toLowerCase()}"
-            profile.persistentDataContainer.put(id, System.currentTimeMillis())
+            profile.persistentDataContainer[id] = System.currentTimeMillis()
         }
     }
 
@@ -136,11 +136,11 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
             // 超出重复限时
             if (period != null && period.`in`(time).isTimeout(time)) {
                 // 初始化变量
-                profile.persistentDataContainer.put("$id.amount", 1)
-                profile.persistentDataContainer.put("$id.time", System.currentTimeMillis())
+                profile.persistentDataContainer["$id.amount"] = 1
+                profile.persistentDataContainer["$id.time"] = System.currentTimeMillis()
             } else {
                 // 追加次数
-                profile.persistentDataContainer.put("$id.amount", profile.persistentDataContainer["$id.amount", 0].toInt() + 1)
+                profile.persistentDataContainer["$id.amount"] = profile.persistentDataContainer["$id.amount", 0].toInt() + 1
             }
         }
     }

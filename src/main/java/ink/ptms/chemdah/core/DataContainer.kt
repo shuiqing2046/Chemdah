@@ -21,11 +21,20 @@ class DataContainer {
     private val map = ConcurrentHashMap<String, Data>()
     private var locked = false
 
-    val released = ConcurrentSet<String>()
+    /**
+     * 删除节点
+     */
+    val drops = ConcurrentSet<String>()
 
-    val changed: Boolean
-        get() = released.isNotEmpty() || map.any { it.value.changed }
+    /**
+     * 数据是否发生变动
+     */
+    val isChanged: Boolean
+        get() = drops.isNotEmpty() || map.any { it.value.changed }
 
+    /**
+     * 函数内的所有数据修改行为不会记录变动（不更新数据库）
+     */
     fun unchanged(func: DataContainer.() -> Unit) {
         locked = true
         func(this)
@@ -37,40 +46,51 @@ class DataContainer {
         this.map.putAll(map)
     }
 
+    /**
+     * 获取数据
+     */
     operator fun get(key: String) = map[key]
 
+    /**
+     * 获取数据并返回默认值
+     */
     operator fun get(key: String, def: Any) = map[key] ?: def.data()
 
+    /**
+     * 修改数据
+     */
     operator fun set(key: String, value: Any) {
         map[key] = value.data().change()
         if (!locked) {
-            released.remove(key)
+            drops.remove(key)
         }
     }
 
-    fun put(key: String, value: Any) {
-        map[key] = value.data().change()
-        if (!locked) {
-            released.remove(key)
-        }
-    }
-
+    /**
+     * 删除数据
+     */
     fun remove(key: String) {
         map.remove(key)
         if (!locked) {
-            released.add(key)
+            drops.add(key)
         }
     }
 
+    /**
+     * 清空数据
+     */
     fun clear() {
         if (!locked) {
-            released.addAll(map.keys)
+            drops.addAll(map.keys)
         }
         map.clear()
     }
 
+    /**
+     * 合并数据
+     */
     fun merge(meta: DataContainer) {
-        meta.forEach { key, data -> put(key, data.value) }
+        meta.forEach { key, data -> this[key] = data.value }
     }
 
     fun containsKey(key: String) = map.containsKey(key)
@@ -83,11 +103,14 @@ class DataContainer {
 
     fun copy() = DataContainer(map)
 
+    /**
+     * 释放变动
+     */
     fun flush(): DataContainer {
         map.forEach {
             it.value.changed = false
         }
-        released.clear()
+        drops.clear()
         return this
     }
 

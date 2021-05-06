@@ -44,8 +44,8 @@ class PlayerProfile(val uniqueId: UUID) {
     /**
      * 任务或玩家数据是否发生变动
      */
-    val changed: Boolean
-        get() = persistentDataContainer.changed || getQuests().any { it.newQuest || it.persistentDataContainer.changed }
+    val isDataChanged: Boolean
+        get() = persistentDataContainer.isChanged || getQuests().any { it.newQuest || it.persistentDataContainer.isChanged }
 
     /**
      * 持久化数据储存容器

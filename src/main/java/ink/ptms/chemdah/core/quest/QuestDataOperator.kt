@@ -20,7 +20,7 @@ class QuestDataOperator(val profile: PlayerProfile, val task: Task) {
 
     fun get(node: String, def: Any) = container?.get("${task.metaNode}.$node") ?: def.data()
 
-    fun put(node: String, value: Any) = container?.put("${task.metaNode}.$node", value)
+    fun put(node: String, value: Any) = container?.set("${task.metaNode}.$node", value)
 
     fun remove(node: String) = container?.remove("${task.metaNode}.$node")
 

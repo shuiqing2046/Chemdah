@@ -21,21 +21,39 @@ import org.bukkit.entity.Player
  */
 class Quest(val id: String, val profile: PlayerProfile, val persistentDataContainer: DataContainer = DataContainer()) {
 
+    /**
+     * 获取任务模板
+     */
     val template: Template
         get() = ChemdahAPI.getQuestTemplate(id)!!
 
+    /**
+     * 任务是否有效（即模板是否存在）
+     */
     val isValid: Boolean
         get() = ChemdahAPI.getQuestTemplate(id) != null
 
+    /**
+     * 任务是否完成（完成签名）
+     */
     val isCompleted: Boolean
         get() = isValid && template.task.all { it.value.objective.hasCompletedSignature(profile, it.value) }
 
+    /**
+     * 获取所有条目
+     */
     val tasks: Collection<Task>
         get() = template.task.values
 
+    /**
+     * 任务开始时间
+     */
     val startTime: Long
         get() = persistentDataContainer["start", 0L].toLong()
 
+    /**
+     * 任务是否超时
+     */
     val isTimeout: Boolean
         get() = template.isTimeout(startTime)
 
@@ -45,7 +63,7 @@ class Quest(val id: String, val profile: PlayerProfile, val persistentDataContai
     var newQuest = false
 
     init {
-        persistentDataContainer.put("start", System.currentTimeMillis())
+        persistentDataContainer["start"] = System.currentTimeMillis()
         profile.persistentDataContainer.remove("quest.complete.$id")
     }
 
@@ -75,7 +93,7 @@ class Quest(val id: String, val profile: PlayerProfile, val persistentDataContai
                             if (it) {
                                 template.control().signature(profile, MetaControl.Trigger.COMPLETE)
                                 profile.unregisterQuest(this@Quest)
-                                profile.persistentDataContainer.put("quest.complete.$id", System.currentTimeMillis())
+                                profile.persistentDataContainer["quest.complete.$id"] = System.currentTimeMillis()
                                 QuestEvents.Complete.Post(this@Quest, profile).call()
                             }
                             finish()

@@ -127,7 +127,7 @@ class DatabaseSQL : Database() {
             .map {
                 it.getString("key") to it.getString("value")
             }.forEach {
-                persistentDataContainer.unchanged { put(it.first, it.second) }
+                persistentDataContainer.unchanged { this[it.first] = it.second }
             }
         val quests = HashMap<String, DataContainer>()
         tableQuest.select(Where.equals("user", getUserId(player)), Where.equals("mode", 1))
@@ -140,7 +140,7 @@ class DatabaseSQL : Database() {
                 it.getString("quest") to (it.getString("key") to it.getString("value"))
             }.forEach {
                 quests.computeIfAbsent(it.first) { DataContainer() }.unchanged {
-                    put(it.second.first, it.second.second)
+                    this[it.second.first] = it.second.second
                 }
             }
         quests.forEach { registerQuest(Quest(it.key, this, it.value)) }
@@ -158,7 +158,7 @@ class DatabaseSQL : Database() {
                     .run(dataSource)
             }
         }
-        persistentDataContainer.released.toList().forEach {
+        persistentDataContainer.drops.toList().forEach {
             tableUserData.update(Where.equals("user", id), Where.equals("key", it)).set("mode", 0).run(dataSource)
         }
         persistentDataContainer.flush()
@@ -167,7 +167,7 @@ class DatabaseSQL : Database() {
     fun PlayerProfile.updateQuest(player: Player) {
         val id = getUserId(player)
         getQuests().forEach { quest ->
-            if (quest.newQuest || quest.persistentDataContainer.changed) {
+            if (quest.newQuest || quest.persistentDataContainer.isChanged) {
                 quest.newQuest = false
                 val questId = getQuestId(player, quest)
                 if (questId < 0) {
@@ -183,7 +183,7 @@ class DatabaseSQL : Database() {
                             .run(dataSource)
                     }
                 }
-                quest.persistentDataContainer.released.toList().forEach {
+                quest.persistentDataContainer.drops.toList().forEach {
                     tableQuestData.update(Where.equals("quest", questId), Where.equals("key", it)).set("mode", 0).run(dataSource)
                 }
                 quest.persistentDataContainer.flush()
