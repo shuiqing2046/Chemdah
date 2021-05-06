@@ -132,7 +132,7 @@ abstract class Database {
             }
         }
 
-        @TSchedule(period = 200, async = true)
+        @TSchedule(period = 100, async = true)
         private fun update200() {
             Bukkit.getOnlinePlayers().filter { it.isChemdahProfileLoaded }.forEach {
                 val playerProfile = it.chemdahProfile
