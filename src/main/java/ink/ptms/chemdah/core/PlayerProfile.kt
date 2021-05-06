@@ -160,4 +160,11 @@ class PlayerProfile(val uniqueId: UUID) {
     fun tasks(event: Event, func: (Quest, Task) -> Unit) {
         getQuests(openAPI = true).forEach { q -> q.tasks.filter { it.objective.isListener && it.objective.event.isInstance(event) }.forEach { func(q, it) } }
     }
+
+    /**
+     * 检查并更新数据
+     */
+    fun push() {
+        Database.INSTANCE.update(player, this)
+    }
 }
