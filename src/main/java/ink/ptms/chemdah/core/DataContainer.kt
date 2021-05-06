@@ -60,7 +60,7 @@ class DataContainer {
      * 修改数据
      */
     operator fun set(key: String, value: Any) {
-        map[key] = value.data().change()
+        map[key] = if (value is Data) value.change() else value.data().change()
         if (!locked) {
             drops.remove(key)
         }
