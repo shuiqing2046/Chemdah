@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective.bukkit
 
 import ink.ptms.chemdah.core.quest.objective.Dependency
-import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import org.bukkit.event.player.PlayerShearEntityEvent
 
 /**
@@ -12,7 +12,7 @@ import org.bukkit.event.player.PlayerShearEntityEvent
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
-object IPlayerShear : ObjectiveCountable<PlayerShearEntityEvent>() {
+object IPlayerShear : ObjectiveCountableI<PlayerShearEntityEvent>() {
 
     override val name = "player shear"
     override val event = PlayerShearEntityEvent::class

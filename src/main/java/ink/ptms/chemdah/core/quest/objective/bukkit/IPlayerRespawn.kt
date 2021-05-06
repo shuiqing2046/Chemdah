@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective.bukkit
 
 import ink.ptms.chemdah.core.quest.objective.Dependency
-import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import org.bukkit.event.player.PlayerRespawnEvent
 
 /**
@@ -12,7 +12,7 @@ import org.bukkit.event.player.PlayerRespawnEvent
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
-object IPlayerRespawn : ObjectiveCountable<PlayerRespawnEvent>() {
+object IPlayerRespawn : ObjectiveCountableI<PlayerRespawnEvent>() {
 
     override val name = "player respawn"
     override val event = PlayerRespawnEvent::class

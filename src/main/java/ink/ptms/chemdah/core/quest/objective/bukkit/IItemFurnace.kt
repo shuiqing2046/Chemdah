@@ -3,7 +3,7 @@ package ink.ptms.chemdah.core.quest.objective.bukkit
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.objective.Dependency
-import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import org.bukkit.event.inventory.FurnaceExtractEvent
 import org.bukkit.inventory.ItemStack
 
@@ -15,7 +15,7 @@ import org.bukkit.inventory.ItemStack
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
-object IItemFurnace : ObjectiveCountable<FurnaceExtractEvent>() {
+object IItemFurnace : ObjectiveCountableI<FurnaceExtractEvent>() {
 
     override val name = "furnace extract"
     override val event = FurnaceExtractEvent::class

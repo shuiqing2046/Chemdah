@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective.bukkit
 
 import ink.ptms.chemdah.core.quest.objective.Dependency
-import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import io.izzel.taboolib.common.event.PlayerJumpEvent
 
 /**
@@ -12,7 +12,7 @@ import io.izzel.taboolib.common.event.PlayerJumpEvent
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
-object IPlayerJump : ObjectiveCountable<PlayerJumpEvent>() {
+object IPlayerJump : ObjectiveCountableI<PlayerJumpEvent>() {
 
     override val name = "player jump"
     override val event = PlayerJumpEvent::class

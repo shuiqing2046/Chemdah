@@ -3,7 +3,7 @@ package ink.ptms.chemdah.core.quest.objective.bukkit
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.objective.Dependency
-import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable2
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableF
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityRegainHealthEvent
 
@@ -15,7 +15,7 @@ import org.bukkit.event.entity.EntityRegainHealthEvent
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
-object IPlayerRegain : ObjectiveCountable2<EntityRegainHealthEvent>() {
+object IPlayerRegain : ObjectiveCountableF<EntityRegainHealthEvent>() {
 
     override val name = "health regain"
     override val event = EntityRegainHealthEvent::class

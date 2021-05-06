@@ -2,7 +2,7 @@ package ink.ptms.chemdah.core.quest.objective.bukkit.paper
 
 import com.destroystokyo.paper.event.player.PlayerElytraBoostEvent
 import ink.ptms.chemdah.core.quest.objective.Dependency
-import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 
 /**
  * Chemdah
@@ -12,7 +12,7 @@ import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
-object IPlayerElytraBoost : ObjectiveCountable<PlayerElytraBoostEvent>() {
+object IPlayerElytraBoost : ObjectiveCountableI<PlayerElytraBoostEvent>() {
 
     override val name = "elytra boost"
     override val event = PlayerElytraBoostEvent::class

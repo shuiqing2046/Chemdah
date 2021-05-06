@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective.bukkit
 
 import ink.ptms.chemdah.core.quest.objective.Dependency
-import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import io.izzel.taboolib.cronus.CronusUtils
 import io.izzel.taboolib.internal.xseries.XMaterial
 import org.bukkit.entity.Player
@@ -15,7 +15,7 @@ import org.bukkit.event.entity.EntityResurrectEvent
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
-object IPlayerResurrect : ObjectiveCountable<EntityResurrectEvent>() {
+object IPlayerResurrect : ObjectiveCountableI<EntityResurrectEvent>() {
 
     override val name = "player resurrect"
     override val event = EntityResurrectEvent::class

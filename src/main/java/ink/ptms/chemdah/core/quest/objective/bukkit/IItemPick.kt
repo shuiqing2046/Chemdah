@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective.bukkit
 
 import ink.ptms.chemdah.core.quest.objective.Dependency
-import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityPickupItemEvent
 
@@ -13,7 +13,7 @@ import org.bukkit.event.entity.EntityPickupItemEvent
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
-object IItemPick : ObjectiveCountable<EntityPickupItemEvent>() {
+object IItemPick : ObjectiveCountableI<EntityPickupItemEvent>() {
 
     override val name = "pickup item"
     override val event = EntityPickupItemEvent::class

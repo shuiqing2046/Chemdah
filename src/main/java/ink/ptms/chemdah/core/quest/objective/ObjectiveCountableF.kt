@@ -15,7 +15,7 @@ import org.bukkit.event.Event
  * @since 2021/3/1 11:53 下午
  */
 @Abstract
-abstract class ObjectiveCountable2<E : Event> : Objective<E>() {
+abstract class ObjectiveCountableF<E : Event> : Objective<E>() {
 
     init {
         addGoal { profile, task ->

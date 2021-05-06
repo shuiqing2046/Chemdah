@@ -3,7 +3,7 @@ package ink.ptms.chemdah.core.quest.objective.bukkit
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.objective.Dependency
-import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import org.bukkit.event.player.PlayerExpChangeEvent
 
 /**
@@ -14,7 +14,7 @@ import org.bukkit.event.player.PlayerExpChangeEvent
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
-object IPlayerExpChange : ObjectiveCountable<PlayerExpChangeEvent>() {
+object IPlayerExpChange : ObjectiveCountableI<PlayerExpChangeEvent>() {
 
     override val name = "exp change"
     override val event = PlayerExpChangeEvent::class

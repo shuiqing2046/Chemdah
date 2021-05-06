@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective.bukkit
 
 import ink.ptms.chemdah.core.quest.objective.Dependency
-import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import org.bukkit.event.player.PlayerHarvestBlockEvent
 
 /**
@@ -12,7 +12,7 @@ import org.bukkit.event.player.PlayerHarvestBlockEvent
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
-object IBlockHarvest : ObjectiveCountable<PlayerHarvestBlockEvent>() {
+object IBlockHarvest : ObjectiveCountableI<PlayerHarvestBlockEvent>() {
 
     override val name = "harvest block"
     override val event = PlayerHarvestBlockEvent::class

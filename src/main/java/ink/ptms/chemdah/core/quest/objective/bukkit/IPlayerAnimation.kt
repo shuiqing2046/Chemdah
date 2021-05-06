@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective.bukkit
 
 import ink.ptms.chemdah.core.quest.objective.Dependency
-import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import org.bukkit.event.player.PlayerAnimationEvent
 
 /**
@@ -12,7 +12,7 @@ import org.bukkit.event.player.PlayerAnimationEvent
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
-object IPlayerAnimation : ObjectiveCountable<PlayerAnimationEvent>() {
+object IPlayerAnimation : ObjectiveCountableI<PlayerAnimationEvent>() {
 
     override val name = "player animation"
     override val event = PlayerAnimationEvent::class

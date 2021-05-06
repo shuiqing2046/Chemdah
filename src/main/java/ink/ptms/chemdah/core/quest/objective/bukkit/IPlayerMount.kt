@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective.bukkit
 
 import ink.ptms.chemdah.core.quest.objective.Dependency
-import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import org.bukkit.entity.Player
 import org.spigotmc.event.entity.EntityMountEvent
 
@@ -13,7 +13,7 @@ import org.spigotmc.event.entity.EntityMountEvent
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
-object IPlayerMount : ObjectiveCountable<EntityMountEvent>() {
+object IPlayerMount : ObjectiveCountableI<EntityMountEvent>() {
 
     override val name = "entity mount"
     override val event = EntityMountEvent::class

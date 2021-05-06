@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective.sandalphon
 
 import ink.ptms.chemdah.core.quest.objective.Dependency
-import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import ink.ptms.sandalphon.module.impl.treasurechest.event.ChestOpenEvent
 
 /**
@@ -12,7 +12,7 @@ import ink.ptms.sandalphon.module.impl.treasurechest.event.ChestOpenEvent
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("Sandalphon")
-object SChestOpen : ObjectiveCountable<ChestOpenEvent>() {
+object SChestOpen : ObjectiveCountableI<ChestOpenEvent>() {
 
     override val name = "sandalphon chest open"
     override val event = ChestOpenEvent::class

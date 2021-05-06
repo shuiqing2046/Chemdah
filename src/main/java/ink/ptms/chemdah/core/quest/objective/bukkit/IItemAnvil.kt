@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective.bukkit
 
 import ink.ptms.chemdah.core.quest.objective.Dependency
-import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.PrepareAnvilEvent
 
@@ -13,7 +13,7 @@ import org.bukkit.event.inventory.PrepareAnvilEvent
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
-object IItemAnvil : ObjectiveCountable<PrepareAnvilEvent>() {
+object IItemAnvil : ObjectiveCountableI<PrepareAnvilEvent>() {
 
     override val name = "player anvil"
     override val event = PrepareAnvilEvent::class

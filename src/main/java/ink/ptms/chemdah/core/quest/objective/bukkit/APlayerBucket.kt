@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective.bukkit
 
 import ink.ptms.chemdah.core.quest.objective.Abstract
-import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import org.bukkit.event.player.PlayerBucketEvent
 import org.bukkit.inventory.ItemStack
 
@@ -13,7 +13,7 @@ import org.bukkit.inventory.ItemStack
  * @since 2021/3/2 5:09 下午
  */
 @Abstract
-abstract class APlayerBucket<T : PlayerBucketEvent> : ObjectiveCountable<T>() {
+abstract class APlayerBucket<T : PlayerBucketEvent> : ObjectiveCountableI<T>() {
 
     init {
         handler {

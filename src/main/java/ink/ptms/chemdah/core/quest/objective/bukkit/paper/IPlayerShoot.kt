@@ -2,7 +2,7 @@ package ink.ptms.chemdah.core.quest.objective.bukkit.paper
 
 import com.destroystokyo.paper.event.player.PlayerLaunchProjectileEvent
 import ink.ptms.chemdah.core.quest.objective.Dependency
-import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 
 /**
  * Chemdah
@@ -12,7 +12,7 @@ import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
-object IPlayerShoot : ObjectiveCountable<PlayerLaunchProjectileEvent>() {
+object IPlayerShoot : ObjectiveCountableI<PlayerLaunchProjectileEvent>() {
 
     override val name = "shoot projectile"
     override val event = PlayerLaunchProjectileEvent::class

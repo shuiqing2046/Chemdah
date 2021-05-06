@@ -55,7 +55,7 @@ class Template(id: String, config: ConfigurationSection) : QuestContainer(id, co
      */
     fun acceptTo(profile: PlayerProfile): CompletableFuture<AcceptResult> {
         return checkAccept(profile).thenApply {
-            if (it == AcceptResult.SUCCESSFUL) {
+            if (it.type == AcceptResult.Type.SUCCESSFUL) {
                 val quest = Quest(id, profile)
                 val control = control()
                 control.signature(profile, MetaControl.Trigger.ACCEPT)
@@ -63,7 +63,7 @@ class Template(id: String, config: ConfigurationSection) : QuestContainer(id, co
                 agent(profile, AgentType.QUEST_START)
                 QuestEvents.Accept.Post(quest, profile).call()
             } else {
-                agent(profile, AgentType.QUEST_ACCEPT_CANCELLED)
+                agent(profile, AgentType.QUEST_ACCEPT_CANCELLED, reason = it.reason)
             }
             it
         }
@@ -76,28 +76,29 @@ class Template(id: String, config: ConfigurationSection) : QuestContainer(id, co
         val future = CompletableFuture<AcceptResult>()
         mirrorFuture("Template:checkAccept") {
             if (profile.getQuestById(id, openAPI = false) != null) {
-                future.complete(AcceptResult.ALREADY_EXISTS)
+                future.complete(AcceptResult(AcceptResult.Type.ALREADY_EXISTS))
                 finish()
                 return@mirrorFuture
             }
-            if (QuestEvents.Accept.Pre(this@Template, profile).call().isCancelled) {
-                future.complete(AcceptResult.CANCELLED_BY_EVENT)
+            val pre = QuestEvents.Accept.Pre(this@Template, profile).call()
+            if (pre.isCancelled) {
+                future.complete(AcceptResult(AcceptResult.Type.CANCELLED_BY_EVENT, pre.reason))
                 finish()
                 return@mirrorFuture
             }
             val control = control()
             control.check(profile).thenApply { c ->
-                if (c) {
+                if (c.pass) {
                     agent(profile, AgentType.QUEST_ACCEPT).thenAccept { a ->
                         if (a) {
-                            future.complete(AcceptResult.SUCCESSFUL)
+                            future.complete(AcceptResult(AcceptResult.Type.SUCCESSFUL))
                         } else {
-                            future.complete(AcceptResult.CANCELLED_BY_AGENT)
+                            future.complete(AcceptResult(AcceptResult.Type.CANCELLED_BY_AGENT))
                         }
                         finish()
                     }
                 } else {
-                    future.complete(AcceptResult.CANCELLED_BY_CONTROL)
+                    future.complete(AcceptResult(AcceptResult.Type.CANCELLED_BY_CONTROL, c.reason))
                     finish()
                 }
             }

@@ -6,7 +6,7 @@ import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.AgentType
 import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.core.quest.Task
-import ink.ptms.chemdah.core.quest.meta.MetaRestart.Companion.restart
+import ink.ptms.chemdah.core.quest.meta.MetaRestart.Companion.canRestart
 import ink.ptms.chemdah.util.mirrorFuture
 import ink.ptms.chemdah.util.safely
 import org.bukkit.entity.Player
@@ -174,7 +174,7 @@ abstract class Objective<E : Event> {
     open fun checkComplete(profile: PlayerProfile, task: Task, quest: Quest) {
         if (!hasCompletedSignature(profile, task)) {
             mirrorFuture("Objective:checkComplete") {
-                task.restart(profile).thenAccept { r ->
+                task.canRestart(profile).thenAccept { r ->
                     if (r) {
                         if (ObjectiveEvents.Reset.Pre(this@Objective, task, quest, profile).call().nonCancelled()) {
                             onReset(profile, task, quest)

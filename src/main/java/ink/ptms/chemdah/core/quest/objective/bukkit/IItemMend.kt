@@ -3,7 +3,7 @@ package ink.ptms.chemdah.core.quest.objective.bukkit
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.objective.Dependency
-import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import org.bukkit.event.player.PlayerItemMendEvent
 
 /**
@@ -14,7 +14,7 @@ import org.bukkit.event.player.PlayerItemMendEvent
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
-object IItemMend : ObjectiveCountable<PlayerItemMendEvent>() {
+object IItemMend : ObjectiveCountableI<PlayerItemMendEvent>() {
 
     override val name = "item mend"
     override val event = PlayerItemMendEvent::class

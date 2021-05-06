@@ -2,7 +2,7 @@ package ink.ptms.chemdah.core.quest.objective.bukkit.paper
 
 import com.destroystokyo.paper.event.player.PlayerAdvancementCriterionGrantEvent
 import ink.ptms.chemdah.core.quest.objective.Dependency
-import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 
 /**
  * Chemdah
@@ -12,7 +12,7 @@ import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
-object IPlayerCriterionGrant : ObjectiveCountable<PlayerAdvancementCriterionGrantEvent>() {
+object IPlayerCriterionGrant : ObjectiveCountableI<PlayerAdvancementCriterionGrantEvent>() {
 
     override val name = "criterion grant"
     override val event = PlayerAdvancementCriterionGrantEvent::class

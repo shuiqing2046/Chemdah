@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective.other
 
 import ink.ptms.chemdah.core.quest.Task
-import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import org.bukkit.event.Event
 
 /**
@@ -16,7 +16,7 @@ import org.bukkit.event.Event
  * @author sky
  * @since 2021/3/2 5:09 下午
  */
-object ITrigger : ObjectiveCountable<Event>() {
+object ITrigger : ObjectiveCountableI<Event>() {
 
     override val name = "trigger"
     override val event = Event::class

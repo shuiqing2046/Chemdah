@@ -140,11 +140,8 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
     /**
      * 指定脚本代理
      * 当高优先级的脚本代理取消行为时后续脚本代理将不再运行
-     *
-     * @param profile 玩家数据
-     * @param agentType 脚本代理类型
      */
-    fun agent(profile: PlayerProfile, agentType: AgentType, restrict: String = "self"): CompletableFuture<Boolean> {
+    fun agent(profile: PlayerProfile, agentType: AgentType, restrict: String = "self", reason: String? = null): CompletableFuture<Boolean> {
         val future = CompletableFuture<Boolean>()
         mirrorFuture("QuestContainer:agent") {
             if (QuestEvents.Agent(this@QuestContainer, profile, agentType, restrict).call().isCancelled) {
@@ -158,6 +155,7 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
                         KetherShell.eval(agent[cur].action, namespace = agentType.namespaceAll()) {
                             sender = profile.player
                             rootFrame().variables().also { vars ->
+                                vars.set("reason", reason)
                                 vars.set("@QuestContainer", this@QuestContainer)
                             }
                         }.thenApply {

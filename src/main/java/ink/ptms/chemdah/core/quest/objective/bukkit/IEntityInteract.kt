@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective.bukkit
 
 import ink.ptms.chemdah.core.quest.objective.Dependency
-import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
 
 /**
@@ -12,7 +12,7 @@ import org.bukkit.event.player.PlayerInteractAtEntityEvent
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
-object IEntityInteract : ObjectiveCountable<PlayerInteractAtEntityEvent>() {
+object IEntityInteract : ObjectiveCountableI<PlayerInteractAtEntityEvent>() {
 
     override val name = "entity interact"
     override val event = PlayerInteractAtEntityEvent::class

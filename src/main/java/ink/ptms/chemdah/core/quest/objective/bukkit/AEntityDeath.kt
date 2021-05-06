@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective.bukkit
 
 import ink.ptms.chemdah.core.quest.objective.Abstract
-import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import org.bukkit.event.entity.EntityDeathEvent
 
 /**
@@ -12,7 +12,7 @@ import org.bukkit.event.entity.EntityDeathEvent
  * @since 2021/3/2 5:09 下午
  */
 @Abstract
-abstract class AEntityDeath<T : EntityDeathEvent> : ObjectiveCountable<T>() {
+abstract class AEntityDeath<T : EntityDeathEvent> : ObjectiveCountableI<T>() {
 
     init {
         addCondition("position") { e ->

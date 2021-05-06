@@ -7,7 +7,7 @@ import ink.ptms.chemdah.core.DataContainer
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.meta.MetaControl
 import ink.ptms.chemdah.core.quest.meta.MetaControl.Companion.control
-import ink.ptms.chemdah.core.quest.meta.MetaRestart.Companion.restart
+import ink.ptms.chemdah.core.quest.meta.MetaRestart.Companion.canRestart
 import ink.ptms.chemdah.core.quest.meta.MetaTimeout.Companion.isTimeout
 import ink.ptms.chemdah.util.mirrorFuture
 import org.bukkit.entity.Player
@@ -83,7 +83,7 @@ class Quest(val id: String, val profile: PlayerProfile, val persistentDataContai
      */
     fun checkComplete() {
         mirrorFuture("Quest:checkComplete") {
-            template.restart(profile).thenAccept { reset ->
+            template.canRestart(profile).thenAccept { reset ->
                 if (reset) {
                     resetQuest()
                     finish()

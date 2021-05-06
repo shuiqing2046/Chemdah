@@ -33,7 +33,7 @@ class QuestEvents {
      */
     class Accept {
 
-        class Pre(val quest: Template, val playerProfile: PlayerProfile): EventCancellable<Pre>(true)
+        class Pre(val quest: Template, val playerProfile: PlayerProfile, var reason: String? = null): EventCancellable<Pre>(true)
 
         class Post(val quest: Quest, val playerProfile: PlayerProfile): EventNormal<Post>(true)
     }

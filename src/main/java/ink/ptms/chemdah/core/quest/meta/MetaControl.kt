@@ -1,6 +1,7 @@
 package ink.ptms.chemdah.core.quest.meta
 
 import com.google.common.base.Enums
+import ink.ptms.chemdah.api.event.collect.TemplateEvents
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Id
 import ink.ptms.chemdah.core.quest.QuestContainer
@@ -46,8 +47,11 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
                         ControlCooldown(trigger, map["time"]?.toString()?.toTime() ?: return@forEach, map["group"]?.toString())
                     }
                     else -> {
-                        warning("Unrecognized control format: $map")
-                        null
+                        val control = TemplateEvents.ControlHook(questContainer as Template, type, map).call().control
+                        if (control != null) {
+                            warning("Unrecognized control format: $type $map")
+                        }
+                        control
                     }
                 }?.run {
                     control += this
@@ -56,16 +60,20 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
         }
     }
 
+    data class Result(val pass: Boolean, val reason: String? = null)
+
     abstract class Control {
 
-        abstract fun check(profile: PlayerProfile, template: Template): CompletableFuture<Boolean>
+        abstract fun check(profile: PlayerProfile, template: Template): CompletableFuture<Result>
 
         abstract fun signature(profile: PlayerProfile, template: Template)
+
+        fun Boolean.toResult(reason: String) = Result(this, reason)
     }
 
     class ControlAgent(val agent: List<String>) : Control() {
 
-        override fun check(profile: PlayerProfile, template: Template): CompletableFuture<Boolean> {
+        override fun check(profile: PlayerProfile, template: Template): CompletableFuture<Result> {
             return try {
                 KetherShell.eval(agent.asList(), namespace = namespaceQuest) {
                     this.sender = profile.player
@@ -73,11 +81,11 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
                         vars.set("@QuestContainer", template)
                     }
                 }.thenApply {
-                    Coerce.toBoolean(it)
+                    Coerce.toBoolean(it).toResult("agent")
                 }
             } catch (e: Throwable) {
                 e.print()
-                CompletableFuture.completedFuture(false)
+                CompletableFuture.completedFuture(false.toResult("agent"))
             }
         }
 
@@ -87,10 +95,10 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
 
     class ControlCooldown(val type: Trigger, val time: Time, val group: String?) : Control() {
 
-        override fun check(profile: PlayerProfile, template: Template): CompletableFuture<Boolean> {
+        override fun check(profile: PlayerProfile, template: Template): CompletableFuture<Result> {
             val id = "quest.cooldown.${if (group != null) "@$group" else template.id}.${type.name.toLowerCase()}"
             val start = profile.persistentDataContainer[id, 0L].toLong()
-            return CompletableFuture.completedFuture(time.`in`(start).isTimeout(start))
+            return CompletableFuture.completedFuture(time.`in`(start).isTimeout(start).toResult("cooldown"))
         }
 
         override fun signature(profile: PlayerProfile, template: Template) {
@@ -101,17 +109,17 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
 
     class ControlCoexist(val alias: Int, val label: Map<String, Int>) : Control() {
 
-        override fun check(profile: PlayerProfile, template: Template): CompletableFuture<Boolean> {
+        override fun check(profile: PlayerProfile, template: Template): CompletableFuture<Result> {
             if (alias > 0) {
                 val a = template.alias()
                 if (a != null && profile.getQuests().count { it.template.alias() == a } >= alias) {
-                    return CompletableFuture.completedFuture(false)
+                    return CompletableFuture.completedFuture(false.toResult("coexist"))
                 }
             }
             if (label.any { label -> profile.getQuests().count { label.key in it.template.label() } > label.value }) {
-                return CompletableFuture.completedFuture(false)
+                return CompletableFuture.completedFuture(false.toResult("coexist"))
             }
-            return CompletableFuture.completedFuture(true)
+            return CompletableFuture.completedFuture(true.toResult("coexist"))
         }
 
         override fun signature(profile: PlayerProfile, template: Template) {
@@ -120,14 +128,14 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
 
     class ControlRepeat(val type: Trigger, val amount: Int, val period: Time?, val group: String?) : Control() {
 
-        override fun check(profile: PlayerProfile, template: Template): CompletableFuture<Boolean> {
+        override fun check(profile: PlayerProfile, template: Template): CompletableFuture<Result> {
             val id = "quest.repeat.${if (group != null) "@$group" else template.id}.${type.name.toLowerCase()}"
             val time = profile.persistentDataContainer["$id.time", 0L].toLong()
             // 超出重复限时
             if (period != null && period.`in`(time).isTimeout(time)) {
-                return CompletableFuture.completedFuture(true)
+                return CompletableFuture.completedFuture(true.toResult("repeat"))
             }
-            return CompletableFuture.completedFuture(profile.persistentDataContainer["$id.amount", 0].toInt() < amount)
+            return CompletableFuture.completedFuture((profile.persistentDataContainer["$id.amount", 0].toInt() < amount).toResult("repeat"))
         }
 
         override fun signature(profile: PlayerProfile, template: Template) {
@@ -147,25 +155,28 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
 
     class ControlOperator(val template: Template, val control: List<Control>?) {
 
-        fun check(profile: PlayerProfile): CompletableFuture<Boolean> {
-            val future = CompletableFuture<Boolean>()
+        /**
+         * 任务是否被限制接受
+         */
+        fun check(profile: PlayerProfile): CompletableFuture<Result> {
+            val future = CompletableFuture<Result>()
             if (control == null) {
-                future.complete(true)
+                future.complete(Result(true))
                 return future
             }
             mirrorFuture("MetaControl:check") {
                 fun process(cur: Int) {
                     if (cur < control.size) {
                         control[cur].check(profile, template).thenApply {
-                            if (it) {
+                            if (it.pass) {
                                 process(cur + 1)
                             } else {
-                                future.complete(false)
+                                future.complete(it)
                                 finish()
                             }
                         }
                     } else {
-                        future.complete(true)
+                        future.complete(Result(true))
                         finish()
                     }
                 }

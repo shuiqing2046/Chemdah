@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective.bukkit
 
 import ink.ptms.chemdah.core.quest.objective.Dependency
-import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import org.bukkit.event.player.PlayerEditBookEvent
 
 /**
@@ -12,7 +12,7 @@ import org.bukkit.event.player.PlayerEditBookEvent
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
-object IPlayerBook : ObjectiveCountable<PlayerEditBookEvent>() {
+object IPlayerBook : ObjectiveCountableI<PlayerEditBookEvent>() {
 
     override val name = "edit book"
     override val event = PlayerEditBookEvent::class

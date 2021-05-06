@@ -4,7 +4,7 @@ import com.destroystokyo.paper.event.player.PlayerPickupExperienceEvent
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.objective.Dependency
-import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 
 /**
  * Chemdah
@@ -14,7 +14,7 @@ import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
-object IItemPickExp : ObjectiveCountable<PlayerPickupExperienceEvent>() {
+object IItemPickExp : ObjectiveCountableI<PlayerPickupExperienceEvent>() {
 
     override val name = "pickup exp"
     override val event = PlayerPickupExperienceEvent::class

@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective.bukkit
 
 import ink.ptms.chemdah.core.quest.objective.Dependency
-import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import io.izzel.taboolib.util.item.Items
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.CraftItemEvent
@@ -14,7 +14,7 @@ import org.bukkit.event.inventory.CraftItemEvent
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
-object IItemCraft : ObjectiveCountable<CraftItemEvent>() {
+object IItemCraft : ObjectiveCountableI<CraftItemEvent>() {
 
     override val name = "craft item"
     override val event = CraftItemEvent::class

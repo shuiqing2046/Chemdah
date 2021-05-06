@@ -29,11 +29,6 @@ class AddonParty(config: ConfigurationSection, questContainer: QuestContainer) :
      */
     val canContinue = config.getBoolean("continue")
 
-    /**
-     * 队员是否可以替你完成这个任务
-     */
-    val canComplete = config.getBoolean("complete")
-
     companion object {
 
         fun QuestContainer.party() = addon<AddonParty>("party")

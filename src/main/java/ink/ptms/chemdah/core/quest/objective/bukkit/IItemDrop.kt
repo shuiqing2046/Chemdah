@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective.bukkit
 
 import ink.ptms.chemdah.core.quest.objective.Dependency
-import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import org.bukkit.event.player.PlayerDropItemEvent
 
 /**
@@ -12,7 +12,7 @@ import org.bukkit.event.player.PlayerDropItemEvent
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
-object IItemDrop : ObjectiveCountable<PlayerDropItemEvent>() {
+object IItemDrop : ObjectiveCountableI<PlayerDropItemEvent>() {
 
     override val name = "drop item"
     override val event = PlayerDropItemEvent::class

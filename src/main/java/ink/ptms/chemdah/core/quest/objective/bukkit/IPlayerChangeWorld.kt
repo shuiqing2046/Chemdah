@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective.bukkit
 
 import ink.ptms.chemdah.core.quest.objective.Dependency
-import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import org.bukkit.event.player.PlayerChangedWorldEvent
 
 /**
@@ -12,7 +12,7 @@ import org.bukkit.event.player.PlayerChangedWorldEvent
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
-object IPlayerChangeWorld : ObjectiveCountable<PlayerChangedWorldEvent>() {
+object IPlayerChangeWorld : ObjectiveCountableI<PlayerChangedWorldEvent>() {
 
     override val name = "change world"
     override val event = PlayerChangedWorldEvent::class

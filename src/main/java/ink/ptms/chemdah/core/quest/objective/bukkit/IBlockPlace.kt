@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective.bukkit
 
 import ink.ptms.chemdah.core.quest.objective.Dependency
-import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import org.bukkit.event.block.BlockPlaceEvent
 
 /**
@@ -12,7 +12,7 @@ import org.bukkit.event.block.BlockPlaceEvent
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
-object IBlockPlace : ObjectiveCountable<BlockPlaceEvent>() {
+object IBlockPlace : ObjectiveCountableI<BlockPlaceEvent>() {
 
     override val name = "block place"
     override val event = BlockPlaceEvent::class

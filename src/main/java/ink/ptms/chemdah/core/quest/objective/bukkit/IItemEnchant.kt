@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective.bukkit
 
 import ink.ptms.chemdah.core.quest.objective.Dependency
-import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import org.bukkit.event.enchantment.EnchantItemEvent
 
 /**
@@ -12,7 +12,7 @@ import org.bukkit.event.enchantment.EnchantItemEvent
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
-object IItemEnchant : ObjectiveCountable<EnchantItemEvent>() {
+object IItemEnchant : ObjectiveCountableI<EnchantItemEvent>() {
 
     override val name = "enchant item"
     override val event = EnchantItemEvent::class

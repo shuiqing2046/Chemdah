@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective.bukkit
 
 import ink.ptms.chemdah.core.quest.objective.Dependency
-import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import org.bukkit.event.player.PlayerFishEvent
 
 /**
@@ -12,7 +12,7 @@ import org.bukkit.event.player.PlayerFishEvent
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
-object IPlayerFish : ObjectiveCountable<PlayerFishEvent>() {
+object IPlayerFish : ObjectiveCountableI<PlayerFishEvent>() {
 
     override val name = "player fish"
     override val event = PlayerFishEvent::class

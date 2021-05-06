@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective.bukkit
 
 import ink.ptms.chemdah.core.quest.objective.Dependency
-import ink.ptms.chemdah.core.quest.objective.ObjectiveCountable
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityPortalExitEvent
 
@@ -13,7 +13,7 @@ import org.bukkit.event.entity.EntityPortalExitEvent
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
-object IPlayerPortalExit : ObjectiveCountable<EntityPortalExitEvent>() {
+object IPlayerPortalExit : ObjectiveCountableI<EntityPortalExitEvent>() {
 
     override val name = "portal exit"
     override val event = EntityPortalExitEvent::class
