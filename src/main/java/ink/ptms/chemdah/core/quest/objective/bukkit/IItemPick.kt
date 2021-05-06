@@ -1,5 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective.bukkit
 
+import ink.ptms.chemdah.core.PlayerProfile
+import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import org.bukkit.entity.Player
@@ -28,5 +30,15 @@ object IItemPick : ObjectiveCountableI<EntityPickupItemEvent>() {
         addCondition("item") { e ->
             toInferItem().isItem(e.item.itemStack)
         }
+        addCondition("amount") { e ->
+            toInt() <= e.item.itemStack.amount
+        }
+        addConditionVariable("amount") {
+            it.item.itemStack.amount
+        }
+    }
+
+    override fun getCount(profile: PlayerProfile, task: Task, event: EntityPickupItemEvent): Int {
+        return event.item.itemStack.amount
     }
 }
