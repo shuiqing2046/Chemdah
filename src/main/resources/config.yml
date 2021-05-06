@@ -17,6 +17,7 @@ database:
       client: 'mongodb://localhost:3308'
       database: test
       collection: chemdah
+  join-select-delay: 20
 
 default-stats:
   stay: 100

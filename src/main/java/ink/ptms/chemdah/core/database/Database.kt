@@ -1,6 +1,7 @@
 package ink.ptms.chemdah.core.database
 
 import com.google.common.base.Preconditions
+import ink.ptms.chemdah.Chemdah
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.api.ChemdahAPI.isChemdahProfileLoaded
@@ -107,7 +108,7 @@ abstract class Database {
 
         @EventHandler
         private fun e(e: PlayerJoinEvent) {
-            Tasks.task(true) {
+            Tasks.delay(Chemdah.conf.getLong("join-select-delay", 20), true) {
                 mirrorFuture("Database:select") {
                     INSTANCE.select(e.player).also {
                         ChemdahAPI.playerProfile[e.player.name] = it
