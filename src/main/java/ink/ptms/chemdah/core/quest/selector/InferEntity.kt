@@ -22,9 +22,9 @@ class InferEntity(val entities: List<Entity>) {
 
     open class Entity(val name: String, val flags: List<Flags>, val data: Map<String, String>) {
 
-        open fun match(entity: org.bukkit.entity.Entity) = matchFlags(entity.type.name.toLowerCase()) && matchData(entity)
+        open fun match(entity: org.bukkit.entity.Entity) = matchType(entity.type.name.toLowerCase()) && matchData(entity)
 
-        open fun matchFlags(type: String) = flags.any { it.match(type, name) }
+        open fun matchType(type: String) = flags.any { it.match(type, name) }
 
         open fun matchData(entity: org.bukkit.entity.Entity): Boolean {
             return data.all {
@@ -42,7 +42,7 @@ class InferEntity(val entities: List<Entity>) {
     class CitizensEntity(material: String, flags: List<Flags>, data: Map<String, String>) : Entity(material, flags, data) {
 
         override fun match(entity: org.bukkit.entity.Entity): Boolean {
-            return matchFlags(entity.citizensId()) && matchData(entity)
+            return matchType(entity.citizensId()) && matchData(entity)
         }
 
         override fun matchData(entity: org.bukkit.entity.Entity): Boolean {
@@ -66,8 +66,12 @@ class InferEntity(val entities: List<Entity>) {
 
     class MythicMobsEntity(material: String, flags: List<Flags>, data: Map<String, String>) : Entity(material, flags, data) {
 
+        fun org.bukkit.entity.Entity.mythicMobId(): String {
+            return MythicMobs.inst().mobManager.getMythicMobInstance(this)?.type?.internalName ?: "@vanilla"
+        }
+
         override fun match(entity: org.bukkit.entity.Entity): Boolean {
-            return matchFlags(entity.mythicMobId()) && matchData(entity)
+            return matchType(entity.mythicMobId()) && matchData(entity)
         }
 
         override fun matchData(entity: org.bukkit.entity.Entity): Boolean {
@@ -82,10 +86,6 @@ class InferEntity(val entities: List<Entity>) {
                     else -> mob.type.config.getString(it.key)?.contains(it.value) == true
                 }
             }
-        }
-
-        fun org.bukkit.entity.Entity.mythicMobId(): String {
-            return MythicMobs.inst().mobManager.getMythicMobInstance(this)?.type?.internalName ?: "@vanilla"
         }
     }
 
