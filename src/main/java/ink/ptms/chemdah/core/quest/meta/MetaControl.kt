@@ -16,7 +16,7 @@ import java.util.concurrent.CompletableFuture
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.quest.meta.MetaAliases
+ * ink.ptms.chemdah.core.quest.meta.MetaControl
  *
  * @author sky
  * @since 2021/3/1 11:47 下午
@@ -64,6 +64,8 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
 
     abstract class Control {
 
+        abstract val trigger: Trigger?
+
         abstract fun check(profile: PlayerProfile, template: Template): CompletableFuture<Result>
 
         abstract fun signature(profile: PlayerProfile, template: Template)
@@ -72,6 +74,9 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
     }
 
     class ControlAgent(val agent: List<String>) : Control() {
+
+        override val trigger: Trigger?
+            get() = null
 
         override fun check(profile: PlayerProfile, template: Template): CompletableFuture<Result> {
             return try {
@@ -95,6 +100,9 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
 
     class ControlCooldown(val type: Trigger, val time: Time, val group: String?) : Control() {
 
+        override val trigger: Trigger
+            get() = type
+
         override fun check(profile: PlayerProfile, template: Template): CompletableFuture<Result> {
             val id = "quest.cooldown.${if (group != null) "@$group" else template.id}.${type.name.toLowerCase()}"
             val start = profile.persistentDataContainer[id, 0L].toLong()
@@ -108,6 +116,9 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
     }
 
     class ControlCoexist(val alias: Int, val label: Map<String, Int>) : Control() {
+
+        override val trigger: Trigger?
+            get() = null
 
         override fun check(profile: PlayerProfile, template: Template): CompletableFuture<Result> {
             if (alias > 0) {
@@ -127,6 +138,9 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
     }
 
     class ControlRepeat(val type: Trigger, val amount: Int, val period: Time?, val group: String?) : Control() {
+
+        override val trigger: Trigger
+            get() = type
 
         override fun check(profile: PlayerProfile, template: Template): CompletableFuture<Result> {
             val id = "quest.repeat.${if (group != null) "@$group" else template.id}.${type.name.toLowerCase()}"
@@ -186,7 +200,7 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
         }
 
         fun signature(profile: PlayerProfile, type: Trigger = Trigger.COMPLETE) {
-            control?.filter { it !is ControlRepeat || it.type == type }?.forEach { it.signature(profile, template) }
+            control?.filter { it.trigger == null || it.trigger == type }?.forEach { it.signature(profile, template) }
         }
     }
 
