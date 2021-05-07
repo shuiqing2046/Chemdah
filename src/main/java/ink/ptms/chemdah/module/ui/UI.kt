@@ -90,7 +90,7 @@ class UI(val config: ConfigurationSection) {
                     // 任务接受条件判断
                     quest.checkAccept(playerProfile).thenAccept { cond ->
                         // 任务可以接受
-                        if (cond == AcceptResult.SUCCESSFUL) {
+                        if (cond.type == AcceptResult.Type.SUCCESSFUL) {
                             // 任务允许显示可接受状态
                             if (ui?.visibleStart == true) {
                                 collect.add(UITemplate(quest, ItemType.QUEST_CAN_START))

@@ -172,7 +172,7 @@ class AddonAutomation(source: ConfigurationSection, questContainer: QuestContain
                             fun process() {
                                 if (i > 0 && pool.isNotEmpty()) {
                                     pool.removeAt(Random.nextInt(pool.size)).acceptTo(profile).thenAccept {
-                                        if (it == AcceptResult.SUCCESSFUL) {
+                                        if (it.type == AcceptResult.Type.SUCCESSFUL) {
                                             i--
                                         }
                                         process()
