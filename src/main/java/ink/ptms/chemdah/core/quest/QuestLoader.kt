@@ -104,18 +104,17 @@ object QuestLoader {
         if (isListener) {
             // 对该条目注册独立监听器
             SingleListener.listen(event.java, priority, ignoreCancelled) { e ->
-                // 若该事件未被任何任务使用
-                if (ChemdahAPI.questTemplate.none { t -> t.value.task.none { it.value.objective == this } }) {
-                    return@listen
-                }
-                // 获取该监听器中的玩家对象
-                handler(e)?.run {
-                    if (isAsync) {
-                        Tasks.task(true) {
+                // 若该事件被任何任务使用
+                if (ChemdahAPI.questTemplate.any { t -> t.value.task.any { it.value.objective == this } }) {
+                    // 获取该监听器中的玩家对象
+                    handler(e)?.run {
+                        if (isAsync) {
+                            Tasks.task(true) {
+                                handleEvent(this, e, this@register)
+                            }
+                        } else {
                             handleEvent(this, e, this@register)
                         }
-                    } else {
-                        handleEvent(this, e, this@register)
                     }
                 }
             }

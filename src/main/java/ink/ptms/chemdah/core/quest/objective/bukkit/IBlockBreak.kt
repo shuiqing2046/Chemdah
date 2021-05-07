@@ -24,7 +24,7 @@ object IBlockBreak : ObjectiveCountableI<BlockBreakEvent>() {
         addCondition("position") { 
             toPosition().inside(it.block.location)
         }
-        addCondition("material") { 
+        addCondition("material") {
             toInferBlock().isBlock(it.block)
         }
         addCondition("exp") { 
