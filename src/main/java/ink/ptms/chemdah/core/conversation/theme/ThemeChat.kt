@@ -48,8 +48,8 @@ class ThemeChat : Theme<ThemeChatSettings>(), Listener {
      */
     @TPacket(type = TPacket.Type.SEND)
     fun e(player: Player, packet: Packet): Boolean {
-        if (packet.equals("PacketPlayOutChat") && packet.read("b")!!.toString() == "GAME_INFO") {
-            if (player.conversationSession != null && packet.read("a").reflexInvoke<String>("getText") != TLocale.asString(player, "theme-chat-help")) {
+        if (packet.equals("PacketPlayOutChat") && packet.read("b")?.toString() == "GAME_INFO") {
+            if (player.conversationSession != null && packet.read("a")?.reflexInvoke<String>("getText") != TLocale.asString(player, "theme-chat-help")) {
                 return false
             }
         }
