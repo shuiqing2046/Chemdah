@@ -60,7 +60,7 @@ class InferItemHooks : Listener {
         }
 
         override fun match(item: ItemStack): Boolean {
-            return matchFlags(item.zaphkielId()) && matchMetaData(item)
+            return matchType(item.zaphkielId()) && matchMetaData(item)
         }
 
         override fun matchMetaData(item: ItemStack, itemMeta: ItemMeta, key: String, value: String): Boolean {
@@ -90,7 +90,7 @@ class InferItemHooks : Listener {
         }
 
         override fun match(item: ItemStack): Boolean {
-            return matchFlags(item.mmoId()) && matchMetaData(item)
+            return matchType(item.mmoId()) && matchMetaData(item)
         }
 
         override fun matchMetaData(item: ItemStack, itemMeta: ItemMeta, key: String, value: String): Boolean {
@@ -113,7 +113,7 @@ class InferItemHooks : Listener {
         }
 
         override fun match(item: ItemStack): Boolean {
-            return matchFlags(item.rpgName()) && matchMetaData(item)
+            return matchType(item.rpgName()) && matchMetaData(item)
         }
 
         override fun matchMetaData(item: ItemStack, itemMeta: ItemMeta, key: String, value: String): Boolean {
@@ -135,7 +135,7 @@ class InferItemHooks : Listener {
         }
 
         override fun match(item: ItemStack): Boolean {
-            return matchFlags(item.quantumName()) && matchMetaData(item)
+            return matchType(item.quantumName()) && matchMetaData(item)
         }
 
         override fun matchMetaData(item: ItemStack, itemMeta: ItemMeta, key: String, value: String): Boolean {
@@ -181,7 +181,7 @@ class InferItemHooks : Listener {
         }
 
         override fun match(item: ItemStack): Boolean {
-            return matchFlags(item.pxId()) && matchMetaData(item)
+            return matchType(item.pxId()) && matchMetaData(item)
         }
 
         override fun matchMetaData(item: ItemStack, itemMeta: ItemMeta, key: String, value: String): Boolean {
@@ -209,7 +209,7 @@ class InferItemHooks : Listener {
         }
 
         override fun match(item: ItemStack): Boolean {
-            return matchFlags(item.julyName()) && matchMetaData(item)
+            return matchType(item.julyName()) && matchMetaData(item)
         }
     }
 
@@ -220,7 +220,7 @@ class InferItemHooks : Listener {
         }
 
         override fun match(item: ItemStack): Boolean {
-            return matchFlags(item.executableId()) && matchMetaData(item)
+            return matchType(item.executableId()) && matchMetaData(item)
         }
     }
 }

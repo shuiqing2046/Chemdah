@@ -31,7 +31,7 @@ enum class Flags(val match: (String, String) -> Boolean) {
             }
         }
 
-        fun String.matchFlags(flags: MutableList<Flags>): String {
+        fun String.matchType(flags: MutableList<Flags>): String {
             var result = this
             if (result == "*") {
                 flags.add(ALL)

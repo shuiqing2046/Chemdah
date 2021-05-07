@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.core.quest.selector
 
 import ink.ptms.chemdah.api.event.InferItemHookEvent
-import ink.ptms.chemdah.core.quest.selector.Flags.Companion.matchFlags
+import ink.ptms.chemdah.core.quest.selector.Flags.Companion.matchType
 import ink.ptms.chemdah.util.warning
 import io.izzel.taboolib.module.nms.NMS
 import io.izzel.taboolib.util.Reflection
@@ -37,9 +37,9 @@ class InferItem(val items: List<Item>) {
 
     open class Item(val material: String, val flags: List<Flags>, val data: Map<String, String>) {
 
-        open fun match(item: ItemStack) = matchFlags(item.type.name.toLowerCase()) && matchMetaData(item)
+        open fun match(item: ItemStack) = matchType(item.type.name.toLowerCase()) && matchMetaData(item)
 
-        open fun matchFlags(type: String) = flags.any { it.match(type, material) }
+        open fun matchType(type: String) = flags.any { it.match(type, material) }
 
         open fun matchMetaData(item: ItemStack): Boolean {
             val meta = item.itemMeta
@@ -103,7 +103,7 @@ class InferItem(val items: List<Item>) {
             } else {
                 Item::class.java
             }
-            return Reflection.instantiateObject(item, type.matchFlags(flag), flag, data) as Item
+            return Reflection.instantiateObject(item, type.matchType(flag), flag, data) as Item
         }
     }
 }

@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.core.quest.selector
 
 import ink.ptms.chemdah.api.event.InferEntityHookEvent
-import ink.ptms.chemdah.core.quest.selector.Flags.Companion.matchFlags
+import ink.ptms.chemdah.core.quest.selector.Flags.Companion.matchType
 import ink.ptms.chemdah.util.warning
 import io.izzel.taboolib.module.i18n.I18n
 import io.izzel.taboolib.util.Coerce
@@ -118,7 +118,7 @@ class InferEntity(val entities: List<Entity>) {
             } else {
                 Entity::class.java
             }
-            return Reflection.instantiateObject(entity, type.matchFlags(flag), flag, data) as Entity
+            return Reflection.instantiateObject(entity, type.matchType(flag), flag, data) as Entity
         }
     }
 }

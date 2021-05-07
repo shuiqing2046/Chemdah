@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.core.quest.selector
 
 import com.google.common.collect.ImmutableMap
-import ink.ptms.chemdah.core.quest.selector.Flags.Companion.matchFlags
+import ink.ptms.chemdah.core.quest.selector.Flags.Companion.matchType
 import io.izzel.taboolib.Version
 import io.izzel.taboolib.kotlin.Reflex.Companion.reflex
 import io.izzel.taboolib.kotlin.Reflex.Companion.reflexInvoke
@@ -63,7 +63,7 @@ class InferBlock(val mats: List<Block>) {
             } else {
                 type = this
             }
-            return Block(type.matchFlags(flag), flag, data)
+            return Block(type.matchType(flag), flag, data)
         }
     }
 }
