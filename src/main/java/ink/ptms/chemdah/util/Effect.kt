@@ -14,6 +14,7 @@ import org.bukkit.Color
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.Particle
+import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 /**
@@ -67,6 +68,17 @@ open class Effect(val source: String) {
             .count(count)
             .speed(speed)
             .range(100.0)
+            .data0(data)
+            .playAsync()
+    }
+
+    fun run(location: Location, player: Player) {
+        val quat = Quat.at(location.clone().add(posX, posY, posZ))
+        Effects.create(particle, quat.rotate2D(location.yaw.toDouble(), location.x, location.z).toLocation(location.world))
+            .offset(doubleArrayOf(offsetX, offsetY, offsetZ))
+            .count(count)
+            .speed(speed)
+            .player(player)
             .data0(data)
             .playAsync()
     }
