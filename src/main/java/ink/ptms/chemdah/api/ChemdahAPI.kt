@@ -91,9 +91,23 @@ object ChemdahAPI {
     fun getConversation(id: String) = conversation[id]
 
     /**
+     * 注册任务模板
+     */
+    fun addConversation(id: String, con: Conversation) {
+        conversation[id] = con
+    }
+
+    /**
      * 获取对话模式
      */
     fun getConversationTheme(id: String) = conversationTheme[id]
+
+    /**
+     * 注册任务模板
+     */
+    fun addConversationTheme(id: String, theme: Theme<*>) {
+        conversationTheme[id] = theme
+    }
 
     /**
      * 获取任务模板
@@ -101,9 +115,23 @@ object ChemdahAPI {
     fun getQuestTemplate(id: String) = questTemplate[id]
 
     /**
+     * 注册任务模板
+     */
+    fun addQuestTemplate(id: String, template: Template) {
+        questTemplate[id] = template
+    }
+
+    /**
      * 获取任务元数据
      */
     fun getQuestMeta(id: String) = questMeta[id]
+
+    /**
+     * 注册任务元数据
+     */
+    fun addQuestMeta(id: String, meta: Class<out Meta<*>>) {
+        questMeta[id] = meta
+    }
 
     /**
      * 获取任务扩展（组件）
@@ -111,9 +139,23 @@ object ChemdahAPI {
     fun getQuestAddon(id: String) = questAddon[id]
 
     /**
+     * 注册任务扩展（组件）
+     */
+    fun addQuestAddon(id: String, addon: Class<out Addon>) {
+        questAddon[id] = addon
+    }
+
+    /**
      * 获取任务目标
      */
     fun getQuestObjective(id: String) = questObjective[id]
+
+    /**
+     * 注册任务元数据
+     */
+    fun addQuestObjective(id: String, objective: Objective<*>) {
+        questObjective[id] = objective
+    }
 
     /**
      * 获取插件功能模块
