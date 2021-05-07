@@ -2,6 +2,7 @@ package ink.ptms.chemdah.util
 
 import com.google.common.base.Enums
 import io.izzel.taboolib.Version
+import io.izzel.taboolib.internal.xseries.particles.XParticle
 import io.izzel.taboolib.kotlin.Demand
 import io.izzel.taboolib.kotlin.Reflex
 import io.izzel.taboolib.kotlin.Reflex.Companion.reflexInvoke
