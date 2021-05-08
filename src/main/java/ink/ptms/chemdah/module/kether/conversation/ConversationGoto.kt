@@ -23,6 +23,7 @@ class ConversationGoto(val conversation: String) : QuestAction<Session>() {
         val conversation = ChemdahAPI.getConversation(conversation) ?: error("Conversation not found: $conversation")
         val session = frame.getSession()
         session.isNext = true
+        session.npcSide.clear()
         session.variables.clear()
         session.variables.putAll(frame.vars())
         session.conversation = conversation
@@ -31,7 +32,7 @@ class ConversationGoto(val conversation: String) : QuestAction<Session>() {
 
     companion object {
 
-        @KetherParser(["goto"], namespace = "chemdah-conversation-player")
+        @KetherParser(["goto"], namespace = "chemdah-conversation")
         fun parser() = ScriptParser.parser {
             ConversationGoto(it.nextToken())
         }

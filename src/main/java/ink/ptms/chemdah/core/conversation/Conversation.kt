@@ -105,8 +105,11 @@ data class Conversation(
                                 ConversationEvents.Begin(this@Conversation, session, sessionTop != null).call()
                                 // 渲染对话
                                 option.instanceTheme.onBegin(session).thenAccept {
-                                    future.complete(session)
-                                    ConversationEvents.Post(this@Conversation, session, sessionTop != null).call()
+                                    // 脚本代理
+                                    agent(session, AgentType.START).thenAccept {
+                                        future.complete(session)
+                                        ConversationEvents.Post(this@Conversation, session, sessionTop != null).call()
+                                    }
                                 }
                             }
                             finish()

@@ -3,9 +3,14 @@ package ink.ptms.chemdah.core.conversation
 enum class AgentType(val namespace: String) {
 
     /**
-     * 对话开始
+     * 对话即将开始
      */
     BEGIN("npc"),
+
+    /**
+     * 对话已经开始
+     */
+    START("npc"),
 
     /**
      * 对话放弃
