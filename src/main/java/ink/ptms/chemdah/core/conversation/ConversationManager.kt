@@ -26,10 +26,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.player.PlayerCommandPreprocessEvent
-import org.bukkit.event.player.PlayerInteractAtEntityEvent
-import org.bukkit.event.player.PlayerMoveEvent
-import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.event.player.*
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
@@ -137,11 +134,15 @@ object ConversationManager : Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private fun e(e: PlayerMoveEvent) {
-        if (e.from.x != e.to.x || e.from.z != e.to.z) {
-            val conversation = e.player.conversationSession?.conversation ?: return
-            if (conversation.hasFlag("NO_MOVE")) {
-                e.isCancelled = true
-            }
+        if (e.player.conversationSession?.conversation?.hasFlag("NO_MOVE") == true && (e.from.x != e.to.x || e.from.z != e.to.z)) {
+            e.isCancelled = true
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    private fun e(e: PlayerDropItemEvent) {
+        if (e.player.conversationSession?.conversation?.hasFlag("FORCE_DISPLAY") == true) {
+            e.isCancelled = true
         }
     }
 
