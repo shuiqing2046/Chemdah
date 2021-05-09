@@ -3,7 +3,6 @@ __option__:
   title: 'Mr.{name}'
 
 conversation_0:
-  force-display: false
   npc id: 'adyeshach test'
   npc:
     - 'Hi! {{ sender }}.'

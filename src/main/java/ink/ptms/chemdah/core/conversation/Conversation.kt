@@ -32,12 +32,14 @@ data class Conversation(
 ) {
 
     /**
-     * 是否强制播放
-     * 不允许跳过，不允许以任何形式取消对话直到对话播放完成
-     *
-     * 目前仅支持 chat 风格
+     * 对话约束
+     * 例如控制是否允许玩家跳过对话，或在对话中移动等
      */
-    var isForceDisplay = root.getBoolean("force-display")
+    val flags = root.getStringList("flags").toMutableList()
+
+    fun hasFlag(value: String): Boolean {
+        return value in flags
+    }
 
     fun isNPC(namespace: String, id: String): Boolean {
         return npcId.id.any { it.namespace.equals(namespace, true) && it.value == id }

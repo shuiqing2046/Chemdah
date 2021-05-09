@@ -28,6 +28,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerCommandPreprocessEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
+import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.potion.PotionEffect
@@ -60,7 +61,7 @@ object ConversationManager : Listener {
     private fun tick() {
         Bukkit.getOnlinePlayers().forEach { p ->
             val session = p.conversationSession ?: return@forEach
-            if (session.isClosed || session.conversation.isForceDisplay) {
+            if (session.isClosed || session.conversation.hasFlag("FORCE_DISPLAY")) {
                 return@forEach
             }
             // 远离或背对对话单位
@@ -79,29 +80,37 @@ object ConversationManager : Listener {
     @TFunction.Cancel
     private fun cancel() {
         Bukkit.getOnlinePlayers().forEach { p ->
-            effectFreeze.forEach { p.removePotionEffect(it.first) }
-            effects.remove(p.name)?.forEach { p.addPotionEffect(it) }
+            if (p.conversationSession?.conversation?.hasFlag("NO_EFFECT") == false) {
+                effectFreeze.forEach { p.removePotionEffect(it.first) }
+                effects.remove(p.name)?.forEach { p.addPotionEffect(it) }
+            }
             p.conversationSession?.close(refuse = true)
         }
     }
 
     @EventHandler
     private fun e(e: PlayerQuitEvent) {
-        effectFreeze.forEach { e.player.removePotionEffect(it.first) }
-        effects.remove(e.player.name)?.forEach { e.player.addPotionEffect(it) }
+        if (e.player.conversationSession?.conversation?.hasFlag("NO_EFFECT") == false) {
+            effectFreeze.forEach { e.player.removePotionEffect(it.first) }
+            effects.remove(e.player.name)?.forEach { e.player.addPotionEffect(it) }
+        }
         e.player.conversationSession?.close(refuse = true)
     }
 
     @EventHandler
     private fun e(e: ConversationEvents.Begin) {
-        effects[e.session.player.name] = effectFreeze.mapNotNull { e.session.player.getPotionEffect(it.first) }.filter { it.duration in 10..9999 }
-        effectFreeze.forEach { e.session.player.addPotionEffect(PotionEffect(it.first, 99999, it.second).hidden()) }
+        if (!e.conversation.hasFlag("NO_EFFECT")) {
+            effects[e.session.player.name] = effectFreeze.mapNotNull { e.session.player.getPotionEffect(it.first) }.filter { it.duration in 10..9999 }
+            effectFreeze.forEach { e.session.player.addPotionEffect(PotionEffect(it.first, 99999, it.second).hidden()) }
+        }
     }
 
     @EventHandler
     private fun e(e: ConversationEvents.Closed) {
-        effectFreeze.forEach { e.session.player.removePotionEffect(it.first) }
-        effects.remove(e.session.player.name)?.forEach { e.session.player.addPotionEffect(it) }
+        if (!e.session.conversation.hasFlag("NO_EFFECT")) {
+            effectFreeze.forEach { e.session.player.removePotionEffect(it.first) }
+            effects.remove(e.session.player.name)?.forEach { e.session.player.addPotionEffect(it) }
+        }
         // 视觉效果
         if (!e.session.player.hasPotionEffect(PotionEffectType.BLINDNESS)) {
             e.session.player.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS, 20, 0))
@@ -112,11 +121,26 @@ object ConversationManager : Listener {
     private fun e(e: EntityDamageEvent) {
         if (e.entity is Player) {
             val session = sessions[e.entity.name] ?: return
-            if (!session.isClosed && !session.conversation.isForceDisplay) {
-                session.isClosed = true
-                Tasks.task {
-                    session.close(refuse = true)
-                }
+            if (session.isClosed) {
+                return
+            }
+            if (session.conversation.hasFlag("FORCE_DISPLAY")) {
+                e.isCancelled = true
+                return
+            }
+            session.isClosed = true
+            Tasks.task {
+                session.close(refuse = true)
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    private fun e(e: PlayerMoveEvent) {
+        if (e.from.x != e.to.x || e.from.z != e.to.z) {
+            val conversation = e.player.conversationSession?.conversation ?: return
+            if (conversation.hasFlag("NO_MOVE")) {
+                e.isCancelled = true
             }
         }
     }

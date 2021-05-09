@@ -85,10 +85,11 @@ class ThemeChat : Theme<ThemeChatSettings>(), Listener {
         if (session.conversation.option.theme == "chat") {
             e.isCancelled = true
             if (session.npcTalking) {
-                // 在强制播放模式下不允许跳过动态效果
-                if (!session.conversation.isForceDisplay) {
-                    session.npcTalking = false
+                // 是否不允许玩家跳过对话演出效果
+                if (session.conversation.hasFlag("NO_SKIP") || session.conversation.hasFlag("FORCE_DISPLAY")) {
+                    return
                 }
+                session.npcTalking = false
             } else {
                 session.playerSide?.run {
                     check(session).thenApply {

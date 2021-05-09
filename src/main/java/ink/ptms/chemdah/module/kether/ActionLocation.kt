@@ -1,4 +1,4 @@
-package ink.ptms.chemdah.module.kether.conversation
+package ink.ptms.chemdah.module.kether
 
 import ink.ptms.chemdah.util.getSession
 import io.izzel.taboolib.kotlin.kether.Kether.expects
@@ -15,19 +15,12 @@ import java.util.concurrent.CompletableFuture
 
 /**
  * Chemdah
- * ink.ptms.chemdah.module.kether.conversation.ConversationLocation
+ * ink.ptms.chemdah.module.kether.ConversationLocation
  *
  * @author sky
  * @since 2021/2/10 6:39 下午
  */
-class ConversationLocation {
-
-    class LocationOrigin : QuestAction<Location>() {
-
-        override fun process(frame: QuestContext.Frame): CompletableFuture<Location> {
-            return CompletableFuture.completedFuture(frame.getSession().origin)
-        }
-    }
+class ActionLocation {
 
     class LocationFunc(val location: ParsedAction<*>, val value: ParsedAction<*>, val func: (Location, Any) -> Any) : QuestAction<Any>() {
 
@@ -182,11 +175,6 @@ class ConversationLocation {
                 }
                 else -> error("out of case")
             }
-        }
-
-        @KetherParser(["origin"], namespace = "chemdah-conversation")
-        fun parser() = ScriptParser.parser {
-            LocationOrigin()
         }
     }
 }
