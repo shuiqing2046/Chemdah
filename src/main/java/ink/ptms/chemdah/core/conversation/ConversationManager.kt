@@ -1,6 +1,5 @@
 package ink.ptms.chemdah.core.conversation
 
-import com.sucy.skill.SkillAPI
 import com.sucy.skill.api.event.PlayerCastSkillEvent
 import ink.ptms.adyeshach.api.event.AdyeshachEntityInteractEvent
 import ink.ptms.adyeshach.common.entity.EntityInstance
@@ -9,14 +8,10 @@ import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.conversationSession
 import ink.ptms.chemdah.api.event.collect.ConversationEvents
 import ink.ptms.chemdah.util.hidden
-import io.izzel.taboolib.kotlin.Reflex.Companion.reflex
-import io.izzel.taboolib.kotlin.Reflex.Companion.reflexInvoke
 import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.module.config.TConfig
 import io.izzel.taboolib.module.i18n.I18n
 import io.izzel.taboolib.module.inject.*
-import io.izzel.taboolib.module.packet.Packet
-import io.izzel.taboolib.module.packet.TPacket
 import io.lumine.xikage.mythicmobs.MythicMobs
 import net.citizensnpcs.api.CitizensAPI
 import org.bukkit.Bukkit
