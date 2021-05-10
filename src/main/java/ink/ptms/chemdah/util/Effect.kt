@@ -28,9 +28,9 @@ open class Effect(val source: String) {
 
     val demand = Demand(source)
     val particle = Enums.getIfPresent(Particle::class.java, demand.namespace.toUpperCase()).or(Particle.FLAME)!!
-    val offsetX = Coerce.toDouble(demand.get(1, "0")!!)
-    val offsetY = Coerce.toDouble(demand.get(2, "0")!!)
-    val offsetZ = Coerce.toDouble(demand.get(3, "0")!!)
+    val offsetX = Coerce.toDouble(demand.get(0, "0")!!)
+    val offsetY = Coerce.toDouble(demand.get(1, "0")!!)
+    val offsetZ = Coerce.toDouble(demand.get(2, "0")!!)
     val posX = Coerce.toDouble(demand.get("posX"))
     val posY = Coerce.toDouble(demand.get("posY"))
     val posZ = Coerce.toDouble(demand.get("posZ"))

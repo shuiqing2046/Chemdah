@@ -6,6 +6,7 @@ import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.api.ChemdahAPI.isChemdahProfileLoaded
 import ink.ptms.chemdah.api.event.collect.ObjectiveEvents
 import ink.ptms.chemdah.core.PlayerProfile
+import ink.ptms.chemdah.core.quest.QuestLoader.register
 import ink.ptms.chemdah.core.quest.addon.Addon
 import ink.ptms.chemdah.core.quest.meta.Meta
 import ink.ptms.chemdah.core.quest.objective.Abstract
@@ -105,7 +106,7 @@ object QuestLoader {
             // 对该条目注册独立监听器
             SingleListener.listen(event.java, priority, ignoreCancelled) { e ->
                 // 若该事件被任何任务使用
-                if (ChemdahAPI.questTemplate.any { t -> t.value.task.any { it.value.objective == this } }) {
+                if (using) {
                     // 获取该监听器中的玩家对象
                     handler(e)?.run {
                         if (isAsync) {
@@ -159,6 +160,17 @@ object QuestLoader {
         }
     }
 
+    /**
+     * 刷新任务目标缓存
+     */
+    fun refreshCache() {
+        ChemdahAPI.questObjective.forEach { it.value.using = false }
+        ChemdahAPI.questTemplate.forEach { t -> t.value.task.forEach { it.value.objective.using = true } }
+    }
+
+    /**
+     * 载入所有任务模板
+     */
     fun loadTemplate() {
         val file = File(Chemdah.plugin.dataFolder, "core/quest")
         if (!file.exists()) {
@@ -166,9 +178,13 @@ object QuestLoader {
         }
         ChemdahAPI.questTemplate.clear()
         ChemdahAPI.questTemplate.putAll(loadTemplate(file).map { it.id to it })
+        refreshCache()
         println("[Chemdah] ${ChemdahAPI.questTemplate.size} template loaded.")
     }
 
+    /**
+     * 载入任务模板
+     */
     fun loadTemplate(file: File): List<Template> {
         return when {
             file.isDirectory -> {

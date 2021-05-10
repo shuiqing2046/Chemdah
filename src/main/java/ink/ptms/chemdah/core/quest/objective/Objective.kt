@@ -26,6 +26,11 @@ import kotlin.reflect.KClass
 abstract class Objective<E : Event> {
 
     /**
+     * 是否正在使用
+     */
+    var using = false
+
+    /**
      * 条目继续的条件
      */
     private val conditions = ArrayList<(PlayerProfile, Task, E) -> Boolean>()

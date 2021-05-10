@@ -3,6 +3,7 @@ package ink.ptms.chemdah.module.kether
 import ink.ptms.adyeshach.api.AdyeshachAPI
 import ink.ptms.adyeshach.api.event.AdyeshachEntityTickEvent
 import ink.ptms.adyeshach.common.entity.EntityTypes
+import ink.ptms.adyeshach.common.entity.ai.general.GeneralGravity
 import ink.ptms.adyeshach.common.entity.manager.ManagerPrivateTemp
 import ink.ptms.adyeshach.common.entity.type.AdyFallingBlock
 import ink.ptms.chemdah.api.event.collect.PlayerEvents
@@ -112,18 +113,16 @@ class ActionScenes {
     companion object : Listener {
 
         /**
-         * scenes set location *world *0 *0 *0 to (falling) stone
-         * scenes set location *world *0 *0 *0 to (falling) location *world *0 *0 *0
+         * scenes set (falling) stone to location *world *0 *0 *0
+         * scenes copy (falling) location *world *0 *0 *0 to location *world *0 *0 *0
          * scenes reset location *world *0 *0 *0
          *
          * scenes set location *world *0 *0 *0 falling solid stone
          */
         @KetherParser(["scenes"])
         fun parser() = ScriptParser.parser {
-            when (it.expects("set", "reset")) {
+            when (it.expects("set", "copy", "reset")) {
                 "set" -> {
-                    val location = it.next(ArgTypes.ACTION)
-                    it.expect("to")
                     val falling = try {
                         it.mark()
                         it.expect("falling")
@@ -142,16 +141,34 @@ class ActionScenes {
                             false
                         }
                     } else false
-                    it.mark()
                     val block = it.nextToken()
-                    if (block == "location") {
+                    val material = Items.asMaterial(block.split(":")[0]) ?: Material.STONE
+                    val data = Coerce.toByte(block.split(":").getOrNull(1))
+                    it.expect("to")
+                    ScenesBlockSet0(it.next(ArgTypes.ACTION), material, data, falling, solid)
+                }
+                "copy" -> {
+                    val falling = try {
+                        it.mark()
+                        it.expect("falling")
+                        true
+                    } catch (ex: Exception) {
                         it.reset()
-                        ScenesBlockSet1(location, it.next(ArgTypes.ACTION), falling, solid)
-                    } else {
-                        val material = Items.asMaterial(block.split(":")[0]) ?: Material.STONE
-                        val data = Coerce.toByte(block.split(":").getOrNull(1))
-                        ScenesBlockSet0(location, material, data, falling, solid)
+                        false
                     }
+                    val solid = if (falling) {
+                        try {
+                            it.mark()
+                            it.expect("solid")
+                            true
+                        } catch (ex: Exception) {
+                            it.reset()
+                            false
+                        }
+                    } else false
+                    val location = it.next(ArgTypes.ACTION)
+                    it.expect("to")
+                    ScenesBlockSet1(it.next(ArgTypes.ACTION), location, falling, solid)
                 }
                 "reset" -> {
                     ScenesBlockReset(it.next(ArgTypes.ACTION))
@@ -166,13 +183,17 @@ class ActionScenes {
         @TPacket(type = TPacket.Type.RECEIVE)
         private fun e(player: Player, packet: Packet): Boolean {
             if (packet.equals("PacketPlayInUseItem")) {
-                val position = TabooLibAPI.nmsFactory().generic().fromBlockPosition(packet.reflex().read("a/c"))
+                val position = if (Version.isAfter(Version.v1_14)) {
+                    TabooLibAPI.nmsFactory().generic().fromBlockPosition(packet.reflex().read("a/c"))
+                } else {
+                    TabooLibAPI.nmsFactory().generic().fromBlockPosition(packet.reflex().read("a"))
+                }
                 val data = scenesBlocks[player.name]?.get(player.world.name)?.get(position) ?: return true
                 PlayerEvents.ScenesBlockInteract(player, data).call()
                 return false
             }
             if (packet.equals("PacketPlayInBlockDig")) {
-                val position = TabooLibAPI.nmsFactory().generic().fromBlockPosition(packet.read("a"))
+                val position = TabooLibAPI.nmsFactory().generic().fromBlockPosition(packet.read("a") ?: return true)
                 val data = scenesBlocks[player.name]?.get(player.world.name)?.get(position) ?: return true
                 if (packet.read("c").toString() == "STOP_DESTROY_BLOCK") {
                     PlayerEvents.ScenesBlockBreak(player, data).call()
@@ -192,7 +213,9 @@ class ActionScenes {
         }
 
         fun Player.createScenesBlock(location: Location, material: Material, data: Byte = 0) {
-            scenesBlocks[name]?.get(world.name)?.put(Position.at(location), ScenesBlockData(material, data))
+            val worlds = scenesBlocks.computeIfAbsent(name) { ConcurrentHashMap() }
+            val blocks = worlds.computeIfAbsent(world.name) { ConcurrentHashMap() }
+            blocks[Position.at(location)] = ScenesBlockData(material, data)
             if (Version.isAfter(Version.v1_13)) {
                 sendBlockChange(location, material.createBlockData())
             } else {
@@ -213,7 +236,12 @@ class ActionScenes {
         fun e(e: AdyeshachEntityTickEvent) {
             val entity = e.entity
             val manager = entity.manager
-            if (entity is AdyFallingBlock && entity.isControllerOnGround() && entity.hasTag("chemdah:scenes") && manager is ManagerPrivateTemp) {
+            if (manager is ManagerPrivateTemp
+                && entity is AdyFallingBlock
+                && entity.hasTag("chemdah:scenes")
+                && entity.getController().any { it is GeneralGravity }
+                && entity.isControllerOnGround()
+            ) {
                 if (entity.getTag("chemdah:scenes") == "SOLID") {
                     Bukkit.getPlayerExact(manager.player)?.createScenesBlock(entity.getLocation(), entity.material, entity.data)
                 }
