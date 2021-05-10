@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'ink.ptms.chemdah'
-version = 'SNAPSHOT 05 10 01'
+version = 'SNAPSHOT 05 11 01'
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
