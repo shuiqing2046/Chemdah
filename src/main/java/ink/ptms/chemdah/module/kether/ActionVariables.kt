@@ -30,6 +30,10 @@ class ActionVariables {
                 }
             }
         }
+
+        override fun toString(): String {
+            return "VariablesGet(key=$key, default=$default)"
+        }
     }
 
     class VariablesSet(
@@ -50,12 +54,20 @@ class ActionVariables {
                 }
             }
         }
+
+        override fun toString(): String {
+            return "VariablesSet(key=$key, value=$value, symbol=$symbol, default=$default)"
+        }
     }
 
     class VariablesKeys : QuestAction<List<String>>() {
 
         override fun process(frame: QuestContext.Frame): CompletableFuture<List<String>> {
             return CompletableFuture.completedFuture(ChemdahAPI.getVariables())
+        }
+
+        override fun toString(): String {
+            return "VariablesKeys()"
         }
     }
 

@@ -24,6 +24,11 @@ class ActionSkillAPI {
         override fun process(frame: QuestContext.Frame): CompletableFuture<Any> {
             return CompletableFuture.completedFuture(action(SkillAPI.getPlayerData(frame.getPlayer())))
         }
+
+        override fun toString(): String {
+            return "Base(action=$action)"
+        }
+
     }
 
     companion object {

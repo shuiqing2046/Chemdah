@@ -24,6 +24,11 @@ class ActionCore {
         override fun process(frame: QuestContext.Frame): CompletableFuture<Any> {
             return CompletableFuture.completedFuture(action(MMOCore.plugin.dataProvider.dataManager.get(frame.getPlayer())))
         }
+
+        override fun toString(): String {
+            return "Base(action=$action)"
+        }
+
     }
 
     companion object {

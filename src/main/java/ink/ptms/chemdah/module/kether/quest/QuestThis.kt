@@ -31,6 +31,10 @@ class QuestThis(val task: Boolean) : QuestAction<String>() {
         return CompletableFuture.completedFuture(id)
     }
 
+    override fun toString(): String {
+        return "QuestThis(task=$task)"
+    }
+
     companion object {
 
         @KetherParser(["this"], namespace = "chemdah-quest")

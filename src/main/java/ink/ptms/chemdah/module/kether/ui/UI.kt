@@ -37,6 +37,11 @@ class UI {
                 if (percent.isNaN() || percent == 0.0) empty else if (percent >= i.toDouble() / size) fill else empty
             })
         }
+
+        override fun toString(): String {
+            return "UIBar(plan='$plan', include=$include, exclude=$exclude)"
+        }
+
     }
 
     class UIPercent(val include: List<String>, val exclude: List<String>) : QuestAction<String>() {
@@ -51,6 +56,11 @@ class UI {
                 CompletableFuture.completedFuture(Coerce.format(percent * 100).toString())
             }
         }
+
+        override fun toString(): String {
+            return "UIPercent(include=$include, exclude=$exclude)"
+        }
+
     }
 
     companion object {

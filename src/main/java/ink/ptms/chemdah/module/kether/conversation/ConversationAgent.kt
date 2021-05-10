@@ -24,6 +24,10 @@ class ConversationAgent : QuestAction<Void>() {
         return CompletableFuture.completedFuture(null)
     }
 
+    override fun toString(): String {
+        return "ConversationAgent()"
+    }
+
     companion object {
 
         @KetherParser(["agent"], namespace = "chemdah-conversation")

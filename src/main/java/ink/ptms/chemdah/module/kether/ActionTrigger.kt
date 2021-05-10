@@ -22,6 +22,10 @@ class ActionTrigger(val trigger: String) : QuestAction<Void>() {
         return CompletableFuture.completedFuture(null)
     }
 
+    override fun toString(): String {
+        return "ActionTrigger(trigger='$trigger')"
+    }
+
     companion object {
 
         /**

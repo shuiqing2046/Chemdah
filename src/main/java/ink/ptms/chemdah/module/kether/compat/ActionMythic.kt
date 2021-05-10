@@ -47,6 +47,11 @@ class ActionMythic {
             }
             return CompletableFuture.completedFuture(null);
         }
+
+        override fun toString(): String {
+            return "MythicMobsCast(mechanic=$mechanic, trigger=$trigger)"
+        }
+
     }
 
     companion object {

@@ -26,6 +26,10 @@ class ConversationTalkNPC(val token: String) : QuestAction<Void>() {
         return CompletableFuture.completedFuture(null)
     }
 
+    override fun toString(): String {
+        return "ConversationTalkNPC(token='$token')"
+    }
+
     companion object {
 
         @KetherParser(["talk"], namespace = "chemdah-conversation-npc")

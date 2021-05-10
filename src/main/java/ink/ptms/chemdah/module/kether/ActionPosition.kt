@@ -23,6 +23,10 @@ class ActionPosition(val area: InferArea) : QuestAction<Boolean>() {
         return CompletableFuture.completedFuture(area.inside(frame.getPlayer().location))
     }
 
+    override fun toString(): String {
+        return "ActionPosition(area=$area)"
+    }
+
     companion object {
 
         /**

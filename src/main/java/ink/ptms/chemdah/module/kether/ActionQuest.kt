@@ -29,6 +29,11 @@ class ActionQuest {
         override fun process(frame: QuestContext.Frame): CompletableFuture<List<String>> {
             return CompletableFuture.completedFuture(frame.getProfile().getQuests(openAPI = !self).map { it.id })
         }
+
+        override fun toString(): String {
+            return "Quests(self=$self)"
+        }
+
     }
 
     class QuestDataGet(val quest: ParsedAction<*>, val key: ParsedAction<*>) : QuestAction<Any?>() {
@@ -42,6 +47,11 @@ class ActionQuest {
             }
             return future
         }
+
+        override fun toString(): String {
+            return "QuestDataGet(quest=$quest, key=$key)"
+        }
+
     }
 
     class QuestDataSet(val quest: ParsedAction<*>, val key: ParsedAction<*>, val value: ParsedAction<*>, val symbol: Symbol) : QuestAction<Void>() {
@@ -68,6 +78,11 @@ class ActionQuest {
                 }
             }
         }
+
+        override fun toString(): String {
+            return "QuestDataSet(quest=$quest, key=$key, value=$value, symbol=$symbol)"
+        }
+
     }
 
     class QuestDataKeys(val quest: ParsedAction<*>) : QuestAction<List<String>>() {
@@ -77,6 +92,11 @@ class ActionQuest {
                 frame.getProfile().getQuestById(quest.toString())?.persistentDataContainer?.keys() ?: emptyList()
             }
         }
+
+        override fun toString(): String {
+            return "QuestDataKeys(quest=$quest)"
+        }
+
     }
 
     class QuestAccept(val quest: ParsedAction<*>, val check: Boolean) : QuestAction<String>() {
@@ -101,6 +121,11 @@ class ActionQuest {
             }
             return future
         }
+
+        override fun toString(): String {
+            return "QuestAccept(quest=$quest, check=$check)"
+        }
+
     }
 
     class QuestAccepted(val quest: ParsedAction<*>) : QuestAction<Boolean>() {
@@ -110,6 +135,11 @@ class ActionQuest {
                 frame.getProfile().getQuestById(quest.toString()) != null
             }
         }
+
+        override fun toString(): String {
+            return "QuestAccepted(quest=$quest)"
+        }
+
     }
 
     class QuestCompleted(val quest: ParsedAction<*>) : QuestAction<Boolean>() {
@@ -119,6 +149,11 @@ class ActionQuest {
                 frame.getProfile().isQuestCompleted(quest.toString())
             }
         }
+
+        override fun toString(): String {
+            return "QuestCompleted(quest=$quest)"
+        }
+
     }
 
     class QuestActions(val quest: ParsedAction<*>, val action: Action) : QuestAction<Void>() {
@@ -141,6 +176,11 @@ class ActionQuest {
                 }
             }
         }
+
+        override fun toString(): String {
+            return "QuestActions(quest=$quest, action=$action)"
+        }
+
     }
 
     class QuestStats(val quest: ParsedAction<*>, val task: ParsedAction<*>?, val action: Action) : QuestAction<Void>() {
@@ -183,6 +223,11 @@ class ActionQuest {
                 }
             }
         }
+
+        override fun toString(): String {
+            return "QuestStats(quest=$quest, task=$task, action=$action)"
+        }
+
     }
 
     class QuestTasks(val quest: ParsedAction<*>) : QuestAction<List<String>>() {
@@ -192,6 +237,11 @@ class ActionQuest {
                 ChemdahAPI.getQuestTemplate(quest.toString())?.task?.keys?.toList() ?: emptyList()
             }
         }
+
+        override fun toString(): String {
+            return "QuestTasks(quest=$quest)"
+        }
+
     }
 
     companion object {

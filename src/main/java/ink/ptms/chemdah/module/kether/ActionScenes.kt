@@ -61,6 +61,11 @@ class ActionScenes {
                 }
             }
         }
+
+        override fun toString(): String {
+            return "ScenesBlockSet0(location=$location, material=$material, data=$data, falling=$falling, solid=$solid)"
+        }
+
     }
 
     class ScenesBlockSet1(
@@ -82,6 +87,11 @@ class ActionScenes {
                 }
             }
         }
+
+        override fun toString(): String {
+            return "ScenesBlockSet1(location=$location, copy=$copy, falling=$falling, solid=$solid)"
+        }
+
     }
 
     class ScenesBlockReset(val location: ParsedAction<*>) : QuestAction<Void>() {
@@ -91,6 +101,11 @@ class ActionScenes {
                 frame.getPlayer().removeScenesBlock(location)
             }
         }
+
+        override fun toString(): String {
+            return "ScenesBlockReset(location=$location)"
+        }
+
     }
 
     @TListener

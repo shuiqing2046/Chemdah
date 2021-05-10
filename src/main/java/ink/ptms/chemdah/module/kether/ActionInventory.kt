@@ -27,6 +27,11 @@ class ActionInventory {
         override fun process(frame: QuestContext.Frame): CompletableFuture<Boolean> {
             return CompletableFuture.completedFuture(item.take(frame.getPlayer().inventory, amount))
         }
+
+        override fun toString(): String {
+            return "InventoryTake(item=$item, amount=$amount)"
+        }
+
     }
 
     class InventoryCheck(val item: InferItem.Item, val amount: Int) : QuestAction<Boolean>() {
@@ -34,6 +39,11 @@ class ActionInventory {
         override fun process(frame: QuestContext.Frame): CompletableFuture<Boolean> {
             return CompletableFuture.completedFuture(item.check(frame.getPlayer().inventory, amount))
         }
+
+        override fun toString(): String {
+            return "InventoryCheck(item=$item, amount=$amount)"
+        }
+
     }
 
     class InventorySlot(val slot: Int, val item: InferItem.Item, val amount: Int) : QuestAction<Boolean>() {
@@ -46,6 +56,11 @@ class ActionInventory {
                 CompletableFuture.completedFuture(false)
             }
         }
+
+        override fun toString(): String {
+            return "InventorySlot(slot=$slot, item=$item, amount=$amount)"
+        }
+
     }
 
     class InventoryEquipment(val equipment: Equipments, val item: InferItem.Item, val amount: Int) : QuestAction<Boolean>() {
@@ -58,6 +73,11 @@ class ActionInventory {
                 CompletableFuture.completedFuture(false)
             }
         }
+
+        override fun toString(): String {
+            return "InventoryEquipment(equipment=$equipment, item=$item, amount=$amount)"
+        }
+
     }
 
     class InventoryClose() : QuestAction<Void>() {
@@ -66,6 +86,11 @@ class ActionInventory {
             frame.getPlayer().closeInventory()
             return CompletableFuture.completedFuture(null)
         }
+
+        override fun toString(): String {
+            return "InventoryClose()"
+        }
+
     }
 
     companion object {

@@ -87,6 +87,10 @@ class ActionSchematic(
         }
     }
 
+    override fun toString(): String {
+        return "ActionSchematic(name=$name, location=$location, rotation=$rotation, ignoreAir=$ignoreAir)"
+    }
+
     companion object {
 
         /**

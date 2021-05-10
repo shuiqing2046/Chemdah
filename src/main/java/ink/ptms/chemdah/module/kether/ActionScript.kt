@@ -39,6 +39,10 @@ class ActionScript {
             }
             return CompletableFuture.completedFuture(null)
         }
+
+        override fun toString(): String {
+            return "ScriptRun(name='$name', self=$self)"
+        }
     }
 
     class ScriptStop(val name: String, val self: Boolean) : QuestAction<Void>() {
@@ -50,6 +54,10 @@ class ActionScript {
                 ChemdahAPI.workspace.terminateScript(script)
             }
             return CompletableFuture.completedFuture(null)
+        }
+
+        override fun toString(): String {
+            return "ScriptStop(name='$name', self=$self)"
         }
     }
 

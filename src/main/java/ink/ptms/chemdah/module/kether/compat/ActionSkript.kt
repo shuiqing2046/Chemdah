@@ -26,6 +26,11 @@ class ActionSkript {
                 Variables.getVariable(it.toString(), null, false)
             }
         }
+
+        override fun toString(): String {
+            return "SkriptVar(key=$key)"
+        }
+
     }
 
     companion object {

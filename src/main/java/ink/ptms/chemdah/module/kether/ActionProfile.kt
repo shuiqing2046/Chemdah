@@ -34,6 +34,11 @@ class ActionProfile {
                 }
             }
         }
+
+        override fun toString(): String {
+            return "ProfileDataGet(key=$key, default=$default)"
+        }
+
     }
 
     class ProfileDataSet(
@@ -63,6 +68,11 @@ class ActionProfile {
                 }
             }
         }
+
+        override fun toString(): String {
+            return "ProfileDataSet(key=$key, value=$value, symbol=$symbol, default=$default)"
+        }
+
     }
 
     class ProfileDataKeys : QuestAction<List<String>>() {
@@ -70,6 +80,11 @@ class ActionProfile {
         override fun process(frame: QuestContext.Frame): CompletableFuture<List<String>> {
             return CompletableFuture.completedFuture(frame.getProfile().persistentDataContainer.keys())
         }
+
+        override fun toString(): String {
+            return "ProfileDataKeys()"
+        }
+
     }
 
     class ProfileLevelSet(val key: ParsedAction<*>, val type: LevelType, val value: ParsedAction<*>, val symbol: Symbol) : QuestAction<Void>() {
@@ -106,6 +121,11 @@ class ActionProfile {
                 }
             }
         }
+
+        override fun toString(): String {
+            return "ProfileLevelSet(key=$key, type=$type, value=$value, symbol=$symbol)"
+        }
+
     }
 
     class ProfileLevelGet(val key: ParsedAction<*>, val type: LevelType) : QuestAction<Int>() {
@@ -124,6 +144,11 @@ class ActionProfile {
                 }
             }
         }
+
+        override fun toString(): String {
+            return "ProfileLevelGet(key=$key, type=$type)"
+        }
+
     }
 
     enum class LevelType {

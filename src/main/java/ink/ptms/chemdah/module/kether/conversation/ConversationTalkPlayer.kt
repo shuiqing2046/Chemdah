@@ -36,6 +36,10 @@ class ConversationTalkPlayer(val token: String) : QuestAction<Void>() {
         return CompletableFuture.completedFuture(null)
     }
 
+    override fun toString(): String {
+        return "ConversationTalkPlayer(token='$token')"
+    }
+
     companion object {
 
         @KetherParser(["talk"], namespace = "chemdah-conversation-player")

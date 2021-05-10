@@ -32,6 +32,11 @@ class ActionParticle {
                 }
             }
         }
+
+        override fun toString(): String {
+            return "ParticleNormal(effect=$effect, location=$location, self=$self)"
+        }
+
     }
 
     companion object {

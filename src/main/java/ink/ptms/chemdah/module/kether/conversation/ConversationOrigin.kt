@@ -26,6 +26,10 @@ class ConversationOrigin : QuestAction<Location>() {
         return CompletableFuture.completedFuture(frame.getSession().origin)
     }
 
+    override fun toString(): String {
+        return "ConversationOrigin()"
+    }
+
     companion object {
 
         @KetherParser(["origin"], namespace = "chemdah-conversation")

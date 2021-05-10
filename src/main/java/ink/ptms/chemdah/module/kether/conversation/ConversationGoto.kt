@@ -30,6 +30,10 @@ class ConversationGoto(val conversation: String) : QuestAction<Session>() {
         return conversation.open(session.player, session.origin, sessionTop = session)
     }
 
+    override fun toString(): String {
+        return "ConversationGoto(conversation='$conversation')"
+    }
+
     companion object {
 
         @KetherParser(["goto"], namespace = "chemdah-conversation")

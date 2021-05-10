@@ -21,6 +21,10 @@ class ConversationClose : QuestAction<Void>() {
         return CompletableFuture.completedFuture(null)
     }
 
+    override fun toString(): String {
+        return "ConversationClose()"
+    }
+
     companion object {
 
         @KetherParser(["close"], namespace = "chemdah-conversation")
