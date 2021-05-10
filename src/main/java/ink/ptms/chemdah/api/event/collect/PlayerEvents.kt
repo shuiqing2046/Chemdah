@@ -2,6 +2,7 @@ package ink.ptms.chemdah.api.event.collect
 
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Template
+import ink.ptms.chemdah.module.kether.ActionScenes
 import ink.ptms.chemdah.module.level.LevelOption
 import io.izzel.taboolib.module.event.EventCancellable
 import io.izzel.taboolib.module.event.EventNormal
@@ -42,4 +43,14 @@ class PlayerEvents {
         var newLevel: Int,
         var newExperience: Int,
     ) : EventCancellable<LevelChange>(true)
+
+    /**
+     * 当玩家破坏演出方块
+     */
+    class ScenesBlockBreak(val player: Player, val blockData: ActionScenes.ScenesBlockData): EventNormal<ScenesBlockInteract>(true)
+
+    /**
+     * 当玩家交互演出方块
+     */
+    class ScenesBlockInteract(val player: Player, val blockData: ActionScenes.ScenesBlockData): EventNormal<ScenesBlockInteract>(true)
 }

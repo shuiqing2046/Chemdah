@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'ink.ptms.chemdah'
-version = 'SNAPSHOT 05 09 2'
+version = 'SNAPSHOT 05 10 01'
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
@@ -53,7 +53,7 @@ dependencies {
     implementation 'public:ExecutableItems:1.0.0'
     implementation 'ink.ptms:Zaphkiel:1.4.2'
     implementation 'ink.ptms:Sandalphon:1.2.8'
-    implementation 'ink.ptms.adyeshach:Adyeshach:1.1.9'
+    implementation 'ink.ptms:Adyeshach:1.2.1'
     implementation 'ink.ptms.core:v11604:11604:all'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib'
     implementation fileTree(dir: 'libs', includes: ['*.jar'])
