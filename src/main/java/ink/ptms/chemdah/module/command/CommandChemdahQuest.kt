@@ -145,7 +145,7 @@ class CommandChemdahQuest : BaseMainCommand() {
                 TLocale.sendTo(sender, "command-quest-info-body", "    §7Start in ${DateFormatUtils.format(quest.startTime, "yyyy/MM/dd HH:mm:ss")}")
                 TLocale.sendTo(sender, "command-quest-info-body", "    §7Data:")
                 quest.persistentDataContainer.entries().forEach { e ->
-                    TLocale.sendTo(sender, "command-quest-info-body", "      §7${e.key.replace(".", "§f.§7")} §8= §f${e.value.value}")
+                    TLocale.sendTo(sender, "command-quest-info-body", "      §7${e.key.replace(".", "§f.§7")} §8= §f${e.value.data}")
                 }
             }
             TLocale.sendTo(sender, "command-quest-info-bottom", (page + 1), ceil(quests.size / 5.0).toInt())

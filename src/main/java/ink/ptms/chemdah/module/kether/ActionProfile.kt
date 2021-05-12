@@ -30,7 +30,7 @@ class ActionProfile {
         override fun process(frame: QuestContext.Frame): CompletableFuture<Any> {
             return frame.newFrame(key).run<Any>().thenApply {
                 frame.newFrame(default).run<Any>().thenApply { def ->
-                    frame.getProfile().persistentDataContainer[it.toString()]?.value ?: def
+                    frame.getProfile().persistentDataContainer[it.toString()]?.data ?: def
                 }
             }
         }

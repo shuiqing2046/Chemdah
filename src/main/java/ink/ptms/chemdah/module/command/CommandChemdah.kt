@@ -33,7 +33,7 @@ class CommandChemdah : BaseMainCommand() {
         TLocale.sendTo(sender, "command-info-header")
         TLocale.sendTo(sender, "command-info-body", "  §7Data:")
         playerExact.chemdahProfile.persistentDataContainer.entries().forEach { e ->
-            TLocale.sendTo(sender, "command-info-body", "    §7${e.key.replace(".", "§f.§7")} §8= §f${e.value.value}")
+            TLocale.sendTo(sender, "command-info-body", "    §7${e.key.replace(".", "§f.§7")} §8= §f${e.value.data}")
         }
         val quests = playerExact.chemdahProfile.getQuests(openAPI = true)
         TLocale.sendTo(sender, "command-info-body", "  §7Quests: §f${quests.filter { it.isOwner(playerExact) }.map { it.id }.toList()}")

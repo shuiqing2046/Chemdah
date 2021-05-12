@@ -90,7 +90,7 @@ class DataContainer {
      * 合并数据
      */
     fun merge(meta: DataContainer) {
-        meta.forEach { key, data -> this[key] = data.value }
+        meta.forEach { key, data -> this[key] = data.data }
     }
 
     fun containsKey(key: String) = map.containsKey(key)
@@ -127,19 +127,19 @@ class DataContainer {
     }
 
     fun toMap(): Map<String, Any> {
-        return map.mapValues { it.value.value }
+        return map.mapValues { it.value.data }
     }
 
     fun toNBT(): NBTCompound {
         return NBTCompound().also {
-            map.forEach { (k, v) -> it[k] = NBTBase.toNBT(v.value) }
+            map.forEach { (k, v) -> it[k] = NBTBase.toNBT(v.data) }
         }
     }
 
     fun toJson() = JsonObject().also {
         map.forEach { (k, v) ->
             it.add(k, JsonPrimitive(0).also { json ->
-                json.reflex("value", v.value)
+                json.reflex("value", v.data)
             })
         }
     }.toString()
@@ -168,7 +168,7 @@ class DataContainer {
 
     companion object {
 
-        fun Any.data() = Data(this)
+        fun Any.data() = Data.unsafeData(this)
 
         fun JsonObject.dataContainer(): DataContainer {
             return DataContainer(entrySet().map { it.key to it.value.asJsonPrimitive.reflex<Any>("value")!!.data() }.toMap())

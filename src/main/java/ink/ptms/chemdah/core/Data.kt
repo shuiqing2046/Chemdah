@@ -1,8 +1,12 @@
 package ink.ptms.chemdah.core
 
+import ink.ptms.chemdah.core.quest.selector.InferArea
 import ink.ptms.chemdah.core.quest.selector.InferArea.Companion.toInferArea
+import ink.ptms.chemdah.core.quest.selector.InferBlock
 import ink.ptms.chemdah.core.quest.selector.InferBlock.Companion.toInferBlock
+import ink.ptms.chemdah.core.quest.selector.InferEntity
 import ink.ptms.chemdah.core.quest.selector.InferEntity.Companion.toInferEntity
+import ink.ptms.chemdah.core.quest.selector.InferItem
 import ink.ptms.chemdah.core.quest.selector.InferItem.Companion.toInferItem
 import ink.ptms.chemdah.util.asList
 import io.izzel.taboolib.util.Coerce
@@ -14,66 +18,111 @@ import io.izzel.taboolib.util.Coerce
  * @author sky
  * @since 2021/3/2 12:00 上午
  */
-class Data(val value: Any) {
+open class Data {
 
+    val data: Any
     var changed = false
 
-    private val lazyPosition by lazy {
-        value.toString().toInferArea(noWorld = false)
+    protected var lazyCache: Any? = null
+
+    constructor(value: Int) {
+        this.data = value
     }
 
-    private val lazyVector by lazy {
-        value.toString().toInferArea(noWorld = true)
+    constructor(value: Float) {
+        this.data = value
     }
 
-    private val lazyEntity by lazy {
-        value.asList().toInferEntity()
+    constructor(value: Double) {
+        this.data = value
     }
 
-    private val lazyBlock by lazy {
-        value.asList().toInferBlock()
+    constructor(value: Long) {
+        this.data = value
     }
 
-    private val lazyItem by lazy {
-        value.asList().toInferItem()
+    constructor(value: Short) {
+        this.data = value
     }
 
-    fun toInt() = Coerce.toInteger(value)
+    constructor(value: Byte) {
+        this.data = value
+    }
 
-    fun toFloat() = Coerce.toFloat(value)
+    constructor(value: Boolean) {
+        this.data = value
+    }
 
-    fun toDouble() = Coerce.toDouble(value)
+    protected constructor(value: Any) {
+        this.data = value
+    }
 
-    fun toLong() = Coerce.toLong(value)
+    fun toInt() = Coerce.toInteger(data)
 
-    fun toShort() = Coerce.toShort(value)
+    fun toFloat() = Coerce.toFloat(data)
 
-    fun toByte() = Coerce.toByte(value)
+    fun toDouble() = Coerce.toDouble(data)
 
-    fun toBoolean() = Coerce.toBoolean(value)
+    fun toLong() = Coerce.toLong(data)
 
-    fun toVector() = lazyVector
+    fun toShort() = Coerce.toShort(data)
 
-    fun toPosition() = lazyPosition
+    fun toByte() = Coerce.toByte(data)
 
-    fun toInferEntity() = lazyEntity
+    fun toBoolean() = Coerce.toBoolean(data)
 
-    fun toInferBlock() = lazyBlock
+    fun toVector(): InferArea {
+        if (lazyCache !is InferArea) {
+            lazyCache = data.toString().toInferArea(true)
+        }
+        return lazyCache as InferArea
+    }
 
-    fun toInferItem() = lazyItem
+    fun toPosition(): InferArea {
+        if (lazyCache !is InferArea) {
+            lazyCache = data.toString().toInferArea()
+        }
+        return lazyCache as InferArea
+    }
 
-    fun asList() = value.asList()
+    fun toInferEntity(): InferEntity {
+        if (lazyCache !is InferEntity) {
+            lazyCache = data.asList().toInferEntity()
+        }
+        return lazyCache as InferEntity
+    }
 
-    override fun toString() = value.toString()
+    fun toInferBlock(): InferBlock {
+        if (lazyCache !is InferBlock) {
+            lazyCache = data.asList().toInferBlock()
+        }
+        return lazyCache as InferBlock
+    }
+
+    fun toInferItem(): InferItem {
+        if (lazyCache !is InferItem) {
+            lazyCache = data.asList().toInferItem()
+        }
+        return lazyCache as InferItem
+    }
+
+    fun asList() = data.asList()
+
+    override fun toString() = data.toString()
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Data) return false
-        if (value != other.value) return false
+        if (data != other.data) return false
         return true
     }
 
     override fun hashCode(): Int {
-        return value.hashCode()
+        return data.hashCode()
+    }
+
+    companion object {
+
+        fun unsafeData(any: Any) = Data(any)
     }
 }

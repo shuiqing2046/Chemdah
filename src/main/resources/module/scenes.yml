@@ -1,0 +1,22 @@
+example:
+  world: world
+  state:
+    0:
+      $: ~
+      relative: 0 80 0
+      set:
+        - 1 1 1 stone
+        - 0 0 0 ~ 2 0 2 stone
+    1:
+      $: ~
+      relative: 0 80 0
+      copy:
+        from-world: ~
+        from: 0 0 0 ~ 10 10 10
+        to: 0 0 0
+  automation:
+    - if: permission *view0
+      state: 0
+    - if: permission *view1
+      state: 1
+      merge: true

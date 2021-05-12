@@ -65,7 +65,7 @@ open class DatabaseLocal : Database() {
         if (playerProfile.persistentDataContainer.isChanged) {
             playerProfile.persistentDataContainer.forEach { key, obj ->
                 if (obj.changed) {
-                    data.set("Chemdah.data.${key.replace(".", namespace)}", obj.value)
+                    data.set("Chemdah.data.${key.replace(".", namespace)}", obj.data)
                 }
             }
             playerProfile.persistentDataContainer.drops.forEach {
@@ -77,7 +77,7 @@ open class DatabaseLocal : Database() {
             if (quest.persistentDataContainer.isChanged) {
                 quest.persistentDataContainer.forEach { key, obj ->
                     if (obj.changed) {
-                        data.set("Chemdah.quest.${quest.id}.${key.replace(".", namespace)}", obj.value)
+                        data.set("Chemdah.quest.${quest.id}.${key.replace(".", namespace)}", obj.data)
                     }
                 }
                 quest.persistentDataContainer.drops.forEach {

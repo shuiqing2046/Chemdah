@@ -152,8 +152,8 @@ class DatabaseSQL : Database() {
         persistentDataContainer.forEach { key, data ->
             if (data.changed) {
                 tableUserData.update(Where.equals("user", id), Where.equals("key", key))
-                    .insertIfAbsent(null, id, key, data.value, 1)
-                    .set("value", data.value)
+                    .insertIfAbsent(null, id, key, data.data, 1)
+                    .set("value", data.data)
                     .set("mode", 1)
                     .run(dataSource)
             }
@@ -177,8 +177,8 @@ class DatabaseSQL : Database() {
                 quest.persistentDataContainer.forEach { key, data ->
                     if (data.changed) {
                         tableQuestData.update(Where.equals("quest", questId), Where.equals("key", key))
-                            .insertIfAbsent(null, questId, key, data.value, 1)
-                            .set("value", data.value)
+                            .insertIfAbsent(null, questId, key, data.data, 1)
+                            .set("value", data.data)
                             .set("mode", 1)
                             .run(dataSource)
                     }
@@ -202,7 +202,7 @@ class DatabaseSQL : Database() {
                 }
                 cacheUserId[player.name] = userId
                 persistentDataContainer.forEach { k, v ->
-                    tableUserData.insert(null, userId, k, v.value, 1).run(dataSource)
+                    tableUserData.insert(null, userId, k, v.data, 1).run(dataSource)
                 }
                 persistentDataContainer.flush()
                 getQuests().forEach {
@@ -223,7 +223,7 @@ class DatabaseSQL : Database() {
                 }
                 cacheQuestId.computeIfAbsent(name) { HashMap() }[quest.id] = questId
                 quest.persistentDataContainer.forEach { k, v ->
-                    tableQuestData.insert(null, questId, k, v.value, 1).run(dataSource)
+                    tableQuestData.insert(null, questId, k, v.data, 1).run(dataSource)
                 }
                 quest.persistentDataContainer.flush()
             }.run()

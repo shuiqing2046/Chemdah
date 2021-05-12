@@ -42,7 +42,7 @@ class ActionQuest {
             val future = CompletableFuture<Any?>()
             frame.newFrame(quest).run<Any>().thenApply { quest ->
                 frame.newFrame(key).run<Any>().thenApply {
-                    future.complete(frame.getProfile().getQuestById(quest.toString())?.persistentDataContainer?.get(it.toString())?.value)
+                    future.complete(frame.getProfile().getQuestById(quest.toString())?.persistentDataContainer?.get(it.toString())?.data)
                 }
             }
             return future

@@ -142,7 +142,7 @@ abstract class Objective<E : Event> {
      */
     open fun checkCondition(profile: PlayerProfile, task: Task, event: E): CompletableFuture<Boolean> {
         return if (conditions.all { it(profile, task, event) }) {
-            profile.checkAgent(task.condition["$"]?.value, event, conditionVars.mapNotNull { safely { it(event) } }.toMap())
+            profile.checkAgent(task.condition["$"]?.data, event, conditionVars.mapNotNull { safely { it(event) } }.toMap())
         } else {
             CompletableFuture.completedFuture(false)
         }
@@ -164,7 +164,7 @@ abstract class Objective<E : Event> {
     open fun checkGoal(profile: PlayerProfile, task: Task): CompletableFuture<Boolean> {
         return when {
             hasCompletedSignature(profile, task) -> CompletableFuture.completedFuture(false)
-            goals.all { it(profile, task) } -> profile.checkAgent(task.goal["$"]?.value)
+            goals.all { it(profile, task) } -> profile.checkAgent(task.goal["$"]?.data)
             else -> CompletableFuture.completedFuture(false)
         }
     }
