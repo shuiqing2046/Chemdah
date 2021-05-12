@@ -1,6 +1,6 @@
 package ink.ptms.chemdah.core.quest
 
-import ink.ptms.chemdah.core.DataContainer.Companion.data
+import ink.ptms.chemdah.core.DataContainer.Companion.unsafeData
 import ink.ptms.chemdah.core.PlayerProfile
 
 /**
@@ -18,7 +18,7 @@ class QuestDataOperator(val profile: PlayerProfile, val task: Task) {
 
     fun get(node: String) = container?.get("${task.metaNode}.$node")
 
-    fun get(node: String, def: Any) = container?.get("${task.metaNode}.$node") ?: def.data()
+    fun get(node: String, def: Any) = container?.get("${task.metaNode}.$node") ?: def.unsafeData()
 
     fun put(node: String, value: Any) = container?.set("${task.metaNode}.$node", value)
 

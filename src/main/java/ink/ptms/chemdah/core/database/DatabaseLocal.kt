@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.core.database
 
 import ink.ptms.chemdah.core.DataContainer
-import ink.ptms.chemdah.core.DataContainer.Companion.data
+import ink.ptms.chemdah.core.DataContainer.Companion.unsafeData
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.util.asMap
@@ -46,13 +46,13 @@ open class DatabaseLocal : Database() {
         if (data.contains("Chemdah")) {
             data.getConfigurationSection("Chemdah.data")?.also {
                 playerProfile.persistentDataContainer.unchanged {
-                    merge(DataContainer(it.asMap().map { it.key.replace(namespace, ".") to it.value.data() }.toMap()))
+                    merge(DataContainer(it.asMap().map { it.key.replace(namespace, ".") to it.value.unsafeData() }.toMap()))
                 }
             }
             data.getConfigurationSection("Chemdah.quest")?.getValues(false)?.forEach { (id, value) ->
                 playerProfile.registerQuest(Quest(id, playerProfile).also { quest ->
                     quest.persistentDataContainer.unchanged {
-                        merge(DataContainer(value.asMap().map { it.key.replace(namespace, ".") to it.value.data() }.toMap()))
+                        merge(DataContainer(value.asMap().map { it.key.replace(namespace, ".") to it.value.unsafeData() }.toMap()))
                     }
                 })
             }

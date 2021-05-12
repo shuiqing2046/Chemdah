@@ -54,13 +54,13 @@ class DataContainer {
     /**
      * 获取数据并返回默认值
      */
-    operator fun get(key: String, def: Any) = map[key] ?: def.data()
+    operator fun get(key: String, def: Any) = map[key] ?: def.unsafeData()
 
     /**
      * 修改数据
      */
     operator fun set(key: String, value: Any) {
-        map[key] = if (value is Data) value.change() else value.data().change()
+        map[key] = if (value is Data) value.change() else value.unsafeData().change()
         if (!locked) {
             drops.remove(key)
         }
@@ -95,7 +95,7 @@ class DataContainer {
 
     fun containsKey(key: String) = map.containsKey(key)
 
-    fun containsValue(value: Any) = map.containsValue(value.data())
+    fun containsValue(value: Any) = map.containsValue(value.unsafeData())
 
     fun entries() = map.entries
 
@@ -168,14 +168,14 @@ class DataContainer {
 
     companion object {
 
-        fun Any.data() = Data.unsafeData(this)
+        fun Any.unsafeData() = Data.unsafeData(this)
 
         fun JsonObject.dataContainer(): DataContainer {
-            return DataContainer(entrySet().map { it.key to it.value.asJsonPrimitive.reflex<Any>("value")!!.data() }.toMap())
+            return DataContainer(entrySet().map { it.key to it.value.asJsonPrimitive.reflex<Any>("value")!!.unsafeData() }.toMap())
         }
 
         fun NBTCompound.dataContainer(): DataContainer {
-            return DataContainer(map { it.key to it.value.reflex<Any>("data")!!.data() }.toMap())
+            return DataContainer(map { it.key to it.value.reflex<Any>("data")!!.unsafeData() }.toMap())
         }
 
         fun fromJson(source: String): DataContainer {
