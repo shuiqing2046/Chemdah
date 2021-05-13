@@ -5,8 +5,9 @@ example:
       $: ~
       relative: 0 80 0
       set:
-        - 1 1 1 stone
-        - 0 0 0 ~ 2 0 2 stone
+        - 1 1 1 -> stone
+        - 0 0 0 ~ 2 0 2 -> stone
+      auto-next: 20
     1:
       $: ~
       relative: 0 80 0
@@ -14,6 +15,7 @@ example:
         from-world: ~
         from: 0 0 0 ~ 10 10 10
         to: 0 0 0
+      auto-next: ~
   automation:
     - if: permission *view0
       state: 0

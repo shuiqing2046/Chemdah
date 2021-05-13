@@ -7,6 +7,7 @@ import ink.ptms.adyeshach.common.entity.ai.general.GeneralGravity
 import ink.ptms.adyeshach.common.entity.manager.ManagerPrivateTemp
 import ink.ptms.adyeshach.common.entity.type.AdyFallingBlock
 import ink.ptms.chemdah.api.event.collect.PlayerEvents
+import ink.ptms.chemdah.module.scenes.ScenesBlockData
 import ink.ptms.chemdah.util.getPlayer
 import io.izzel.taboolib.TabooLibAPI
 import io.izzel.taboolib.Version
@@ -42,8 +43,6 @@ import java.util.concurrent.ConcurrentHashMap
  * @since 2021/2/10 6:39 下午
  */
 class ActionScenes {
-
-    data class ScenesBlockData(val material: Material, val data: Byte = 0)
 
     class ScenesBlockSet0(
         val location: ParsedAction<*>,
