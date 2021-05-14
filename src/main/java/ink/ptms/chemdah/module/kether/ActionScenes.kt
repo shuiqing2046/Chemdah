@@ -11,6 +11,7 @@ import ink.ptms.chemdah.module.scenes.ScenesBlockData
 import ink.ptms.chemdah.util.getPlayer
 import io.izzel.taboolib.TabooLibAPI
 import io.izzel.taboolib.Version
+import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.kotlin.kether.Kether.expects
 import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
@@ -20,6 +21,7 @@ import io.izzel.taboolib.kotlin.kether.common.api.QuestContext
 import io.izzel.taboolib.kotlin.kether.common.loader.types.ArgTypes
 import io.izzel.taboolib.module.inject.PlayerContainer
 import io.izzel.taboolib.module.inject.TListener
+import io.izzel.taboolib.module.inject.TSchedule
 import io.izzel.taboolib.module.nms.impl.Position
 import io.izzel.taboolib.module.packet.Packet
 import io.izzel.taboolib.module.packet.TPacket
@@ -31,6 +33,8 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.player.PlayerChangedWorldEvent
+import org.bukkit.event.player.PlayerTeleportEvent
 import java.lang.Exception
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
@@ -195,11 +199,36 @@ class ActionScenes {
                 val position = TabooLibAPI.nmsFactory().generic().fromBlockPosition(packet.read("a") ?: return true)
                 val data = scenesBlocks[player.name]?.get(player.world.name)?.get(position) ?: return true
                 if (packet.read("c").toString() == "STOP_DESTROY_BLOCK") {
-                    PlayerEvents.ScenesBlockBreak(player, data).call()
-                    return false
+                    if (PlayerEvents.ScenesBlockBreak(player, data).call().isCancelled) {
+                        Tasks.delay(1) {
+                            player.createScenesBlock(position.toLocation(player.world), data.material, data.data)
+                        }
+                        return false
+                    } else {
+                        player.removeScenesBlock(position.toLocation(player.world))
+                    }
                 }
             }
             return true
+        }
+
+        @TSchedule(period = 40, async = true)
+        fun e() {
+            Bukkit.getOnlinePlayers().forEach { it.updateScenesBlock() }
+        }
+
+        @EventHandler
+        fun e(e: PlayerTeleportEvent) {
+            Tasks.delay(20) {
+                e.player.updateScenesBlock()
+            }
+        }
+
+        @EventHandler
+        fun e(e: PlayerChangedWorldEvent) {
+            Tasks.delay(20) {
+                e.player.updateScenesBlock()
+            }
         }
 
         fun Player.removeScenesBlock(location: Location) {
@@ -219,6 +248,19 @@ class ActionScenes {
                 sendBlockChange(location, material.createBlockData())
             } else {
                 sendBlockChange(location, material, data)
+            }
+        }
+
+        fun Player.updateScenesBlock() {
+            scenesBlocks[name]?.get(world.name)?.forEach {
+                val loc = it.key.toLocation(world)
+                if (loc.distance(location) < 128) {
+                    if (Version.isAfter(Version.v1_13)) {
+                        sendBlockChange(loc, it.value.material.createBlockData())
+                    } else {
+                        sendBlockChange(loc, it.value.material, it.value.data)
+                    }
+                }
             }
         }
 
