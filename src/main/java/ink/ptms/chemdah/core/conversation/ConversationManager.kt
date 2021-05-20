@@ -180,6 +180,7 @@ object ConversationManager : Listener {
             if (npc is EntityInstance) {
                 npc.setTag("isFreeze", "true")
                 npc.setTag("conversation:${e.session.player.name}", "conversation")
+                npc.controllerLook(e.session.player.eyeLocation, smooth = true)
             }
         }
 
