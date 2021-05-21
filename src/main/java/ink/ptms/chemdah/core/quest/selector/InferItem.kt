@@ -47,6 +47,7 @@ class InferItem(val items: List<Item>) {
                 when (it.key) {
                     "name" -> it.value in Items.getName(item)
                     "lore" -> meta?.lore?.toString()?.contains(it.value) == true
+                    "custommodeldata" -> meta?.customModelData?.equals(Integer.parseInt(it.value)) == true
                     "enchant", "enchants", "enchantment" -> meta.enchants.any { e -> e.key.name.equals(it.value, true) }
                     "potion", "potions" -> if (meta is PotionMeta) {
                         meta.basePotionData.type.name.equals(it.value, true) || meta.customEffects.any { e -> e.type.name.equals(it.value, true) }
