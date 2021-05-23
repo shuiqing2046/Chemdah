@@ -9,15 +9,17 @@ import ink.ptms.chemdah.api.ChemdahAPI.conversationSession
 import ink.ptms.chemdah.api.event.collect.ConversationEvents
 import ink.ptms.chemdah.util.hidden
 import io.izzel.taboolib.kotlin.Tasks
+import io.izzel.taboolib.module.ai.SimpleAiSelector
 import io.izzel.taboolib.module.config.TConfig
 import io.izzel.taboolib.module.i18n.I18n
 import io.izzel.taboolib.module.inject.*
 import io.lumine.xikage.mythicmobs.MythicMobs
+import io.lumine.xikage.mythicmobs.mobs.ActiveMob
 import net.citizensnpcs.api.CitizensAPI
+import net.citizensnpcs.api.npc.NPC
 import org.bukkit.Bukkit
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
-import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
@@ -180,7 +182,10 @@ object ConversationManager : Listener {
             if (npc is EntityInstance) {
                 npc.setTag("isFreeze", "true")
                 npc.setTag("conversation:${e.session.player.name}", "conversation")
-                npc.controllerLook(e.session.player.eyeLocation, smooth = true)
+                // 让 NPC 看向玩家
+                if (e.conversation.hasFlag("LOOK_PLAYER")) {
+                    npc.controllerLook(e.session.player.eyeLocation, smooth = true)
+                }
             }
         }
 
@@ -220,6 +225,14 @@ object ConversationManager : Listener {
     @TListener(depend = ["Citizens"])
     private class CompatCitizens : Listener {
 
+        @EventHandler
+        fun e(e: ConversationEvents.Begin) {
+            val npc = e.session.npcObject
+            if (npc is NPC && e.conversation.hasFlag("LOOK_PLAYER")) {
+                npc.faceLocation(e.session.player.eyeLocation)
+            }
+        }
+
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         fun e(e: PlayerInteractAtEntityEvent) {
             if (e.hand == EquipmentSlot.HAND && e.rightClicked.hasMetadata("NPC") && e.player.conversationSession == null) {
@@ -236,6 +249,14 @@ object ConversationManager : Listener {
 
     @TListener(depend = ["MythicMobs"])
     private class CompatMythicMobs : Listener {
+
+        @EventHandler
+        fun e(e: ConversationEvents.Begin) {
+            val npc = e.session.npcObject
+            if (npc is ActiveMob && npc.entity.bukkitEntity is LivingEntity && e.conversation.hasFlag("LOOK_PLAYER")) {
+                SimpleAiSelector.getExecutor().controllerLookAt(npc.entity.bukkitEntity as LivingEntity, e.session.player)
+            }
+        }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         fun e(e: PlayerInteractAtEntityEvent) {
