@@ -10,6 +10,7 @@ import io.izzel.taboolib.internal.xseries.XMaterial
 import io.izzel.taboolib.kotlin.Demand.Companion.toDemand
 import io.izzel.taboolib.kotlin.Mirror
 import io.izzel.taboolib.kotlin.MirrorData
+import io.izzel.taboolib.kotlin.Reflex.Companion.reflex
 import io.izzel.taboolib.module.config.TConfig
 import io.izzel.taboolib.util.Coerce
 import io.izzel.taboolib.util.item.ItemBuilder
@@ -104,11 +105,14 @@ fun <T> safely(func: () -> T): T? {
 }
 
 fun PotionEffect.hidden(): PotionEffect {
-    return if (Version.isAfter(Version.v1_13)) {
-        withParticles(false).withIcon(false)
-    } else {
-        this
+    if (Version.isAfter(Version.v1_13)) {
+        try {
+            reflex("icon", false)
+            reflex("particles", false)
+        } catch (ex: Throwable) {
+        }
     }
+    return this
 }
 
 fun Location.toCenter(): Location {
