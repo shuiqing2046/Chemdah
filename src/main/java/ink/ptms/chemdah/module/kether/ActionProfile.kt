@@ -28,11 +28,13 @@ class ActionProfile {
     class ProfileDataGet(val key: ParsedAction<*>, val default: ParsedAction<*> = ParsedAction.noop<Any>()) : QuestAction<Any>() {
 
         override fun process(frame: QuestContext.Frame): CompletableFuture<Any> {
-            return frame.newFrame(key).run<Any>().thenApply {
+            val future = CompletableFuture<Any>()
+            frame.newFrame(key).run<Any>().thenApply {
                 frame.newFrame(default).run<Any>().thenApply { def ->
-                    frame.getProfile().persistentDataContainer[it.toString()]?.data ?: def
+                    future.complete(frame.getProfile().persistentDataContainer[it.toString()]?.data ?: def)
                 }
             }
+            return future
         }
 
         override fun toString(): String {
