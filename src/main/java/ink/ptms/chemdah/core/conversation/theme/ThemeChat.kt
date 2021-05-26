@@ -66,7 +66,15 @@ class ThemeChat : Theme<ThemeChatSettings>(), Listener {
     @EventHandler
     fun e(e: PlayerItemHeldEvent) {
         val session = e.player.conversationSession ?: return
-        if (session.conversation.option.theme == "chat" && !session.npcTalking) {
+        if (session.conversation.option.theme == "chat") {
+            if (session.npcTalking) {
+                // 是否不允许玩家跳过对话演出效果
+                if (session.conversation.hasFlag("NO_SKIP") || session.conversation.hasFlag("FORCE_DISPLAY")) {
+                    e.isCancelled = true
+                    return
+                }
+                session.npcTalking = false
+            }
             val replies = session.playerReplyForDisplay
             if (replies.isNotEmpty()) {
                 val index = replies.indexOf(session.playerSide)
