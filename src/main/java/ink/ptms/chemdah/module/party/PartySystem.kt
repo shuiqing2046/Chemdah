@@ -173,5 +173,17 @@ object PartySystem : Module, Listener {
         if (!e.quest.isOwner(e.playerProfile.player) && (e.quest.template.party()?.canContinue == false || e.task.party()?.canContinue == false)) {
             e.isCancelled = true
         }
+        val requireMembers = e.task.party()?.requireMembers ?: e.quest.template.party()?.requireMembers ?: 0
+        if (requireMembers > 0 && requireMembers < e.playerProfile.player.getPartyMembers().size) {
+            e.isCancelled = true
+        }
+    }
+
+    @EventHandler
+    fun e(e: ObjectiveEvents.Complete.Pre) {
+        val requireMembers = e.task.party()?.requireMembers ?: e.quest.template.party()?.requireMembers ?: 0
+        if (requireMembers > 0 && requireMembers < e.playerProfile.player.getPartyMembers().size) {
+            e.isCancelled = true
+        }
     }
 }

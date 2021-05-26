@@ -29,6 +29,12 @@ class AddonParty(config: ConfigurationSection, questContainer: QuestContainer) :
      */
     val canContinue = config.getBoolean("continue")
 
+    /**
+     * 只有处于队伍中，且队员人数达到需求才能进行该任务或条目
+     * 任务和条目均支持该配置
+     */
+    val requireMembers = config.getInt("require-members")
+
     companion object {
 
         fun QuestContainer.party() = addon<AddonParty>("party")
