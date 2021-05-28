@@ -238,5 +238,5 @@ class ThemeChat : Theme<ThemeChatSettings>(), Listener {
         TLocale.Display.sendActionBar(session.player, TLocale.asString(session.player, "theme-chat-help"))
     }
 
-    private fun newJson() = TellrawJson.create().also { json -> repeat(100) { json.newLine() } }
+    private fun newJson() = TellrawJson.create().also { json -> repeat(settings.spaceLine) { json.newLine() } }
 }

@@ -1,6 +1,7 @@
 package ink.ptms.chemdah.module.compat
 
 import ink.ptms.chemdah.Chemdah
+import ink.ptms.chemdah.api.ChemdahAPI.isChemdahProfileLoaded
 import io.izzel.taboolib.kotlin.kether.KetherFunction
 import io.izzel.taboolib.module.compat.PlaceholderHook
 import io.izzel.taboolib.module.inject.THook
@@ -26,8 +27,12 @@ class CompatPlaceholderAPI : PlaceholderHook.Expansion {
     }
 
     override fun onPlaceholderRequest(player: Player, args: String): String {
-        return KetherFunction.parse("{{ $args }}", namespace = listOf("chemdah")) {
-            sender = player
+        return if (player.isChemdahProfileLoaded) {
+            KetherFunction.parse("{{ $args }}", namespace = listOf("chemdah")) {
+                sender = player
+            }
+        } else {
+            "..."
         }
     }
 }

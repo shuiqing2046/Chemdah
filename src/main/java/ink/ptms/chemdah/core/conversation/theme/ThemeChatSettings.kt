@@ -17,7 +17,8 @@ class ThemeChatSettings(
     val selectOther: String = root.getString("select.other", "")!!,
     val selectColor: String = root.getString("select.color", "")!!.colored(),
     val talking: String = root.getString("talking", "")!!.colored(),
-    val animation: Boolean = root.getBoolean("animation", true)
+    val animation: Boolean = root.getBoolean("animation", true),
+    val spaceLine: Int = root.getInt("space-line", 30)
 ) : ThemeSettings(root) {
 
     override fun toString(): String {
