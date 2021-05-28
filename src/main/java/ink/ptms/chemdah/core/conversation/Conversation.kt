@@ -54,7 +54,14 @@ data class Conversation(
      * @param origin 原点（对话实体的头顶坐标）
      * @param sessionTop 上层会话（继承关系）
      */
-    fun open(player: Player, origin: Location, sessionTop: Session? = null, npcName: String? = null, npcObject: Any? = null): CompletableFuture<Session> {
+    fun open(
+        player: Player,
+        origin: Location,
+        sessionTop: Session? = null,
+        npcName: String? = null,
+        npcObject: Any? = null,
+        consumer: (Session) -> Unit = {}
+    ): CompletableFuture<Session> {
         val future = CompletableFuture<Session>()
         mirrorFuture("Conversation:open") {
             val session = sessionTop ?: Session(this@Conversation, player.location.clone(), origin.clone(), player)
@@ -71,6 +78,7 @@ data class Conversation(
             }
             // 注册会话
             sessions[player.name] = session
+            consumer(session)
             // 重置会话
             session.reload()
             // 判定条件

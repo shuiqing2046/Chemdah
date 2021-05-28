@@ -3,7 +3,6 @@ package ink.ptms.chemdah.core.conversation
 import com.sucy.skill.api.event.PlayerCastSkillEvent
 import ink.ptms.adyeshach.api.event.AdyeshachEntityInteractEvent
 import ink.ptms.adyeshach.common.entity.EntityInstance
-import ink.ptms.adyeshach.common.entity.type.AdyHuman
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.conversationSession
 import ink.ptms.chemdah.api.event.collect.ConversationEvents
@@ -208,15 +207,11 @@ object ConversationManager : Listener {
                 getConversation("adyeshach", e.entity.id)?.run {
                     e.isCancelled = true
                     Tasks.task {
-                        open(
-                            e.player, e.entity.getLocation().also {
-                                it.y += e.entity.entityType.entitySize.height
-                            }, npcName = if (e.entity is AdyHuman) {
-                                (e.entity as AdyHuman).getName()
-                            } else {
-                                e.entity.getCustomName()
-                            }, npcObject = e.entity
-                        )
+                        val origin = e.entity.getLocation().add(0.0, e.entity.entityType.entitySize.height, 0.0)
+                        open(e.player, origin, npcName = e.entity.getDisplayName(), npcObject = e.entity) {
+                            it.variables["@manager"] = e.entity.manager
+                            it.variables["@entities"] = listOf(e.entity)
+                        }
                     }
                 }
             }
@@ -240,9 +235,7 @@ object ConversationManager : Listener {
                 val npc = CitizensAPI.getNPCRegistry().getNPC(e.rightClicked) ?: return
                 getConversation("citizens", npc.id.toString())?.run {
                     e.isCancelled = true
-                    open(e.player, e.rightClicked.location.also {
-                        it.y += e.rightClicked.height
-                    }, npcName = npc.fullName, npcObject = npc)
+                    open(e.player, e.rightClicked.location.add(0.0, e.rightClicked.height, 0.0), npcName = npc.fullName, npcObject = npc)
                 }
             }
         }
@@ -265,9 +258,7 @@ object ConversationManager : Listener {
                 val mob = MythicMobs.inst().mobManager.getMythicMobInstance(e.rightClicked) ?: return
                 getConversation("mythicmobs", mob.type.internalName)?.run {
                     e.isCancelled = true
-                    open(e.player, e.rightClicked.location.also {
-                        it.y += e.rightClicked.height
-                    }, npcName = mob.displayName, npcObject = mob)
+                    open(e.player, e.rightClicked.location.add(0.0, e.rightClicked.height, 0.0), npcName = mob.displayName, npcObject = mob)
                 }
             }
         }
