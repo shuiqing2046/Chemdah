@@ -72,7 +72,7 @@ enum class AgentType(val namespace: String) {
     /**
      * 条目完成之后
      */
-    TASK_COMPLETED("task"),
+    TASK_COMPLxETED("task"),
 
     /**
      * 无

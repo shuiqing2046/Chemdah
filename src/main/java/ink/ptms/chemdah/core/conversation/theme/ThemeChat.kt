@@ -20,6 +20,7 @@ import io.izzel.taboolib.util.Coerce
 import io.izzel.taboolib.util.lite.Effects
 import org.bukkit.Bukkit
 import org.bukkit.Particle
+import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -81,6 +82,7 @@ class ThemeChat : Theme<ThemeChatSettings>(), Listener {
                 val select = e.newSlot.coerceAtMost(replies.size - 1)
                 if (select != index) {
                     session.playerSide = replies[select]
+                    settings.playSelectSound(session)
                     CompletableFuture<Void>().npcTalk(session, session.npcSide, "", session.npcSide.size, end = true, canReply = true)
                 }
             }

@@ -15,6 +15,10 @@ theme-chat:
     char: '>'
     other: ' '
     color: '&b&n'
+    sound:
+      name: ENTITY_EXPERIENCE_ORB_PICKUP
+      p: 2
+      v: 0
   talking: '    &8...'
   animation: true
   sound:

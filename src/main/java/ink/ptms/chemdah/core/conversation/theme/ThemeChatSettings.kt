@@ -1,6 +1,8 @@
 package ink.ptms.chemdah.core.conversation.theme
 
+import ink.ptms.chemdah.core.conversation.Session
 import ink.ptms.chemdah.util.colored
+import io.izzel.taboolib.internal.xseries.XSound
 import org.bukkit.configuration.ConfigurationSection
 
 /**
@@ -20,6 +22,14 @@ class ThemeChatSettings(
     val animation: Boolean = root.getBoolean("animation", true),
     val spaceLine: Int = root.getInt("space-line", 30)
 ) : ThemeSettings(root) {
+
+    val selectSound: XSound? = XSound.matchXSound(root.getString("select.sound.name").toString()).orElse(null)
+    val selectSoundPitch = root.getDouble("select.sound.p").toFloat()
+    val selectSoundVolume = root.getDouble("select.sound.v").toFloat()
+
+    fun playSelectSound(session: Session) {
+        selectSound?.play(session.player, selectSoundPitch, selectSoundVolume)
+    }
 
     override fun toString(): String {
         return "ThemeChatSettings(" +
