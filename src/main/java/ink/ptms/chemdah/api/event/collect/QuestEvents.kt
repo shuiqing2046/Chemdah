@@ -39,19 +39,9 @@ class QuestEvents {
     }
 
     /**
-     * 当任务完成时
-     */
-    class Complete {
-
-        class Pre(val quest: Quest, val playerProfile: PlayerProfile): EventCancellable<Pre>(true)
-
-        class Post(val quest: Quest, val playerProfile: PlayerProfile): EventNormal<Post>(true)
-    }
-
-    /**
      * 当任务失败（放弃）时
      */
-    class Failure {
+    class Fail {
 
         class Pre(val quest: Quest, val playerProfile: PlayerProfile): EventCancellable<Pre>(true)
 
@@ -61,7 +51,17 @@ class QuestEvents {
     /**
      * 当任务重置时
      */
-    class Reset {
+    class Restart {
+
+        class Pre(val quest: Quest, val playerProfile: PlayerProfile): EventCancellable<Pre>(true)
+
+        class Post(val quest: Quest, val playerProfile: PlayerProfile): EventNormal<Post>(true)
+    }
+
+    /**
+     * 当任务完成时
+     */
+    class Complete {
 
         class Pre(val quest: Quest, val playerProfile: PlayerProfile): EventCancellable<Pre>(true)
 

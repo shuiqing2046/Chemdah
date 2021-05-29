@@ -60,7 +60,7 @@ class Template(id: String, config: ConfigurationSection) : QuestContainer(id, co
                 val control = control()
                 control.signature(profile, MetaControl.Trigger.ACCEPT)
                 profile.registerQuest(quest)
-                agent(profile, AgentType.QUEST_START)
+                agent(profile, AgentType.QUEST_ACCEPTED)
                 QuestEvents.Accept.Post(quest, profile).call()
             } else {
                 agent(profile, AgentType.QUEST_ACCEPT_CANCELLED, reason = it.reason)

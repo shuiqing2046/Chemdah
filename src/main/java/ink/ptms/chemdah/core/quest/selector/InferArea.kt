@@ -6,6 +6,8 @@ import io.izzel.taboolib.util.Coerce
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.util.Vector
+import java.lang.Double.max
+import java.lang.Double.min
 
 /**
  * Chemdah
@@ -34,14 +36,13 @@ abstract class InferArea(val source: String, val noWorld: Boolean) {
             val index = if (noWorld) 0 else 1
             val args = source.split(" ")
             world = args[0]
-            box = BoundingBox(
-                Coerce.toDouble(args[index + 0]),
-                Coerce.toDouble(args[index + 1]),
-                Coerce.toDouble(args[index + 2]),
-                Coerce.toDouble(args[index + 4]),
-                Coerce.toDouble(args[index + 5]),
-                Coerce.toDouble(args[index + 6])
-            )
+            val x1 = Coerce.toDouble(args[index + 0])
+            val y1 = Coerce.toDouble(args[index + 1])
+            val z1 = Coerce.toDouble(args[index + 2])
+            val x2 = Coerce.toDouble(args[index + 4])
+            val y2 = Coerce.toDouble(args[index + 5])
+            val z2 = Coerce.toDouble(args[index + 6])
+            box = BoundingBox(min(x1, x2), min(y1, y2), min(z1, z2), max(x1, x2), max(y1, y2), max(z1, z2))
         }
 
         override fun inside(location: Location): Boolean {

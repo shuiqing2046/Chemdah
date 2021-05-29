@@ -120,51 +120,51 @@ object PartySystem : Module, Listener {
     }
 
     @EventHandler
-    fun e(e: QuestEvents.Complete.Post) {
+    fun e(e: QuestEvents.Fail.Post) {
         e.quest.profile.player.getPartyMembers().forEach { member ->
-            e.quest.template.agent(member.chemdahProfile, AgentType.QUEST_COMPLETE, "party")
+            e.quest.template.agent(member.chemdahProfile, AgentType.QUEST_FAILED, "party")
         }
     }
 
     @EventHandler
-    fun e(e: QuestEvents.Failure.Post) {
+    fun e(e: QuestEvents.Restart.Post) {
         e.quest.profile.player.getPartyMembers().forEach { member ->
-            e.quest.template.agent(member.chemdahProfile, AgentType.QUEST_FAILURE, "party")
+            e.quest.template.agent(member.chemdahProfile, AgentType.QUEST_RESTART, "party")
         }
     }
 
     @EventHandler
     fun e(e: QuestEvents.Accept.Post) {
         e.quest.profile.player.getPartyMembers().forEach { member ->
-            e.quest.template.agent(member.chemdahProfile, AgentType.QUEST_START, "party")
+            e.quest.template.agent(member.chemdahProfile, AgentType.QUEST_ACCEPTED, "party")
         }
     }
 
     @EventHandler
-    fun e(e: QuestEvents.Reset.Post) {
+    fun e(e: QuestEvents.Complete.Post) {
         e.quest.profile.player.getPartyMembers().forEach { member ->
-            e.quest.template.agent(member.chemdahProfile, AgentType.QUEST_RESET, "party")
+            e.quest.template.agent(member.chemdahProfile, AgentType.QUEST_COMPLETED, "party")
         }
     }
 
     @EventHandler
-    fun e(e: ObjectiveEvents.Complete.Post) {
+    fun e(e: ObjectiveEvents.Restart.Post) {
         e.quest.profile.player.getPartyMembers().forEach { member ->
-            e.task.agent(member.chemdahProfile, AgentType.TASK_COMPLETE, "party")
+            e.task.agent(member.chemdahProfile, AgentType.TASK_RESTARTED, "party")
         }
     }
 
     @EventHandler
     fun e(e: ObjectiveEvents.Continue.Post) {
         e.quest.profile.player.getPartyMembers().forEach { member ->
-            e.task.agent(member.chemdahProfile, AgentType.TASK_CONTINUE, "party")
+            e.task.agent(member.chemdahProfile, AgentType.TASK_CONTINUED, "party")
         }
     }
 
     @EventHandler
-    fun e(e: ObjectiveEvents.Reset.Post) {
+    fun e(e: ObjectiveEvents.Complete.Post) {
         e.quest.profile.player.getPartyMembers().forEach { member ->
-            e.task.agent(member.chemdahProfile, AgentType.TASK_RESET, "party")
+            e.task.agent(member.chemdahProfile, AgentType.TASK_COMPLETED, "party")
         }
     }
 

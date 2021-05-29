@@ -11,9 +11,9 @@
     icon: iron_pickaxe
     description:
       - '&7Mine &3[10 Diamond Ores] &7anywhere.'
-  agent:start:
+  agent:accepted:
     - tell colored *"&3[Break Diamonds] &7accepted!"
-  agent:complete:
+  agent:completed:
     - tell colored *"&3[Break Diamonds] &7completed!"
   meta:
     name: Break Diamonds

@@ -39,7 +39,7 @@ class ObjectiveEvents {
     /**
      * 当条目重置时
      */
-    class Reset {
+    class Restart {
 
         class Pre(val objective: Objective<*>, val task: Task, val quest: Quest, val playerProfile: PlayerProfile): EventCancellable<Pre>(true)
 

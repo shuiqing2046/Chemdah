@@ -3,11 +3,6 @@ package ink.ptms.chemdah.core.quest
 enum class AgentType(val namespace: String) {
 
     /**
-     * 任务开始之后
-     */
-    QUEST_START("quest"),
-
-    /**
      * 任务接受之前（包含任何可能的检测）
      * 不代表任务已经接受，请勿实现任何不可逆的行为
      *
@@ -16,45 +11,68 @@ enum class AgentType(val namespace: String) {
     QUEST_ACCEPT("quest"),
 
     /**
+     * 任务接受之后
+     */
+    QUEST_ACCEPTED("quest"),
+
+    /**
      * 任务接受被取消之后（任何可能的方式）
      */
     QUEST_ACCEPT_CANCELLED("quest"),
 
     /**
      * 任务失败之前
+     * 不代表任务已经失败，请勿实现任何不可逆的行为
+     *
      * 返回的内容决定是否继续逻辑
      */
-    QUEST_FAILURE("quest"),
+    QUEST_FAIL("quest"),
+
+    /**
+     * 任务失败之后
+     */
+    QUEST_FAILED("quest"),
 
     /**
      * 任务完成之前
+     * 不代表任务已经完成，请勿实现任何不可逆的行为
+     *
      * 返回的内容决定是否继续逻辑
      */
     QUEST_COMPLETE("quest"),
 
     /**
-     * 任务重置之前
-     * 返回的内容决定是否继续逻辑
+     * 任务完成之后
      */
-    QUEST_RESET("quest"),
+    QUEST_COMPLETED("quest"),
 
     /**
-     * 条目继续之前
+     * 任务重启之前
+     * 不代表任务已经重启，请勿实现任何不可逆的行为
+     *
      * 返回的内容决定是否继续逻辑
      */
-    TASK_CONTINUE("task"),
+    QUEST_RESTART("quest"),
 
     /**
-     * 条目完成之前
-     * 返回的内容决定是否继续逻辑
+     * 任务重启之后
      */
-    TASK_COMPLETE("task"),
+    QUEST_RESTARTED("quest"),
 
     /**
-     * 条目重置之前
-     * 返回的内容决定是否继续逻辑
+     * 条目继续之后
      */
-    TASK_RESET("task"),
+    TASK_CONTINUED("task"),
+
+    /**
+     * 条目重置之后
+     */
+    TASK_RESTARTED("task"),
+
+    /**
+     * 条目完成之后
+     */
+    TASK_COMPLETED("task"),
 
     /**
      * 无
@@ -74,7 +92,7 @@ enum class AgentType(val namespace: String) {
 
         fun String.toAgentType(): AgentType {
             return try {
-                valueOf(toUpperCase().replace(" ", "_"))
+                valueOf(toUpperCase().replace("[ :]".toRegex(), "_"))
             } catch (ignored: Exception) {
                 NONE
             }
