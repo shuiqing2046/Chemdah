@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective.skillapi
 
-import ink.ptms.chemdah.core.quest.objective.Dependency
 import com.sucy.skill.api.event.PlayerSkillDowngradeEvent
+import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 
 /**
@@ -22,8 +22,14 @@ object SSkillDowngrade : ObjectiveCountableI<PlayerSkillDowngradeEvent>() {
         handler {
             playerData.player
         }
+        addCondition("position") {
+            toPosition().inside(it.playerData.player.location)
+        }
         addCondition("skill") {
             toString().equals(it.downgradedSkill.status.name, true)
+        }
+        addConditionVariable("skill") {
+            it.downgradedSkill.status.name
         }
     }
 }

@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective.skillapi
 
-import ink.ptms.chemdah.core.quest.objective.Dependency
 import com.sucy.skill.api.event.PlayerLevelUpEvent
+import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 
 /**
@@ -14,21 +14,21 @@ import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 @Dependency("SkillAPI")
 object SLevelUp : ObjectiveCountableI<PlayerLevelUpEvent>() {
 
-    override val name = "skillapi level up"
+    override val name = "skillapi levelup"
     override val event = PlayerLevelUpEvent::class
 
     init {
         handler {
             playerData.player
         }
+        addCondition("position") {
+            toPosition().inside(it.playerData.player.location)
+        }
         addCondition("level") {
-            toInt() == it.level
-        }
-        addCondition("level more than") {
-            toInt() >= it.level
-        }
-        addCondition("level less than") {
             toInt() <= it.level
+        }
+        addConditionVariable("level") {
+            it.level
         }
     }
 }

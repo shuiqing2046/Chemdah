@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'ink.ptms.chemdah'
-version = '0.0.10'
+version = '0.0.11'
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
@@ -36,7 +36,7 @@ dependencies {
     implementation 'public:Team3:1.0.0:3'
     implementation 'public:CustomGo:1.0.0'
     implementation 'public:Skript:1.0.0'
-    implementation 'public:SkillAPI:1.0.0'
+    implementation 'public:SkillAPI:s1.98'
     implementation 'public:mcMMO:1.0.0'
     implementation 'public:MMOLib:1.0.0'
     implementation 'public:MMOCore:1.0.0'

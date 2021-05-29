@@ -4,6 +4,7 @@ import ink.ptms.chemdah.api.event.InferItemHookEvent
 import ink.ptms.chemdah.core.quest.selector.Flags.Companion.matchType
 import ink.ptms.chemdah.util.warning
 import io.izzel.taboolib.module.nms.NMS
+import io.izzel.taboolib.util.Coerce
 import io.izzel.taboolib.util.Reflection
 import io.izzel.taboolib.util.item.Items
 import org.bukkit.inventory.Inventory
@@ -47,7 +48,7 @@ class InferItem(val items: List<Item>) {
                 when (it.key) {
                     "name" -> it.value in Items.getName(item)
                     "lore" -> meta?.lore?.toString()?.contains(it.value) == true
-                    "custommodeldata" -> meta?.customModelData?.equals(Integer.parseInt(it.value)) == true
+                    "custom-model-data" -> meta?.customModelData == Coerce.toInteger(it.value)
                     "enchant", "enchants", "enchantment" -> meta.enchants.any { e -> e.key.name.equals(it.value, true) }
                     "potion", "potions" -> if (meta is PotionMeta) {
                         meta.basePotionData.type.name.equals(it.value, true) || meta.customEffects.any { e -> e.type.name.equals(it.value, true) }

@@ -1,8 +1,8 @@
 package ink.ptms.chemdah.core.quest.objective.skillapi
 
 import com.sucy.skill.api.event.PlayerCastSkillEvent
-import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import ink.ptms.chemdah.core.quest.objective.Dependency
+import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 
 /**
  * Chemdah
@@ -21,17 +21,17 @@ object SCastSkill : ObjectiveCountableI<PlayerCastSkillEvent>() {
         handler {
             player
         }
+        addCondition("position") {
+            toPosition().inside(it.player.location)
+        }
         addCondition("skill") {
             toString().equals(it.skill.status.name, true)
         }
         addCondition("mana") {
-            toDouble()  == it.skill.manaCost
-        }
-        addCondition("mana more than") {
-            toDouble() >= it.skill.manaCost
-        }
-        addCondition("mana less than") {
             toDouble() <= it.skill.manaCost
+        }
+        addConditionVariable("mana") {
+            it.skill.manaCost
         }
     }
 }

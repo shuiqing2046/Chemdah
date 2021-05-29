@@ -21,11 +21,14 @@ object SChestOpen : ObjectiveCountableI<ChestOpenEvent>() {
         handler {
             player
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("position") || task.condition["position"]!!.toPosition().inside(e.chestData.block)
+        addCondition("position") {
+            toPosition().inside(it.chestData.block)
         }
-        addCondition { _, task, e ->
-            !task.condition.containsKey("title") || task.condition["title"]!!.toString().equals(e.chestData.title, true)
+        addCondition("title") {
+            toString().equals(it.chestData.title, true)
+        }
+        addConditionVariable("title") {
+            it.chestData.title
         }
     }
 }

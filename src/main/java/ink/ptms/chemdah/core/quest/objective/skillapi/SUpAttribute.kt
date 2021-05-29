@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective.skillapi
 
-import ink.ptms.chemdah.core.quest.objective.Dependency
 import com.sucy.skill.api.event.PlayerUpAttributeEvent
+import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 
 /**
@@ -15,15 +15,21 @@ import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 
 object SUpAttribute : ObjectiveCountableI<PlayerUpAttributeEvent>() {
 
-    override val name = "skillapi attr up"
+    override val name = "skillapi up attribute"
     override val event = PlayerUpAttributeEvent::class
 
     init {
         handler {
             playerData.player
         }
-        addCondition("attr") {
+        addCondition("position") {
+            toPosition().inside(it.playerData.player.location)
+        }
+        addCondition("attribute") {
             toString().equals(it.attribute, true)
+        }
+        addConditionVariable("attribute") {
+            it.attribute
         }
     }
 }
