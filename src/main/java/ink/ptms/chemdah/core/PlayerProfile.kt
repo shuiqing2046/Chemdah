@@ -61,10 +61,10 @@ class PlayerProfile(val uniqueId: UUID) {
      * 强制注册新的任务
      * 会覆盖原有的相同任务且不会进行任何条件判断和触发事件
      */
-    fun registerQuest(quest: Quest) {
+    fun registerQuest(quest: Quest, newQuest: Boolean = true) {
         questMap[quest.id] = quest
         if (quest.isValid) {
-            quest.newQuest = true
+            quest.newQuest = newQuest
             QuestEvents.Registered(quest, this).call()
         }
     }

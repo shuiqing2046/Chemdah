@@ -143,7 +143,7 @@ class DatabaseSQL : Database() {
                     this[it.second.first] = it.second.second
                 }
             }
-        quests.forEach { registerQuest(Quest(it.key, this, it.value)) }
+        quests.forEach { registerQuest(Quest(it.key, this, it.value), newQuest = false) }
         return this
     }
 

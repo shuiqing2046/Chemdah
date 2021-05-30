@@ -54,7 +54,7 @@ open class DatabaseLocal : Database() {
                     quest.persistentDataContainer.unchanged {
                         merge(DataContainer(value.asMap().map { it.key.replace(namespace, ".") to it.value.unsafeData() }.toMap()))
                     }
-                })
+                }, newQuest = false)
             }
         }
         return playerProfile

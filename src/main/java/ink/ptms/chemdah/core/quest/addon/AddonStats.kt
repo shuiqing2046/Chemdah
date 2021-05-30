@@ -2,6 +2,7 @@ package ink.ptms.chemdah.core.quest.addon
 
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.api.event.collect.ObjectiveEvents
+import ink.ptms.chemdah.api.event.collect.PlayerEvents
 import ink.ptms.chemdah.api.event.collect.QuestEvents
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Id
@@ -124,6 +125,16 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
                 }
             }
         }
+
+        @EventHandler
+        private fun e(e: PlayerEvents.Selected) {
+            e.playerProfile.getQuests().forEach { quest ->
+                quest.getMembers(self = true).forEach {
+                    quest.refreshStats(it.chemdahProfile)
+                }
+            }
+        }
+
 
         @EventHandler
         private fun e(e: QuestEvents.Registered) {
