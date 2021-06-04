@@ -18,7 +18,7 @@ class LevelOption(val algorithm: Level.Algorithm, val min: Int, val root: Config
 
     init {
         root.getConfigurationSection("reward")?.getKeys(false)?.forEach { node ->
-            val args = node.split("~")
+            val args = node.split("[-~]".toRegex())
             val range = (Coerce.toInteger(args[0])..Coerce.toInteger(args.getOrElse(1) { args[0] })).toList()
             reward.add(LevelReward(range, root.get("reward.$node")!!.asList()))
         }
