@@ -97,6 +97,7 @@ data class Conversation(
                                         ConversationEvents.Cancelled(this@Conversation, session, true).call()
                                     }
                                 } else {
+                                    sessions.remove(player.name)
                                     future.complete(session)
                                     ConversationEvents.Cancelled(this@Conversation, session, false).call()
                                 }
@@ -126,6 +127,7 @@ data class Conversation(
                         }
                     }
                 } else {
+                    sessions.remove(player.name)
                     future.complete(session)
                     finish()
                     ConversationEvents.Cancelled(this@Conversation, session, false).call()

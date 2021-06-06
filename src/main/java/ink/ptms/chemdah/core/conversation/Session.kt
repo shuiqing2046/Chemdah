@@ -4,6 +4,7 @@ import ink.ptms.chemdah.api.event.collect.ConversationEvents
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Chemdah
@@ -17,7 +18,7 @@ data class Session(
     var location: Location,
     val origin: Location,
     val player: Player,
-    val variables: MutableMap<String, Any?> = HashMap()
+    val variables: MutableMap<String, Any?> = ConcurrentHashMap()
 ) {
 
     /**
@@ -46,6 +47,8 @@ data class Session(
 
     var isNext = false
     var isClosed = false
+
+    val beginTime = System.currentTimeMillis();
 
     /**
      * 关闭会话

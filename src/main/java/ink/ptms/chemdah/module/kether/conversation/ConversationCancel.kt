@@ -1,6 +1,6 @@
 package ink.ptms.chemdah.module.kether.conversation
 
-import ink.ptms.chemdah.util.getSession
+import ink.ptms.chemdah.util.rootVariables
 import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import io.izzel.taboolib.kotlin.kether.common.api.QuestAction
@@ -17,8 +17,7 @@ import java.util.concurrent.CompletableFuture
 class ConversationCancel : QuestAction<Void>() {
 
     override fun process(frame: QuestContext.Frame): CompletableFuture<Void> {
-        val session = frame.getSession()
-        session.variables["@Cancelled"] = true
+        frame.rootVariables().set("@Cancelled", true)
         return CompletableFuture.completedFuture(null)
     }
 

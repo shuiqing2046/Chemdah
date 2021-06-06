@@ -1,11 +1,11 @@
 package ink.ptms.chemdah.module.kether.conversation
 
 import ink.ptms.chemdah.util.getSession
-import ink.ptms.chemdah.util.vars
 import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import io.izzel.taboolib.kotlin.kether.common.api.QuestAction
 import io.izzel.taboolib.kotlin.kether.common.api.QuestContext
+import io.izzel.taboolib.kotlin.kether.deepVars
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -20,7 +20,7 @@ class ConversationAgent : QuestAction<Void>() {
     override fun process(frame: QuestContext.Frame): CompletableFuture<Void> {
         val session = frame.getSession()
         session.variables.clear()
-        session.variables.putAll(frame.vars())
+        session.variables.putAll(frame.deepVars().filterKeys { !it.startsWith("~") })
         return CompletableFuture.completedFuture(null)
     }
 
