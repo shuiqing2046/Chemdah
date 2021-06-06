@@ -14,7 +14,7 @@ import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 @Dependency("Brewery")
 object BBarrelAccess : ObjectiveCountableI<BarrelAccessEvent>() {
 
-    override val name = "brewery barrelaccess"
+    override val name = "brewery barrel access"
     override val event = BarrelAccessEvent::class
 
     init {
@@ -22,7 +22,13 @@ object BBarrelAccess : ObjectiveCountableI<BarrelAccessEvent>() {
             player
         }
         addCondition("position") {
-            toPosition().inside(it.player.location)
+            toPosition().inside(it.clickedBlock.location)
+        }
+        addCondition("material") { e ->
+            toInferBlock().isBlock(e.clickedBlock!!)
+        }
+        addCondition("face") { e ->
+            asList().any { it.equals(e.clickedBlockFace.name, true) }
         }
     }
 }

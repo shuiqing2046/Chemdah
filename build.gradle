@@ -1,18 +1,19 @@
 plugins {
     id 'java'
+    id 'maven'
     id 'io.izzel.taboolib' version '1.3'
-    id 'org.jetbrains.kotlin.jvm' version '1.4.0'
+    id 'org.jetbrains.kotlin.jvm' version '1.5.10'
 }
 
 group = 'ink.ptms.chemdah'
-version = '0.0.12'
+version = '0.0.13'
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
 taboolib {
-    tabooLibVersion = '5.7.1'
-    loaderVersion = '3.0.3'
+    tabooLibVersion = '5.7.2'
+    loaderVersion = '3.0.4'
     classifier = null
     builtin = true
 }
@@ -51,6 +52,7 @@ dependencies {
     implementation 'public:MythicMobs:1.0.1'
     implementation 'public:DungeonPlus:1.0.0'
     implementation 'public:ExecutableItems:1.0.0'
+    implementation 'public:Brewery:1.0.0'
     implementation 'ink.ptms:Zaphkiel:1.4.2'
     implementation 'ink.ptms:Sandalphon:1.2.8'
     implementation 'ink.ptms:Adyeshach:1.2.1'
@@ -81,5 +83,19 @@ compileKotlin {
 compileTestKotlin {
     kotlinOptions {
         jvmTarget = "1.8"
+    }
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: project.findProperty('repository')) {
+                authentication(userName: project.findProperty('user'), password: project.findProperty('password'))
+            }
+            pom.artifactId = rootProject.name
+            pom.groupId = project.group
+            pom.version = project.version
+            pom.packaging = 'jar'
+        }
     }
 }

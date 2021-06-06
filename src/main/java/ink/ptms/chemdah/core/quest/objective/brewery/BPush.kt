@@ -24,5 +24,23 @@ object BPush : ObjectiveCountableI<PlayerPushEvent>() {
         addCondition("position") {
             toPosition().inside(it.player.location)
         }
+        addCondition("x") {
+            toInt() <= it.push.x
+        }
+        addCondition("y") {
+            toInt() <= it.push.y
+        }
+        addCondition("z") {
+            toInt() <= it.push.z
+        }
+        addConditionVariable("x") {
+            it.push.x
+        }
+        addConditionVariable("y") {
+            it.push.y
+        }
+        addConditionVariable("z") {
+            it.push.z
+        }
     }
 }

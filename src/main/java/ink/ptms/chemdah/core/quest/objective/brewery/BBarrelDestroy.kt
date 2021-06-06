@@ -3,8 +3,6 @@ package ink.ptms.chemdah.core.quest.objective.brewery
 import com.dre.brewery.api.events.barrel.BarrelDestroyEvent
 import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
-import org.bukkit.entity.Player
-import org.jetbrains.annotations.NotNull
 
 /**
  * Chemdah
@@ -16,12 +14,18 @@ import org.jetbrains.annotations.NotNull
 @Dependency("Brewery")
 object BBarrelDestroy : ObjectiveCountableI<BarrelDestroyEvent>() {
 
-    override val name = "brewery barreldestory"
+    override val name = "brewery barrel destroy"
     override val event = BarrelDestroyEvent::class
 
     init {
         handler {
             playerOptional
+        }
+        addCondition("position") {
+            toPosition().inside(it.broken.location)
+        }
+        addCondition("reason") { e ->
+            asList().any { it.equals(e.reason.name, true) }
         }
     }
 }

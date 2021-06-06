@@ -3,6 +3,8 @@ package ink.ptms.chemdah.core.quest.objective.brewery
 import com.dre.brewery.api.events.brew.BrewDrinkEvent
 import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
+import org.bukkit.Material
+import org.bukkit.inventory.ItemStack
 
 /**
  * Chemdah
@@ -21,14 +23,23 @@ object BBrewDrink : ObjectiveCountableI<BrewDrinkEvent>() {
         handler {
             player
         }
+        addCondition("position") {
+            toPosition().inside(it.player.location)
+        }
+        addCondition("brew") {
+            toInferItem().isItem(ItemStack(Material.POTION).also { item -> item.itemMeta = it.itemMeta })
+        }
         addCondition("alcohol") {
             toInt() <= it.addedAlcohol
         }
         addCondition("quality") {
             toInt() <= it.quality
         }
-        addCondition("position") {
-            toPosition().inside(it.player.location)
+        addConditionVariable("alcohol") {
+            it.addedAlcohol
+        }
+        addConditionVariable("quality") {
+            it.quality
         }
     }
 }

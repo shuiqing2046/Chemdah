@@ -14,7 +14,7 @@ import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 @Dependency("Brewery")
 object BBarrelCreate : ObjectiveCountableI<BarrelCreateEvent>() {
 
-    override val name = "brewery barrelcreate"
+    override val name = "brewery barrel create"
     override val event = BarrelCreateEvent::class
 
     init {
@@ -22,7 +22,7 @@ object BBarrelCreate : ObjectiveCountableI<BarrelCreateEvent>() {
             player
         }
         addCondition("position") {
-            toPosition().inside(it.player.location)
+            toPosition().inside(it.barrel.spigot.location)
         }
     }
 }
