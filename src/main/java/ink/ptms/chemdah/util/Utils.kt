@@ -65,7 +65,7 @@ fun String.toTime(): Time {
 fun ItemStack.setIcon(value: String) {
     val itemBuilder = ItemBuilder(this)
     value.toDemand().run {
-        Items.asMaterial(namespace)?.let {
+        Items.asMaterial(namespace).let {
             type = it
         }
         get(listOf("d", "data"))?.let {

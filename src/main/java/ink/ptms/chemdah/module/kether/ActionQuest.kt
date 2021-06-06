@@ -3,6 +3,7 @@ package ink.ptms.chemdah.module.kether
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.quest.addon.AddonStats.Companion.hiddenStats
 import ink.ptms.chemdah.core.quest.addon.AddonStats.Companion.refreshStats
+import ink.ptms.chemdah.core.quest.addon.AddonStats.Companion.refreshStatusAlwaysType
 import ink.ptms.chemdah.util.getProfile
 import ink.ptms.chemdah.util.increaseAny
 import io.izzel.taboolib.kotlin.kether.Kether.expects
@@ -197,7 +198,10 @@ class ActionQuest {
                     profile.getQuestById(quest.toString())?.run {
                         when (action) {
                             Action.HIDDEN -> hiddenStats(profile)
-                            Action.REFRESH -> refreshStats(profile)
+                            Action.REFRESH -> {
+                                template.refreshStats(profile)
+                                refreshStatusAlwaysType(profile)
+                            }
                         }
                     }
                 } else {
@@ -209,6 +213,10 @@ class ActionQuest {
                                         Action.HIDDEN -> it.hiddenStats(profile)
                                         Action.REFRESH -> it.refreshStats(profile)
                                     }
+                                }
+                                when (action) {
+                                    Action.HIDDEN -> hiddenStats(profile)
+                                    Action.REFRESH -> template.refreshStats(profile)
                                 }
                             } else {
                                 getTask(task.toString())?.run {

@@ -5,10 +5,7 @@ import ink.ptms.chemdah.api.event.collect.ObjectiveEvents
 import ink.ptms.chemdah.api.event.collect.PlayerEvents
 import ink.ptms.chemdah.api.event.collect.QuestEvents
 import ink.ptms.chemdah.core.PlayerProfile
-import ink.ptms.chemdah.core.quest.Id
-import ink.ptms.chemdah.core.quest.Quest
-import ink.ptms.chemdah.core.quest.QuestContainer
-import ink.ptms.chemdah.core.quest.Task
+import ink.ptms.chemdah.core.quest.*
 import ink.ptms.chemdah.core.quest.meta.MetaName.Companion.displayName
 import ink.ptms.chemdah.core.quest.objective.Progress
 import ink.ptms.chemdah.module.party.PartySystem.getMembers
@@ -48,64 +45,120 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
         val bossBarAlways = ConcurrentHashMap<String, BossBar>()
     }
 
+    /**
+     * 注入接口
+     */
     val agent = config.get("$", "pass")!!.asList()
+
+    /**
+     * 是否可见（一段时间后隐藏）
+     */
     val visible = config.getBoolean("visible")
+
+    /**
+     * 是否持续可见
+     */
     val visibleAlways = config.getBoolean("visible-always")
+
+    /**
+     * BOSS 音效
+     */
     val bossMusic = config.getBoolean("boss-music")
+
+    /**
+     * 黑天
+     */
     val darkenSky = config.getBoolean("darken-sky")
+
+    /**
+     * 任务进度持续显示时间
+     */
     val stay = config.getInt("stay", conf.getInt("default-stats.stay"))
 
+    /**
+     * 任务进度样式
+     */
     val style = try {
         BarStyle.valueOf(config.getString("style", conf.getString("default-stats.style"))!!.toUpperCase())
     } catch (ignored: Throwable) {
         BarStyle.SOLID
     }
 
+    /**
+     * 任务进度颜色
+     */
     val color = try {
         BarColor.valueOf(config.getString("color", conf.getString("default-stats.color"))!!.toUpperCase())
     } catch (ignored: Throwable) {
         BarColor.WHITE
     }
 
+    /**
+     * 进度原始内容
+     */
     val content = config.getString("content", conf.getStringColored("default-stats.content")).toString()
 
-    fun getTitle(task: Task, progress: Progress) = content
+    /**
+     * 进度格式化后的内容
+     */
+    fun getTitle(task: QuestContainer, progress: Progress) = content
         .replace("{name}", task.displayName())
         .replace("{value}", progress.value.toString())
         .replace("{target}", progress.target.toString())
         .replace("{percent}", Coerce.format(progress.percent * 100).toString())
 
-    fun getProgress(profile: PlayerProfile): CompletableFuture<Progress> {
-        val future = CompletableFuture<Progress>()
-        val task = questContainer as? Task
-        if (task == null) {
-            warning("Template(${questContainer.path}) not support addon(Stats).")
-            future.complete(Progress.empty)
+    /**
+     * 获取进度
+     * 获取某个单独的条目进度，也可以获取整个任务中的所有条目进度总和
+     * 但是所有条目的进度必须是数字才可以被正常叠加
+     */
+    fun getProgress(profile: PlayerProfile, task: Task? = null): CompletableFuture<Progress> {
+        if (task != null) {
+            val future = CompletableFuture<Progress>()
+            val quest = profile.getQuests(openAPI = true).firstOrNull { it.id == task.template.id }
+            if (quest == null) {
+                warning("Quest(${questContainer.node}) not accepted.")
+                future.complete(Progress.empty)
+                return future
+            }
+            val vars = AtomicReference<QuestContext.VarTable>()
+            KetherShell.eval(agent, namespace = namespaceQuest) {
+                sender = profile.player
+                vars.set(rootFrame().variables().also { vars ->
+                    vars.set("@QuestContainer", task)
+                })
+            }.thenApply {
+                task.objective.getProgress(profile, task).run {
+                    future.complete(
+                        Progress(
+                            vars.get().get<Any?>("value").orElse(value),
+                            vars.get().get<Any?>("target").orElse(target),
+                            vars.get().get<Any?>("percent").orElse(null).asDouble(percent)
+                        )
+                    )
+                }
+            }
             return future
         }
-        val quest = profile.getQuests(openAPI = true).firstOrNull { it.id == task.template.id }
-        if (quest == null) {
-            warning("Quest(${questContainer.node}) not accepted.")
-            future.complete(Progress.empty)
-            return future
+        return if (questContainer is Template) {
+            val future = CompletableFuture<Progress>()
+            val tasks = questContainer.task.values.toList()
+            var p = Progress.empty
+            fun process(cur: Int) {
+                if (cur < tasks.size) {
+                    getProgress(profile, tasks[cur]).thenAccept {
+                        p = Progress(p.value.increaseAny(it.value), p.target.increaseAny(it.target), p.percent + (it.percent / tasks.size))
+                        process(cur + 1)
+                    }
+                } else {
+                    future.complete(p)
+                }
+            }
+            process(0)
+            future
+        } else {
+            getProgress(profile, questContainer as Task)
         }
-        val vars = AtomicReference<QuestContext.VarTable>()
-        KetherShell.eval(agent, namespace = namespaceQuest) {
-            sender = profile.player
-            vars.set(rootFrame().variables().also { vars ->
-                vars.set("@QuestContainer", task)
-            })
-        }.thenApply {
-            val op = task.objective.getProgress(profile, task)
-            future.complete(
-                Progress(
-                    vars.get().get<Any?>("value").orElse(op.value),
-                    vars.get().get<Any?>("target").orElse(op.target),
-                    vars.get().get<Any?>("percent").orElse(null).asDouble(op.percent)
-                )
-            )
-        }
-        return future
     }
 
     @TListener
@@ -130,16 +183,15 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
         private fun e(e: PlayerEvents.Selected) {
             e.playerProfile.getQuests().forEach { quest ->
                 quest.getMembers(self = true).forEach {
-                    quest.refreshStats(it.chemdahProfile)
+                    quest.refreshStatusAlwaysType(it.chemdahProfile)
                 }
             }
         }
 
-
         @EventHandler
         private fun e(e: QuestEvents.Registered) {
             e.quest.getMembers(self = true).forEach {
-                e.quest.refreshStats(it.chemdahProfile)
+                e.quest.refreshStatusAlwaysType(it.chemdahProfile)
             }
         }
 
@@ -151,25 +203,26 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
         }
 
         @EventHandler
-        private fun e(e: ObjectiveEvents.Continue.Post) {
-            e.quest.getMembers(self = true).forEach {
-                e.task.refreshStats(it.chemdahProfile)
-            }
-        }
-
-        @EventHandler
         private fun e(e: ObjectiveEvents.Complete.Post) {
             e.quest.getMembers(self = true).forEach {
                 e.task.hiddenStats(it.chemdahProfile)
             }
         }
 
-        fun Task.stats() = addon<AddonStats>("stats")
+        @EventHandler
+        private fun e(e: ObjectiveEvents.Continue.Post) {
+            e.quest.getMembers(self = true).forEach {
+                e.task.refreshStats(it.chemdahProfile)
+                e.quest.template.refreshStats(it.chemdahProfile)
+            }
+        }
+
+        fun QuestContainer.stats() = addon<AddonStats>("stats")
 
         /**
          * 通过可能存在的 Stats 扩展展示条目进度
          */
-        fun Task.statsDisplay(profile: PlayerProfile): CompletableFuture<BossBar?> {
+        fun QuestContainer.statsDisplay(profile: PlayerProfile): CompletableFuture<BossBar?> {
             val future = CompletableFuture<BossBar?>()
             val stats = stats()
             if (stats == null) {
@@ -199,8 +252,25 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
          * 获取条目进度
          * 并通过可能存在的 Stats 扩展
          */
-        fun Task.getProgress(profile: PlayerProfile): CompletableFuture<Progress> {
-            return stats()?.getProgress(profile) ?: CompletableFuture.completedFuture(objective.getProgress(profile, this))
+        fun QuestContainer.getProgress(profile: PlayerProfile): CompletableFuture<Progress> {
+            val progress = stats()?.getProgress(profile)
+            if (progress != null) {
+                return progress
+            }
+            return when (this) {
+                is Template -> {
+                    var p = Progress.empty
+                    task.forEach { (_, task) ->
+                        val tp = task.objective.getProgress(profile, task)
+                        p = Progress(p.value.increaseAny(tp.value), p.target.increaseAny(tp.target), p.percent + (tp.percent / this.task.size))
+                    }
+                    CompletableFuture.completedFuture(p)
+                }
+                is Task -> {
+                    CompletableFuture.completedFuture(objective.getProgress(profile, this))
+                }
+                else -> error("out of case")
+            }
         }
 
         /**
@@ -208,6 +278,10 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
          */
         fun Quest.hiddenStats(profile: PlayerProfile) {
             val statsMap = statsMap.computeIfAbsent(profile.player.name) { StatsMap() }
+            // 任务
+            statsMap.bossBar.remove(template.path)?.key?.removeAll()
+            statsMap.bossBarAlways.remove(template.path)?.removeAll()
+            // 条目
             tasks.forEach {
                 statsMap.bossBar.remove(it.path)?.key?.removeAll()
                 statsMap.bossBarAlways.remove(it.path)?.removeAll()
@@ -226,8 +300,17 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
         /**
          * 刷新任务进度（仅持续显示的）
          */
-        fun Quest.refreshStats(profile: PlayerProfile) {
+        fun Quest.refreshStatusAlwaysType(profile: PlayerProfile) {
             val statsMap = statsMap.computeIfAbsent(profile.player.name) { StatsMap() }
+            // 任务
+            if (template.stats()?.visibleAlways == true) {
+                template.statsDisplay(profile).thenApply { bossBar ->
+                    if (bossBar != null) {
+                        statsMap.bossBarAlways.put(template.path, bossBar)?.removeAll()
+                    }
+                }
+            }
+            // 条目
             tasks.forEach {
                 if (it.stats()?.visibleAlways == true) {
                     it.statsDisplay(profile).thenApply { bossBar ->
@@ -242,7 +325,7 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
         /**
          * 刷新条目进度
          */
-        fun Task.refreshStats(profile: PlayerProfile) {
+        fun QuestContainer.refreshStats(profile: PlayerProfile) {
             val stats = stats() ?: return
             val statsMap = statsMap.computeIfAbsent(profile.player.name) { StatsMap() }
             mirrorFuture("AddonStats:onContinue") {
