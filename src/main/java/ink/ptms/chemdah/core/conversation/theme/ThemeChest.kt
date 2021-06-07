@@ -1,6 +1,5 @@
 package ink.ptms.chemdah.core.conversation.theme
 
-import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.event.collect.ConversationEvents
 import ink.ptms.chemdah.core.conversation.ConversationManager
 import ink.ptms.chemdah.core.conversation.PlayerReply
@@ -8,7 +7,6 @@ import ink.ptms.chemdah.core.conversation.Session
 import ink.ptms.chemdah.util.asList
 import ink.ptms.chemdah.util.colored
 import ink.ptms.chemdah.util.setIcon
-import io.izzel.taboolib.Version
 import io.izzel.taboolib.module.inject.TListener
 import io.izzel.taboolib.util.Coerce
 import io.izzel.taboolib.util.item.inventory.MenuBuilder
@@ -83,8 +81,12 @@ class ThemeChest : Theme<ThemeChestSetting>(), Listener {
         if (icon != null) {
             setIcon(icon)
         }
+        val build = reply.build(session)
         itemMeta = itemMeta.also { meta ->
-            meta.setDisplayName(meta.displayName.replace("{index}", index.toString()).replace("{playerSide}", reply.build(session)))
+            meta.setDisplayName(meta.displayName.replace("{index}", index.toString()).replace("{playerSide}", build))
+            meta.lore = meta.lore?.map { line ->
+                line.replace("{index}", index.toString()).replace("{playerSide}", build)
+            }
         }
         return this
     }
@@ -100,7 +102,7 @@ class ThemeChest : Theme<ThemeChestSetting>(), Listener {
                 if (line.contains("{npcSide}")) {
                     message.map { line.replace("{npcSide}", it) }
                 } else {
-                    line.asList()
+                    line.toTitle(session).asList()
                 }
             }
         }

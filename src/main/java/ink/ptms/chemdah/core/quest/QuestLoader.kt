@@ -13,6 +13,7 @@ import ink.ptms.chemdah.core.quest.objective.Abstract
 import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.Objective
 import ink.ptms.chemdah.util.mirrorFuture
+import ink.ptms.chemdah.util.warning
 import io.izzel.taboolib.TabooLibLoader
 import io.izzel.taboolib.Version
 import io.izzel.taboolib.compat.kotlin.CompatKotlin
@@ -176,10 +177,17 @@ object QuestLoader {
         if (!file.exists()) {
             Chemdah.plugin.saveResource("core/quest/example.yml", true)
         }
+        val templates = loadTemplate(file)
         ChemdahAPI.questTemplate.clear()
-        ChemdahAPI.questTemplate.putAll(loadTemplate(file).map { it.id to it })
+        ChemdahAPI.questTemplate.putAll(templates.map { it.id to it })
         refreshCache()
-        println("[Chemdah] ${ChemdahAPI.questTemplate.size} template loaded.")
+        println("[Chemdah] ${ChemdahAPI.questTemplate.size} templates loaded.")
+        // 重复检查
+        templates.groupBy { it.id }.forEach { (id, c) ->
+            if (c.size > 1) {
+                warning("${c.size} templates use duplicate id: $id")
+            }
+        }
     }
 
     /**

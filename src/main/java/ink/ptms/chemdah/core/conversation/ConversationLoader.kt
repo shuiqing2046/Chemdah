@@ -5,6 +5,7 @@ import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.conversation.AgentType.Companion.toAgentType
 import ink.ptms.chemdah.util.asList
 import ink.ptms.chemdah.util.asMap
+import ink.ptms.chemdah.util.warning
 import io.izzel.taboolib.module.db.local.SecuredFile
 import io.izzel.taboolib.module.inject.TFunction
 import org.bukkit.configuration.ConfigurationSection
@@ -26,10 +27,17 @@ object ConversationLoader {
         if (!file.exists()) {
             Chemdah.plugin.saveResource("core/conversation/example.yml", true)
         }
+        val conversations = load(file)
         ChemdahAPI.conversation.clear()
-        ChemdahAPI.conversation.putAll(load(file).map { it.id to it })
+        ChemdahAPI.conversation.putAll(conversations.map { it.id to it })
         ChemdahAPI.conversationTheme.values.forEach { it.reloadConfig() }
-        println("[Chemdah] ${ChemdahAPI.conversation.size} conversation loaded.")
+        println("[Chemdah] ${ChemdahAPI.conversation.size} conversations loaded.")
+        // 重复检查
+        conversations.groupBy { it.id }.forEach { (id, c) ->
+            if (c.size > 1) {
+                warning("${c.size} conversations use duplicate id: $id")
+            }
+        }
     }
 
     fun load(file: FileConfiguration): List<Conversation> {
