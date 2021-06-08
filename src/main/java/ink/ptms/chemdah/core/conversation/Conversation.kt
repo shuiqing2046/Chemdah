@@ -144,9 +144,7 @@ data class Conversation(
                 return@also
             }
             try {
-                KetherShell.eval(condition!!.asList().toMutableList().also {
-                    it.add("agent")
-                }, namespace = namespaceConversationNPC) {
+                KetherShell.eval(condition!!, namespace = namespaceConversationNPC) {
                     extend(session.variables)
                 }.thenApply {
                     future.complete(Coerce.toBoolean(it))
