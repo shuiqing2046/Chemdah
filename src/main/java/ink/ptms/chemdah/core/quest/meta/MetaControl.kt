@@ -206,7 +206,7 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
 
     enum class Trigger {
 
-        ACCEPT, FAILURE, COMPLETE;
+        ACCEPT, FAIL, COMPLETE;
 
         companion object {
 

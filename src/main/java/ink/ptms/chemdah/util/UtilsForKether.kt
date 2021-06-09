@@ -7,14 +7,20 @@ import ink.ptms.chemdah.core.conversation.Session
 import ink.ptms.chemdah.core.quest.QuestContainer
 import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.Template
+import ink.ptms.chemdah.core.quest.addon.AddonTrack.Companion.trackQuest
 import ink.ptms.chemdah.module.ui.UI
 import io.izzel.taboolib.cronus.util.StringNumber
+import io.izzel.taboolib.kotlin.kether.Kether.expects
 import io.izzel.taboolib.kotlin.kether.ScriptContext
+import io.izzel.taboolib.kotlin.kether.common.api.ParsedAction
+import io.izzel.taboolib.kotlin.kether.common.api.QuestAction
 import io.izzel.taboolib.kotlin.kether.common.api.QuestContext
+import io.izzel.taboolib.kotlin.kether.common.loader.QuestReader
 import io.izzel.taboolib.kotlin.kether.common.util.LocalizedException
 import io.izzel.taboolib.kotlin.kether.script
 import io.izzel.taboolib.module.locale.TLocale
 import org.bukkit.entity.Player
+import java.util.concurrent.CompletableFuture
 
 val namespaceQuest = listOf(
     "chemdah",
@@ -45,6 +51,10 @@ fun String.colored(): String {
 
 fun List<String>.colored(): List<String> {
     return TLocale.Translate.setColored(this)
+}
+
+fun QuestContext.Frame.getQuestSelected(): String {
+    return variables().get<Any?>("@QuestSelected").orElse(null)?.toString() ?: error("No quest selected.")
 }
 
 fun QuestContext.Frame.getQuestContainer(): QuestContainer {
@@ -112,4 +122,50 @@ fun Throwable.print() {
 fun Any?.increaseAny(any: Any): Any {
     this ?: return any
     return StringNumber(toString()).add(any.toString()).get()
+}
+
+fun QuestReader.switch(func: ExpectDSL.() -> Unit): QuestAction<*> {
+    val ex = ExpectDSL()
+    func(ex)
+    val sel = expects(*ex.method.keys.toTypedArray())
+    return ex.method[sel]!!()
+}
+
+class ExpectDSL {
+
+    val method = HashMap<String, QuestReader.() -> QuestAction<*>>()
+
+    fun case(vararg str: String, func: QuestReader.() -> QuestAction<*>) {
+        str.forEach {
+            method[it] = func
+        }
+    }
+
+    fun actionNow(name: String = "chemdah-action-del", func: QuestContext.Frame.() -> Any?): QuestAction<*> {
+        return object : QuestAction<Any?>() {
+
+            override fun process(frame: QuestContext.Frame): CompletableFuture<Any?> {
+                return CompletableFuture.completedFuture(func(frame))
+            }
+
+            override fun toString(): String {
+                return "QuestDSL($name)"
+            }
+        }
+    }
+
+    fun actionFuture(name: String = "chemdah-action-del", func: QuestContext.Frame.(CompletableFuture<Any?>) -> Any?): QuestAction<*> {
+        return object : QuestAction<Any?>() {
+
+            override fun process(frame: QuestContext.Frame): CompletableFuture<Any?> {
+                val future = CompletableFuture<Any?>()
+                func(frame, future)
+                return future
+            }
+
+            override fun toString(): String {
+                return "QuestDSL($name)"
+            }
+        }
+    }
 }

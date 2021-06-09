@@ -6,7 +6,6 @@ import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.api.ChemdahAPI.isChemdahProfileLoaded
 import ink.ptms.chemdah.api.event.collect.ObjectiveEvents
 import ink.ptms.chemdah.core.PlayerProfile
-import ink.ptms.chemdah.core.quest.QuestLoader.register
 import ink.ptms.chemdah.core.quest.addon.Addon
 import ink.ptms.chemdah.core.quest.meta.Meta
 import ink.ptms.chemdah.core.quest.objective.Abstract
@@ -45,7 +44,7 @@ object QuestLoader {
                     profile.getQuests().forEach { quest ->
                         // 检测超时
                         if (quest.isTimeout) {
-                            quest.failureQuest()
+                            quest.failQuest()
                         } else {
                             // 检查条目自动完成
                             quest.tasks.forEach { task ->

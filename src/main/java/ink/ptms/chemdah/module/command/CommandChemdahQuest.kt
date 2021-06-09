@@ -61,7 +61,7 @@ class CommandChemdahQuest : BaseMainCommand() {
             TLocale.sendTo(sender, "command-quest-not-accepted")
             return
         }
-        quest.failureQuest()
+        quest.failQuest()
     }
 
     @SubCommand(description = "@command-quest-complete", arguments = ["@command-argument-player", "@command-argument-quest"], priority = 1.2)
@@ -91,7 +91,7 @@ class CommandChemdahQuest : BaseMainCommand() {
             TLocale.sendTo(sender, "command-quest-not-accepted")
             return
         }
-        quest.resetQuest()
+        quest.restartQuest()
     }
 
     @SubCommand(description = "@command-quest-stop", arguments = ["@command-argument-player", "@command-argument-quest"], priority = 1.4)

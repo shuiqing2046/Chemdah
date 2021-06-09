@@ -1,11 +1,15 @@
 package ink.ptms.chemdah.module.kether
 
 import ink.ptms.chemdah.api.ChemdahAPI
+import ink.ptms.chemdah.core.quest.addon.AddonStats.Companion.getProgress
 import ink.ptms.chemdah.core.quest.addon.AddonStats.Companion.hiddenStats
 import ink.ptms.chemdah.core.quest.addon.AddonStats.Companion.refreshStats
 import ink.ptms.chemdah.core.quest.addon.AddonStats.Companion.refreshStatusAlwaysType
+import ink.ptms.chemdah.core.quest.addon.AddonTrack.Companion.trackQuest
 import ink.ptms.chemdah.util.getProfile
+import ink.ptms.chemdah.util.getQuestSelected
 import ink.ptms.chemdah.util.increaseAny
+import ink.ptms.chemdah.util.switch
 import io.izzel.taboolib.kotlin.kether.Kether.expects
 import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
@@ -34,45 +38,50 @@ class ActionQuest {
         override fun toString(): String {
             return "Quests(self=$self)"
         }
-
     }
 
-    class QuestDataGet(val quest: ParsedAction<*>, val key: ParsedAction<*>) : QuestAction<Any?>() {
+    class QuestDataKeys : QuestAction<Any?>() {
 
         override fun process(frame: QuestContext.Frame): CompletableFuture<Any?> {
-            val future = CompletableFuture<Any?>()
-            frame.newFrame(quest).run<Any>().thenApply { quest ->
-                frame.newFrame(key).run<Any>().thenApply {
-                    future.complete(frame.getProfile().getQuestById(quest.toString())?.persistentDataContainer?.get(it.toString())?.data)
-                }
-            }
-            return future
+            return CompletableFuture.completedFuture(
+                frame.getProfile().getQuestById(frame.getQuestSelected())?.persistentDataContainer?.keys() ?: emptyList<String>()
+            )
         }
 
         override fun toString(): String {
-            return "QuestDataGet(quest=$quest, key=$key)"
+            return "QuestDataKeys()"
         }
-
     }
 
-    class QuestDataSet(val quest: ParsedAction<*>, val key: ParsedAction<*>, val value: ParsedAction<*>, val symbol: Symbol) : QuestAction<Void>() {
+    class QuestDataGet(val key: ParsedAction<*>) : QuestAction<Any?>() {
+
+        override fun process(frame: QuestContext.Frame): CompletableFuture<Any?> {
+            return frame.newFrame(key).run<Any>().thenApply {
+                frame.getProfile().getQuestById(frame.getQuestSelected())?.persistentDataContainer?.get(it.toString())?.data
+            }
+        }
+
+        override fun toString(): String {
+            return "QuestDataGet(key=$key)"
+        }
+    }
+
+    class QuestDataSet(val key: ParsedAction<*>, val value: ParsedAction<*>, val symbol: Symbol) : QuestAction<Void>() {
 
         override fun process(frame: QuestContext.Frame): CompletableFuture<Void> {
-            return frame.newFrame(quest).run<Any>().thenAccept { quest ->
-                frame.newFrame(key).run<Any>().thenAccept { key ->
-                    frame.newFrame(value).run<Any?>().thenAccept { value ->
-                        val persistentDataContainer = frame.getProfile().getQuestById(quest.toString())?.persistentDataContainer
-                        if (persistentDataContainer != null) {
-                            when {
-                                value == null -> {
-                                    persistentDataContainer.remove(key.toString())
-                                }
-                                symbol == Symbol.ADD -> {
-                                    persistentDataContainer[key.toString()] = persistentDataContainer[key.toString()].increaseAny(value)
-                                }
-                                else -> {
-                                    persistentDataContainer[key.toString()] = value
-                                }
+            return frame.newFrame(key).run<Any>().thenAccept { key ->
+                frame.newFrame(value).run<Any?>().thenAccept { value ->
+                    val persistentDataContainer = frame.getProfile().getQuestById(frame.getQuestSelected())?.persistentDataContainer
+                    if (persistentDataContainer != null) {
+                        when {
+                            value == null -> {
+                                persistentDataContainer.remove(key.toString())
+                            }
+                            symbol == Symbol.ADD -> {
+                                persistentDataContainer[key.toString()] = persistentDataContainer[key.toString()].increaseAny(value)
+                            }
+                            else -> {
+                                persistentDataContainer[key.toString()] = value
                             }
                         }
                     }
@@ -81,110 +90,11 @@ class ActionQuest {
         }
 
         override fun toString(): String {
-            return "QuestDataSet(quest=$quest, key=$key, value=$value, symbol=$symbol)"
+            return "QuestDataSet(key=$key, value=$value, symbol=$symbol)"
         }
-
     }
 
-    class QuestDataKeys(val quest: ParsedAction<*>) : QuestAction<List<String>>() {
-
-        override fun process(frame: QuestContext.Frame): CompletableFuture<List<String>> {
-            return frame.newFrame(quest).run<Any>().thenApply { quest ->
-                frame.getProfile().getQuestById(quest.toString())?.persistentDataContainer?.keys() ?: emptyList()
-            }
-        }
-
-        override fun toString(): String {
-            return "QuestDataKeys(quest=$quest)"
-        }
-
-    }
-
-    class QuestAccept(val quest: ParsedAction<*>, val check: Boolean) : QuestAction<String>() {
-
-        override fun process(frame: QuestContext.Frame): CompletableFuture<String> {
-            val future = CompletableFuture<String>()
-            frame.newFrame(quest).run<Any>().thenApply { quest ->
-                val template = ChemdahAPI.getQuestTemplate(quest.toString())
-                if (template == null) {
-                    future.complete("NULL")
-                } else {
-                    if (check) {
-                        template.checkAccept(frame.getProfile()).thenAccept {
-                            future.complete(it.toString())
-                        }
-                    } else {
-                        template.acceptTo(frame.getProfile()).thenAccept {
-                            future.complete(it.toString())
-                        }
-                    }
-                }
-            }
-            return future
-        }
-
-        override fun toString(): String {
-            return "QuestAccept(quest=$quest, check=$check)"
-        }
-
-    }
-
-    class QuestAccepted(val quest: ParsedAction<*>) : QuestAction<Boolean>() {
-
-        override fun process(frame: QuestContext.Frame): CompletableFuture<Boolean> {
-            return frame.newFrame(quest).run<Any>().thenApply { quest ->
-                frame.getProfile().getQuestById(quest.toString()) != null
-            }
-        }
-
-        override fun toString(): String {
-            return "QuestAccepted(quest=$quest)"
-        }
-
-    }
-
-    class QuestCompleted(val quest: ParsedAction<*>) : QuestAction<Boolean>() {
-
-        override fun process(frame: QuestContext.Frame): CompletableFuture<Boolean> {
-            return frame.newFrame(quest).run<Any>().thenApply { quest ->
-                frame.getProfile().isQuestCompleted(quest.toString())
-            }
-        }
-
-        override fun toString(): String {
-            return "QuestCompleted(quest=$quest)"
-        }
-
-    }
-
-    class QuestActions(val quest: ParsedAction<*>, val action: Action) : QuestAction<Void>() {
-
-        enum class Action {
-
-            COMPLETE, FAILURE, RESET, STOP
-        }
-
-        override fun process(frame: QuestContext.Frame): CompletableFuture<Void> {
-            return frame.newFrame(quest).run<Any>().thenAccept { quest ->
-                val profile = frame.getProfile()
-                profile.getQuestById(quest.toString())?.run {
-                    when (action) {
-                        Action.COMPLETE -> completeQuest()
-                        Action.FAILURE -> failureQuest()
-                        Action.RESET -> resetQuest()
-                        Action.STOP -> profile.unregisterQuest(this)
-                    }
-                }
-            }
-        }
-
-        override fun toString(): String {
-            return "QuestActions(quest=$quest, action=$action)"
-        }
-
-    }
-
-    class QuestStats(val quest: ParsedAction<*>, val task: ParsedAction<*>?, val action: Action) : QuestAction<Void>() {
+    class QuestStats(val task: ParsedAction<*>?, val action: Action) : QuestAction<Void>() {
 
         enum class Action {
 
@@ -192,64 +102,101 @@ class ActionQuest {
         }
 
         override fun process(frame: QuestContext.Frame): CompletableFuture<Void> {
-            return frame.newFrame(quest).run<Any>().thenAccept { quest ->
-                val profile = frame.getProfile()
-                if (task == null) {
-                    profile.getQuestById(quest.toString())?.run {
-                        when (action) {
-                            Action.HIDDEN -> hiddenStats(profile)
-                            Action.REFRESH -> {
-                                template.refreshStats(profile)
-                                refreshStatusAlwaysType(profile)
-                            }
+            val profile = frame.getProfile()
+            if (task == null) {
+                profile.getQuestById(frame.getQuestSelected())?.run {
+                    when (action) {
+                        Action.HIDDEN -> {
+                            hiddenStats(profile)
+                        }
+                        Action.REFRESH -> {
+                            template.refreshStats(profile)
+                            refreshStatusAlwaysType(profile)
                         }
                     }
-                } else {
-                    frame.newFrame(task).run<Any>().thenAccept { task ->
-                        profile.getQuestById(quest.toString())?.run {
-                            if (task.toString() == "all") {
-                                tasks.forEach {
-                                    when (action) {
-                                        Action.HIDDEN -> it.hiddenStats(profile)
-                                        Action.REFRESH -> it.refreshStats(profile)
-                                    }
+                }
+            } else {
+                frame.newFrame(task).run<Any>().thenAccept { task ->
+                    profile.getQuestById(frame.getQuestSelected())?.run {
+                        if (task.toString() == "*") {
+                            tasks.forEach {
+                                when (action) {
+                                    Action.HIDDEN -> it.hiddenStats(profile)
+                                    Action.REFRESH -> it.refreshStats(profile)
                                 }
+                            }
+                            when (action) {
+                                Action.HIDDEN -> hiddenStats(profile)
+                                Action.REFRESH -> template.refreshStats(profile)
+                            }
+                        } else {
+                            getTask(task.toString())?.run {
                                 when (action) {
                                     Action.HIDDEN -> hiddenStats(profile)
-                                    Action.REFRESH -> template.refreshStats(profile)
-                                }
-                            } else {
-                                getTask(task.toString())?.run {
-                                    when (action) {
-                                        Action.HIDDEN -> hiddenStats(profile)
-                                        Action.REFRESH -> refreshStats(profile)
-                                    }
+                                    Action.REFRESH -> refreshStats(profile)
                                 }
                             }
                         }
                     }
                 }
             }
+            return CompletableFuture.completedFuture(null)
         }
 
         override fun toString(): String {
-            return "QuestStats(quest=$quest, task=$task, action=$action)"
+            return "QuestStats(task=$task, action=$action)"
         }
-
     }
 
-    class QuestTasks(val quest: ParsedAction<*>) : QuestAction<List<String>>() {
+    class QuestProgress(val task: ParsedAction<*>?, val action: Action) : QuestAction<Any>() {
 
-        override fun process(frame: QuestContext.Frame): CompletableFuture<List<String>> {
-            return frame.newFrame(quest).run<Any>().thenApply { quest ->
-                ChemdahAPI.getQuestTemplate(quest.toString())?.task?.keys?.toList() ?: emptyList()
+        enum class Action {
+
+            VALUE, TARGET, PERCENT
+        }
+
+        override fun process(frame: QuestContext.Frame): CompletableFuture<Any> {
+            val future = CompletableFuture<Any>()
+            val profile = frame.getProfile()
+            val quest = profile.getQuestById(frame.getQuestSelected())
+            if (quest == null) {
+                future.complete("NULL")
+                return future
             }
+            if (task == null) {
+                quest.template.getProgress(profile).thenAccept { progress ->
+                    future.complete(
+                        when (action) {
+                            Action.VALUE -> progress.value
+                            Action.TARGET -> progress.target
+                            Action.PERCENT -> progress.percent
+                        }
+                    )
+                }
+            } else {
+                frame.newFrame(task).run<Any>().thenAccept { task ->
+                    val t = quest.getTask(task.toString())
+                    if (t == null) {
+                        future.complete("NULL")
+                        return@thenAccept
+                    }
+                    t.getProgress(profile).thenAccept { progress ->
+                        future.complete(
+                            when (action) {
+                                Action.VALUE -> progress.value
+                                Action.TARGET -> progress.target
+                                Action.PERCENT -> progress.percent
+                            }
+                        )
+                    }
+                }
+            }
+            return future
         }
 
         override fun toString(): String {
-            return "QuestTasks(quest=$quest)"
+            return "QuestStats(task=$task, action=$action)"
         }
-
     }
 
     companion object {
@@ -270,37 +217,138 @@ class ActionQuest {
         }
 
         /**
-         * quest [accept|accepted|check-accept|complete|completed|failure|reset|stop] *quest
-         * quest data *quest *key
-         * quest data *quest *key to *value
-         * quest data *quest keys
+         * 选择任务
+         * quest select *quest
          *
-         * quest accept-check *def
+         * 任务控制或判断
+         * quest (accept|accepted|accept-check|complete|completed|fail|restart|stop)
          *
-         * quest stats *quest hidden *1
-         * quest stats *quest refresh *1
+         * 追踪任务
+         * quest track
+         * quest tracking
          *
-         * quest tasks *quest
+         * 任务条目
+         * quest tasks
+         *
+         * 任务数据
+         * quest data {action|*} [(add|increase|to) {action}]
+         *
+         * 任务进度
+         * quest stats (refresh|hidden) [task {action|*}]
+         *
+         * 任务阶段
+         * quest progress (value|target|percent) [task {action}]
          */
         @KetherParser(["quest"])
         fun parser1() = ScriptParser.parser {
-            when (it.expects("accept", "accept-check", "accepted", "complete", "completed", "failure", "reset", "stop", "cancel", "stats", "tasks", "data")) {
-                "accept" -> QuestAccept(it.next(ArgTypes.ACTION), false)
-                "accept-check" -> QuestAccept(it.next(ArgTypes.ACTION), true)
-                "accepted" -> QuestAccepted(it.next(ArgTypes.ACTION))
-                "complete" -> QuestActions(it.next(ArgTypes.ACTION), QuestActions.Action.COMPLETE)
-                "completed" -> QuestCompleted(it.next(ArgTypes.ACTION))
-                "failure" -> QuestActions(it.next(ArgTypes.ACTION), QuestActions.Action.FAILURE)
-                "reset" -> QuestActions(it.next(ArgTypes.ACTION), QuestActions.Action.RESET)
-                "stop", "cancel" -> QuestActions(it.next(ArgTypes.ACTION), QuestActions.Action.STOP)
-                "tasks" -> QuestTasks(it.next(ArgTypes.ACTION))
-                "stats" -> {
+            it.switch {
+                case("select") {
+                    val quest = it.next(ArgTypes.ACTION)
+                    actionNow {
+                        newFrame(quest).run<Any>().thenAccept { r ->
+                            variables().set("@QuestSelected", r.toString())
+                        }
+                    }
+                }
+                case("accept") {
+                    actionFuture { future ->
+                        val template = ChemdahAPI.getQuestTemplate(getQuestSelected())
+                        if (template == null) {
+                            future.complete("NULL")
+                        } else {
+                            template.acceptTo(getProfile()).thenAccept { r ->
+                                future.complete(r.type.toString())
+                            }
+                        }
+                    }
+                }
+                case("accept-check") {
+                    actionFuture { future ->
+                        val template = ChemdahAPI.getQuestTemplate(getQuestSelected())
+                        if (template == null) {
+                            future.complete("NULL")
+                        } else {
+                            template.checkAccept(getProfile()).thenAccept { r ->
+                                future.complete(r.type.toString())
+                            }
+                        }
+                    }
+                }
+                case("accepted") {
+                    actionNow {
+                        getProfile().getQuestById(getQuestSelected()) != null
+                    }
+                }
+                case("complete") {
+                    actionNow {
+                        getProfile().getQuestById(getQuestSelected())?.completeQuest()
+                    }
+                }
+                case("completed") {
+                    actionNow {
+                        getProfile().isQuestCompleted(getQuestSelected())
+                    }
+                }
+                case("fail", "failure") {
+                    actionNow {
+                        getProfile().getQuestById(getQuestSelected())?.failQuest()
+                    }
+                }
+                case("reset", "restart") {
+                    actionNow {
+                        getProfile().getQuestById(getQuestSelected())?.restartQuest()
+                    }
+                }
+                case("stop", "cancel") {
+                    actionNow {
+                        getProfile().unregisterQuest(getProfile().getQuestById(getQuestSelected()) ?: return@actionNow null)
+                    }
+                }
+                case("track") {
+                    actionNow {
+                        val template = ChemdahAPI.getQuestTemplate(getQuestSelected())
+                        if (template != null) {
+                            getProfile().trackQuest = template
+                        }
+                    }
+                }
+                case("tracking") {
+                    actionNow {
+                        getProfile().trackQuest?.id
+                    }
+                }
+                case("tasks") {
+                    actionNow {
+                        ChemdahAPI.getQuestTemplate(getQuestSelected())?.task?.keys ?: emptyList<String>()
+                    }
+                }
+                case("data") {
+                    try {
+                        it.mark()
+                        it.expect("*")
+                        QuestDataKeys()
+                    } catch (ex: Throwable) {
+                        it.reset()
+                        val key = it.next(ArgTypes.ACTION)
+                        try {
+                            it.mark()
+                            when (it.expects("to", "add", "increase")) {
+                                "to" -> QuestDataSet(key, it.next(ArgTypes.ACTION), Symbol.SET)
+                                "add", "increase" -> QuestDataSet(key, it.next(ArgTypes.ACTION), Symbol.ADD)
+                                else -> error("out of case")
+                            }
+                        } catch (ex: Throwable) {
+                            it.reset()
+                            QuestDataGet(key)
+                        }
+                    }
+                }
+                case("stats", "status") {
                     val action = when (it.expects("refresh", "hide", "hidden")) {
                         "refresh" -> QuestStats.Action.REFRESH
                         "hide", "hidden" -> QuestStats.Action.HIDDEN
                         else -> error("out of case")
                     }
-                    val quest = it.next(ArgTypes.ACTION)
                     val task = try {
                         it.mark()
                         it.expect("task")
@@ -309,31 +357,25 @@ class ActionQuest {
                         it.reset()
                         null
                     }
-                    QuestStats(quest, task, action)
+                    QuestStats(task, action)
                 }
-                "data" -> {
-                    val quest = it.next(ArgTypes.ACTION)
-                    try {
-                        it.mark()
-                        it.expect("keys")
-                        QuestDataKeys(quest)
-                    } catch (ex: Throwable) {
-                        it.reset()
-                        val key = it.next(ArgTypes.ACTION)
-                        try {
-                            it.mark()
-                            when (it.expects("to", "add", "increase")) {
-                                "to" -> QuestDataSet(quest, key, it.next(ArgTypes.ACTION), Symbol.SET)
-                                "add", "increase" -> QuestDataSet(quest, key, it.next(ArgTypes.ACTION), Symbol.ADD)
-                                else -> error("out of case")
-                            }
-                        } catch (ex: Throwable) {
-                            it.reset()
-                            QuestDataGet(quest, key)
-                        }
+                case("progress") {
+                    val action = when (it.expects("value", "target", "percent")) {
+                        "value" -> QuestProgress.Action.VALUE
+                        "target" -> QuestProgress.Action.TARGET
+                        "percent" -> QuestProgress.Action.PERCENT
+                        else -> error("out of case")
                     }
+                    val task = try {
+                        it.mark()
+                        it.expect("task")
+                        it.next(ArgTypes.ACTION)
+                    } catch (ex: Exception) {
+                        it.reset()
+                        null
+                    }
+                    QuestProgress(task, action)
                 }
-                else -> error("out of case")
             }
         }
     }
