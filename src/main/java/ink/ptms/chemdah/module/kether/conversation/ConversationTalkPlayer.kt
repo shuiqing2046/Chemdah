@@ -19,9 +19,9 @@ import java.util.concurrent.CompletableFuture
 class ConversationTalkPlayer(val token: String) : QuestAction<Void>() {
 
     override fun process(frame: QuestContext.Frame): CompletableFuture<Void> {
+        val session = frame.getSession()
         try {
             KetherFunction.parse(token, namespace = namespaceConversationPlayer) { extend(frame.vars()) }.run {
-                val session = frame.getSession()
                 val theme = session.conversation.option.instanceTheme
                 if (theme.allowFarewell()) {
                     session.npcSide.clear()

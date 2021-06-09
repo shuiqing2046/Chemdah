@@ -12,6 +12,7 @@ import io.izzel.taboolib.module.ai.SimpleAiSelector
 import io.izzel.taboolib.module.config.TConfig
 import io.izzel.taboolib.module.i18n.I18n
 import io.izzel.taboolib.module.inject.*
+import io.izzel.taboolib.util.Baffle
 import io.lumine.xikage.mythicmobs.MythicMobs
 import io.lumine.xikage.mythicmobs.mobs.ActiveMob
 import net.citizensnpcs.api.CitizensAPI
@@ -28,6 +29,7 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.TimeUnit
 
 /**
  * Chemdah
@@ -48,6 +50,9 @@ object ConversationManager : Listener {
 
     @PlayerContainer
     val sessions = ConcurrentHashMap<String, Session>()
+
+    @PlayerContainer
+    val cooldown = Baffle.of(500, TimeUnit.MILLISECONDS)
 
     fun getConversation(namespace: String, name: String) = ChemdahAPI.conversation.values.firstOrNull { it.isNPC(namespace, name) }
 
@@ -164,7 +169,7 @@ object ConversationManager : Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private fun e(e: PlayerInteractAtEntityEvent) {
-        if (e.hand == EquipmentSlot.HAND && e.player.conversationSession == null) {
+        if (e.hand == EquipmentSlot.HAND && e.player.conversationSession == null && cooldown.hasNext(e.player.name)) {
             val name = I18n.get().getName(e.rightClicked)
             val conversation = getConversation("minecraft", name) ?: return
             val origin = e.rightClicked.location.add(0.0, e.rightClicked.height, 0.0)
@@ -203,7 +208,7 @@ object ConversationManager : Listener {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         fun e(e: AdyeshachEntityInteractEvent) {
-            if (e.isMainHand && e.player.conversationSession == null) {
+            if (e.isMainHand && e.player.conversationSession == null && cooldown.hasNext(e.player.name)) {
                 getConversation("adyeshach", e.entity.id)?.run {
                     e.isCancelled = true
                     Tasks.task {
@@ -231,7 +236,7 @@ object ConversationManager : Listener {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         fun e(e: PlayerInteractAtEntityEvent) {
-            if (e.hand == EquipmentSlot.HAND && e.rightClicked.hasMetadata("NPC") && e.player.conversationSession == null) {
+            if (e.hand == EquipmentSlot.HAND && e.rightClicked.hasMetadata("NPC") && e.player.conversationSession == null && cooldown.hasNext(e.player.name)) {
                 val npc = CitizensAPI.getNPCRegistry().getNPC(e.rightClicked) ?: return
                 getConversation("citizens", npc.id.toString())?.run {
                     e.isCancelled = true
@@ -254,7 +259,7 @@ object ConversationManager : Listener {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         fun e(e: PlayerInteractAtEntityEvent) {
-            if (e.hand == EquipmentSlot.HAND && e.rightClicked is LivingEntity && e.player.conversationSession == null) {
+            if (e.hand == EquipmentSlot.HAND && e.rightClicked is LivingEntity && e.player.conversationSession == null && cooldown.hasNext(e.player.name)) {
                 val mob = MythicMobs.inst().mobManager.getMythicMobInstance(e.rightClicked) ?: return
                 getConversation("mythicmobs", mob.type.internalName)?.run {
                     e.isCancelled = true
