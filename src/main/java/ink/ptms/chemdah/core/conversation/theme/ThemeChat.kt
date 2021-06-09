@@ -83,7 +83,7 @@ class ThemeChat : Theme<ThemeChatSettings>(), Listener {
                 if (select != index) {
                     session.playerSide = replies[select]
                     settings.playSelectSound(session)
-                    CompletableFuture<Void>().npcTalk(session, session.npcSide, "", session.npcSide.size, end = true, canReply = true)
+                    CompletableFuture<Void>().npcTalk(session, session.npcSide, "", session.npcSide.size, end = true, canReply = !session.isFarewell)
                 }
             }
         }
@@ -158,7 +158,7 @@ class ThemeChat : Theme<ThemeChatSettings>(), Listener {
                             future.npcTalk(session, message, printText, index, printLine + 1 == messageText.size, canReply)
                         } else if (!cancel) {
                             cancel = true
-                            future.npcTalk(session, session.npcSide, "", session.npcSide.size, end = true, canReply = true)
+                            future.npcTalk(session, session.npcSide, "", session.npcSide.size, end = true, canReply = !session.isFarewell)
                             future.complete(null)
                         }
                     } else if (!cancel) {

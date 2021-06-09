@@ -24,6 +24,9 @@ class ConversationTalkPlayer(val token: String) : QuestAction<Void>() {
                 val session = frame.getSession()
                 val theme = session.conversation.option.instanceTheme
                 if (theme.allowFarewell()) {
+                    session.npcSide.clear()
+                    session.npcSide.add(colored())
+                    session.isFarewell = true
                     return theme.onDisplay(session, listOf(colored()), false)
                 } else {
                     session.player.sendHolographic(session.origin.clone().add(0.0, 0.25, 0.0), "&7$this")

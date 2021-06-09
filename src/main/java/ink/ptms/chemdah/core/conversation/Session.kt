@@ -47,6 +47,7 @@ data class Session(
 
     var isNext = false
     var isClosed = false
+    var isFarewell = false
 
     val beginTime = System.currentTimeMillis();
 
