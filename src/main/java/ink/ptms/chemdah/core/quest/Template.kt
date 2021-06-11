@@ -3,11 +3,13 @@ package ink.ptms.chemdah.core.quest
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.event.collect.QuestEvents
 import ink.ptms.chemdah.core.PlayerProfile
+import ink.ptms.chemdah.core.quest.addon.AddonControl
+import ink.ptms.chemdah.core.quest.addon.AddonControl.Companion.control
 import ink.ptms.chemdah.core.quest.meta.Meta
-import ink.ptms.chemdah.core.quest.meta.MetaControl
-import ink.ptms.chemdah.core.quest.meta.MetaControl.Companion.control
 import ink.ptms.chemdah.util.asList
 import ink.ptms.chemdah.util.mirrorFuture
+import ink.ptms.chemdah.util.warning
+import io.izzel.taboolib.util.Reflection
 import org.bukkit.configuration.ConfigurationSection
 import java.util.concurrent.CompletableFuture
 
@@ -23,17 +25,17 @@ class Template(id: String, config: ConfigurationSection) : QuestContainer(id, co
     /**
      * 所有任务条目
      */
-    val task = config.getKeys(false)
-        .filter { it.startsWith("task:") }
-        .map {
-            val taskId = it.substring("task:".length)
-            taskId to Task(taskId, config.getConfigurationSection(it)!!, this)
-        }.toMap()
+    val taskMap = HashMap<String, Task>()
 
     /**
      * 元数据引用
      */
     private val metaImport = config.get("meta.import")?.asList() ?: emptyList()
+
+    init {
+        config.getKeys(false).filter { it.startsWith("task:") }.forEach { loadTask(it.substring("task:".length), it) }
+        config.getConfigurationSection("task")?.getKeys(false)?.forEach { node -> loadTask(node) }
+    }
 
     /**
      * 获取包含模板导入 (import) 的所有任务元数据
@@ -58,7 +60,7 @@ class Template(id: String, config: ConfigurationSection) : QuestContainer(id, co
             if (it.type == AcceptResult.Type.SUCCESSFUL) {
                 val quest = Quest(id, profile)
                 val control = control()
-                control.signature(profile, MetaControl.Trigger.ACCEPT)
+                control.signature(profile, AddonControl.Trigger.ACCEPT)
                 profile.registerQuest(quest)
                 agent(profile, AgentType.QUEST_ACCEPTED)
                 QuestEvents.Accept.Post(quest, profile).call()
@@ -104,5 +106,9 @@ class Template(id: String, config: ConfigurationSection) : QuestContainer(id, co
             }
         }
         return future
+    }
+
+    private fun loadTask(taskId: String, taskNode: String = "task.$taskId") {
+        taskMap[taskId] = Task(taskId, config.getConfigurationSection(taskNode)!!, this)
     }
 }

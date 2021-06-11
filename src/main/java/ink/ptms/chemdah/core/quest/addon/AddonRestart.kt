@@ -1,8 +1,10 @@
-package ink.ptms.chemdah.core.quest.meta
+package ink.ptms.chemdah.core.quest.addon
 
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Id
+import ink.ptms.chemdah.core.quest.Option
 import ink.ptms.chemdah.core.quest.QuestContainer
+import ink.ptms.chemdah.core.quest.Template
 import ink.ptms.chemdah.util.asList
 import ink.ptms.chemdah.util.mirrorFuture
 import ink.ptms.chemdah.util.namespaceQuest
@@ -12,16 +14,16 @@ import java.util.concurrent.CompletableFuture
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.quest.meta.MetaRestart
+ * ink.ptms.chemdah.core.quest.addon.MetaRestart
  *
  * @author sky
  * @since 2021/3/1 11:47 下午
  */
 @Id("restart")
-@MetaType(MetaType.Type.ANY)
-class MetaRestart(source: Any?, questContainer: QuestContainer) : Meta<Any?>(source, questContainer) {
+@Option(Option.Type.ANY)
+class AddonRestart(root: Any?, template: Template) : Addon(root, template) {
 
-    val restart = source?.asList() ?: emptyList()
+    val restart = root?.asList() ?: emptyList()
 
     companion object {
 
@@ -31,7 +33,7 @@ class MetaRestart(source: Any?, questContainer: QuestContainer) : Meta<Any?>(sou
         fun QuestContainer.canRestart(profile: PlayerProfile): CompletableFuture<Boolean> {
             return CompletableFuture<Boolean>().also { future ->
                 mirrorFuture("AddonRestart:checkRestart") {
-                    val reset = meta<MetaRestart>("restart")?.restart
+                    val reset = addon<AddonRestart>("restart")?.restart
                     if (reset == null || reset.isEmpty()) {
                         future.complete(false)
                         finish()

@@ -1,35 +1,26 @@
 package ink.ptms.chemdah.core.quest.meta
 
-import ink.ptms.chemdah.util.warning
-import org.bukkit.configuration.ConfigurationSection
+import ink.ptms.chemdah.core.quest.Id
+import ink.ptms.chemdah.core.quest.Option
+import ink.ptms.chemdah.core.quest.QuestContainer
+import ink.ptms.chemdah.core.quest.Template
+import ink.ptms.chemdah.util.asList
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.quest.meta.MetaType
+ * ink.ptms.chemdah.core.quest.meta.MetaAliases
  *
  * @author sky
- * @since 2021/3/4 12:45 上午
+ * @since 2021/3/1 11:47 下午
  */
-annotation class MetaType(val type: Type) {
+@Id("type")
+@Option(Option.Type.ANY)
+class MetaType(source: Any?, questContainer: QuestContainer) : Meta<Any?>(source, questContainer) {
 
-    enum class Type {
+    val type = source?.asList() ?: emptyList()
 
-        LIST, MAP_LIST, SECTION, TEXT, NUMBER, ANY;
+    companion object {
 
-        operator fun get(config: ConfigurationSection, node: String): Any? {
-            try {
-                return when (this) {
-                    LIST -> config.getList(node)
-                    MAP_LIST -> config.getMapList(node)
-                    SECTION -> config.getConfigurationSection(node)
-                    TEXT -> config.getString(node)
-                    NUMBER -> config.getDouble(node)
-                    ANY -> config.get(node)
-                }
-            } catch (e: Throwable) {
-                warning("${config.get(node)} (${config.get(node)?.javaClass?.simpleName}) cannot cast to $this ($node)")
-            }
-            return null
-        }
+        fun Template.type() = meta<MetaType>("type")?.type ?: emptyList()
     }
 }

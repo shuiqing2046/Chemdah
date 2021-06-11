@@ -1,6 +1,7 @@
 package ink.ptms.chemdah.core.quest.meta
 
 import ink.ptms.chemdah.core.quest.Id
+import ink.ptms.chemdah.core.quest.Option
 import ink.ptms.chemdah.core.quest.QuestContainer
 import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.util.colored
@@ -13,7 +14,7 @@ import ink.ptms.chemdah.util.colored
  * @since 2021/3/1 11:47 下午
  */
 @Id("name")
-@MetaType(MetaType.Type.TEXT)
+@Option(Option.Type.TEXT)
 class MetaName(source: String?, questContainer: QuestContainer) : Meta<String?>(source, questContainer) {
 
     val displayName = source?.colored()

@@ -1,13 +1,12 @@
-package ink.ptms.chemdah.core.quest.meta
+package ink.ptms.chemdah.core.quest.addon
 
 import com.google.common.base.Enums
 import ink.ptms.chemdah.api.event.collect.TemplateEvents
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Id
-import ink.ptms.chemdah.core.quest.QuestContainer
+import ink.ptms.chemdah.core.quest.Option
 import ink.ptms.chemdah.core.quest.Template
-import ink.ptms.chemdah.core.quest.meta.MetaAlias.Companion.alias
-import ink.ptms.chemdah.core.quest.meta.MetaLabel.Companion.label
+import ink.ptms.chemdah.core.quest.meta.MetaType.Companion.type
 import ink.ptms.chemdah.util.*
 import io.izzel.taboolib.cronus.util.Time
 import io.izzel.taboolib.kotlin.kether.KetherShell
@@ -16,27 +15,26 @@ import java.util.concurrent.CompletableFuture
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.quest.meta.MetaControl
+ * ink.ptms.chemdah.core.quest.addon.MetaControl
  *
  * @author sky
  * @since 2021/3/1 11:47 下午
  */
-@Suppress("UNCHECKED_CAST")
 @Id("control")
-@MetaType(MetaType.Type.MAP_LIST)
-class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer) : Meta<List<Map<String, Any>>>(source, questContainer) {
+@Option(Option.Type.MAP_LIST)
+class AddonControl(root: List<Map<String, Any>>, template: Template) : Addon(root, template) {
 
     val control = ArrayList<Control>()
 
     init {
-        source.forEach { map ->
+        root.forEach { map ->
             if (map["$"] != null) {
                 control += ControlAgent(map["$"]!!.asList())
             } else {
                 val type = map["type"].toString().toLowerCase()
                 when {
                     type == "coexist" -> {
-                        ControlCoexist(map["alias"].asInt(), map["label"].asMap().map { it.key to it.value.asInt() }.toMap())
+                        ControlCoexist(map["amount"].asMap().map { it.key to it.value.asInt() }.toMap())
                     }
                     type.startsWith("repeat") -> {
                         val trigger = Trigger.fromName(type.substring("repeat".length).trim())
@@ -90,7 +88,7 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
                 }
             } catch (e: Throwable) {
                 e.print()
-                CompletableFuture.completedFuture(false.toResult("agent"))
+                CompletableFuture.completedFuture(Result(false, "agent"))
             }
         }
 
@@ -115,22 +113,17 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
         }
     }
 
-    class ControlCoexist(val alias: Int, val label: Map<String, Int>) : Control() {
+    class ControlCoexist(val type: Map<String, Int>) : Control() {
 
         override val trigger: Trigger?
             get() = null
 
         override fun check(profile: PlayerProfile, template: Template): CompletableFuture<Result> {
-            if (alias > 0) {
-                val a = template.alias()
-                if (a != null && profile.getQuests().count { it.template.alias() == a } >= alias) {
-                    return CompletableFuture.completedFuture(false.toResult("coexist"))
-                }
+            return if (type.any { label -> profile.getQuests().count { label.key in it.template.type() } > label.value }) {
+                CompletableFuture.completedFuture(Result(false, "coexist"))
+            } else {
+                CompletableFuture.completedFuture(Result(true, "coexist"))
             }
-            if (label.any { label -> profile.getQuests().count { label.key in it.template.label() } > label.value }) {
-                return CompletableFuture.completedFuture(false.toResult("coexist"))
-            }
-            return CompletableFuture.completedFuture(true.toResult("coexist"))
         }
 
         override fun signature(profile: PlayerProfile, template: Template) {
@@ -147,7 +140,7 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
             val time = profile.persistentDataContainer["$id.time", 0L].toLong()
             // 超出重复限时
             if (period != null && period.`in`(time).isTimeout(time)) {
-                return CompletableFuture.completedFuture(true.toResult("repeat"))
+                return CompletableFuture.completedFuture(Result(true, "repeat"))
             }
             return CompletableFuture.completedFuture((profile.persistentDataContainer["$id.amount", 0].toInt() < amount).toResult("repeat"))
         }
@@ -216,6 +209,6 @@ class MetaControl(source: List<Map<String, Any>>, questContainer: QuestContainer
 
     companion object {
 
-        fun Template.control() = ControlOperator(this, meta<MetaControl>("control")?.control)
+        fun Template.control() = ControlOperator(this, addon<AddonControl>("control")?.control)
     }
 }

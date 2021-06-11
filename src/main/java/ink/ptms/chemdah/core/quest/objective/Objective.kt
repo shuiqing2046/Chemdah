@@ -6,7 +6,7 @@ import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.AgentType
 import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.core.quest.Task
-import ink.ptms.chemdah.core.quest.meta.MetaRestart.Companion.canRestart
+import ink.ptms.chemdah.core.quest.addon.AddonRestart.Companion.canRestart
 import ink.ptms.chemdah.util.mirrorFuture
 import ink.ptms.chemdah.util.safely
 import org.bukkit.entity.Player

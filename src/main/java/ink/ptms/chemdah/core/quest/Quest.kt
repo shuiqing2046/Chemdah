@@ -5,10 +5,10 @@ import ink.ptms.chemdah.api.event.collect.ObjectiveEvents
 import ink.ptms.chemdah.api.event.collect.QuestEvents
 import ink.ptms.chemdah.core.DataContainer
 import ink.ptms.chemdah.core.PlayerProfile
-import ink.ptms.chemdah.core.quest.meta.MetaControl
-import ink.ptms.chemdah.core.quest.meta.MetaControl.Companion.control
-import ink.ptms.chemdah.core.quest.meta.MetaRestart.Companion.canRestart
-import ink.ptms.chemdah.core.quest.meta.MetaTimeout.Companion.isTimeout
+import ink.ptms.chemdah.core.quest.addon.AddonControl
+import ink.ptms.chemdah.core.quest.addon.AddonControl.Companion.control
+import ink.ptms.chemdah.core.quest.addon.AddonRestart.Companion.canRestart
+import ink.ptms.chemdah.core.quest.addon.AddonTimeout.Companion.isTimeout
 import ink.ptms.chemdah.util.mirrorFuture
 import org.bukkit.entity.Player
 
@@ -37,13 +37,13 @@ class Quest(val id: String, val profile: PlayerProfile, val persistentDataContai
      * 任务是否完成（完成签名）
      */
     val isCompleted: Boolean
-        get() = isValid && template.task.all { it.value.objective.hasCompletedSignature(profile, it.value) }
+        get() = isValid && template.taskMap.all { it.value.objective.hasCompletedSignature(profile, it.value) }
 
     /**
      * 获取所有条目
      */
     val tasks: Collection<Task>
-        get() = template.task.values
+        get() = template.taskMap.values
 
     /**
      * 任务开始时间
@@ -93,7 +93,7 @@ class Quest(val id: String, val profile: PlayerProfile, val persistentDataContai
                             if (it) {
                                 profile.persistentDataContainer["quest.complete.$id"] = System.currentTimeMillis()
                                 profile.unregisterQuest(this@Quest)
-                                template.control().signature(profile, MetaControl.Trigger.COMPLETE)
+                                template.control().signature(profile, AddonControl.Trigger.COMPLETE)
                                 template.agent(profile, AgentType.QUEST_COMPLETED)
                                 QuestEvents.Complete.Post(this@Quest, profile).call()
                             }
@@ -124,7 +124,7 @@ class Quest(val id: String, val profile: PlayerProfile, val persistentDataContai
                 template.agent(profile, AgentType.QUEST_FAIL).thenAccept {
                     if (it) {
                         profile.unregisterQuest(this@Quest)
-                        template.control().signature(profile, MetaControl.Trigger.FAIL)
+                        template.control().signature(profile, AddonControl.Trigger.FAIL)
                         template.agent(profile, AgentType.QUEST_FAILED)
                         QuestEvents.Fail.Post(this@Quest, profile).call()
                     }

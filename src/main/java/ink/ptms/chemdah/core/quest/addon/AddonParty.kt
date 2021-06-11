@@ -1,6 +1,7 @@
 package ink.ptms.chemdah.core.quest.addon
 
 import ink.ptms.chemdah.core.quest.Id
+import ink.ptms.chemdah.core.quest.Option
 import ink.ptms.chemdah.core.quest.QuestContainer
 import org.bukkit.configuration.ConfigurationSection
 
@@ -12,6 +13,7 @@ import org.bukkit.configuration.ConfigurationSection
  * @since 2021/3/11 9:05 上午
  */
 @Id("party")
+@Option(Option.Type.SECTION)
 class AddonParty(config: ConfigurationSection, questContainer: QuestContainer) : Addon(config, questContainer) {
 
     /**

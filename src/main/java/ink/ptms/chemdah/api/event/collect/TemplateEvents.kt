@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.api.event.collect
 
 import ink.ptms.chemdah.core.quest.Template
-import ink.ptms.chemdah.core.quest.meta.MetaControl
+import ink.ptms.chemdah.core.quest.addon.AddonControl
 import io.izzel.taboolib.module.event.EventNormal
 
 /**
@@ -15,6 +15,6 @@ class TemplateEvents {
 
     class ControlHook(val template: Template, val type: String, val map: Map<String, Any>): EventNormal<ControlHook>(true) {
 
-        var control: MetaControl.Control? = null
+        var control: AddonControl.Control? = null
     }
 }

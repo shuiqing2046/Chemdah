@@ -319,7 +319,7 @@ class ActionQuest {
                 }
                 case("tasks") {
                     actionNow {
-                        ChemdahAPI.getQuestTemplate(getQuestSelected())?.task?.keys ?: emptyList<String>()
+                        ChemdahAPI.getQuestTemplate(getQuestSelected())?.taskMap?.keys ?: emptyList<String>()
                     }
                 }
                 case("data") {

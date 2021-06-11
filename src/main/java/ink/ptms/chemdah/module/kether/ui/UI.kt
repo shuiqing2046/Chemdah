@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.module.kether.ui
 
 import ink.ptms.chemdah.api.ChemdahAPI
-import ink.ptms.chemdah.core.quest.meta.MetaLabel.Companion.label
+import ink.ptms.chemdah.core.quest.meta.MetaType.Companion.type
 import ink.ptms.chemdah.util.UI
 import ink.ptms.chemdah.util.colored
 import ink.ptms.chemdah.util.getProfile
@@ -27,7 +27,7 @@ class UI {
 
         override fun process(frame: QuestContext.Frame): CompletableFuture<String> {
             val profile = frame.getProfile()
-            val quests = ChemdahAPI.questTemplate.filter { (_, v) -> v.label().any { it in include } && v.label().none { it in exclude } }.values.toList()
+            val quests = ChemdahAPI.questTemplate.filter { (_, v) -> v.type().any { it in include } && v.type().none { it in exclude } }.values.toList()
             val percent = quests.count { profile.isQuestCompleted(it) } / quests.size.toDouble()
             val ui = frame.UI()
             val empty = ui.config.getString("bar.$plan.empty", "&8|")!!.colored()
@@ -48,7 +48,7 @@ class UI {
 
         override fun process(frame: QuestContext.Frame): CompletableFuture<String> {
             val profile = frame.getProfile()
-            val quests = ChemdahAPI.questTemplate.filter { (_, v) -> v.label().any { it in include } && v.label().none { it in exclude } }.values.toList()
+            val quests = ChemdahAPI.questTemplate.filter { (_, v) -> v.type().any { it in include } && v.type().none { it in exclude } }.values.toList()
             val percent = quests.count { profile.isQuestCompleted(it) } / quests.size.toDouble()
             return if (percent.isNaN()) {
                 CompletableFuture.completedFuture("0")

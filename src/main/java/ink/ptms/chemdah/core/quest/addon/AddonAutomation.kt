@@ -4,10 +4,7 @@ import com.google.common.base.Enums
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.api.ChemdahAPI.isChemdahProfileLoaded
-import ink.ptms.chemdah.core.quest.AcceptResult
-import ink.ptms.chemdah.core.quest.Id
-import ink.ptms.chemdah.core.quest.QuestContainer
-import ink.ptms.chemdah.core.quest.Template
+import ink.ptms.chemdah.core.quest.*
 import ink.ptms.chemdah.util.mirrorFuture
 import io.izzel.taboolib.module.inject.TSchedule
 import io.izzel.taboolib.util.Coerce
@@ -27,6 +24,7 @@ import kotlin.random.Random
  * @since 2021/3/1 11:47 下午
  */
 @Id("automation")
+@Option(Option.Type.SECTION)
 class AddonAutomation(source: ConfigurationSection, questContainer: QuestContainer) : Addon(source, questContainer) {
 
     class Plan(val type: PlanType, val count: Int, val group: String?) {

@@ -37,6 +37,7 @@ import java.util.concurrent.atomic.AtomicReference
  * @since 2021/3/5 11:14 上午
  */
 @Id("stats")
+@Option(Option.Type.SECTION)
 class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) : Addon(config, questContainer) {
 
     class StatsMap {
@@ -53,12 +54,12 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
     /**
      * 是否可见（一段时间后隐藏）
      */
-    val visible = config.getBoolean("visible")
+    val visible = config.get("visible") == "true"
 
     /**
      * 是否持续可见
      */
-    val visibleAlways = config.getBoolean("visible-always")
+    val visibleAlways = config.get("visible") == "always"
 
     /**
      * BOSS 音效
@@ -142,7 +143,7 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
         }
         return if (questContainer is Template) {
             val future = CompletableFuture<Progress>()
-            val tasks = questContainer.task.values.toList()
+            val tasks = questContainer.taskMap.values.toList()
             var p = Progress.empty
             fun process(cur: Int) {
                 if (cur < tasks.size) {
@@ -260,9 +261,9 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
             return when (this) {
                 is Template -> {
                     var p = Progress.empty
-                    task.forEach { (_, task) ->
+                    taskMap.forEach { (_, task) ->
                         val tp = task.objective.getProgress(profile, task)
-                        p = Progress(p.value.increaseAny(tp.value), p.target.increaseAny(tp.target), p.percent + (tp.percent / this.task.size))
+                        p = Progress(p.value.increaseAny(tp.value), p.target.increaseAny(tp.target), p.percent + (tp.percent / this.taskMap.size))
                     }
                     CompletableFuture.completedFuture(p)
                 }

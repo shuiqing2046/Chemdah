@@ -15,7 +15,7 @@ object Metrics {
         metrics.addCustomChart(BMetrics.AdvancedPie("objectives") {
             HashMap<String, Int>().also { map ->
                 ChemdahAPI.questTemplate.forEach { template ->
-                    template.value.task.forEach {
+                    template.value.taskMap.forEach {
                         map[it.value.objective.name] = (map[it.value.objective.name] ?: 0) + 1
                     }
                 }
@@ -24,8 +24,8 @@ object Metrics {
         metrics.addCustomChart(BMetrics.AdvancedPie("addon") {
             HashMap<String, Int>().also { map ->
                 ChemdahAPI.questTemplate.forEach { template ->
-                    template.value.task.forEach { task ->
-                        task.value.addons.forEach {
+                    template.value.taskMap.forEach { task ->
+                        task.value.addonMap.keys.forEach {
                             map[it] = (map[it] ?: 0) + 1
                         }
                     }
@@ -35,7 +35,7 @@ object Metrics {
         metrics.addCustomChart(BMetrics.AdvancedPie("agent") {
             HashMap<String, Int>().also { map ->
                 ChemdahAPI.questTemplate.forEach { template ->
-                    template.value.task.forEach { task ->
+                    template.value.taskMap.forEach { task ->
                         task.value.agents.forEach {
                             map[it] = (map[it] ?: 0) + 1
                         }

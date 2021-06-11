@@ -48,6 +48,7 @@ import java.util.concurrent.ConcurrentHashMap
  * @since 2021/3/11 9:05 上午
  */
 @Id("track")
+@Option(Option.Type.SECTION)
 class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) : Addon(config, questContainer) {
 
     class ScoreboardContent(val content: List<String>) {
@@ -138,7 +139,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
          * 任务允许被追踪
          */
         fun QuestContainer.allowTracked() = when (this) {
-            is Template -> track() != null || task.values.any { it.track() != null }
+            is Template -> track() != null || taskMap.values.any { it.track() != null }
             is Task -> track() != null
             else -> error("out of case")
         }
@@ -195,7 +196,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                 }
                 // 反之追踪任务条目
                 else {
-                    quest.task.forEach sub@{ (_, task) ->
+                    quest.taskMap.forEach sub@{ (_, task) ->
                         val track = task.track() ?: return@sub
                         // 条目尚未完成
                         if (!task.isCompleted(chemdahProfile)) {
@@ -289,7 +290,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
             if (chemdahProfile.getQuestById(quest.id) == null) {
                 refreshTrackingNavigation(quest.track() ?: return, quest.path, true)
             } else {
-                quest.task.forEach { (_, task) ->
+                quest.taskMap.forEach { (_, task) ->
                     refreshTrackingNavigation(task.track() ?: return@forEach, task.path, !task.isCompleted(chemdahProfile))
                 }
             }
@@ -342,7 +343,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                 }
             } else {
                 // 任意子条目启用 Scoreboard 追踪
-                if (quest.task.any { it.value.track()?.scoreboard == true }) {
+                if (quest.taskMap.any { it.value.track()?.scoreboard == true }) {
                     sendScoreboard("")
                 }
             }
@@ -377,7 +378,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                 } else {
                     (quest.track()?.scoreboardContent ?: defaultContent).flatMap {
                         if (it.isQuestFormat) {
-                            quest.task.flatMap { (_, task) ->
+                            quest.taskMap.flatMap { (_, task) ->
                                 val taskTrack = task.track()
                                 if (taskTrack != null && !task.isCompleted(chemdahProfile)) {
                                     it.content.flatMap { contentLine ->

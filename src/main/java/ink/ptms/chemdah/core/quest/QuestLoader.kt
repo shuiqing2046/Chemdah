@@ -165,7 +165,7 @@ object QuestLoader {
      */
     fun refreshCache() {
         ChemdahAPI.questObjective.forEach { it.value.using = false }
-        ChemdahAPI.questTemplate.forEach { t -> t.value.task.forEach { it.value.objective.using = true } }
+        ChemdahAPI.questTemplate.forEach { t -> t.value.taskMap.forEach { it.value.objective.using = true } }
     }
 
     /**
