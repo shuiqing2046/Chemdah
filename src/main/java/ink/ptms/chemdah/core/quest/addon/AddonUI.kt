@@ -4,6 +4,7 @@ import ink.ptms.chemdah.core.quest.Id
 import ink.ptms.chemdah.core.quest.Option
 import ink.ptms.chemdah.core.quest.QuestContainer
 import ink.ptms.chemdah.core.quest.Template
+import ink.ptms.chemdah.util.asList
 import org.bukkit.configuration.ConfigurationSection
 
 /**
@@ -36,7 +37,7 @@ class AddonUI(root: ConfigurationSection, questContainer: QuestContainer) : Addo
     /**
      * 显示介绍
      */
-    val description = root.getStringList("description").toList()
+    val description = root.get("description")?.asList()
 
     companion object {
 

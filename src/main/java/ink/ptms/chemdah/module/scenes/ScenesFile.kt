@@ -1,7 +1,6 @@
 package ink.ptms.chemdah.module.scenes
 
 import ink.ptms.chemdah.util.asInt
-import ink.ptms.chemdah.util.asMap
 import org.bukkit.configuration.ConfigurationSection
 
 /**
@@ -13,15 +12,12 @@ import org.bukkit.configuration.ConfigurationSection
  */
 class ScenesFile(val root: ConfigurationSection) {
 
-    val world = root.getString("world")
+    val world = root.getString("world") ?: "world"
     val state = root.getConfigurationSection("state")?.getKeys(false)?.mapNotNull {
         when {
-            root.contains("state.set") -> ScenesState.Block(it.asInt(), root)
-            root.contains("state.copy") -> ScenesState.Copy(it.asInt(), root)
+            root.contains("state.set") -> ScenesState.Block(it.asInt(), root, this)
+            root.contains("state.copy") -> ScenesState.Copy(it.asInt(), root, this)
             else -> null
         }
-    }
-    val automation = root.getMapList("automation").map {
-        ScenesAutomation(it.asMap())
-    }
+    } ?: emptyList()
 }

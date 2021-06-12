@@ -8,7 +8,9 @@ import ink.ptms.adyeshach.common.entity.manager.ManagerPrivateTemp
 import ink.ptms.adyeshach.common.entity.type.AdyFallingBlock
 import ink.ptms.chemdah.api.event.collect.PlayerEvents
 import ink.ptms.chemdah.module.scenes.ScenesBlockData
+import ink.ptms.chemdah.module.scenes.ScenesSystem
 import ink.ptms.chemdah.util.getPlayer
+import ink.ptms.chemdah.util.switch
 import io.izzel.taboolib.TabooLibAPI
 import io.izzel.taboolib.Version
 import io.izzel.taboolib.kotlin.Tasks
@@ -69,7 +71,6 @@ class ActionScenes {
         override fun toString(): String {
             return "ScenesBlockSet0(location=$location, material=$material, data=$data, falling=$falling, solid=$solid)"
         }
-
     }
 
     class ScenesBlockSet1(
@@ -95,37 +96,21 @@ class ActionScenes {
         override fun toString(): String {
             return "ScenesBlockSet1(location=$location, copy=$copy, falling=$falling, solid=$solid)"
         }
-
-    }
-
-    class ScenesBlockReset(val location: ParsedAction<*>) : QuestAction<Void>() {
-
-        override fun process(frame: QuestContext.Frame): CompletableFuture<Void> {
-            return frame.newFrame(location).run<Location>().thenAccept { location ->
-                frame.getPlayer().removeScenesBlock(location)
-            }
-        }
-
-        override fun toString(): String {
-            return "ScenesBlockReset(location=$location)"
-        }
-
     }
 
     @TListener
     companion object : Listener {
 
         /**
-         * scenes set (falling) stone to location *world *0 *0 *0
-         * scenes copy (falling) location *world *0 *0 *0 to location *world *0 *0 *0
-         * scenes reset location *world *0 *0 *0
-         *
-         * scenes set location *world *0 *0 *0 falling solid stone
+         * scenes set [falling [solid]] {token} to {location}
+         * scenes copy [falling [solid]] {location} to {location}
+         * scenes file {token} [(state|cancel) {int}]
+         * scenes reset {location}
          */
         @KetherParser(["scenes"])
         fun parser() = ScriptParser.parser {
-            when (it.expects("set", "copy", "reset")) {
-                "set" -> {
+            it.switch {
+                case("set") {
                     val falling = try {
                         it.mark()
                         it.expect("falling")
@@ -145,12 +130,12 @@ class ActionScenes {
                         }
                     } else false
                     val block = it.nextToken()
-                    val material = Items.asMaterial(block.split(":")[0]) ?: Material.STONE
+                    val material = Items.asMaterial(block.split(":")[0])
                     val data = Coerce.toByte(block.split(":").getOrNull(1))
                     it.expect("to")
                     ScenesBlockSet0(it.next(ArgTypes.ACTION), material, data, falling, solid)
                 }
-                "copy" -> {
+                case("copy") {
                     val falling = try {
                         it.mark()
                         it.expect("falling")
@@ -173,10 +158,32 @@ class ActionScenes {
                     it.expect("to")
                     ScenesBlockSet1(it.next(ArgTypes.ACTION), location, falling, solid)
                 }
-                "reset" -> {
-                    ScenesBlockReset(it.next(ArgTypes.ACTION))
+                case("file") {
+                    val file = it.nextToken()
+                    when (it.expects("state", "cancel")) {
+                        "state" -> {
+                            val state = it.nextInt()
+                            actionNow {
+                                ScenesSystem.scenesMap[file]?.state?.firstOrNull { s -> s.index == state }?.send(getPlayer())
+                            }
+                        }
+                        "cancel" -> {
+                            val state = it.nextInt()
+                            actionNow {
+                                ScenesSystem.scenesMap[file]?.state?.firstOrNull { s -> s.index == state }?.cancel(getPlayer())
+                            }
+                        }
+                        else -> error("out of case")
+                    }
                 }
-                else -> error("out of case")
+                case("reset") {
+                    val loc = it.next(ArgTypes.ACTION)
+                    actionNow {
+                        newFrame(loc).run<Location>().thenAccept {
+                            getPlayer().removeScenesBlock(it)
+                        }
+                    }
+                }
             }
         }
 

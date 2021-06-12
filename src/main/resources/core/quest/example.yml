@@ -1,20 +1,23 @@
 10_diamond_ore:
-  task:0:
-    objective: block break
-    condition:
-      material: diamond_ore
-    goal:
-      amount: 10
-    addon:stats:
-      visible: true
-  addon:ui:
-    icon: iron_pickaxe
-    description:
-      - '&7Mine &3[10 Diamond Ores] &7anywhere.'
-  agent:accepted:
-    - tell colored *"&3[Break Diamonds] &7accepted!"
-  agent:completed:
-    - tell colored *"&3[Break Diamonds] &7completed!"
   meta:
     name: Break Diamonds
-    label: L1
+    type: L1
+  task:
+    0:
+      objective: block break
+      condition:
+        material: diamond_ore
+      goal:
+        amount: 10
+      addon:
+        stats:
+          visible: true
+  addon:
+    ui:
+      icon: iron_pickaxe
+      description: '&7Mine &3[10 Diamond Ores] &7anywhere.'
+  agent:
+    accepted:
+      - tell colored *"&3[Break Diamonds] &7accepted!"
+    completed:
+      - tell colored *"&3[Break Diamonds] &7completed!"
