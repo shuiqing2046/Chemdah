@@ -15,8 +15,8 @@ class ScenesFile(val root: ConfigurationSection) {
     val world = root.getString("world") ?: "world"
     val state = root.getConfigurationSection("state")?.getKeys(false)?.mapNotNull {
         when {
-            root.contains("state.set") -> ScenesState.Block(it.asInt(), root, this)
-            root.contains("state.copy") -> ScenesState.Copy(it.asInt(), root, this)
+            root.contains("state.$it.set") -> ScenesState.Block(it.asInt(), root.getConfigurationSection("state.$it")!!, this)
+            root.contains("state.$it.copy") -> ScenesState.Copy(it.asInt(), root.getConfigurationSection("state.$it")!!, this)
             else -> null
         }
     } ?: emptyList()

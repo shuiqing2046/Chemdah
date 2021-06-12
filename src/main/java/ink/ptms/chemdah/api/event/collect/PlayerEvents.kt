@@ -2,7 +2,6 @@ package ink.ptms.chemdah.api.event.collect
 
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Template
-import ink.ptms.chemdah.module.kether.ActionScenes
 import ink.ptms.chemdah.module.level.LevelOption
 import ink.ptms.chemdah.module.scenes.ScenesBlockData
 import io.izzel.taboolib.module.event.EventCancellable

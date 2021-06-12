@@ -37,7 +37,6 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerChangedWorldEvent
 import org.bukkit.event.player.PlayerTeleportEvent
-import java.lang.Exception
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 

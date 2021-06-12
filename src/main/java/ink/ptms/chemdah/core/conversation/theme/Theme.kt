@@ -3,7 +3,6 @@ package ink.ptms.chemdah.core.conversation.theme
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.conversation.PlayerReply
 import ink.ptms.chemdah.core.conversation.Session
-import java.lang.Exception
 import java.util.concurrent.CompletableFuture
 
 /**

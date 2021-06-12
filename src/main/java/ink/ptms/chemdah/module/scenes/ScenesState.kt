@@ -4,7 +4,6 @@ import ink.ptms.chemdah.module.kether.ActionScenes.Companion.createScenesBlock
 import ink.ptms.chemdah.module.kether.ActionScenes.Companion.createScenesFallingBlock
 import ink.ptms.chemdah.module.kether.ActionScenes.Companion.removeScenesBlock
 import ink.ptms.chemdah.util.asList
-import ink.ptms.chemdah.util.namespaceQuest
 import ink.ptms.chemdah.util.print
 import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.kotlin.kether.KetherShell
@@ -14,6 +13,8 @@ import io.izzel.taboolib.util.item.Items
 import org.bukkit.Bukkit
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
+import java.lang.Integer.max
+import java.lang.Integer.min
 
 /**
  * Chemdah
@@ -36,14 +37,14 @@ abstract class ScenesState(val index: Int, val root: ConfigurationSection) {
 
     class Block(index: Int, root: ConfigurationSection, val file: ScenesFile) : ScenesState(index, root) {
 
-        val set = root.getStringList("root").mapNotNull {
-            val args = it.split(">")
+        val set = root.getStringList("set").mapNotNull {
+            val args = it.split(">").map { i -> i.trim() }
             if (args.size == 2) {
-                val area = args[0].split("~")
+                val area = args[0].split("~").map { i -> i.trim() }
                 val blockList = if (area.size == 1) {
                     BlockListSingle(area[0].toPosition(relative))
                 } else {
-                    BlockListArea(args[0].toPosition(relative), args[1].toPosition(relative))
+                    BlockListArea(area[0].toPosition(relative), area[1].toPosition(relative))
                 }
                 val block = args[1].split(" ")
                 when {
@@ -98,7 +99,9 @@ abstract class ScenesState(val index: Int, val root: ConfigurationSection) {
     class Copy(index: Int, root: ConfigurationSection, val file: ScenesFile) : ScenesState(index, root) {
 
         val fromWorld = root.getString("copy.from-world") ?: file.world
-        val from = root.getString("copy.from", "")!!.run { BlockListArea(split("~")[0].toPosition(), split("~").getOrNull(1).toString().toPosition()) }
+        val from = root.getString("copy.from", "")!!.run {
+            BlockListArea(split("~")[0].trim().toPosition(), split("~").getOrNull(1).toString().trim().toPosition())
+        }
         val to = root.getString("copy.to", "")!!.toPosition(relative)
         val falling = root.getBoolean("copy.falling")
 
@@ -111,7 +114,7 @@ abstract class ScenesState(val index: Int, val root: ConfigurationSection) {
                 ex.print()
             }
             val blocksFrom = from.getList(Bukkit.getWorld(fromWorld) ?: return)
-            val blocksTo = BlockListArea(to, from.max).getList()
+            val blocksTo = BlockListArea(to, to.add(from.max.subtract(from.min))).getList()
             blocksFrom.forEachIndexed { index, block ->
                 if (falling) {
                     player.createScenesFallingBlock(blocksTo[index].toLocation(player.world), block.type, block.data)
@@ -133,7 +136,7 @@ abstract class ScenesState(val index: Int, val root: ConfigurationSection) {
         }
 
         override fun getAffectPosition(): Set<Position> {
-            return BlockListArea(to, from.max).getList().toSet()
+            return BlockListArea(to, to.add(from.max.subtract(from.min))).getList().toSet()
         }
     }
 
@@ -142,10 +145,31 @@ abstract class ScenesState(val index: Int, val root: ConfigurationSection) {
         fun String.toPosition(relative: Position? = null): Position {
             val args = split(" ").map { Coerce.toInteger(it) }
             val position = Position(args[0], args.getOrNull(1) ?: args[0], args.getOrNull(2) ?: args[0])
-            if (relative != null) {
-                return Position(position.x + relative.x, position.y + relative.y, position.z + relative.z)
+            return if (relative != null) {
+                position.add(relative)
+            } else {
+                position
             }
-            return position
+        }
+
+        fun Position.add(pos: Position): Position {
+            return Position(x + pos.x, y + pos.y, z + pos.z)
+        }
+
+        fun Position.subtract(pos: Position): Position {
+            return Position(x - pos.x, y - pos.y, z - pos.z)
+        }
+
+        fun getArea(pos1: Position, pos2: Position): Pair<Position, Position> {
+            return Position(
+                min(pos1.x, pos2.x),
+                min(pos1.y, pos2.y),
+                min(pos1.z, pos2.z)
+            ) to Position(
+                max(pos1.x, pos2.x),
+                max(pos1.y, pos2.y),
+                max(pos1.z, pos2.z)
+            )
         }
     }
 }

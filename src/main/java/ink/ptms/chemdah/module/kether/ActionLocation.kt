@@ -1,7 +1,5 @@
 package ink.ptms.chemdah.module.kether
 
-import ink.ptms.adyeshach.api.AdyeshachAPI.toDistance
-import ink.ptms.chemdah.util.getSession
 import io.izzel.taboolib.kotlin.kether.Kether.expects
 import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
@@ -11,7 +9,6 @@ import io.izzel.taboolib.kotlin.kether.common.api.QuestContext
 import io.izzel.taboolib.kotlin.kether.common.loader.types.ArgTypes
 import io.izzel.taboolib.util.Coerce
 import org.bukkit.Location
-import java.lang.Exception
 import java.util.concurrent.CompletableFuture
 
 /**

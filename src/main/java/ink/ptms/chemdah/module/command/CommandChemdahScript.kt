@@ -5,7 +5,9 @@ import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.util.print
 import io.izzel.taboolib.kotlin.kether.ScriptContext
 import io.izzel.taboolib.kotlin.sendLocale
-import io.izzel.taboolib.module.command.base.*
+import io.izzel.taboolib.module.command.base.BaseCommand
+import io.izzel.taboolib.module.command.base.BaseMainCommand
+import io.izzel.taboolib.module.command.base.SubCommand
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 

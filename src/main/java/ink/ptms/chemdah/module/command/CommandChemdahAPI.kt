@@ -1,11 +1,6 @@
 package ink.ptms.chemdah.module.command
 
-import ink.ptms.chemdah.api.ChemdahAPI
-import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
-import ink.ptms.chemdah.api.ChemdahAPI.mirror
 import ink.ptms.chemdah.module.scenes.ScenesSystem
-import io.izzel.taboolib.kotlin.Tasks
-import io.izzel.taboolib.kotlin.sendLocale
 import io.izzel.taboolib.module.command.base.BaseCommand
 import io.izzel.taboolib.module.command.base.BaseMainCommand
 import io.izzel.taboolib.module.command.base.SubCommand
@@ -32,7 +27,7 @@ class CommandChemdahAPI : BaseMainCommand() {
     }
 
     @SubCommand(
-        description = "@command-api-scenes",
+        description = "@command-api-scenes-create",
         arguments = ["@command-argument-player", "@command-argument-name", "@command-argument-state"],
         priority = 1.0
     )
@@ -51,7 +46,7 @@ class CommandChemdahAPI : BaseMainCommand() {
     }
 
     @SubCommand(
-        description = "@command-api-scenes",
+        description = "@command-api-scenes-cancel",
         arguments = ["@command-argument-player", "@command-argument-name"],
         priority = 1.1
     )

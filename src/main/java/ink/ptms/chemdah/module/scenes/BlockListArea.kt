@@ -11,7 +11,10 @@ import org.bukkit.block.Block
  * @author sky
  * @since 2021/5/13 11:55 下午
  */
-class BlockListArea(val min: Position, val max: Position) : BlockList {
+class BlockListArea(min: Position, max: Position) : BlockList {
+
+    val min = ScenesState.getArea(min, max).first
+    val max = ScenesState.getArea(min, max).second
 
     override fun getList(): List<Position> {
         return ArrayList<Position>().also { blocks ->
