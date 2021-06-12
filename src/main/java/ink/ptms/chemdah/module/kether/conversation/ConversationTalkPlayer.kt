@@ -22,15 +22,18 @@ class ConversationTalkPlayer(val token: String) : QuestAction<Void>() {
         val session = frame.getSession()
         try {
             KetherFunction.parse(token, namespace = namespaceConversationPlayer) { extend(frame.vars()) }.run {
+                val messages = split("\\n").colored()
                 val theme = session.conversation.option.instanceTheme
                 if (theme.allowFarewell()) {
                     session.npcSide.clear()
-                    session.npcSide.add(colored())
+                    session.npcSide.addAll(messages)
                     session.isFarewell = true
-                    return theme.onDisplay(session, listOf(colored()), false)
+                    return theme.onDisplay(session, messages, false)
                 } else {
-                    session.player.sendHolographic(session.origin.clone().add(0.0, 0.25, 0.0), "&7$this")
                     theme.settings.playSound(session)
+                    messages.forEachIndexed { index, s ->
+                        session.player.sendHolographic(session.origin.clone().add(0.0, 0.25 + (index * 0.3), 0.0), "&7$s")
+                    }
                 }
             }
         } catch (e: Throwable) {

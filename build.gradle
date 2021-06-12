@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'ink.ptms.chemdah'
-version = '0.0.18 NOT WORKING'
+version = '0.0.19'
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
@@ -57,6 +57,7 @@ dependencies {
     implementation 'ink.ptms:Sandalphon:1.2.8'
     implementation 'ink.ptms:Adyeshach:1.2.1'
     implementation 'ink.ptms.core:v11604:11604:all'
+    implementation 'ink.ptms.core:v11200:11200:all'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib'
     implementation fileTree(dir: 'libs', includes: ['*.jar'])
 }

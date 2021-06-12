@@ -3,6 +3,8 @@ package ink.ptms.chemdah.core.conversation.theme
 import ink.ptms.chemdah.api.ChemdahAPI.conversationSession
 import ink.ptms.chemdah.core.conversation.ConversationManager
 import ink.ptms.chemdah.core.conversation.Session
+import ink.ptms.chemdah.core.quest.QuestDevelopment.hasTransmitMessages
+import ink.ptms.chemdah.core.quest.QuestDevelopment.releaseTransmit
 import ink.ptms.chemdah.util.colored
 import io.izzel.taboolib.cronus.CronusUtils
 import io.izzel.taboolib.kotlin.Reflex.Companion.reflexInvoke
@@ -159,6 +161,7 @@ class ThemeChat : Theme<ThemeChatSettings>(), Listener {
                         }
                     } else if (!cancel) {
                         cancel = true
+                        future.npcTalk(session, message, printText, index, end = true, canReply = false)
                         future.complete(null)
                     }
                 }
@@ -175,59 +178,62 @@ class ThemeChat : Theme<ThemeChatSettings>(), Listener {
 
     fun CompletableFuture<Void>.npcTalk(session: Session, messages: List<String>, message: String, index: Int, end: Boolean, canReply: Boolean) {
         session.conversation.playerSide.checked(session).thenApply { replies ->
-            newJson().also { json ->
-                try {
-                    settings.format.forEach {
-                        when {
-                            it.contains("{title}") -> {
-                                json.append(it.replace("{title}", session.conversation.option.title.replace("{name}", session.npcName))).newLine()
-                            }
-                            it.contains("{npcSide}") -> {
-                                messages.colored().forEachIndexed { i, fully ->
-                                    when {
-                                        index > i -> json.append(it.replace("{npcSide}", fully)).newLine()
-                                        index == i -> json.append(it.replace("{npcSide}", message)).newLine()
-                                        else -> json.newLine()
-                                    }
+            // 最终效果
+            val finally = index + 1 >= messages.size && end
+            // 如果是最终效果并且存在对话转发，则不发送白信息
+            val json = if (finally && session.player.hasTransmitMessages() && !canReply) TellrawJson.create().fixed() else newJson().fixed()
+            try {
+                settings.format.forEach {
+                    when {
+                        it.contains("{title}") -> {
+                            json.append(it.replace("{title}", session.conversation.option.title.replace("{name}", session.npcName))).newLine()
+                        }
+                        it.contains("{npcSide}") -> {
+                            messages.colored().forEachIndexed { i, fully ->
+                                when {
+                                    index > i -> json.append(it.replace("{npcSide}", fully)).newLine()
+                                    index == i -> json.append(it.replace("{npcSide}", message)).newLine()
+                                    else -> json.newLine()
                                 }
                             }
-                            it.contains("{playerSide}") -> {
-                                session.playerReplyForDisplay.clear()
-                                session.playerReplyForDisplay.addAll(replies)
-                                if (canReply) {
-                                    replies.forEachIndexed { n, reply ->
-                                        if (index + 1 >= messages.size && end) {
-                                            val text = reply.build(session)
-                                            if (session.playerSide == reply) {
-                                                json.append(it.replace("{select}", settings.selectChar).replace("{playerSide}", "${settings.selectColor}$text"))
-                                                    .hoverText(text)
-                                                    .clickCommand("/session reply ${reply.uuid}")
-                                                    .newLine()
-                                            } else {
-                                                json.append(it.replace("{select}", settings.selectOther).replace("{playerSide}", text))
-                                                    .hoverText(text)
-                                                    .clickCommand("/session reply ${reply.uuid}")
-                                                    .newLine()
-                                            }
+                        }
+                        it.contains("{playerSide}") -> {
+                            session.playerReplyForDisplay.clear()
+                            session.playerReplyForDisplay.addAll(replies)
+                            if (canReply) {
+                                replies.forEachIndexed { n, reply ->
+                                    if (finally) {
+                                        val text = reply.build(session)
+                                        if (session.playerSide == reply) {
+                                            json.append(it.replace("{select}", settings.selectChar).replace("{playerSide}", "${settings.selectColor}$text"))
+                                                .hoverText(text)
+                                                .clickCommand("/session reply ${reply.uuid}")
+                                                .newLine()
                                         } else {
-                                            if (n == 0) {
-                                                json.append(settings.talking).newLine()
-                                            } else {
-                                                json.newLine()
-                                            }
+                                            json.append(it.replace("{select}", settings.selectOther).replace("{playerSide}", text))
+                                                .hoverText(text)
+                                                .clickCommand("/session reply ${reply.uuid}")
+                                                .newLine()
+                                        }
+                                    } else {
+                                        if (n == 0) {
+                                            json.append(settings.talking).newLine()
+                                        } else {
+                                            json.newLine()
                                         }
                                     }
                                 }
                             }
-                            else -> {
-                                json.append(it).newLine()
-                            }
+                        }
+                        else -> {
+                            json.append(it).newLine()
                         }
                     }
-                } catch (ex: Throwable) {
-                    ex.printStackTrace()
                 }
-            }.send(session.player)
+            } catch (ex: Throwable) {
+                ex.printStackTrace()
+            }
+            json.send(session.player)
             // 打印完成则结束演示
             if (index + 1 == messages.size && end) {
                 complete(null)
@@ -237,4 +243,8 @@ class ThemeChat : Theme<ThemeChatSettings>(), Listener {
     }
 
     private fun newJson() = TellrawJson.create().also { json -> repeat(settings.spaceLine) { json.newLine() } }
+
+    private fun TellrawJson.fixed(): TellrawJson {
+        return append("\n").clickCommand("PLEASE!PASS!ME!d3486345-e35d-326a-b5c5-787de3814770!")
+    }
 }

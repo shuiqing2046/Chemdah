@@ -44,7 +44,7 @@ class ConversationEvents {
     /**
      * 当对话结束之后
      */
-    class Closed(val session: Session): EventNormal<Closed>(true)
+    class Closed(val session: Session, val refust: Boolean = false): EventNormal<Closed>(true)
 
     /**
      * 当箱子对话页面构建完成后

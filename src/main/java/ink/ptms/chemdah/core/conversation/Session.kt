@@ -60,7 +60,7 @@ data class Session(
             conversation.option.instanceTheme.onClose(this).thenApply {
                 future.complete(null)
                 ConversationManager.sessions.remove(player.name)
-                ConversationEvents.Closed(this).call()
+                ConversationEvents.Closed(this, refuse).call()
             }
         }
         return future
