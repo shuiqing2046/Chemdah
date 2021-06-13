@@ -43,8 +43,7 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
         get() = agentList.map { "${it.type.name} @ ${it.restrict}" }
 
     /**
-     * 当前节点
-     * 任务则返回任务序号，条目则返回条目序号
+     * 当前所属任务节点
      */
     val node: String
         get() = when (this) {
@@ -122,6 +121,7 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
                             sender = profile.player
                             rootFrame().variables().also { vars ->
                                 vars.set("reason", reason)
+                                vars.set("@QuestSelected", node)
                                 vars.set("@QuestContainer", this@QuestContainer)
                             }
                         }.thenApply {

@@ -98,14 +98,12 @@ abstract class Objective<E : Event> {
      * 当条目继续时
      */
     internal open fun onContinue(profile: PlayerProfile, task: Task, quest: Quest, event: Event) {
-        task.agent(quest.profile, AgentType.TASK_CONTINUED)
     }
 
     /**
      * 当条目完成时
      */
     internal open fun onComplete(profile: PlayerProfile, task: Task, quest: Quest) {
-        task.agent(quest.profile, AgentType.TASK_COMPLETED)
         setCompletedSignature(profile, task, true)
     }
 
@@ -113,7 +111,6 @@ abstract class Objective<E : Event> {
      * 当条目重置时
      */
     internal open fun onReset(profile: PlayerProfile, task: Task, quest: Quest) {
-        task.agent(quest.profile, AgentType.TASK_RESTARTED)
         profile.dataOperator(task) {
             clear()
         }
@@ -183,6 +180,7 @@ abstract class Objective<E : Event> {
                     if (r) {
                         if (ObjectiveEvents.Restart.Pre(this@Objective, task, quest, profile).call().nonCancelled()) {
                             onReset(profile, task, quest)
+                            task.agent(quest.profile, AgentType.TASK_RESTARTED)
                             ObjectiveEvents.Restart.Post(this@Objective, task, quest, profile).call()
                         }
                         finish()
@@ -191,6 +189,7 @@ abstract class Objective<E : Event> {
                             if (it && !hasCompletedSignature(profile, task)) {
                                 if (ObjectiveEvents.Complete.Pre(this@Objective, task, quest, profile).call().nonCancelled()) {
                                     onComplete(profile, task, quest)
+                                    task.agent(quest.profile, AgentType.TASK_COMPLETED)
                                     ObjectiveEvents.Complete.Post(this@Objective, task, quest, profile).call()
                                 }
                             }

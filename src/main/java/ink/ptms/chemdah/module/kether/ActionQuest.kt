@@ -10,6 +10,7 @@ import ink.ptms.chemdah.util.getProfile
 import ink.ptms.chemdah.util.getQuestSelected
 import ink.ptms.chemdah.util.increaseAny
 import ink.ptms.chemdah.util.switch
+import io.izzel.taboolib.cronus.CronusUtils
 import io.izzel.taboolib.kotlin.kether.Kether.expects
 import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
@@ -18,6 +19,7 @@ import io.izzel.taboolib.kotlin.kether.common.api.ParsedAction
 import io.izzel.taboolib.kotlin.kether.common.api.QuestAction
 import io.izzel.taboolib.kotlin.kether.common.api.QuestContext
 import io.izzel.taboolib.kotlin.kether.common.loader.types.ArgTypes
+import io.izzel.taboolib.util.Coerce
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -152,7 +154,7 @@ class ActionQuest {
 
         enum class Action {
 
-            VALUE, TARGET, PERCENT
+            VALUE, TARGET, PERCENT, PERCENT_100
         }
 
         override fun process(frame: QuestContext.Frame): CompletableFuture<Any> {
@@ -170,6 +172,7 @@ class ActionQuest {
                             Action.VALUE -> progress.value
                             Action.TARGET -> progress.target
                             Action.PERCENT -> progress.percent
+                            Action.PERCENT_100 -> Coerce.format(progress.percent * 100)
                         }
                     )
                 }
@@ -186,6 +189,7 @@ class ActionQuest {
                                 Action.VALUE -> progress.value
                                 Action.TARGET -> progress.target
                                 Action.PERCENT -> progress.percent
+                                Action.PERCENT_100 -> Coerce.format(progress.percent * 100)
                             }
                         )
                     }
@@ -237,7 +241,7 @@ class ActionQuest {
          * quest stats (refresh|hidden) [task {action|*}]
          *
          * 任务阶段
-         * quest progress (value|target|percent) [task {action}]
+         * quest progress (value|target|percent|percent100) [task {action}]
          */
         @KetherParser(["quest"])
         fun parser1() = ScriptParser.parser {
@@ -360,10 +364,11 @@ class ActionQuest {
                     QuestStats(task, action)
                 }
                 case("progress") {
-                    val action = when (it.expects("value", "target", "percent")) {
+                    val action = when (it.expects("value", "target", "percent", "percent100")) {
                         "value" -> QuestProgress.Action.VALUE
                         "target" -> QuestProgress.Action.TARGET
                         "percent" -> QuestProgress.Action.PERCENT
+                        "percent100" -> QuestProgress.Action.PERCENT_100
                         else -> error("out of case")
                     }
                     val task = try {

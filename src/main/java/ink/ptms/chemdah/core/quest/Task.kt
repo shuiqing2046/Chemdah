@@ -20,8 +20,6 @@ class Task(id: String, config: ConfigurationSection, val template: Template) : Q
     val condition = DataContainer()
     val goal = DataContainer()
 
-    val metaNode = "${template.id}.$id"
-
     init {
         config.getConfigurationSection("condition")?.getValues(false)?.forEach { (k, v) ->
             condition[k] = v

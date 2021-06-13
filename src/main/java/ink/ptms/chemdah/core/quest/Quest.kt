@@ -147,6 +147,7 @@ class Quest(val id: String, val profile: PlayerProfile, val persistentDataContai
                         tasks.forEach { task ->
                             if (ObjectiveEvents.Restart.Pre(task.objective, task, this@Quest, profile).call().nonCancelled()) {
                                 task.objective.onReset(profile, task, this@Quest)
+                                task.agent(profile, AgentType.TASK_RESTARTED)
                                 ObjectiveEvents.Restart.Post(task.objective, task, this@Quest, profile).call()
                             }
                         }

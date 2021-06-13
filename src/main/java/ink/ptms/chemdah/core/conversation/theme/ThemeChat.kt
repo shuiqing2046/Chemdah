@@ -283,7 +283,7 @@ class ThemeChat : Theme<ThemeChatSettings>(), Listener {
             }
             json.send(session.player)
             // 打印完成则结束演示
-            if (index + 1 == messages.size && endMessage) {
+            if (finally) {
                 complete(null)
             }
         }

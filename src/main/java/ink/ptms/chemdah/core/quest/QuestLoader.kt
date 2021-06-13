@@ -153,6 +153,7 @@ object QuestLoader {
         objective.checkCondition(profile, task, event).thenAccept { cond ->
             if (cond && ObjectiveEvents.Continue.Pre(objective, task, quest, profile).call().nonCancelled()) {
                 objective.onContinue(profile, task, quest, event)
+                task.agent(quest.profile, AgentType.TASK_CONTINUED)
                 ObjectiveEvents.Continue.Post(objective, task, quest, profile).call()
                 objective.checkComplete(profile, task, quest)
                 quest.checkComplete()

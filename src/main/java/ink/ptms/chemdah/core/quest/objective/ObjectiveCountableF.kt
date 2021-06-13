@@ -32,7 +32,6 @@ abstract class ObjectiveCountableF<E : Event> : Objective<E>() {
 
     @Suppress("UNCHECKED_CAST")
     override fun onContinue(profile: PlayerProfile, task: Task, quest: Quest, event: Event) {
-        super.onContinue(profile, task, quest, event)
         profile.dataOperator(task) {
             put("amount", get("amount", 0).toDouble() + getCount(profile, task, event as E))
         }
