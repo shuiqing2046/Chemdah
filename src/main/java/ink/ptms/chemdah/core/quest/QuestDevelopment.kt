@@ -93,7 +93,8 @@ object QuestDevelopment : Listener {
             playerRelease[name] = list
             playerMessageCache[name]?.forEachIndexed { index, packet ->
                 // 2021/06/13 03:00
-                // 因为聊天数据包会被重复拦截两次，1.12 和 1.16 均由该问题，所以直发偶数包
+                // 因为聊天数据包会被重复拦截两次每次都不一样，1.12 和 1.16 均有该问题所以只发偶数包
+                // 删除 ViaVersion 测试同样如此
                 if (index % 2 == 0) {
                     list.add(packet.reflex<Any>("a")!!.toString())
                     TPacketHandler.sendPacket(this, packet)
