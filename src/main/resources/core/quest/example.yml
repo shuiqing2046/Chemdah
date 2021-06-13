@@ -12,6 +12,10 @@
       addon:
         stats:
           visible: true
+    1:
+      objective: block break
+      condition:
+        material: diamond_ore
   addon:
     ui:
       icon: iron_pickaxe
