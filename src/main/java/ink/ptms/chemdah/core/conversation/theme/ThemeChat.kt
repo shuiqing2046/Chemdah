@@ -1,8 +1,10 @@
 package ink.ptms.chemdah.core.conversation.theme
 
 import ink.ptms.chemdah.api.ChemdahAPI.conversationSession
+import ink.ptms.chemdah.api.event.collect.ConversationEvents
 import ink.ptms.chemdah.core.conversation.ConversationManager
 import ink.ptms.chemdah.core.conversation.Session
+import ink.ptms.chemdah.core.quest.QuestDevelopment
 import ink.ptms.chemdah.core.quest.QuestDevelopment.hasTransmitMessages
 import ink.ptms.chemdah.core.quest.QuestDevelopment.releaseTransmit
 import ink.ptms.chemdah.util.colored
@@ -81,7 +83,7 @@ class ThemeChat : Theme<ThemeChatSettings>(), Listener {
                 if (select != index) {
                     session.playerSide = replies[select]
                     settings.playSelectSound(session)
-                    CompletableFuture<Void>().npcTalk(session, session.npcSide, "", session.npcSide.size, end = true, canReply = !session.isFarewell)
+                    CompletableFuture<Void>().npcTalk(session, session.npcSide, "", session.npcSide.size, endMessage = true, canReply = !session.isFarewell)
                 }
             }
         }
@@ -125,6 +127,14 @@ class ThemeChat : Theme<ThemeChatSettings>(), Listener {
         }
     }
 
+    @EventHandler
+    fun e(e: ConversationEvents.Closed) {
+        if (e.refust && !e.session.npcTalking && QuestDevelopment.enableMessageTransmit) {
+            newJson().send(e.session.player)
+            e.session.player.releaseTransmit()
+        }
+    }
+
     override fun createConfig(): ThemeChatSettings {
         return ThemeChatSettings(ConversationManager.conf.getConfigurationSection("theme-chat")!!)
     }
@@ -149,19 +159,34 @@ class ThemeChat : Theme<ThemeChatSettings>(), Listener {
         var cancel = false
         session.npcTalking = true
         message.colored().map { if (settings.animation) it.toPrinted("_") else listOf(it) }.forEachIndexed { index, messageText ->
-            messageText.forEachIndexed { printLine, printText ->
+            messageText.forEachIndexed { printIndex, printText ->
+                val endMessage = printIndex + 1 == messageText.size
                 Tasks.delay(d++) {
                     if (session.isValid) {
                         if (session.npcTalking) {
-                            future.npcTalk(session, message, printText, index, printLine + 1 == messageText.size, canReply)
-                        } else if (!cancel) {
+                            future.npcTalk(session, message, printText, index, endMessage = endMessage, canReply = canReply)
+                        }
+                        // 跳过对话
+                        else if (!cancel) {
                             cancel = true
-                            future.npcTalk(session, session.npcSide, "", session.npcSide.size, end = true, canReply = !session.isFarewell)
+                            // 如果是告别则转发信息
+                            if (session.isFarewell) {
+                                session.player.releaseTransmit()
+                            }
+                            future.npcTalk(session, session.npcSide, "", session.npcSide.size, endMessage = true, canReply = !session.isFarewell)
                             future.complete(null)
                         }
-                    } else if (!cancel) {
+                    }
+                    // 对话中断
+                    else if (!cancel) {
                         cancel = true
-                        future.npcTalk(session, message, printText, index, end = true, canReply = false)
+                        if (QuestDevelopment.enableMessageTransmit) {
+                            // 清空对话
+                            newJson().send(session.player)
+                            // 转发信息
+                            session.player.releaseTransmit()
+                        }
+                        future.npcTalk(session, message, printText, index, endMessage = endMessage, canReply, noSpace = true)
                         future.complete(null)
                     }
                 }
@@ -176,12 +201,31 @@ class ThemeChat : Theme<ThemeChatSettings>(), Listener {
         return future
     }
 
-    fun CompletableFuture<Void>.npcTalk(session: Session, messages: List<String>, message: String, index: Int, end: Boolean, canReply: Boolean) {
+    /**
+     * 发送聊天信息
+     *
+     * @param session 会话对象
+     * @param messages 所有信息
+     * @param message 正在打印的信息
+     * @param index 打印信息在所有信息中的索引
+     * @param endMessage 本行信息的打印是否结束
+     * @param canReply 是否允许回复
+     * @param noSpace 没有隔离空行
+     */
+    fun CompletableFuture<Void>.npcTalk(
+        session: Session,
+        messages: List<String>,
+        message: String,
+        index: Int,
+        endMessage: Boolean,
+        canReply: Boolean,
+        noSpace: Boolean = false
+    ) {
         session.conversation.playerSide.checked(session).thenApply { replies ->
             // 最终效果
-            val finally = index + 1 >= messages.size && end
+            val finally = index + 1 >= messages.size && endMessage
             // 如果是最终效果并且存在对话转发，则不发送白信息
-            val json = if (finally && session.player.hasTransmitMessages() && !canReply) TellrawJson.create().fixed() else newJson().fixed()
+            val json = if (noSpace || (finally && session.player.hasTransmitMessages() && !canReply)) TellrawJson.create().fixed() else newJson()
             try {
                 settings.format.forEach {
                     when {
@@ -233,16 +277,20 @@ class ThemeChat : Theme<ThemeChatSettings>(), Listener {
             } catch (ex: Throwable) {
                 ex.printStackTrace()
             }
+            if (finally && !canReply && QuestDevelopment.enableMessageTransmit) {
+                newJson().send(session.player)
+                session.player.releaseTransmit()
+            }
             json.send(session.player)
             // 打印完成则结束演示
-            if (index + 1 == messages.size && end) {
+            if (index + 1 == messages.size && endMessage) {
                 complete(null)
             }
         }
         TLocale.Display.sendActionBar(session.player, TLocale.asString(session.player, "theme-chat-help"))
     }
 
-    private fun newJson() = TellrawJson.create().also { json -> repeat(settings.spaceLine) { json.newLine() } }
+    private fun newJson() = TellrawJson.create().also { json -> repeat(settings.spaceLine) { json.newLine() } }.fixed()
 
     private fun TellrawJson.fixed(): TellrawJson {
         return append("\n").clickCommand("PLEASE!PASS!ME!d3486345-e35d-326a-b5c5-787de3814770!")

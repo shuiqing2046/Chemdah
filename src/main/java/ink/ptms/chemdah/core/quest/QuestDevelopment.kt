@@ -89,7 +89,7 @@ object QuestDevelopment : Listener {
 
     fun Player.releaseTransmit() {
         if (enableMessageTransmit) {
-            val list = ArrayList<String>()
+            val list = CopyOnWriteArrayList<String>()
             playerRelease[name] = list
             playerMessageCache[name]?.forEachIndexed { index, packet ->
                 // 2021/06/13 03:00

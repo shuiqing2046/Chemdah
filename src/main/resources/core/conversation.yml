@@ -5,6 +5,7 @@
 
 theme-chat:
   format:
+    - ''
     - ' {title}:'
     - ''
     - '  &f" &7{npcSide}&r &f"'
