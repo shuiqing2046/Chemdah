@@ -12,7 +12,7 @@ import org.bukkit.configuration.ConfigurationSection
  */
 class ScenesFile(val root: ConfigurationSection) {
 
-    val world = root.getString("world") ?: "world"
+    val world = root.getString("in") ?: "world"
     val state = root.getConfigurationSection("state")?.getKeys(false)?.mapNotNull {
         when {
             root.contains("state.$it.set") -> ScenesState.Block(it.asInt(), root.getConfigurationSection("state.$it")!!, this)

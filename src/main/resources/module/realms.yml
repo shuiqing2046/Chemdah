@@ -1,0 +1,8 @@
+
+
+#         Powered by TabooLib 5.0         #
+
+
+example:
+  in: world
+  area: 0 0 0 ~ 10 10 10

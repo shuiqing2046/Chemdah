@@ -6,10 +6,13 @@ import ink.ptms.chemdah.core.conversation.PlayerReply
 import ink.ptms.chemdah.core.conversation.Session
 import ink.ptms.chemdah.util.asList
 import ink.ptms.chemdah.util.colored
+import ink.ptms.chemdah.util.print
 import ink.ptms.chemdah.util.setIcon
+import io.izzel.taboolib.kotlin.kether.KetherShell
 import io.izzel.taboolib.module.inject.TListener
 import io.izzel.taboolib.util.Coerce
 import io.izzel.taboolib.util.item.inventory.MenuBuilder
+import org.bukkit.entity.Player
 import org.bukkit.event.Listener
 import org.bukkit.inventory.ItemStack
 import java.util.concurrent.CompletableFuture
@@ -40,38 +43,40 @@ class ThemeChest : Theme<ThemeChestSetting>(), Listener {
     override fun onDisplay(session: Session, message: List<String>, canReply: Boolean): CompletableFuture<Void> {
         var end = false
         return session.createDisplay { replies ->
-            MenuBuilder.builder()
-                .lockHand()
-                .title(settings.title.toTitle(session))
-                .rows(rows(replies.size))
-                .buildAsync {
-                    replies.forEachIndexed { index, playerReply ->
-                        if (index < settings.playerSlot.size) {
-                            it.setItem(settings.playerSlot[index], settings.playerItem.buildItem(session, playerReply, index + 1))
+            rows(session.player, replies.size).thenAccept { rows ->
+                MenuBuilder.builder()
+                    .lockHand()
+                    .title(settings.title.toTitle(session))
+                    .rows(rows)
+                    .buildAsync {
+                        replies.forEachIndexed { index, playerReply ->
+                            if (index < settings.playerSlot.size) {
+                                it.setItem(settings.playerSlot[index], settings.playerItem.buildItem(session, playerReply, index + 1))
+                            }
                         }
-                    }
-                    it.setItem(settings.npcSlot, settings.npcItem.buildItem(session, message))
-                    // 唤起事件
-                    ConversationEvents.ChestThemeBuild(session, message, canReply, it)
-                }.click { e ->
-                    replies.getOrNull(settings.playerSlot.indexOf(e.rawSlot))?.run {
-                        check(session).thenAccept { check ->
-                            if (check) {
-                                end = true
-                                select(session).thenAccept {
-                                    // 若未进行页面切换则关闭页面
-                                    if (session.player.openInventory.topInventory == e.inventory) {
-                                        session.player.closeInventory()
+                        it.setItem(settings.npcSlot, settings.npcItem.buildItem(session, message))
+                        // 唤起事件
+                        ConversationEvents.ChestThemeBuild(session, message, canReply, it)
+                    }.click { e ->
+                        replies.getOrNull(settings.playerSlot.indexOf(e.rawSlot))?.run {
+                            check(session).thenAccept { check ->
+                                if (check) {
+                                    end = true
+                                    select(session).thenAccept {
+                                        // 若未进行页面切换则关闭页面
+                                        if (session.player.openInventory.topInventory == e.inventory) {
+                                            session.player.closeInventory()
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                }.close {
-                    if (!end) {
-                        session.close(refuse = true)
-                    }
-                }.open(session.player)
+                    }.close {
+                        if (!end) {
+                            session.close(refuse = true)
+                        }
+                    }.open(session.player)
+            }
         }
     }
 
@@ -113,11 +118,17 @@ class ThemeChest : Theme<ThemeChestSetting>(), Listener {
         return replace("{title}", session.conversation.option.title.replace("{name}", session.npcName)).colored()
     }
 
-    private fun rows(size: Int): Int {
+    private fun rows(player: Player, size: Int): CompletableFuture<Int> {
         return try {
-            Coerce.toInteger(settings.rows?.eval(SimpleBindings(mapOf("\$size" to size))) ?: 1)
+            KetherShell.eval(settings.rows, namespace = listOf("chemdah")) {
+                sender = player
+                rootFrame().variables().set("size", size)
+            }.thenApply {
+                Coerce.toInteger(it)
+            }
         } catch (ex: Exception) {
-            1
+            ex.print()
+            CompletableFuture.completedFuture(1)
         }
     }
 }

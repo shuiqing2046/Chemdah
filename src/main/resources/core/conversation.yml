@@ -31,7 +31,7 @@ theme-chat:
 theme-chest:
   ui:
     title: 'Talking with {title}...'
-    rows: 'Math.max(Math.ceil($size / 5.0) + 2, 3)'
+    rows: 'max ceil math add [ math div [ &size *5 ] *2 ] *3'
   npc-side:
     item:
       material: book

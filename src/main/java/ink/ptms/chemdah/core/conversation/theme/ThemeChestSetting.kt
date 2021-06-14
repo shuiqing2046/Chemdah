@@ -18,7 +18,7 @@ import javax.script.CompiledScript
 class ThemeChestSetting(
     root: ConfigurationSection,
     val title: String = root.getString("ui.title", "")!!.colored(),
-    val rows: CompiledScript? = Features.compileScript(root.getString("ui.rows", "1")!!),
+    val rows: String = root.getString("ui.rows", "*1")!!,
     npcItem: ItemStack = Items.loadItem(root.getConfigurationSection("npc-side.item") ?: EMPTY_SECTION)!!,
     playerItem: ItemStack = Items.loadItem(root.getConfigurationSection("player-side.item") ?: EMPTY_SECTION)!!,
     val npcSlot: Int = root.getInt("npc-side.slot"),
