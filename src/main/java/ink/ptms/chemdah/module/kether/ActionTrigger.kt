@@ -1,11 +1,12 @@
 package ink.ptms.chemdah.module.kether
 
 import ink.ptms.chemdah.api.ChemdahAPI.callTrigger
-import ink.ptms.chemdah.util.getPlayer
 import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import io.izzel.taboolib.kotlin.kether.common.api.QuestAction
 import io.izzel.taboolib.kotlin.kether.common.api.QuestContext
+import io.izzel.taboolib.kotlin.kether.script
+import org.bukkit.entity.Player
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -18,7 +19,8 @@ import java.util.concurrent.CompletableFuture
 class ActionTrigger(val trigger: String) : QuestAction<Void>() {
 
     override fun process(frame: QuestContext.Frame): CompletableFuture<Void> {
-        frame.getPlayer().callTrigger(trigger)
+        val player = frame.script().sender as? Player ?: error("No player selected.")
+        player.callTrigger(trigger)
         return CompletableFuture.completedFuture(null)
     }
 
