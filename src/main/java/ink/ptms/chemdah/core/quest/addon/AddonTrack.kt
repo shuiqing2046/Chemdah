@@ -222,7 +222,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
 
         private fun Player.trackTickMark(trackAddon: AddonTrack) {
             val center = trackAddon.center ?: return
-            if (center.world.name == world.name) {
+            if (center.world != null && center.world.name == world.name) {
                 val distance = center.distance(location)
                 if (distance > trackAddon.markDistanceMin) {
                     if (trackAddon.mark && trackAddon.markPeriod.hasNext(name)) {
@@ -241,7 +241,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
 
         private fun Player.trackTickNavigation(trackAddon: AddonTrack) {
             val center = trackAddon.center ?: return
-            if (center.world.name == world.name) {
+            if (center.world != null && center.world.name == world.name) {
                 val distance = center.distance(location)
                 if (distance < trackAddon.navigationDistanceMax) {
                     if (trackAddon.navigation && trackAddon.navigationPeriod.hasNext(name)) {
@@ -301,7 +301,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
             val trackCenter = trackAddon.center ?: return
             val hologramMap = trackNavigationHologramMap.computeIfAbsent(name) { ConcurrentHashMap() }
             // 启用 Navigation 并在相同世界
-            if (trackAddon.navigation && trackCenter.world.name == world.name && allow) {
+            if (trackAddon.navigation && trackCenter.world != null && trackCenter.world.name == world.name && allow) {
                 mirrorFuture("AddonTrack:refreshTrackingNavigation") {
                     val name = trackAddon.name ?: trackAddon.questContainer.displayName()
                     val distance = trackCenter.distance(location)
@@ -337,16 +337,9 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
             if (nonChemdahProfileLoaded || quest == null) {
                 return
             }
-            if (chemdahProfile.getQuestById(quest.id) == null) {
-                // 启用 Scoreboard 追踪
-                if (quest.track()?.scoreboard == true) {
-                    sendScoreboard("")
-                }
-            } else {
-                // 任意子条目启用 Scoreboard 追踪
-                if (quest.taskMap.any { it.value.track()?.scoreboard == true }) {
-                    sendScoreboard("")
-                }
+            // 任务本体活任意子条目启用 Scoreboard 追踪
+            if (quest.track()?.scoreboard == true || quest.taskMap.any { it.value.track()?.scoreboard == true }) {
+                sendScoreboard("")
             }
         }
 
