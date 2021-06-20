@@ -9,6 +9,7 @@ import io.izzel.taboolib.kotlin.kether.common.api.QuestContext
 import net.Indyuce.mmocore.MMOCore
 import net.Indyuce.mmocore.api.player.PlayerData
 import java.util.concurrent.CompletableFuture
+import java.util.function.Function
 
 /**
  * Chemdah
@@ -19,10 +20,10 @@ import java.util.concurrent.CompletableFuture
  */
 class ActionCore {
 
-    class Base(val action: (PlayerData) -> (Any)) : QuestAction<Any>() {
+    class Base(val action: Function<PlayerData, Any>) : QuestAction<Any>() {
 
         override fun process(frame: QuestContext.Frame): CompletableFuture<Any> {
-            return CompletableFuture.completedFuture(action(MMOCore.plugin.dataProvider.dataManager.get(frame.getPlayer())))
+            return CompletableFuture.completedFuture(action.apply(MMOCore.plugin.dataProvider.dataManager.get(frame.getPlayer())))
         }
 
         override fun toString(): String {
@@ -43,21 +44,21 @@ class ActionCore {
             when (it.expects("class", "skill", "attribute", "level", "exp", "experience", "mana", "stamina")) {
                 "class" -> {
                     Base(when (it.expects("id", "name", "point")) {
-                        "id" -> { clazz: PlayerData -> clazz.profess.id }
-                        "name" -> { clazz: PlayerData -> clazz.profess.name }
-                        "point" -> { clazz: PlayerData -> clazz.classPoints }
+                        "id" -> { clazz -> clazz.profess.id }
+                        "name" -> { clazz -> clazz.profess.name }
+                        "point" -> { clazz -> clazz.classPoints }
                         else -> error("out of case")
                     })
                 }
                 "skill" -> {
                     Base(when (it.expects("point")) {
-                        "point" -> { clazz: PlayerData -> clazz.skillPoints }
+                        "point" -> { clazz -> clazz.skillPoints }
                         else -> error("out of case")
                     })
                 }
                 "attribute" -> {
                     Base(when (it.expects("point")) {
-                        "point" -> { clazz: PlayerData -> clazz.attributePoints }
+                        "point" -> { clazz -> clazz.attributePoints }
                         else -> error("out of case")
                     })
                 }
