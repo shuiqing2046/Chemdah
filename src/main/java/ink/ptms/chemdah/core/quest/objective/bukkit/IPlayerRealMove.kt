@@ -6,21 +6,21 @@ import org.bukkit.event.player.PlayerMoveEvent
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.quest.objective.bukkit.IPlayerMove
+ * ink.ptms.chemdah.core.quest.objective.bukkit.IPlayerRealMove
  *
  * @author sky
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
-object IPlayerMove : ObjectiveCountableI<PlayerMoveEvent>() {
+object IPlayerRealMove : ObjectiveCountableI<PlayerMoveEvent>() {
 
-    override val name = "player move"
+    override val name = "player real move"
     override val event = PlayerMoveEvent::class
     override val isAsync = true
 
     init {
         handler {
-            if (from.x != to.x || from.z != to.z) player else null
+            if (from.x.toInt() != to.x.toInt() || from.z.toInt() != to.z.toInt()) player else null
         }
         addCondition("position") { e ->
             toPosition().inside(e.to)
