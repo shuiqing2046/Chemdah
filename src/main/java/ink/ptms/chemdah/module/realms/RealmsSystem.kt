@@ -3,6 +3,7 @@ package ink.ptms.chemdah.module.realms
 import ink.ptms.chemdah.Chemdah
 import ink.ptms.chemdah.module.Module
 import ink.ptms.chemdah.module.Module.Companion.register
+import io.izzel.taboolib.Version
 import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.kotlin.blockdb.BlockFactory
 import io.izzel.taboolib.module.config.TConfig
@@ -47,7 +48,11 @@ object RealmsSystem : Module, Listener {
         if (e.player.location.getRealms() != null) {
             Bukkit.getOnlinePlayers().forEach { player ->
                 if (player.name != e.player.name) {
-                    player.hidePlayer(Chemdah.plugin, e.player)
+                    if (Version.isAfter(Version.v1_13)) {
+                        player.hidePlayer(Chemdah.plugin, e.player)
+                    } else {
+                        player.hidePlayer(e.player)
+                    }
                 }
             }
         }
@@ -59,14 +64,22 @@ object RealmsSystem : Module, Listener {
             val realms = e.to.getRealms()
             if (realms != null) {
                 Bukkit.getOnlinePlayers().forEach { player ->
-                    if (player.name != e.player.name) {
-                        player.hidePlayer(Chemdah.plugin, e.player)
+                    if (player.name != e.player.name && player.canSee(e.player)) {
+                        if (Version.isAfter(Version.v1_13)) {
+                            player.hidePlayer(Chemdah.plugin, e.player)
+                        } else {
+                            player.hidePlayer(e.player)
+                        }
                     }
                 }
             } else {
                 Bukkit.getOnlinePlayers().forEach { player ->
-                    if (player.name != e.player.name) {
-                        player.showPlayer(Chemdah.plugin, e.player)
+                    if (player.name != e.player.name && !player.canSee(e.player)) {
+                        if (Version.isAfter(Version.v1_13)) {
+                            player.showPlayer(Chemdah.plugin, e.player)
+                        } else {
+                            player.showPlayer(e.player)
+                        }
                     }
                 }
             }
