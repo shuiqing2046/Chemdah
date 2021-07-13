@@ -68,9 +68,9 @@ object QuestDevelopment : Listener {
                 return true
             }
             val message = playerMessageCache.computeIfAbsent(player.name) { ArrayList() }
-            message.add(packet.get())
+            message += packet.get()
             if (message.size > 32) {
-                message.removeLastOrNull()
+                message.removeFirstOrNull()
             }
             if (player.conversationSession?.conversation?.option?.theme == "chat") {
                 return false
