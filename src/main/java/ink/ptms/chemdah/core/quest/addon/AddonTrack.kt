@@ -190,7 +190,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                     acceptedQuestsMap[player.name] = chemdahProfile.getQuests(openAPI = true)
                 }
                 // 若任务未接受则追踪任务整体
-                if (acceptedQuestsMap[player.name]?.any { it.id == quest.id } == true) {
+                if (acceptedQuestsMap[player.name]?.none { it.id == quest.id } == true) {
                     val track = quest.track() ?: return@forEach
                     player.trackTickMark(track)
                     player.trackTickNavigation(track)

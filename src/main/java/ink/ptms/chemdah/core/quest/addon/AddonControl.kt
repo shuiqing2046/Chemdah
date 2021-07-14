@@ -15,7 +15,7 @@ import java.util.concurrent.CompletableFuture
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.quest.addon.MetaControl
+ * ink.ptms.chemdah.core.quest.addon.AddonControl
  *
  * @author sky
  * @since 2021/3/1 11:47 下午

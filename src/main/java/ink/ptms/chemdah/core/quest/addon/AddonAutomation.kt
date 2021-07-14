@@ -18,7 +18,7 @@ import kotlin.random.Random
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.quest.addon.MetaAutomation
+ * ink.ptms.chemdah.core.quest.addon.AddonAutomation
  *
  * @author sky
  * @since 2021/3/1 11:47 下午

@@ -4,7 +4,6 @@ import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Id
 import ink.ptms.chemdah.core.quest.Option
 import ink.ptms.chemdah.core.quest.QuestContainer
-import ink.ptms.chemdah.core.quest.Template
 import ink.ptms.chemdah.util.asList
 import ink.ptms.chemdah.util.mirrorFuture
 import ink.ptms.chemdah.util.namespaceQuest
@@ -14,14 +13,14 @@ import java.util.concurrent.CompletableFuture
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.quest.addon.MetaRestart
+ * ink.ptms.chemdah.core.quest.addon.AddonRestart
  *
  * @author sky
  * @since 2021/3/1 11:47 下午
  */
 @Id("restart")
 @Option(Option.Type.ANY)
-class AddonRestart(root: Any?, template: Template) : Addon(root, template) {
+class AddonRestart(root: Any?, questContainer: QuestContainer) : Addon(root, questContainer) {
 
     val restart = root?.asList() ?: emptyList()
 

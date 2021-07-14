@@ -8,7 +8,7 @@ import java.text.SimpleDateFormat
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.quest.addon.MetaTimeout
+ * ink.ptms.chemdah.core.quest.addon.AddonTimeout
  *
  * @author sky
  * @since 2021/3/4 9:04 上午

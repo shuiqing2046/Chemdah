@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicReference
 
 /**
  * Chemdah
- * ink.ptms.chemdah.core.quest.addon.AddonProgress
+ * ink.ptms.chemdah.core.quest.addon.AddonStats
  *
  * @author sky
  * @since 2021/3/5 11:14 上午
