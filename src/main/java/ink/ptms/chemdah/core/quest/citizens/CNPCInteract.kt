@@ -15,7 +15,7 @@ object CNPCInteract : ObjectiveCountableI<NPCRightClickEvent>() {
             clicker
         }
         addCondition("position") { e ->
-            toPosition().inside(e.npc.storedLocation)
+            toPosition().inside(e.npc.entity.location)
         }
         addCondition("name") { e ->
             asList().any { it.equals(e.npc.name, true) }
