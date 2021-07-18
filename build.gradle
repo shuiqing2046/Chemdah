@@ -21,12 +21,14 @@ taboolib {
 repositories {
     mavenCentral()
     maven { url = 'https://raw.githubusercontent.com/HyChrod/FriendsAPI/repository' }
+    maven { url = 'https://repo.pcgamingfreaks.at/repository/maven-everything'}
     maven { url = 'https://jitpack.io' }
 }
 
 dependencies {
     implementation 'com.sk89q.worldedit:WorldEdit:7:all'
     implementation 'de.HyChrod:FriendsAPI:1.1.0.9.1'
+    implementation 'at.pcgamingfreaks:MarriageMaster-API-Bukkit:2.4.1'
     implementation 'com.github.angeschossen:LandsAPI:5.12.1'
     implementation 'public:Team:1.0.0:7'
     implementation 'public:Team:1.0.0:9'
