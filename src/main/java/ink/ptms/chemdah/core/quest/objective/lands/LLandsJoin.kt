@@ -16,7 +16,7 @@ object LLandsJoin : ObjectiveCountableI<LandTrustPlayerEvent>() {
             Bukkit.getPlayer(targetUUID)
         }
         addCondition("position") {
-            toPosition().inside(Bukkit.getPlayer(it.target)!!.location)
+            toPosition().inside(Bukkit.getPlayer(it.targetUUID)!!.location)
         }
     }
 }
