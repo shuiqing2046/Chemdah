@@ -17,11 +17,17 @@ object CNPCInteract : ObjectiveCountableI<NPCRightClickEvent>() {
         addCondition("position") { e ->
             toPosition().inside(e.npc.entity.location)
         }
+        addCondition("id") { e ->
+            toInt() == e.npc.id
+        }
         addCondition("name") { e ->
-            asList().any { it.equals(e.npc.name, true) }
+            asList().any { it.equals(e.npc.name, true)}
         }
         addCondition("type") { e ->
             asList().any { it.equals(e.npc.entity.type.name, true) }
+        }
+        addConditionVariable("id") {
+            it.npc.id
         }
         addConditionVariable("name") {
             it.npc.name
