@@ -5,7 +5,7 @@ import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import com.vexsoftware.votifier.model.VotifierEvent
 import org.bukkit.Bukkit
 
-@Dependency("votifier")
+@Dependency("Votifier")
 object VVotifierVote : ObjectiveCountableI<VotifierEvent>() {
 
     override val name = "votifier vote"
