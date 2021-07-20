@@ -33,8 +33,8 @@ class UI {
             val empty = ui.config.getString("bar.$plan.empty", "&8|")!!.colored()
             val fill = ui.config.getString("bar.$plan.fill", "&a|")!!.colored()
             val size = ui.config.getInt("bar.$plan.size", 35)
-            return CompletableFuture.completedFuture((1..size).joinToString("") { i ->
-                if (percent.isNaN() || percent == 0.0) empty else if (percent >= i.toDouble() / size) fill else empty
+            return CompletableFuture.completedFuture((1..size).joinToString("") {
+                if (percent.isNaN() || percent == 0.0) empty else if (percent >= it.toDouble() / size) fill else empty
             })
         }
 

@@ -63,7 +63,7 @@ object QuestDevelopment : Listener {
     @TPacket(type = TPacket.Type.SEND)
     fun e(player: Player, packet: Packet): Boolean {
         if (enableMessageTransmit && packet.`is`("PacketPlayOutChat") && packet.read("b").toString() != "GAME_INFO") {
-            val a = packet.read("a")!!.toString()
+            val a = packet.read("a").toString()
             if (a.contains("PLEASE!PASS!ME!d3486345-e35d-326a-b5c5-787de3814770!") || playerRelease[player.name]?.contains(a) == true) {
                 return true
             }
