@@ -12,7 +12,8 @@ object CNPCDamage : ObjectiveCountableI<NPCDamageByEntityEvent>() {
     override val name = "cnpc damage"
     override val event = NPCDamageByEntityEvent::class
 
-    init {
+    // Will rewrite
+/**    init {
         handler {
             damager as? Player
         }
@@ -41,4 +42,5 @@ object CNPCDamage : ObjectiveCountableI<NPCDamageByEntityEvent>() {
             it.npc.id
         }
     }
+    */
 }
