@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.module.kether
 
-import ink.ptms.adyeshach.taboolib.common.LifeCycle
-import ink.ptms.adyeshach.taboolib.common.platform.Awake
+import taboolib.common.LifeCycle
+import taboolib.common.platform.Awake
 import taboolib.module.kether.Kether
 import taboolib.module.kether.PlayerOperator
 

@@ -1,12 +1,11 @@
 package ink.ptms.chemdah.module.ui
 
-import ink.ptms.adyeshach.taboolib.module.configuration.Config
 import ink.ptms.chemdah.module.Module
 import ink.ptms.chemdah.module.Module.Companion.register
 import org.bukkit.event.player.PlayerQuitEvent
 import taboolib.common.platform.Awake
-import taboolib.common.platform.Schedule
 import taboolib.common.platform.event.SubscribeEvent
+import taboolib.module.configuration.Config
 import taboolib.module.configuration.SecuredFile
 import java.util.concurrent.ConcurrentHashMap
 
@@ -37,7 +36,6 @@ object UISystem : Module {
         ui.values.forEach { it.playerFilters.remove(e.player.uniqueId) }
     }
 
-    @Schedule
     override fun reload() {
         ui.clear()
         ui.putAll(conf.getKeys(false).map { it to UI(conf.getConfigurationSection(it)!!) })
