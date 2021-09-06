@@ -51,7 +51,11 @@ data class PlayerReply(
 
     fun select(session: Session): CompletableFuture<Void> {
         return try {
-            KetherShell.eval(action, namespace = namespaceConversationPlayer) { extend(session.variables) }.thenAccept {
+            KetherShell.eval(action, namespace = namespaceConversationPlayer) {
+                println(session.variables)
+                extend(session.variables)
+
+            }.thenAccept {
                 if (session.isNext) {
                     session.isNext = false
                 } else {

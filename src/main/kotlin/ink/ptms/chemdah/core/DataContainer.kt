@@ -45,7 +45,7 @@ class DataContainer {
     }
 
     internal fun unchanged(func: DataContainer.() -> Unit) {
-        unchanged { func(this) }
+        unchanged(Consumer { func(this) })
     }
 
     constructor()

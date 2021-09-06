@@ -39,7 +39,7 @@ object ChemdahAPI {
     val questMeta = HashMap<String, Class<out Meta<*>>>()
     val questAddon = HashMap<String, Class<out Addon>>()
     val questTemplate = HashMap<String, Template>()
-    val questObjective = HashMap<String, Objective<out Event>>()
+    val questObjective = HashMap<String, Objective<*>>()
 
     val playerProfile = ConcurrentHashMap<String, PlayerProfile>()
 
@@ -51,19 +51,19 @@ object ChemdahAPI {
      */
     val Player.chemdahProfile: PlayerProfile
         @Throws(NullPointerException::class)
-        get() = ChemdahAPI.playerProfile[name]!!
+        get() = playerProfile[name]!!
 
     /**
      * 玩家数据已经加载完成
      */
     val Player.isChemdahProfileLoaded: Boolean
-        get() = ChemdahAPI.playerProfile.containsKey(name)
+        get() = playerProfile.containsKey(name)
 
     /**
      * 玩家数据尚未加载完成
      */
     val Player.nonChemdahProfileLoaded: Boolean
-        get() = !ChemdahAPI.playerProfile.containsKey(name)
+        get() = !playerProfile.containsKey(name)
 
     /**
      * 获取玩家正在进行的会话
@@ -159,14 +159,14 @@ object ChemdahAPI {
     /**
      * 获取任务目标
      */
-    fun getQuestObjective(id: String): Objective<out Event>? {
+    fun getQuestObjective(id: String): Objective<*>? {
         return questObjective[id]
     }
 
     /**
      * 注册任务元数据
      */
-    fun addQuestObjective(id: String, objective: Objective<out Event>) {
+    fun addQuestObjective(id: String, objective: Objective<*>) {
         questObjective[id] = objective
     }
 

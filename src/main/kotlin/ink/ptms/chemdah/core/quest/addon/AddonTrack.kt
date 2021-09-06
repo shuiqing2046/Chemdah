@@ -253,7 +253,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                                 path?.nodes?.forEachIndexed { index, node ->
                                     submit(delay = index.toLong()) {
                                         trackAddon.navigationType.sendTo(
-                                            adaptPlayer(this),
+                                            adaptPlayer(this@trackTickNavigation),
                                             node.asBlockPos().toLocation(center.world!!).toCenter().toProxyLocation(),
                                             offset = Vector(trackAddon.navigationSizeX, trackAddon.navigationSizeY, trackAddon.navigationSizeX),
                                             count = trackAddon.navigationCount

@@ -146,7 +146,8 @@ object CommandChemdahQuest {
     val info = subCommand {
         dynamic {
             suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
-            dynamic {
+            dynamic(optional = true) {
+                suggestion<CommandSender>(uncheck = true) { _, _ -> ChemdahAPI.questTemplate.keys.toList() }
                 execute<CommandSender> { sender, context, argument ->
                     commandInfo(sender, context.argument(-1)!!, Coerce.toInteger(argument))
                 }

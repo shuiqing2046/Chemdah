@@ -7,6 +7,7 @@ import ink.ptms.chemdah.core.quest.Quest
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerQuitEvent
 import taboolib.common.platform.event.SubscribeEvent
+import taboolib.common.platform.function.info
 import taboolib.common.platform.function.submit
 import taboolib.common5.Coerce
 import taboolib.module.database.ColumnOptionSQL
@@ -179,7 +180,7 @@ class DatabaseSQL : Database() {
         val quests = HashMap<String, DataContainer>()
         tableQuest.select(dataSource) {
             rows("${tableQuest.name}.quest", "${tableQuestData.name}.key", "${tableQuestData.name}.value")
-            where("user" eq getUserId(player) and ("${tableQuest.name}.mode" eq 1) and ("${tableQuest.name}.mode" eq 1))
+            where("user" eq getUserId(player) and ("${tableQuest.name}.mode" eq 1) and ("${tableQuestData.name}.mode" eq 1))
             innerJoin(tableQuestData.name) {
                 where { "${tableQuest.name}.id" eq pre("${tableQuestData.name}.quest") }
             }
@@ -209,9 +210,12 @@ class DatabaseSQL : Database() {
                 }
             }
         }
-        tableUserData.update(dataSource) {
-            where { "user" eq id and ("key" inside persistentDataContainer.drops.toTypedArray()) }
-            set("mode", 0)
+        if (persistentDataContainer.drops.isNotEmpty()) {
+            tableUserData.update(dataSource) {
+                where { "user" eq id and ("key" inside persistentDataContainer.drops.toTypedArray()) }
+                set("value", null)
+                set("mode", 0)
+            }
         }
         persistentDataContainer.flush()
     }
@@ -226,6 +230,13 @@ class DatabaseSQL : Database() {
                     player.createQuest(id, quest)
                     return@forEach
                 }
+                // 在2021年9月7日的升级测试中发现，一旦任务完成后再次接受将不会被同步数据，这可能是由上个版本的 SQL 写法尚未进行详细测试导致
+                // 添加下面的代码使任务恢复到接受状态
+                tableQuest.update(dataSource) {
+                    where("id" eq questId and ("user" eq id))
+                    set("mode", 1)
+                }
+                // 对任务数据进行更新
                 quest.persistentDataContainer.forEach { (key, data) ->
                     if (data.changed) {
                         if (tableQuestData.find(dataSource) { where("quest" eq questId and ("key" eq key)) }) {
@@ -239,9 +250,11 @@ class DatabaseSQL : Database() {
                         }
                     }
                 }
-                quest.persistentDataContainer.drops.toList().forEach {
+                // 对丢弃对数据进行删除
+                if (quest.persistentDataContainer.drops.isNotEmpty()) {
                     tableQuestData.update(dataSource) {
-                        where { "quest" eq questId and ("key" eq it) }
+                        where { "quest" eq questId and ("key" inside quest.persistentDataContainer.drops.toTypedArray()) }
+                        set("value", null)
                         set("mode", 0)
                     }
                 }
@@ -352,7 +365,7 @@ class DatabaseSQL : Database() {
     override fun releaseVariable0(key: String) {
         tableVariables.update(dataSource) {
             where { "name" eq key }
-            set("data", "")
+            set("data", null)
             set("mode", false)
         }
     }

@@ -10,9 +10,7 @@ object MMarriageMarried : ObjectiveCountableI<MarryEvent>() {
     override val name = "marriage marry"
     override val event = MarryEvent::class
 
-    // Need to rewrite
-
-/**    init {
+    init {
         handler {
             player1.playerOnline
         }
@@ -20,5 +18,5 @@ object MMarriageMarried : ObjectiveCountableI<MarryEvent>() {
             toPosition().inside(it.player1.playerOnline!!.location) && toPosition().inside(it.player2.playerOnline!!.location)
         }
     }
-**/
+
 }

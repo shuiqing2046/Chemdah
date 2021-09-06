@@ -63,21 +63,24 @@ object QuestLoader {
     fun registerAll() {
         runningClasses.forEach {
             if (Objective::class.java.isAssignableFrom(it) && !it.isAnnotationPresent(Abstract::class.java)) {
-                val objective = it.getInstance() as? Objective<Event>
-                if (objective != null) {
-                    // 检测依赖环境
-                    if (it.isAnnotationPresent(Dependency::class.java)) {
-                        val dependency = it.getAnnotation(Dependency::class.java)
-                        // 不支持的扩展
-                        if (dependency.plugin != "minecraft" && Bukkit.getPluginManager().getPlugin(dependency.plugin) == null) {
-                            return@forEach
-                        }
-                        // 不支持的版本
-                        if (MinecraftVersion.majorLegacy < dependency.version) {
-                            return@forEach
-                        }
+                // 检测依赖环境
+                if (it.isAnnotationPresent(Dependency::class.java)) {
+                    val dependency = it.getAnnotation(Dependency::class.java)
+                    // 不支持的扩展
+                    if (dependency.plugin != "minecraft" && Bukkit.getPluginManager().getPlugin(dependency.plugin) == null) {
+                        return@forEach
                     }
-                    objective.register()
+                    // 不支持的版本
+                    if (MinecraftVersion.majorLegacy < dependency.version) {
+                        return@forEach
+                    }
+                }
+                // 注册目标
+                try {
+                    (it.getInstance()?.get() as? Objective<*>)?.register()
+                } catch (ignored: NoClassDefFoundError) {
+                    // 例如版本问题导致的错误，无法被精确的判断
+                    // ClassNotFoundException: com.destroystokyo.paper.event.player.PlayerElytraBoostEvent
                 }
             } else if (it.isAnnotationPresent(Id::class.java)) {
                 val id = it.getAnnotation(Id::class.java).id
@@ -97,7 +100,7 @@ object QuestLoader {
     /**
      * 注册任务目标
      */
-    fun <T : Event> Objective<T>.register() {
+    fun <T : Any> Objective<T>.register() {
         ChemdahAPI.questObjective[name] = this
         // 是否注册监听器
         if (isListener) {
@@ -128,7 +131,7 @@ object QuestLoader {
      * @param event 事件
      * @param objective 条目类型
      */
-    fun <T : Event> handleEvent(player: Player, event: T, objective: Objective<T>) {
+    fun <T : Any> handleEvent(player: Player, event: T, objective: Objective<T>) {
         mirrorNow("QuestHandler:handleEvent:${objective.name}") {
             if (player.isChemdahProfileLoaded) {
                 player.chemdahProfile.also { profile ->
@@ -140,7 +143,7 @@ object QuestLoader {
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun <T : Event> handleTask(profile: PlayerProfile, task: Task, quest: Quest, event: T) {
+    fun <T : Any> handleTask(profile: PlayerProfile, task: Task, quest: Quest, event: T) {
         val objective: Objective<T> = task.objective as Objective<T>
         // 如果含有完成标记，则不在进行该条目
         if (objective.hasCompletedSignature(profile, task)) {
