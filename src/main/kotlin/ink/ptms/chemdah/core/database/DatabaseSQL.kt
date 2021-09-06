@@ -134,31 +134,21 @@ class DatabaseSQL : Database() {
     }
 
     fun updateUserTime(userId: Long) {
-        tableUser.workspace(dataSource) {
-            update {
-                where {
-                    "id" eq userId
-                }
-                set("time", Date())
-            }
-        }.run()
+        tableUser.update(dataSource) {
+            where("id" eq userId)
+            set("time", Date())
+        }
     }
 
     fun getUserId(player: Player): Long {
         if (cacheUserId.containsKey(player.name)) {
             return cacheUserId[player.name]!!
         }
-        val userId = tableUser.workspace(dataSource) {
-            select {
-                where {
-                    "uuid" eq player.uniqueId.toString()
-                }
-                limit(1)
-                rows("id")
-            }
-        }.firstOrNull {
-            getLong("id")
-        } ?: -1L
+        val userId = tableUser.select(dataSource) {
+            rows("id")
+            where("uuid" eq player.uniqueId.toString())
+            limit(1)
+        }.firstOrNull { getLong("id") } ?: -1L
         cacheUserId[player.name] = userId
         return userId
     }
@@ -168,56 +158,33 @@ class DatabaseSQL : Database() {
         if (map.containsKey(quest.id)) {
             return map[quest.id]!!
         }
-        val userId = tableQuest.workspace(dataSource) {
-            select {
-                where {
-                    and {
-                        "uuid" eq getUserId(player)
-                        "quest" eq quest.id
-                    }
-                }
-                limit(1)
-                rows("id")
-            }
-        }.firstOrNull {
-            getLong("id")
-        } ?: -1L
+        val userId = tableQuest.select(dataSource) {
+            rows("id")
+            where("user" eq getUserId(player) and ("quest" eq quest.id))
+            limit(1)
+        }.firstOrNull { getLong("id") } ?: -1L
         map[quest.id] = userId
         return userId
     }
 
     fun PlayerProfile.init(): PlayerProfile {
-        tableUserData.workspace(dataSource) {
-            select {
-                where {
-                    and {
-                        "user" eq getUserId(player)
-                        "mode" eq 1
-                    }
-                }
-                rows("key", "value")
-            }
+        tableUserData.select(dataSource) {
+            rows("key", "value")
+            where("user" eq getUserId(player) and ("mode" eq 1))
         }.map {
             getString("key") to getString("value")
         }.forEach {
             persistentDataContainer.unchanged { this[it.first] = it.second }
         }
         val quests = HashMap<String, DataContainer>()
-        tableQuest.workspace(dataSource) {
-            select {
-                rows("quest", "${tableQuestData.name}.key", "${tableQuestData.name}.value")
-                where {
-                    and {
-                        "user" eq getUserId(player)
-                        "mode" eq 1
-                    }
-                }
-                innerJoin(tableQuestData.name) {
-                    where { "${tableQuest.name}.id" eq pre("${tableQuestData.name}.quest") }
-                }
+        tableQuest.select(dataSource) {
+            rows("${tableQuest.name}.quest", "${tableQuestData.name}.key", "${tableQuestData.name}.value")
+            where("user" eq getUserId(player) and ("${tableQuest.name}.mode" eq 1) and ("${tableQuest.name}.mode" eq 1))
+            innerJoin(tableQuestData.name) {
+                where { "${tableQuest.name}.id" eq pre("${tableQuestData.name}.quest") }
             }
         }.map {
-            getString("quest") to (getString("key") to getString("value"))
+            getString("${tableQuest.name}.quest") to (getString("${tableQuestData.name}.key") to getString("${tableQuestData.name}.value"))
         }.forEach {
             quests.computeIfAbsent(it.first) { DataContainer() }.unchanged {
                 this[it.second.first] = it.second.second
@@ -231,33 +198,21 @@ class DatabaseSQL : Database() {
         val id = getUserId(player)
         persistentDataContainer.forEach { (key, data) ->
             if (data.changed) {
-                if (tableUserData.workspace(dataSource) { select { where { "user" eq id; "key" eq key } } }.find()) {
-                    tableUserData.workspace(dataSource) {
-                        update {
-                            where {
-                                "user" eq id
-                                "key" eq key
-                            }
-                            set("value", data.data)
-                            set("mode", 1)
-                        }
-                    }.run()
+                if (tableUserData.find(dataSource) { where("user" eq id and ("key" eq key)) }) {
+                    tableUserData.update(dataSource) {
+                        where("user" eq id and ("key" eq key))
+                        set("value", data.data)
+                        set("mode", 1)
+                    }
                 } else {
-                    tableUserData.workspace(dataSource) {
-                        insert("user", "key", "value", "mode") { value(id, key, data.data, 1) }
-                    }.run()
+                    tableUserData.insert(dataSource, "user", "key", "value", "mode") { value(id, key, data.data, 1) }
                 }
             }
         }
-        tableUserData.workspace(dataSource) {
-            update {
-                where {
-                    "user" eq id
-                    "key" inside persistentDataContainer.drops.toTypedArray()
-                }
-                set("mode", 0)
-            }
-        }.run()
+        tableUserData.update(dataSource) {
+            where { "user" eq id and ("key" inside persistentDataContainer.drops.toTypedArray()) }
+            set("mode", 0)
+        }
         persistentDataContainer.flush()
     }
 
@@ -273,34 +228,22 @@ class DatabaseSQL : Database() {
                 }
                 quest.persistentDataContainer.forEach { (key, data) ->
                     if (data.changed) {
-                        if (tableQuestData.workspace(dataSource) { select { where { "quest" eq questId; "key" eq key } } }.find()) {
-                            tableQuestData.workspace(dataSource) {
-                                update {
-                                    where {
-                                        "quest" eq questId
-                                        "key" eq key
-                                    }
-                                    set("value", data.data)
-                                    set("mode", 1)
-                                }
-                            }.run()
+                        if (tableQuestData.find(dataSource) { where("quest" eq questId and ("key" eq key)) }) {
+                            tableQuestData.update(dataSource) {
+                                where("quest" eq questId and ("key" eq key))
+                                set("value", data.data)
+                                set("mode", 1)
+                            }
                         } else {
-                            tableQuestData.workspace(dataSource) {
-                                insert("quest", "key", "value", "mode") { value(questId, key, data.data, 1) }
-                            }.run()
+                            tableQuestData.insert(dataSource, "quest", "key", "value", "mode") { value(questId, key, data.data, 1) }
                         }
                     }
                 }
                 quest.persistentDataContainer.drops.toList().forEach {
-                    tableQuestData.workspace(dataSource) {
-                        update {
-                            where {
-                                "quest" eq questId
-                                "key" eq it
-                            }
-                            set("mode", 0)
-                        }
-                    }.run()
+                    tableQuestData.update(dataSource) {
+                        where { "quest" eq questId and ("key" eq it) }
+                        set("mode", 0)
+                    }
                 }
                 quest.persistentDataContainer.flush()
             }
@@ -309,52 +252,44 @@ class DatabaseSQL : Database() {
 
     fun PlayerProfile.createUser(player: Player): CompletableFuture<Long> {
         val future = CompletableFuture<Long>()
-        tableUser.workspace(dataSource) {
-            insert("name", "uuid", "time") {
-                value(player.name, player.uniqueId.toString(), Date())
-                onFinally {
-                    val userId = generatedKeys.run {
-                        next()
-                        Coerce.toLong(getObject(1))
-                    }
-                    cacheUserId[player.name] = userId
-                    tableUserData.workspace(dataSource) {
-                        insert("user", "key", "value", "mode") {
-                            persistentDataContainer.forEach { (k, v) ->
-                                value(userId, k, v.data, 1)
-                            }
-                        }
-                    }.run()
-                    persistentDataContainer.flush()
-                    getQuests().forEach { player.createQuest(userId, it) }
-                    future.complete(userId)
+        tableUser.insert(dataSource, "name", "uuid", "time") {
+            value(player.name, player.uniqueId.toString(), Date())
+            onFinally {
+                val userId = generatedKeys.run {
+                    next()
+                    Coerce.toLong(getObject(1))
                 }
+                cacheUserId[player.name] = userId
+                tableUserData.insert(dataSource, "user", "key", "value", "mode") {
+                    persistentDataContainer.forEach { (k, v) ->
+                        value(userId, k, v.data, 1)
+                    }
+                }
+                persistentDataContainer.flush()
+                getQuests().forEach { player.createQuest(userId, it) }
+                future.complete(userId)
             }
-        }.run()
+        }
         return future
     }
 
     fun Player.createQuest(userId: Long, quest: Quest) {
-        tableQuest.workspace(dataSource) {
-            insert("user", "quest", "mode") {
-                value(userId, quest.id, 1)
-                onFinally {
-                    val questId = generatedKeys.run {
-                        next()
-                        Coerce.toLong(getObject(1))
-                    }
-                    cacheQuestId.computeIfAbsent(name) { HashMap() }[quest.id] = questId
-                    tableQuestData.workspace(dataSource) {
-                        insert("quest", "key", "value", "mode") {
-                            quest.persistentDataContainer.forEach { (k, v) ->
-                                value(questId, k, v.data, 1)
-                            }
-                        }
-                    }.run()
-                    quest.persistentDataContainer.flush()
+        tableQuest.insert(dataSource, "user", "quest", "mode") {
+            value(userId, quest.id, 1)
+            onFinally {
+                val questId = generatedKeys.run {
+                    next()
+                    Coerce.toLong(getObject(1))
                 }
+                cacheQuestId.computeIfAbsent(name) { HashMap() }[quest.id] = questId
+                tableQuestData.insert(dataSource, "quest", "key", "value", "mode") {
+                    quest.persistentDataContainer.forEach { (k, v) ->
+                        value(questId, k, v.data, 1)
+                    }
+                }
+                quest.persistentDataContainer.flush()
             }
-        }.run()
+        }
     }
 
     override fun select(player: Player): PlayerProfile {
@@ -382,82 +317,50 @@ class DatabaseSQL : Database() {
         if (questId < 0) {
             return
         }
-        tableQuest.workspace(dataSource) {
-            update {
-                where {
-                    and {
-                        "user" eq getUserId(player)
-                        "quest" eq quest.id
-                    }
-                }
-                set("mode", 0)
-            }
-        }.run()
-        tableQuestData.workspace(dataSource) {
-            update {
-                where {
-                    "quest" eq questId
-                }
-                set("mode", 0)
-            }
-        }.run()
+        tableQuest.update(dataSource) {
+            where { "user" eq getUserId(player) and ("quest" eq quest.id) }
+            set("mode", 0)
+        }
+        tableQuestData.update(dataSource) {
+            where { "quest" eq questId }
+            set("mode", 0)
+        }
     }
 
     override fun selectVariable0(key: String): String? {
-        return tableVariables.workspace(dataSource) {
-            select {
-                where {
-                    and {
-                        "name" eq key
-                        "mode" eq true
-                    }
-                }
-                limit(1)
-                rows("data")
-            }
+        return tableVariables.select(dataSource) {
+            rows("data")
+            where { "name" eq key and ("mode" eq true) }
+            limit(1)
         }.firstOrNull {
             getString("data")
         }
     }
 
     override fun updateVariable0(key: String, value: String) {
-        if (tableVariables.workspace(dataSource) { select { where { "name" eq key } } }.find()) {
-            tableVariables.workspace(dataSource) {
-                update {
-                    where {
-                        "name" eq key
-                    }
-                    set("data", value)
-                    set("mode", true)
-                }
-            }.run()
+        if (tableVariables.find(dataSource) { where("name" eq key) }) {
+            tableVariables.update(dataSource) {
+                where { "name" eq key }
+                set("data", value)
+                set("mode", true)
+            }
         } else {
-            tableVariables.workspace(dataSource) {
-                insert("name", "data", "mode") { value(key, value, true) }
-            }.run()
+            tableVariables.insert(dataSource, "name", "data", "mode") { value(key, value, true) }
         }
     }
 
     override fun releaseVariable0(key: String) {
-        tableVariables.workspace(dataSource) {
-            update {
-                where {
-                    "name" eq key
-                }
-                set("data", "")
-                set("mode", false)
-            }
-        }.run()
+        tableVariables.update(dataSource) {
+            where { "name" eq key }
+            set("data", "")
+            set("mode", false)
+        }
     }
 
     override fun variables(): List<String> {
-        return tableVariables.workspace(dataSource) {
-            select {
-                where {
-                    "mode" eq true
-                }
-                rows("name")
-            }
+        return tableVariables.select(dataSource) {
+            rows("name")
+            where { "mode" eq true }
         }.map {
             getString("name")
         }

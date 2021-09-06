@@ -33,13 +33,14 @@ taboolib {
     install("module-ui")
     install("platform-bukkit")
     classifier = null
-    version = "6.0.0-53"
+    version = "6.0.1"
 }
 
 repositories {
     maven { url = uri("https://raw.githubusercontent.com/HyChrod/FriendsAPI/repository") }
     maven { url = uri("https://repo.pcgamingfreaks.at/repository/maven-everything") }
     maven { url = uri("https://jitpack.io") }
+    mavenLocal()
     mavenCentral()
 }
 

@@ -15,23 +15,27 @@ import taboolib.module.kether.ScriptFrame
 import taboolib.module.kether.script
 
 val namespaceQuest = listOf(
+    "adyeshach",
     "chemdah",
     "chemdah-quest"
 )
 
 val namespaceQuestUI = listOf(
+    "adyeshach",
     "chemdah",
     "chemdah-quest",
     "chemdah-quest-ui"
 )
 
 val namespaceConversationNPC = listOf(
+    "adyeshach",
     "chemdah",
     "chemdah-conversation",
     "chemdah-conversation-npc"
 )
 
 val namespaceConversationPlayer = listOf(
+    "adyeshach",
     "chemdah",
     "chemdah-conversation",
     "chemdah-conversation-player"

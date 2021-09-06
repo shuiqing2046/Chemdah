@@ -7,6 +7,8 @@ import taboolib.common.platform.command.CommandBody
 import taboolib.common.platform.command.CommandHeader
 import taboolib.common.platform.command.subCommand
 import taboolib.common.platform.function.adaptCommandSender
+import taboolib.module.kether.Kether
+import taboolib.module.kether.KetherShell
 import taboolib.module.kether.ScriptContext
 import taboolib.module.kether.printKetherErrorMessage
 import taboolib.platform.util.sendLang
@@ -74,6 +76,31 @@ object CommandChemdahScript {
             workspace.cancelAll()
             workspace.loadAll()
             sender.sendLang("command-script-reload-all")
+        }
+    }
+
+    @CommandBody
+    val debug = subCommand {
+        execute<CommandSender> { sender, _, _ ->
+            sender.sendMessage("§c[System] §7RegisteredActions:")
+            Kether.scriptRegistry.registeredNamespace.forEach {
+                sender.sendMessage("§c[System] §7  ${it}: §r${Kether.scriptRegistry.getRegisteredActions(it)}")
+            }
+        }
+    }
+
+    @CommandBody
+    val invoke = subCommand {
+        dynamic {
+            execute<CommandSender> { sender, _, argument ->
+                try {
+                    KetherShell.eval(argument, sender = adaptCommandSender(sender)).thenApply { v ->
+                        sender.sendMessage("§c[System] §7Result: $v")
+                    }
+                } catch (ex: Throwable) {
+                    ex.printKetherErrorMessage()
+                }
+            }
         }
     }
 
