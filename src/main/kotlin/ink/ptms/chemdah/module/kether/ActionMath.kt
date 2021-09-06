@@ -1,9 +1,10 @@
 package ink.ptms.chemdah.module.kether
 
-import taboolib.module.kether.*
 import taboolib.common5.Coerce
 import taboolib.library.kether.ArgTypes
 import taboolib.module.kether.KetherParser
+import taboolib.module.kether.actionFuture
+import taboolib.module.kether.scriptParser
 
 /**
  * Chemdah
@@ -18,14 +19,12 @@ class ActionMath {
 
         @KetherParser(["max"], namespace = "chemdah", shared = true)
         fun max() = scriptParser {
-            it.switch {
-                val n1 = it.next(ArgTypes.ACTION)
-                val n2 = it.next(ArgTypes.ACTION)
-                actionFuture {
-                    newFrame(n1).run<Any>().thenAccept { n1 ->
-                        newFrame(n2).run<Any>().thenAccept { n2 ->
-                            it.complete(kotlin.math.max(Coerce.toDouble(n1), Coerce.toDouble(n2)))
-                        }
+            val n1 = it.next(ArgTypes.ACTION)
+            val n2 = it.next(ArgTypes.ACTION)
+            actionFuture {
+                newFrame(n1).run<Any>().thenAccept { n1 ->
+                    newFrame(n2).run<Any>().thenAccept { n2 ->
+                        it.complete(kotlin.math.max(Coerce.toDouble(n1), Coerce.toDouble(n2)))
                     }
                 }
             }
@@ -33,12 +32,10 @@ class ActionMath {
 
         @KetherParser(["ceil"], namespace = "chemdah", shared = true)
         fun ceil() = scriptParser {
-            it.switch {
-                val n1 = it.next(ArgTypes.ACTION)
-                actionFuture {
-                    newFrame(n1).run<Any>().thenAccept { n1 ->
-                        it.complete(kotlin.math.ceil(Coerce.toDouble(n1)))
-                    }
+            val n1 = it.next(ArgTypes.ACTION)
+            actionFuture {
+                newFrame(n1).run<Any>().thenAccept { n1 ->
+                    it.complete(kotlin.math.ceil(Coerce.toDouble(n1)))
                 }
             }
         }

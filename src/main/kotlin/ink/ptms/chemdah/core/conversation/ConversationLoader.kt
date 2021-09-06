@@ -2,6 +2,8 @@ package ink.ptms.chemdah.core.conversation
 
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.conversation.AgentType.Companion.toAgentType
+import ink.ptms.chemdah.core.conversation.theme.ThemeChat
+import ink.ptms.chemdah.core.conversation.theme.ThemeChest
 import ink.ptms.chemdah.util.asMap
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
@@ -22,6 +24,11 @@ import java.io.File
  * @since 2021/2/9 6:34 下午
  */
 object ConversationLoader {
+
+    init {
+        ChemdahAPI.addConversationTheme("chat", ThemeChat)
+        ChemdahAPI.addConversationTheme("chest", ThemeChest)
+    }
 
     @Awake(LifeCycle.ENABLE)
     fun load() {

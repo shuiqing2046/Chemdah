@@ -15,7 +15,7 @@ import java.util.concurrent.CompletableFuture
 class ActionTrigger(val trigger: String) : ScriptAction<Void>() {
 
     override fun run(frame: ScriptFrame): CompletableFuture<Void> {
-        val player = frame.script().sender as? Player ?: error("No player selected.")
+        val player = frame.script().sender?.castSafely<Player>() ?: error("No player selected.")
         player.callTrigger(trigger)
         return CompletableFuture.completedFuture(null)
     }

@@ -11,6 +11,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerItemHeldEvent
 import org.bukkit.event.player.PlayerSwapHandItemsEvent
+import taboolib.common.LifeCycle
 import taboolib.common.platform.*
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.adaptCommandSender
@@ -37,10 +38,6 @@ import java.util.concurrent.TimeUnit
  * @since 2021/2/12 2:08 上午
  */
 object ThemeChat : Theme<ThemeChatSettings>(), Listener {
-
-    init {
-        register("chat")
-    }
 
     val baffle = Baffle.of(100, TimeUnit.MILLISECONDS)
 

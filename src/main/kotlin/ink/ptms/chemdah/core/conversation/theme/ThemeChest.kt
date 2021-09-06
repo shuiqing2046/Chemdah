@@ -8,6 +8,8 @@ import ink.ptms.chemdah.util.setIcon
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
+import taboolib.common.LifeCycle
+import taboolib.common.platform.SkipTo
 import taboolib.common.platform.function.adaptPlayer
 import taboolib.common.util.asList
 import taboolib.common5.Coerce
@@ -27,10 +29,6 @@ import java.util.concurrent.CompletableFuture
  * @since 2021/2/12 2:08 上午
  */
 object ThemeChest : Theme<ThemeChestSetting>() {
-
-    init {
-        register("chest")
-    }
 
     override fun createConfig(): ThemeChestSetting {
         return ThemeChestSetting(ConversationManager.conf.getConfigurationSection("theme-chest")!!)

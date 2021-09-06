@@ -70,7 +70,7 @@ fun ScriptFrame.getProfile(): PlayerProfile {
 }
 
 fun ScriptFrame.getPlayer(): Player {
-    return script().sender as? Player ?: error("No player selected.")
+    return script().sender?.castSafely<Player>() ?: error("No player selected.")
 }
 
 fun ScriptFrame.vars() = HashMap<String, Any?>().also { map ->
