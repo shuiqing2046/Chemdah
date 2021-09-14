@@ -1,6 +1,7 @@
 package ink.ptms.chemdah.module.compat
 
 import ink.ptms.chemdah.api.ChemdahAPI.isChemdahProfileLoaded
+import ink.ptms.chemdah.util.namespaceQuest
 import org.bukkit.entity.Player
 import taboolib.common.platform.function.adaptPlayer
 import taboolib.module.kether.KetherFunction
@@ -20,7 +21,7 @@ object CompatPlaceholderAPI : PlaceholderExpansion {
 
     override fun onPlaceholderRequest(player: Player, args: String): String {
         return if (player.isChemdahProfileLoaded) {
-            KetherFunction.parse("{{ $args }}", sender = adaptPlayer(player), namespace = listOf("chemdah"))
+            KetherFunction.parse("{{ $args }}", sender = adaptPlayer(player), namespace = namespaceQuest)
         } else {
             "..."
         }

@@ -26,13 +26,13 @@ object CommandChemdahPlayerLevel {
 
     @CommandBody
     val addlevel = subCommand { 
-        dynamic {
+        dynamic(commit = "player") {
             suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
             // level
-            dynamic {
+            dynamic(commit = "level") {
                 suggestion<CommandSender> { _, _ -> LevelSystem.level.keys.toList() }
                 // value
-                dynamic { 
+                dynamic(commit = "value") {
                     execute<CommandSender> { sender, context, argument ->
                         val playerExact = Bukkit.getPlayerExact(context.argument(-2)!!)!!
                         val option = getLevelOption(context.argument(-1)!!)!!
@@ -52,13 +52,13 @@ object CommandChemdahPlayerLevel {
 
     @CommandBody
     val setlevel = subCommand {
-        dynamic {
+        dynamic(commit = "player") {
             suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
             // level
-            dynamic {
+            dynamic(commit = "level") {
                 suggestion<CommandSender> { _, _ -> LevelSystem.level.keys.toList() }
                 // value
-                dynamic {
+                dynamic(commit = "value") {
                     execute<CommandSender> { sender, context, argument ->
                         val playerExact = Bukkit.getPlayerExact(context.argument(-2)!!)!!
                         val option = getLevelOption(context.argument(-1)!!)!!
@@ -78,13 +78,13 @@ object CommandChemdahPlayerLevel {
 
     @CommandBody
     val addexp = subCommand {
-        dynamic {
+        dynamic(commit = "player") {
             suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
             // level
-            dynamic {
+            dynamic(commit = "level") {
                 suggestion<CommandSender> { _, _ -> LevelSystem.level.keys.toList() }
                 // value
-                dynamic {
+                dynamic(commit = "value") {
                     execute<CommandSender> { sender, context, argument ->
                         val playerExact = Bukkit.getPlayerExact(context.argument(-2)!!)!!
                         val option = getLevelOption(context.argument(-1)!!)!!
@@ -104,13 +104,13 @@ object CommandChemdahPlayerLevel {
 
     @CommandBody
     val setexp = subCommand {
-        dynamic {
+        dynamic(commit = "player") {
             suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
             // level
-            dynamic {
+            dynamic(commit = "level") {
                 suggestion<CommandSender> { _, _ -> LevelSystem.level.keys.toList() }
                 // value
-                dynamic {
+                dynamic(commit = "value") {
                     execute<CommandSender> { sender, context, argument ->
                         val playerExact = Bukkit.getPlayerExact(context.argument(-2)!!)!!
                         val option = getLevelOption(context.argument(-1)!!)!!

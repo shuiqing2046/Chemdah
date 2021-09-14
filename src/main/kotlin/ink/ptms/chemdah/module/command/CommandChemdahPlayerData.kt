@@ -22,10 +22,10 @@ object CommandChemdahPlayerData {
 
     @CommandBody
     val set = subCommand {
-        dynamic {
+        dynamic(commit = "player") {
             suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
-            dynamic {
-                dynamic {
+            dynamic(commit = "key") {
+                dynamic(commit = "value") {
                     execute<CommandSender> { sender, context, argument ->
                         val playerExact = Bukkit.getPlayerExact(context.argument(-2)!!)!!
                         playerExact.chemdahProfile.persistentDataContainer[context.argument(-1)!!] = argument
@@ -38,10 +38,10 @@ object CommandChemdahPlayerData {
 
     @CommandBody
     val add = subCommand {
-        dynamic {
+        dynamic(commit = "player") {
             suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
-            dynamic {
-                dynamic {
+            dynamic(commit = "key") {
+                dynamic(commit = "value") {
                     execute<CommandSender> { sender, context, argument ->
                         val playerExact = Bukkit.getPlayerExact(context.argument(-2)!!)!!
                         val key = context.argument(-1)!!
@@ -56,9 +56,9 @@ object CommandChemdahPlayerData {
 
     @CommandBody
     val remove = subCommand {
-        dynamic {
+        dynamic(commit = "player") {
             suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
-            dynamic {
+            dynamic(commit = "key") {
                 execute<CommandSender> { sender, context, argument ->
                     val playerExact = Bukkit.getPlayerExact(context.argument(-1)!!)!!
                     playerExact.chemdahProfile.persistentDataContainer.remove(argument)
@@ -70,7 +70,7 @@ object CommandChemdahPlayerData {
 
     @CommandBody
     val clear = subCommand {
-        dynamic {
+        dynamic(commit = "player") {
             suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
             execute<CommandSender> { sender, context, argument ->
                 val playerExact = Bukkit.getPlayerExact(context.argument(-1)!!)!!

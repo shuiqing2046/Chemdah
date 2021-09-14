@@ -29,9 +29,9 @@ object CommandChemdahQuest {
 
     @CommandBody
     val accept = subCommand {
-        dynamic {
+        dynamic(commit = "player") {
             suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
-            dynamic {
+            dynamic(commit = "quest") {
                 suggestion<CommandSender> { _, _ -> ChemdahAPI.questTemplate.keys.toList() }
                 execute<CommandSender> { _, context, argument ->
                     val playerExact = Bukkit.getPlayerExact(context.argument(-1)!!)!!
@@ -44,9 +44,9 @@ object CommandChemdahQuest {
 
     @CommandBody
     val failure = subCommand {
-        dynamic {
+        dynamic(commit = "player") {
             suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
-            dynamic {
+            dynamic(commit = "quest") {
                 suggestion<CommandSender>(uncheck = true) { _, _ -> ChemdahAPI.questTemplate.keys.toList() }
                 execute<CommandSender> { sender, context, argument ->
                     val playerExact = Bukkit.getPlayerExact(context.argument(-1)!!)!!
@@ -63,9 +63,9 @@ object CommandChemdahQuest {
 
     @CommandBody
     val complete = subCommand {
-        dynamic {
+        dynamic(commit = "player") {
             suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
-            dynamic {
+            dynamic(commit = "quest") {
                 suggestion<CommandSender>(uncheck = true) { _, _ -> ChemdahAPI.questTemplate.keys.toList() }
                 execute<CommandSender> { sender, context, argument ->
                     val playerExact = Bukkit.getPlayerExact(context.argument(-1)!!)!!
@@ -82,9 +82,9 @@ object CommandChemdahQuest {
 
     @CommandBody
     val restart = subCommand {
-        dynamic {
+        dynamic(commit = "player") {
             suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
-            dynamic {
+            dynamic(commit = "quest") {
                 suggestion<CommandSender>(uncheck = true) { _, _ -> ChemdahAPI.questTemplate.keys.toList() }
                 execute<CommandSender> { sender, context, argument ->
                     val playerExact = Bukkit.getPlayerExact(context.argument(-1)!!)!!
@@ -101,9 +101,9 @@ object CommandChemdahQuest {
 
     @CommandBody
     val stop = subCommand {
-        dynamic {
+        dynamic(commit = "player") {
             suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
-            dynamic {
+            dynamic(commit = "quest") {
                 suggestion<CommandSender>(uncheck = true) { _, _ -> ChemdahAPI.questTemplate.keys.toList() }
                 execute<CommandSender> { sender, context, argument ->
                     val playerExact = Bukkit.getPlayerExact(context.argument(-1)!!)!!
@@ -120,9 +120,9 @@ object CommandChemdahQuest {
 
     @CommandBody
     val trigger = subCommand {
-        dynamic {
+        dynamic(commit = "player") {
             suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
-            dynamic {
+            dynamic(commit = "value") {
                 execute<CommandSender> { _, context, argument ->
                     val playerExact = Bukkit.getPlayerExact(context.argument(-1)!!)!!
                     playerExact.callTrigger(argument)
@@ -133,7 +133,7 @@ object CommandChemdahQuest {
 
     @CommandBody
     val triggerAll = subCommand {
-        dynamic {
+        dynamic(commit = "value") {
             execute<CommandSender> { _, _, argument ->
                 Bukkit.getOnlinePlayers().forEach {
                     it.callTrigger(argument)
@@ -144,9 +144,9 @@ object CommandChemdahQuest {
 
     @CommandBody
     val info = subCommand {
-        dynamic {
+        dynamic(commit = "player") {
             suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
-            dynamic(optional = true) {
+            dynamic(commit = "quest", optional = true) {
                 suggestion<CommandSender>(uncheck = true) { _, _ -> ChemdahAPI.questTemplate.keys.toList() }
                 execute<CommandSender> { sender, context, argument ->
                     commandInfo(sender, context.argument(-1)!!, Coerce.toInteger(argument))
@@ -160,9 +160,9 @@ object CommandChemdahQuest {
 
     @CommandBody
     val ui = subCommand {
-        dynamic {
+        dynamic(commit = "player") {
             suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
-            dynamic {
+            dynamic(commit = "ui") {
                 suggestion<CommandSender> { _, _ -> UISystem.ui.keys.toList() }
                 execute<CommandSender> { _, context, argument ->
                     val playerExact = Bukkit.getPlayerExact(context.argument(-1)!!)!!
@@ -175,9 +175,9 @@ object CommandChemdahQuest {
 
     @CommandBody
     val track = subCommand {
-        dynamic {
+        dynamic(commit = "player") {
             suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
-            dynamic {
+            dynamic(commit = "quest") {
                 suggestion<CommandSender> { _, _ -> ChemdahAPI.questTemplate.keys.toList() }
                 execute<CommandSender> { _, context, argument ->
                     val playerExact = Bukkit.getPlayerExact(context.argument(-1)!!)!!

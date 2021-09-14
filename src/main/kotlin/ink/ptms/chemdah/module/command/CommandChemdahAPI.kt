@@ -22,11 +22,11 @@ object CommandChemdahAPI {
 
     @CommandBody
     val createscenes = subCommand {
-        dynamic {
+        dynamic(commit = "player") {
             suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
-            dynamic {
+            dynamic(commit = "scenes") {
                 suggestion<CommandSender> { _, _ -> ScenesSystem.scenesMap.keys.toMutableList() }
-                dynamic {
+                dynamic(commit = "index") {
                     execute<CommandSender> { sender, context, argument ->
                         val playerExact = Bukkit.getPlayerExact(context.argument(-2)!!)!!
                         val scenesFile = ScenesSystem.scenesMap[context.argument(-1)!!]
@@ -43,11 +43,11 @@ object CommandChemdahAPI {
 
     @CommandBody
     val cancelscenes = subCommand {
-        dynamic {
+        dynamic(commit = "player") {
             suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
-            dynamic {
+            dynamic(commit = "scenes") {
                 suggestion<CommandSender> { _, _ -> ScenesSystem.scenesMap.keys.toMutableList() }
-                dynamic {
+                dynamic(commit = "index") {
                     execute<CommandSender> { sender, context, argument ->
                         val playerExact = Bukkit.getPlayerExact(context.argument(-2)!!)!!
                         val scenesFile = ScenesSystem.scenesMap[context.argument(-1)!!]

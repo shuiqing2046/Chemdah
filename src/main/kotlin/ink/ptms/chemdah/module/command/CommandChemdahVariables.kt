@@ -19,7 +19,7 @@ object CommandChemdahVariables {
 
     @CommandBody
     val get = subCommand {
-        dynamic {
+        dynamic(commit = "key") {
             suggestion<CommandSender> { _, _ -> ChemdahAPI.getVariables() }
             execute<CommandSender> { sender, _, argument ->
                 val time = System.currentTimeMillis()
@@ -30,9 +30,9 @@ object CommandChemdahVariables {
 
     @CommandBody
     val set = subCommand {
-        dynamic {
+        dynamic(commit = "key") {
             suggestion<CommandSender>(uncheck = true) { _, _ -> ChemdahAPI.getVariables() }
-            dynamic {
+            dynamic(commit = "value") {
                 execute<CommandSender> { sender, context, argument ->
                     val time = System.currentTimeMillis()
                     ChemdahAPI.setVariable(context.argument(-1)!!, argument)
@@ -44,9 +44,9 @@ object CommandChemdahVariables {
 
     @CommandBody
     val add = subCommand {
-        dynamic {
+        dynamic(commit = "key") {
             suggestion<CommandSender>(uncheck = true) { _, _ -> ChemdahAPI.getVariables() }
-            dynamic {
+            dynamic(commit = "value") {
                 execute<CommandSender> { sender, context, argument ->
                     val time = System.currentTimeMillis()
                     ChemdahAPI.setVariable(context.argument(-1)!!, argument, true)
@@ -58,7 +58,7 @@ object CommandChemdahVariables {
 
     @CommandBody
     val remove = subCommand {
-        dynamic {
+        dynamic(commit = "key") {
             suggestion<CommandSender> { _, _ -> ChemdahAPI.getVariables() }
             execute<CommandSender> { sender, _, argument ->
                 val time = System.currentTimeMillis()

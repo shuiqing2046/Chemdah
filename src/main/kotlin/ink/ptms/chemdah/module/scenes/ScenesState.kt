@@ -3,6 +3,7 @@ package ink.ptms.chemdah.module.scenes
 import ink.ptms.chemdah.module.kether.ActionScenes.Companion.createScenesBlock
 import ink.ptms.chemdah.module.kether.ActionScenes.Companion.createScenesFallingBlock
 import ink.ptms.chemdah.module.kether.ActionScenes.Companion.removeScenesBlock
+import ink.ptms.chemdah.util.namespaceQuest
 import taboolib.common5.Coerce
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -63,7 +64,7 @@ abstract class ScenesState(val index: Int, val root: ConfigurationSection) {
 
         override fun send(player: Player) {
             try {
-                KetherShell.eval(agent, sender = adaptCommandSender(player), namespace = listOf("chemdah"))
+                KetherShell.eval(agent, sender = adaptCommandSender(player), namespace = namespaceQuest)
             } catch (ex: Exception) {
                 ex.printKetherErrorMessage()
             }
@@ -107,7 +108,7 @@ abstract class ScenesState(val index: Int, val root: ConfigurationSection) {
 
         override fun send(player: Player) {
             try {
-                KetherShell.eval(agent, sender = adaptCommandSender(player), namespace = listOf("chemdah"))
+                KetherShell.eval(agent, sender = adaptCommandSender(player), namespace = namespaceQuest)
             } catch (ex: Exception) {
                 ex.printKetherErrorMessage()
             }

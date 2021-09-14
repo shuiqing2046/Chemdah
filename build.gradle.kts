@@ -32,8 +32,9 @@ taboolib {
     install("module-nms-util")
     install("module-ui")
     install("platform-bukkit")
+    install("expansion-command-helper")
     classifier = null
-    version = "6.0.1-6"
+    version = "6.0.2-5"
 }
 
 repositories {

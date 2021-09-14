@@ -6,17 +6,16 @@ import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import taboolib.common.platform.command.CommandBody
 import taboolib.common.platform.command.CommandHeader
+import taboolib.common.platform.command.mainCommand
 import taboolib.common.platform.command.subCommand
 import taboolib.common.platform.function.adaptCommandSender
 import taboolib.common.platform.function.onlinePlayers
 import taboolib.common.platform.function.submit
 import taboolib.common5.Mirror
+import taboolib.expansion.createHelper
 import taboolib.platform.util.sendLang
 
 /**
- * Chemdah
- * ink.ptms.chemdah.command.ChemdahCommand
- *
  * @author sky
  * @since 2021/2/11 7:19 下午
  */
@@ -24,6 +23,11 @@ import taboolib.platform.util.sendLang
 object CommandChemdah {
 
     @CommandBody
+    val main = mainCommand {
+        createHelper()
+    }
+
+    @CommandBody(optional = true)
     val api = CommandChemdahAPI
 
     @CommandBody
@@ -43,7 +47,7 @@ object CommandChemdah {
 
     @CommandBody
     val info = subCommand {
-        dynamic {
+        dynamic(commit = "player") {
             suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
             execute<CommandSender> { sender, _, argument ->
                 val playerExact = Bukkit.getPlayerExact(argument)!!

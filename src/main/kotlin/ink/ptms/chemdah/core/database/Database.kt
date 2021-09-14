@@ -21,6 +21,7 @@ import taboolib.common.platform.function.info
 import taboolib.common.platform.function.submit
 import taboolib.common5.mirrorNow
 import taboolib.platform.util.asLangText
+import java.lang.IllegalStateException
 
 /**
  * Chemdah
@@ -88,8 +89,8 @@ abstract class Database {
             try {
                 when (Type.INSTANCE) {
                     Type.SQL -> DatabaseSQL()
-                    Type.LOCAL -> DatabaseSQL()
-                    Type.MONGODB -> DatabaseSQL()
+                    Type.LOCAL -> DatabaseSQLite()
+                    Type.MONGODB -> DatabaseError(IllegalStateException())
                 }
             } catch (e: Throwable) {
                 e.printStackTrace()

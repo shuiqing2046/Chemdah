@@ -21,13 +21,17 @@ object CommandChemdahScript {
     @CommandBody
     val run = subCommand {
         // script
-        dynamic {
-            suggestion<CommandSender> { _, _ -> workspace.scripts.map { it.value.id } }
+        dynamic(commit = "file") {
+            suggestion<CommandSender> { _, _ ->
+                workspace.scripts.map { it.value.id }
+            }
             // viewer
-            dynamic(optional = true) {
-                suggestion<CommandSender> { _, _ -> Bukkit.getOnlinePlayers().map { it.name } }
+            dynamic(commit = "viewer", optional = true) {
+                suggestion<CommandSender> { _, _ ->
+                    Bukkit.getOnlinePlayers().map { it.name }
+                }
                 // ver
-                dynamic(optional = true) {
+                dynamic(commit = "args", optional = true) {
                     execute<CommandSender> { sender, context, argument ->
                         commandRun(sender, context.argument(-2)!!, context.argument(-1), argument.split(" ").toTypedArray())
                     }
@@ -44,8 +48,10 @@ object CommandChemdahScript {
 
     @CommandBody
     val stop = subCommand {
-        dynamic(optional = true) {
-            suggestion<CommandSender> { _, _ -> workspace.scripts.map { it.value.id } }
+        dynamic(commit = "file", optional = true) {
+            suggestion<CommandSender> { _, _ ->
+                workspace.scripts.map { it.value.id }
+            }
             execute<CommandSender> { sender, _, argument ->
                 val script = workspace.getRunningScript().filter { it.quest.id == argument }
                 if (script.isNotEmpty()) {
@@ -91,7 +97,7 @@ object CommandChemdahScript {
 
     @CommandBody
     val invoke = subCommand {
-        dynamic {
+        dynamic(commit = "script") {
             execute<CommandSender> { sender, _, argument ->
                 try {
                     KetherShell.eval(argument, sender = adaptCommandSender(sender)).thenApply { v ->
@@ -121,7 +127,7 @@ object CommandChemdahScript {
                 }
             }
             try {
-                workspace.runScript(args[0], context)
+                workspace.runScript(file, context)
             } catch (t: Throwable) {
                 sender.sendLang("command-script-error", t.localizedMessage)
                 t.printKetherErrorMessage()
