@@ -8,11 +8,11 @@ import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerQuitEvent
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.getDataFolder
-import taboolib.common5.Coerce
-import taboolib.module.database.*
+import taboolib.module.database.ColumnTypeSQLite
+import taboolib.module.database.Table
+import taboolib.module.database.getHost
 import java.io.File
 import java.util.*
-import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 import javax.sql.DataSource
 
@@ -30,21 +30,20 @@ class DatabaseSQLite : Database() {
     val name: String
         get() = Chemdah.conf.getString("database.source.SQL.table", "chemdah")!!
 
-    val tableUser = Table("${name}_user", host) {
-        add { id() }
-        add("name") {
-            type(ColumnTypeSQLite.TEXT, 36) 
-        }
-        add("uuid") {
-            type(ColumnTypeSQLite.TEXT, 36)
-        }
-        primaryKeyForLegacy += arrayOf("name", "uuid")
-    }
+//    val tableUser = Table("${name}_user", host) {
+//        add("name") {
+//            type(ColumnTypeSQLite.TEXT, 36)
+//        }
+//        add("uuid") {
+//            type(ColumnTypeSQLite.TEXT, 36)
+//        }
+//        primaryKeyForLegacy += arrayOf("name", "uuid")
+//    }
 
     val tableUserData = Table("${name}_user_data", host) {
-        add { id() }
+        // 对应玩家
         add("user") {
-            type(ColumnTypeSQLite.INTEGER, 16)
+            type(ColumnTypeSQLite.TEXT, 36)
         }
         add("key") {
             type(ColumnTypeSQLite.TEXT, 64)
@@ -59,23 +58,28 @@ class DatabaseSQLite : Database() {
     }
 
     val tableQuest = Table("${name}_quest", host) {
-        add { id() }
-        add("user") {
-            type(ColumnTypeSQLite.INTEGER, 16)
+        // 任务 UUID
+        add("id") {
+            type(ColumnTypeSQLite.TEXT, 36)
         }
+        // 对应玩家
+        add("user") {
+            type(ColumnTypeSQLite.TEXT, 36)
+        }
+        // 任务名称
         add("quest") {
             type(ColumnTypeSQLite.TEXT, 36)
         }
         add("mode") {
             type(ColumnTypeSQLite.INTEGER)
         }
-        primaryKeyForLegacy += arrayOf("user", "quest")
+        primaryKeyForLegacy += arrayOf("id", "user", "quest")
     }
 
     val tableQuestData = Table("${name}_quest_data", host) {
-        add { id() }
-        add("quest") {
-            type(ColumnTypeSQLite.INTEGER, 16)
+        // 任务 UUID
+        add("id") {
+            type(ColumnTypeSQLite.TEXT, 36)
         }
         add("key") {
             type(ColumnTypeSQLite.TEXT, 64)
@@ -86,11 +90,10 @@ class DatabaseSQLite : Database() {
         add("mode") {
             type(ColumnTypeSQLite.INTEGER)
         }
-        primaryKeyForLegacy += arrayOf("quest", "key")
+        primaryKeyForLegacy += arrayOf("id", "key")
     }
 
     val tableVariables = Table("${name}_variables", host) {
-        add { id() }
         add("name") {
             type(ColumnTypeSQLite.TEXT, 64)
         }
@@ -108,38 +111,37 @@ class DatabaseSQLite : Database() {
     }
 
     init {
-        tableUser.workspace(dataSource) { createTable() }.run()
         tableQuest.workspace(dataSource) { createTable() }.run()
         tableUserData.workspace(dataSource) { createTable() }.run()
         tableQuestData.workspace(dataSource) { createTable() }.run()
         tableVariables.workspace(dataSource) { createTable() }.run()
     }
 
-    fun getUserId(player: Player): Long {
-        if (cacheUserId.containsKey(player.name)) {
-            return cacheUserId[player.name]!!
+    /**
+     * 获取玩家标识
+     */
+    fun getUserId(player: Player): String {
+        return when (UserIndex.INSTANCE) {
+            UserIndex.NAME -> player.name
+            UserIndex.UUID -> player.uniqueId.toString()
         }
-        val userId = tableUser.select(dataSource) {
-            rows("id")
-            where("uuid" eq player.uniqueId.toString())
-            limit(1)
-        }.firstOrNull { getLong("id") } ?: -1L
-        cacheUserId[player.name] = userId
-        return userId
     }
 
-    fun getQuestId(player: Player, quest: Quest): Long {
+    /**
+     * 获取任务对应 UUID
+     */
+    fun getQuestId(player: Player, quest: Quest): String? {
         val map = cacheQuestId.computeIfAbsent(player.name) { HashMap() }
         if (map.containsKey(quest.id)) {
             return map[quest.id]!!
         }
-        val userId = tableQuest.select(dataSource) {
+        val questId = tableQuest.select(dataSource) {
             rows("id")
             where("user" eq getUserId(player) and ("quest" eq quest.id))
             limit(1)
-        }.firstOrNull { getLong("id") } ?: -1L
-        map[quest.id] = userId
-        return userId
+        }.firstOrNull { getString("id") } ?: return null
+        map[quest.id] = questId
+        return questId
     }
 
     fun PlayerProfile.init(): PlayerProfile {
@@ -153,16 +155,16 @@ class DatabaseSQLite : Database() {
         }
         val quests = HashMap<String, DataContainer>()
         tableQuest.select(dataSource) {
-            rows("${tableQuest.name}.quest", "${tableQuestData.name}.key", "${tableQuestData.name}.value")
-            where("user" eq getUserId(player) and ("${tableQuest.name}.mode" eq 1) and ("${tableQuestData.name}.mode" eq 1))
-            innerJoin(tableQuestData.name) {
-                where { "${tableQuest.name}.id" eq pre("${tableQuestData.name}.quest") }
-            }
-        }.map {
-            getString("${tableQuest.name}.quest") to (getString("${tableQuestData.name}.key") to getString("${tableQuestData.name}.value"))
+            rows("id", "quest")
+            where("user" eq getUserId(player) and ("mode" eq 1))
         }.forEach {
-            quests.computeIfAbsent(it.first) { DataContainer() }.unchanged {
-                this[it.second.first] = it.second.second
+            val id = getString("id")
+            val quest = getString("quest")
+            tableQuestData.select(dataSource) {
+                rows("key", "value")
+                where("id" eq id and ("mode" eq 1))
+            }.forEach {
+                quests.computeIfAbsent(quest) { DataContainer() }.unchanged { set(getString("key"), getString("value")) }
             }
         }
         quests.forEach { registerQuest(Quest(it.key, this, it.value), newQuest = false) }
@@ -200,8 +202,8 @@ class DatabaseSQLite : Database() {
             if (quest.newQuest || quest.persistentDataContainer.isChanged) {
                 quest.newQuest = false
                 val questId = getQuestId(player, quest)
-                if (questId < 0) {
-                    player.createQuest(id, quest)
+                if (questId == null) {
+                    player.createQuest(quest)
                     return@forEach
                 }
                 // 在2021年9月7日的升级测试中发现，一旦任务完成后再次接受将不会被同步数据，这可能是由上个版本的 SQL 写法尚未进行详细测试导致
@@ -213,21 +215,21 @@ class DatabaseSQLite : Database() {
                 // 对任务数据进行更新
                 quest.persistentDataContainer.forEach { (key, data) ->
                     if (data.changed) {
-                        if (tableQuestData.find(dataSource) { where("quest" eq questId and ("key" eq key)) }) {
+                        if (tableQuestData.find(dataSource) { where("id" eq questId and ("key" eq key)) }) {
                             tableQuestData.update(dataSource) {
-                                where("quest" eq questId and ("key" eq key))
+                                where("id" eq questId and ("key" eq key))
                                 set("value", data.data)
                                 set("mode", 1)
                             }
                         } else {
-                            tableQuestData.insert(dataSource, "quest", "key", "value", "mode") { value(questId, key, data.data, 1) }
+                            tableQuestData.insert(dataSource, "id", "key", "value", "mode") { value(questId, key, data.data, 1) }
                         }
                     }
                 }
                 // 对丢弃对数据进行删除
                 if (quest.persistentDataContainer.drops.isNotEmpty()) {
                     tableQuestData.update(dataSource) {
-                        where { "quest" eq questId and ("key" inside quest.persistentDataContainer.drops.toTypedArray()) }
+                        where { "id" eq questId and ("key" inside quest.persistentDataContainer.drops.toTypedArray()) }
                         set("value", null)
                         set("mode", 0)
                     }
@@ -237,41 +239,38 @@ class DatabaseSQLite : Database() {
         }
     }
 
-    fun PlayerProfile.createUser(player: Player): CompletableFuture<Long> {
-        val future = CompletableFuture<Long>()
-        tableUser.insert(dataSource, "name", "uuid") {
-            value(player.name, player.uniqueId.toString())
-            onFinally {
-                val userId = generatedKeys.run {
-                    next()
-                    Coerce.toLong(getObject(1))
-                }
-                cacheUserId[player.name] = userId
-                tableUserData.insert(dataSource, "user", "key", "value", "mode") {
-                    persistentDataContainer.forEach { (k, v) ->
-                        value(userId, k, v.data, 1)
-                    }
-                }
-                persistentDataContainer.flush()
-                getQuests().forEach { player.createQuest(userId, it) }
-                future.complete(userId)
-            }
-        }
-        return future
-    }
+//    fun PlayerProfile.createUser(player: Player): CompletableFuture<Long> {
+//        val future = CompletableFuture<Long>()
+//        tableUser.insert(dataSource, "name", "uuid") {
+//            value(player.name, player.uniqueId.toString())
+//            onFinally {
+//                val userId = generatedKeys.run {
+//                    next()
+//                    Coerce.toLong(getObject(1))
+//                }
+//                cacheUserId[player.name] = userId
+//                tableUserData.insert(dataSource, "user", "key", "value", "mode") {
+//                    persistentDataContainer.forEach { (k, v) ->
+//                        value(userId, k, v.data, 1)
+//                    }
+//                }
+//                persistentDataContainer.flush()
+//                getQuests().forEach { player.createQuest(userId, it) }
+//                future.complete(userId)
+//            }
+//        }
+//        return future
+//    }
 
-    fun Player.createQuest(userId: Long, quest: Quest) {
-        tableQuest.insert(dataSource, "user", "quest", "mode") {
-            value(userId, quest.id, 1)
+    fun Player.createQuest(quest: Quest) {
+        val uuid = UUID.randomUUID().toString()
+        tableQuest.insert(dataSource, "id", "user", "quest", "mode") {
+            value(uuid, getUserId(this@createQuest), quest.id, 1)
             onFinally {
-                val questId = generatedKeys.run {
-                    next()
-                    Coerce.toLong(getObject(1))
-                }
-                cacheQuestId.computeIfAbsent(name) { HashMap() }[quest.id] = questId
-                tableQuestData.insert(dataSource, "quest", "key", "value", "mode") {
+                cacheQuestId.computeIfAbsent(name) { HashMap() }[quest.id] = uuid
+                tableQuestData.insert(dataSource, "id", "key", "value", "mode") {
                     quest.persistentDataContainer.forEach { (k, v) ->
-                        value(questId, k, v.data, 1)
+                        value(uuid, k, v.data, 1)
                     }
                 }
                 quest.persistentDataContainer.flush()
@@ -280,35 +279,22 @@ class DatabaseSQLite : Database() {
     }
 
     override fun select(player: Player): PlayerProfile {
-        val playerProfile = PlayerProfile(player.uniqueId)
-        val user = getUserId(player)
-        if (user == -1L) {
-            return playerProfile
-        }
-        return playerProfile.init()
+        return PlayerProfile(player.uniqueId).init()
     }
 
     override fun update(player: Player, playerProfile: PlayerProfile) {
-        val userId = getUserId(player)
-        if (userId == -1L) {
-            playerProfile.createUser(player)
-        } else {
-            playerProfile.update(player)
-            playerProfile.updateQuest(player)
-        }
+        playerProfile.update(player)
+        playerProfile.updateQuest(player)
     }
 
     override fun releaseQuest(player: Player, playerProfile: PlayerProfile, quest: Quest) {
-        val questId = getQuestId(player, quest)
-        if (questId < 0) {
-            return
-        }
+        val questId = getQuestId(player, quest) ?: return
         tableQuest.update(dataSource) {
             where { "user" eq getUserId(player) and ("quest" eq quest.id) }
             set("mode", 0)
         }
         tableQuestData.update(dataSource) {
-            where { "quest" eq questId }
+            where { "id" eq questId }
             set("mode", 0)
         }
     }
@@ -354,12 +340,11 @@ class DatabaseSQLite : Database() {
 
     companion object {
 
-        private val cacheUserId = ConcurrentHashMap<String, Long>()
-        private val cacheQuestId = ConcurrentHashMap<String, MutableMap<String, Long>>()
+        // <玩家, <任务名称, 任务UUID>>
+        private val cacheQuestId = ConcurrentHashMap<String, MutableMap<String, String>>()
 
         @SubscribeEvent
         internal fun e(e: PlayerQuitEvent) {
-            cacheUserId.remove(e.player.name)
             cacheQuestId.remove(e.player.name)
         }
     }

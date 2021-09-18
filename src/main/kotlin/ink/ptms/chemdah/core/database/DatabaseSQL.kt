@@ -7,7 +7,6 @@ import ink.ptms.chemdah.core.quest.Quest
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerQuitEvent
 import taboolib.common.platform.event.SubscribeEvent
-import taboolib.common.platform.function.info
 import taboolib.common.platform.function.submit
 import taboolib.common5.Coerce
 import taboolib.module.database.ColumnOptionSQL
@@ -147,7 +146,10 @@ class DatabaseSQL : Database() {
         }
         val userId = tableUser.select(dataSource) {
             rows("id")
-            where("uuid" eq player.uniqueId.toString())
+            when (UserIndex.INSTANCE) {
+                UserIndex.NAME -> where("uuid" eq player.name)
+                UserIndex.UUID -> where("uuid" eq player.uniqueId.toString())
+            }
             limit(1)
         }.firstOrNull { getLong("id") } ?: -1L
         cacheUserId[player.name] = userId
@@ -159,13 +161,13 @@ class DatabaseSQL : Database() {
         if (map.containsKey(quest.id)) {
             return map[quest.id]!!
         }
-        val userId = tableQuest.select(dataSource) {
+        val questId = tableQuest.select(dataSource) {
             rows("id")
             where("user" eq getUserId(player) and ("quest" eq quest.id))
             limit(1)
         }.firstOrNull { getLong("id") } ?: -1L
-        map[quest.id] = userId
-        return userId
+        map[quest.id] = questId
+        return questId
     }
 
     fun PlayerProfile.init(): PlayerProfile {

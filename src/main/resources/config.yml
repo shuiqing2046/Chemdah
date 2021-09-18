@@ -18,6 +18,7 @@ database:
       database: test
       collection: chemdah
   join-select-delay: 20
+  user-index: UUID
 
 default-stats:
   stay: 100

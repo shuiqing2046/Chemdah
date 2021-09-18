@@ -17,7 +17,7 @@ enum class Type {
 
         val INSTANCE: Type by lazy {
             try {
-                valueOf(Chemdah.conf.getString("database.use", "")!!.toUpperCase())
+                valueOf(Chemdah.conf.getString("database.use", "")!!.uppercase())
             } catch (ignored: Throwable) {
                 LOCAL
             }
