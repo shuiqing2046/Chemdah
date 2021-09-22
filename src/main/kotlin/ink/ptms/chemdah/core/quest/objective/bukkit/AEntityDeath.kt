@@ -48,7 +48,7 @@ abstract class AEntityDeath<T : EntityDeathEvent> : ObjectiveCountableI<T>() {
             e.droppedExp
         }
         addConditionVariable("revive-health") { e ->
-            e.invokeMethod<Int>("getReviveHealth")!!
+            e.invokeMethod<Double>("getReviveHealth")!!
         }
     }
 }
