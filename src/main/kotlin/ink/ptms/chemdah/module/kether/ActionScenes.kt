@@ -281,15 +281,17 @@ class ActionScenes {
         @SubscribeEvent
         fun e(e: AdyeshachEntityTickEvent) {
             val entity = e.entity
-            val manager = entity.manager
-            if (manager is ManagerPrivateTemp
+            val manager = entity.manager ?: return
+            if (!manager.isPublic()
                 && entity is AdyFallingBlock
                 && entity.hasTag("chemdah:scenes")
                 && entity.getController().any { it is GeneralGravity }
                 && entity.isControllerOnGround()
             ) {
                 if (entity.getTag("chemdah:scenes") == "SOLID") {
-                    Bukkit.getPlayerExact(manager.player)?.createScenesBlock(entity.getLocation(), entity.material, entity.data)
+                    entity.forViewers {
+                        it.createScenesBlock(entity.getLocation(), entity.material, entity.data)
+                    }
                 }
                 entity.removeTag("chemdah:scenes")
                 entity.delete()
