@@ -14,6 +14,7 @@ import net.Indyuce.mmocore.api.player.PlayerData
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.serverct.ersha.dungeon.DungeonPlus
+import org.serverct.ersha.dungeon.common.team.type.PlayerStateType
 import sky_bai.bukkit.baiteam.BaiTeam
 import su.nightexpress.quantumrpg.api.QuantumAPI
 import su.nightexpress.quantumrpg.modules.list.party.PartyManager
@@ -193,16 +194,21 @@ object PartyHook  {
     object DungeonPlusHook : Party {
 
         override fun getParty(player: Player): Party.PartyInfo? {
-            val team = DungeonPlus.groupManager.getGroup(player) ?: return null
-            return object : Party.PartyInfo {
+            // 1.1.3
+            return try {
+                val team = DungeonPlus.teamManager.getTeam(player) ?: return null
+                object : Party.PartyInfo {
 
-                override fun getLeader(): Player {
-                    return team.leader
-                }
+                    override fun getLeader(): Player {
+                        return team.getLeader()
+                    }
 
-                override fun getMembers(): List<Player> {
-                    return team.players.filter { it.uniqueId != team.leader.uniqueId }
+                    override fun getMembers(): List<Player> {
+                        return team.getPlayers(PlayerStateType.ALL).filter { it.uniqueId != team.leader }
+                    }
                 }
+            } catch (ex: Error) {
+                error("Outdated DungeonPlus (required: >1.1.3)")
             }
         }
     }

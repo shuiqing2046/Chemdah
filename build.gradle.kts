@@ -46,6 +46,7 @@ repositories {
 }
 
 dependencies {
+    compileOnly("org.serverct.ersha.dungeon:DungeonPlus:1.1.3")
     compileOnly("com.github.angeschossen:LandsAPI:5.13.0")
     compileOnly("at.pcgamingfreaks:MarriageMaster-API-Bukkit:2.4")
     compileOnly("com.sk89q.worldedit:WorldEdit:7:all")
@@ -78,7 +79,6 @@ dependencies {
     compileOnly("public:Citizens:1.0.0")
     compileOnly("public:MythicLib:1.0.0")
     compileOnly("public:MythicMobs:1.0.1")
-    compileOnly("public:DungeonPlus:1.0.0")
     compileOnly("public:ExecutableItems:1.0.0")
     compileOnly("public:Brewery:1.0.0")
     compileOnly("ink.ptms:blockdb:1.0.0")
