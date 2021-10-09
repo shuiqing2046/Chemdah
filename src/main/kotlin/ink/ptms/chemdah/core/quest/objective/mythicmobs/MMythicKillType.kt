@@ -3,6 +3,7 @@ package ink.ptms.chemdah.core.quest.objective.mythicmobs
 import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDeathEvent
+import org.bukkit.entity.Player
 
 @Dependency("MythicMobs")
 object MMythicKillType : ObjectiveCountableI<MythicMobDeathEvent>() {
@@ -12,7 +13,7 @@ object MMythicKillType : ObjectiveCountableI<MythicMobDeathEvent>() {
 
     init {
         handler {
-            killer.killer
+            killer as? Player
         }
         addCondition("position") { e ->
             toPosition().inside(e.killer.killer!!.location)
