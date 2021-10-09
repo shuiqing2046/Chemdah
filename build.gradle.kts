@@ -34,12 +34,14 @@ taboolib {
     install("platform-bukkit")
     install("expansion-command-helper")
     classifier = null
-    version = "6.0.2-10"
+    version = "6.0.3-9"
 }
 
 repositories {
     maven { url = uri("https://raw.githubusercontent.com/HyChrod/FriendsAPI/repository") }
     maven { url = uri("https://repo.pcgamingfreaks.at/repository/maven-everything") }
+    maven { url = uri("https://nexus.badbones69.com/repository/maven-releases") }
+    maven { url = uri("https://repo.codemc.io/repository/maven-public") }
     maven { url = uri("https://jitpack.io") }
     mavenLocal()
     mavenCentral()
@@ -49,6 +51,8 @@ dependencies {
     compileOnly("org.serverct.ersha.dungeon:DungeonPlus:1.1.3")
     compileOnly("com.github.angeschossen:LandsAPI:5.13.0")
     compileOnly("at.pcgamingfreaks:MarriageMaster-API-Bukkit:2.4")
+    compileOnly("me.badbones69:crazycrates-plugin:1.10")
+    compileOnly("org.maxgamer:QuickShop:4.0.9.10")
     compileOnly("com.sk89q.worldedit:WorldEdit:7:all")
     compileOnly("de.HyChrod:FriendsAPI:1.1.0.9.1")
     compileOnly("public:nuvotifier:1.0.0")
