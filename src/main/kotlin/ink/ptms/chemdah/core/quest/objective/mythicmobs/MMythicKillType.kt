@@ -17,14 +17,17 @@ object MMythicKillType : ObjectiveCountableI<MythicMobDeathEvent>() {
         addCondition("position") { e ->
             toPosition().inside(e.killer.killer!!.location)
         }
-        addCondition("name") {
-            toString() == it.entity.name
+        addCondition("name") { e ->
+            asList().any { it.equals(e.mobType.internalName, true) }
         }
-        addCondition("level") {
-            toDouble() == it.mobLevel
+        addCondition("level") { e ->
+            toDouble() == e.mobLevel
         }
-        addCondition("min-level") {
-            toDouble() <= it.mobLevel
+        addCondition("min-level") { e ->
+            toDouble() <= e.mobLevel
+        }
+        addConditionVariable("name") {
+            it.mobType.internalName
         }
     }
 }
