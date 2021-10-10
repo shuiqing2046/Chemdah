@@ -93,8 +93,11 @@ object QuestDevelopment  {
                 // 因为聊天数据包会被重复拦截两次每次都不一样，1.12 和 1.16 均有该问题所以只发偶数包
                 // 删除 ViaVersion 测试同样如此
                 if (index % 2 == 0) {
-                    list.add(packet.getProperty<Any>("a")!!.toString())
-                    sendPacket(packet)
+                    val value = packet.getProperty<Any>("a")
+                    if (value != null) {
+                        list.add(value.toString())
+                        sendPacket(packet)
+                    }
                 }
             }
         }

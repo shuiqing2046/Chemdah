@@ -1,6 +1,6 @@
 
 
-#         Powered by TabooLib 6.0         #
+#         Powered by TabooLib 5.0         #
 
 
 default:
@@ -43,18 +43,18 @@ default:
       material: name_tag
       name: '&e&lFilter'
       lore:
-        - '&8- &f{filter}'
+        - '&8- &f\{filter\}'
         - ''
         - '&8CLICK TO EDIT'
       all-key: ALL
     quest:
       started:
         material: orange_stained_glass_pane
-        name: '&6&l{name}'
+        name: '&6&l\{name\}'
         lore:
           - '&eStarted...'
           - ''
-          - '{description}'
+          - '\{description\}'
           - ''
           - '&8CLICK TO TRACK'
         enchant:
@@ -63,11 +63,11 @@ default:
           - HIDE_ENCHANTS
       started-shared:
         material: purple_stained_glass_pane
-        name: '&d&l{name} &5(Shared)'
+        name: '&d&l\{name\} &5(Shared)'
         lore:
           - '&eStarted...'
           - ''
-          - '{description}'
+          - '\{description\}'
           - ''
           - '&8CLICK TO TRACK'
         enchant:
@@ -76,29 +76,29 @@ default:
           - HIDE_ENCHANTS
       can-start:
         material: lime_stained_glass_pane
-        name: '&a&l{name}'
+        name: '&a&l\{name\}'
         lore:
           - '&eCan start...'
           - ''
-          - '{description}'
+          - '\{descriptionv}'
           - ''
           - '&8CLICK TO TRACK'
       cannot-start:
         material: red_stained_glass_pane
-        name: '&4&l{name}'
+        name: '&4&l\{name\}'
         lore:
           - '&cCannot started...'
           - ''
-          - '{description}'
+          - '\{description\}'
           - ''
           - '&8UNTRACKED'
       completed:
         material: black_stained_glass_pane
-        name: '&7&l{name}'
+        name: '&7&l\{name\}'
         lore:
           - '&8Completed!'
           - ''
-          - '{description}'
+          - '\{description\}'
           - ''
           - '&8UNTRACKED'
       unavailable:
