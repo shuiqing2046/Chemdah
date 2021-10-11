@@ -1,9 +1,12 @@
 package ink.ptms.chemdah.core.quest.addon
 
+import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.api.event.collect.ObjectiveEvents
 import ink.ptms.chemdah.core.quest.Id
 import ink.ptms.chemdah.core.quest.Option
 import ink.ptms.chemdah.core.quest.QuestContainer
+import ink.ptms.chemdah.core.quest.Task
+import org.bukkit.entity.Player
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.util.asList
 
@@ -24,20 +27,31 @@ class AddonDepend(root: String, questContainer: QuestContainer) : Addon(root, qu
 
         fun QuestContainer.depend() = addon<AddonDepend>("depend")?.depend
 
-        @SubscribeEvent
-        fun e(e: ObjectiveEvents.Continue.Pre) {
-            val taskDepend = e.task.depend()
-            if (taskDepend != null) {
-                val taskMap = e.task.template.taskMap
-                if (taskDepend.any { taskMap[it]?.isCompleted(e.playerProfile) != true }) {
-                    e.isCancelled = true
+        fun QuestContainer.isQuestDependCompleted(player: Player): Boolean {
+            // 任务依赖
+            val questDepend = if (this is Task) template.depend() else depend()
+            if (questDepend != null) {
+                if (questDepend.any { !player.chemdahProfile.isQuestCompleted(it) }) {
+                    return false
                 }
             }
-            val questDepend = e.task.template.depend()
-            if (questDepend != null) {
-                if (questDepend.any { !e.playerProfile.isQuestCompleted(it) }) {
-                    e.isCancelled = true
+            // 条目依赖
+            if (this is Task) {
+                val taskDepend = depend()
+                if (taskDepend != null) {
+                    val taskMap = template.taskMap
+                    if (taskDepend.any { taskMap[it]?.isCompleted(player.chemdahProfile) != true }) {
+                        return false
+                    }
                 }
+            }
+            return true
+        }
+
+        @SubscribeEvent
+        fun e(e: ObjectiveEvents.Continue.Pre) {
+            if (!e.task.isQuestDependCompleted(e.playerProfile.player)) {
+                e.isCancelled = true
             }
         }
     }

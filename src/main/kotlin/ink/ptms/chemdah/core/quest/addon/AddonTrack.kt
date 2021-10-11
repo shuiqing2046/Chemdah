@@ -11,6 +11,7 @@ import ink.ptms.chemdah.api.event.collect.PlayerEvents
 import ink.ptms.chemdah.api.event.collect.QuestEvents
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.*
+import ink.ptms.chemdah.core.quest.addon.AddonDepend.Companion.isQuestDependCompleted
 import ink.ptms.chemdah.core.quest.addon.AddonUI.Companion.ui
 import ink.ptms.chemdah.core.quest.meta.MetaName.Companion.displayName
 import ink.ptms.chemdah.core.quest.selector.InferArea
@@ -199,7 +200,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                     quest.taskMap.forEach sub@{ (_, task) ->
                         val track = task.track() ?: return@sub
                         // 条目尚未完成
-                        if (!task.isCompleted(chemdahProfile)) {
+                        if (!task.isCompleted(chemdahProfile) && task.isQuestDependCompleted(player)) {
                             player.trackTickMark(track)
                             player.trackTickNavigation(track)
                         }
@@ -373,7 +374,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                         if (it.isQuestFormat) {
                             quest.taskMap.flatMap { (_, task) ->
                                 val taskTrack = task.track()
-                                if (taskTrack != null && !task.isCompleted(chemdahProfile)) {
+                                if (taskTrack != null && !task.isCompleted(chemdahProfile) && task.isQuestDependCompleted(this)) {
                                     it.content.flatMap { contentLine ->
                                         if (contentLine.contains("{description}")) {
                                             val description = taskTrack.description ?: quest.ui()?.description ?: emptyList()
