@@ -16,13 +16,15 @@ import ink.ptms.chemdah.core.quest.addon.AddonUI.Companion.ui
 import ink.ptms.chemdah.core.quest.meta.MetaName.Companion.displayName
 import ink.ptms.chemdah.core.quest.selector.InferArea
 import ink.ptms.chemdah.module.party.PartySystem.getMembers
-import ink.ptms.chemdah.util.*
+import ink.ptms.chemdah.util.conf
+import ink.ptms.chemdah.util.toCenter
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerCommandPreprocessEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
-import taboolib.common.platform.*
+import taboolib.common.platform.ProxyParticle
+import taboolib.common.platform.Schedule
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.adaptCommandSender
@@ -293,7 +295,9 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                 refreshTrackingNavigation(quest.track() ?: return, quest.path, true)
             } else {
                 quest.taskMap.forEach { (_, task) ->
-                    refreshTrackingNavigation(task.track() ?: return@forEach, task.path, !task.isCompleted(chemdahProfile))
+                    if (task.isQuestDependCompleted(this)) {
+                        refreshTrackingNavigation(task.track() ?: return@forEach, task.path, !task.isCompleted(chemdahProfile))
+                    }
                 }
             }
         }
@@ -352,51 +356,54 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
             }
             mirrorNow("AddonTrack:refreshTrackingScoreboard") {
                 val quest = chemdahProfile.trackQuest ?: return@mirrorNow
-                // 尚未接受任务，显示任务总信息
-                val content = if (chemdahProfile.getQuestById(quest.id) == null) {
-                    val track = quest.track() ?: return@mirrorNow
-                    track.scoreboardContent.flatMap {
-                        if (it.isQuestFormat) {
-                            it.content.flatMap { contentLine ->
-                                if (contentLine.contains("{description}")) {
-                                    val description = track.description ?: quest.ui()?.description ?: emptyList()
-                                    description.split(track.scoreboardLength).map { descriptionLine -> contentLine.replace("{description}", descriptionLine) }
-                                } else {
-                                    contentLine.replace("{name}", track.name ?: quest.displayName()).asList()
-                                }
-                            }
-                        } else {
-                            it.content
-                        }
-                    }
-                } else {
-                    (quest.track()?.scoreboardContent ?: defaultContent).flatMap {
-                        if (it.isQuestFormat) {
-                            quest.taskMap.flatMap { (_, task) ->
-                                val taskTrack = task.track()
-                                if (taskTrack != null && !task.isCompleted(chemdahProfile) && task.isQuestDependCompleted(this)) {
-                                    it.content.flatMap { contentLine ->
-                                        if (contentLine.contains("{description}")) {
-                                            val description = taskTrack.description ?: quest.ui()?.description ?: emptyList()
-                                            val size = quest.track()?.scoreboardLength ?: defaultLength
-                                            description.split(size).map { d -> contentLine.replace("{description}", d) }
-                                        } else {
-                                            contentLine.replace("{name}", taskTrack.name ?: task.displayName()).asList()
-                                        }
+                if (quest.track()?.scoreboard == true) {
+                    // 尚未接受任务，显示任务总信息
+                    val content = if (chemdahProfile.getQuestById(quest.id) == null) {
+                        val track = quest.track() ?: return@mirrorNow
+                        track.scoreboardContent.flatMap {
+                            if (it.isQuestFormat) {
+                                it.content.flatMap { contentLine ->
+                                    if (contentLine.contains("{description}")) {
+                                        val description = track.description ?: quest.ui()?.description ?: emptyList()
+                                        description.split(track.scoreboardLength)
+                                            .map { descriptionLine -> contentLine.replace("{description}", descriptionLine) }
+                                    } else {
+                                        contentLine.replace("{name}", track.name ?: quest.displayName()).asList()
                                     }
-                                } else {
-                                    emptyList()
                                 }
+                            } else {
+                                it.content
                             }
-                        } else {
-                            it.content
+                        }
+                    } else {
+                        (quest.track()?.scoreboardContent ?: defaultContent).flatMap {
+                            if (it.isQuestFormat) {
+                                quest.taskMap.flatMap { (_, task) ->
+                                    val taskTrack = task.track()
+                                    if (taskTrack != null && !task.isCompleted(chemdahProfile) && task.isQuestDependCompleted(this)) {
+                                        it.content.flatMap { contentLine ->
+                                            if (contentLine.contains("{description}")) {
+                                                val description = taskTrack.description ?: quest.ui()?.description ?: emptyList()
+                                                val size = quest.track()?.scoreboardLength ?: defaultLength
+                                                description.split(size).map { d -> contentLine.replace("{description}", d) }
+                                            } else {
+                                                contentLine.replace("{name}", taskTrack.name ?: task.displayName()).asList()
+                                            }
+                                        }
+                                    } else {
+                                        emptyList()
+                                    }
+                                }
+                            } else {
+                                it.content
+                            }
                         }
                     }
-                }
-                if (content.size > 2) {
-                    sendScoreboard(*content.colored().mapIndexed { index, s -> "§${chars[index]}$s" }.toTypedArray())
-                } else {
-                    cancelTrackingScoreboard(quest)
+                    if (content.size > 2) {
+                        sendScoreboard(*content.colored().mapIndexed { index, s -> "§${chars[index]}$s" }.toTypedArray())
+                    } else {
+                        cancelTrackingScoreboard(quest)
+                    }
                 }
             }
         }
