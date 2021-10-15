@@ -72,8 +72,8 @@ object CommandChemdahPlayerData {
     val clear = subCommand {
         dynamic(commit = "player") {
             suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
-            execute<CommandSender> { sender, context, argument ->
-                val playerExact = Bukkit.getPlayerExact(context.argument(-1)!!)!!
+            execute<CommandSender> { sender, _, argument ->
+                val playerExact = Bukkit.getPlayerExact(argument)!!
                 playerExact.chemdahProfile.persistentDataContainer.clear()
                 sender.sendLang("command-variables-change", "* §8= §fnull")
             }
