@@ -11,6 +11,7 @@ import taboolib.common.reflect.Reflex.Companion.invokeConstructor
 import taboolib.common5.Coerce
 import taboolib.module.nms.getI18nName
 import taboolib.module.nms.getItemTag
+import taboolib.module.nms.getName
 import taboolib.platform.util.hasItem
 import taboolib.platform.util.takeItem
 
@@ -48,7 +49,7 @@ class InferItem(val items: List<Item>) {
             val meta = item.itemMeta
             return data.all {
                 when (it.key) {
-                    "name" -> it.value in item.getI18nName()
+                    "name" -> it.value in item.getName()
                     "lore" -> meta?.lore?.toString()?.contains(it.value) == true
                     "custom-model-data" -> meta?.customModelData == Coerce.toInteger(it.value)
                     "enchant", "enchants", "enchantment" -> meta?.enchants?.any { e -> e.key.name.equals(it.value, true) } == true
