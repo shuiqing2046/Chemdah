@@ -7,6 +7,7 @@ import ink.ptms.chemdah.core.conversation.Session
 import ink.ptms.chemdah.core.quest.QuestDevelopment
 import ink.ptms.chemdah.core.quest.QuestDevelopment.hasTransmitMessages
 import ink.ptms.chemdah.core.quest.QuestDevelopment.releaseTransmit
+import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.event.Listener
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerItemHeldEvent
@@ -23,6 +24,7 @@ import taboolib.common5.Coerce
 import taboolib.common5.util.printed
 import taboolib.module.chat.TellrawJson
 import taboolib.module.chat.colored
+import taboolib.module.chat.uncolored
 import taboolib.module.kether.isInt
 import taboolib.module.nms.PacketSendEvent
 import taboolib.platform.util.asLangText
@@ -47,8 +49,9 @@ object ThemeChat : Theme<ThemeChatSettings>(), Listener {
      */
     @SubscribeEvent
     fun e(e: PacketSendEvent) {
-        if (e.packet.name == "PacketPlayOutChat" && e.packet.read<Any>("b").toString() == "GAME_INFO") {
-            if (e.player.conversationSession != null && e.packet.read<Any>("a")?.invokeMethod<String>("getText") != e.player.asLangText("theme-chat-help")) {
+        if (e.packet.name == "PacketPlayOutChat" && e.packet.read<Any>("b").toString() == "GAME_INFO" && e.player.conversationSession != null) {
+            val text = TextComponent.toPlainText(*e.packet.read("components")).uncolored()
+            if (text != e.player.asLangText("theme-chat-help").uncolored()) {
                 e.isCancelled = true
             }
         }
