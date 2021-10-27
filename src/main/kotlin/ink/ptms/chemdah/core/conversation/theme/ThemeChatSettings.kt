@@ -20,7 +20,8 @@ class ThemeChatSettings(
     val selectColor: String = root.getString("select.color", "")!!.colored(),
     val talking: String = root.getString("talking", "")!!.colored(),
     val animation: Boolean = root.getBoolean("animation", true),
-    val spaceLine: Int = root.getInt("space-line", 30)
+    val spaceLine: Int = root.getInt("space-line", 30),
+    val useScroll: Boolean = root.getBoolean("use-scroll")
 ) : ThemeSettings(root) {
 
     val selectSound: XSound? = XSound.matchXSound(root.getString("select.sound.name").toString()).orElse(null)

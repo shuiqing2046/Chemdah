@@ -27,6 +27,7 @@ theme-chat:
     p: 1
     v: 0
   space-line: 30
+  use-scroll: false
 
 theme-chest:
   ui:

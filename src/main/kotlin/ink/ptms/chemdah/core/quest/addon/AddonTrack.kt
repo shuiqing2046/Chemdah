@@ -253,6 +253,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                             mirrorNow("AddonTrack:trackTickNavigation:${if (trackAddon.navigationSync) "sync" else "async"}") {
                                 val pathFinder = createPathfinder(NodeEntity(location, 2.0, 1.0, canOpenDoors = true, canPassDoors = true))
                                 val path = pathFinder.findPath(center, distance = trackAddon.navigationDistanceMax.toFloat())
+                                // 触发寻路逻辑
                                 path?.nodes?.forEachIndexed { index, node ->
                                     submit(delay = index.toLong()) {
                                         trackAddon.navigationType.sendTo(

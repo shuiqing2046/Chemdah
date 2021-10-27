@@ -11,15 +11,14 @@ import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.event.Listener
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerItemHeldEvent
+import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.player.PlayerSwapHandItemsEvent
-import taboolib.common.LifeCycle
-import taboolib.common.platform.*
+import taboolib.common.platform.ProxyParticle
+import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.adaptCommandSender
 import taboolib.common.platform.function.adaptPlayer
 import taboolib.common.platform.function.submit
-import taboolib.common.reflect.Reflex.Companion.invokeMethod
-import taboolib.common5.Baffle
 import taboolib.common5.Coerce
 import taboolib.common5.util.printed
 import taboolib.module.chat.TellrawJson
@@ -30,7 +29,7 @@ import taboolib.module.nms.PacketSendEvent
 import taboolib.platform.util.asLangText
 import taboolib.platform.util.toProxyLocation
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Chemdah
@@ -40,8 +39,6 @@ import java.util.concurrent.TimeUnit
  * @since 2021/2/12 2:08 上午
  */
 object ThemeChat : Theme<ThemeChatSettings>(), Listener {
-
-    val baffle = Baffle.of(100, TimeUnit.MILLISECONDS)
 
     /**
      * 屏蔽其他插件在对话过程中发送的动作栏信息
@@ -61,7 +58,7 @@ object ThemeChat : Theme<ThemeChatSettings>(), Listener {
      * 取消这个行为会出现客户端显示不同步的错误
      * 以及无法 mc 无法重复切换相同物品栏
      */
-    @SubscribeEvent
+    @SubscribeEvent(EventPriority.HIGHEST, ignoreCancelled = true)
     fun e(e: PlayerItemHeldEvent) {
         val session = e.player.conversationSession ?: return
         if (session.conversation.option.theme == "chat") {
@@ -76,7 +73,23 @@ object ThemeChat : Theme<ThemeChatSettings>(), Listener {
             val replies = session.playerReplyForDisplay
             if (replies.isNotEmpty()) {
                 val index = replies.indexOf(session.playerSide)
-                val select = e.newSlot.coerceAtMost(replies.size - 1)
+                var select: Int
+                // 使用滚轮
+                if (settings.useScroll) {
+                    if (e.newSlot > e.previousSlot) {
+                        select = index + 1
+                        if (select >= replies.size) {
+                            select = 0
+                        }
+                    } else {
+                        select = index - 1
+                        if (select < 0) {
+                            select = replies.size - 1
+                        }
+                    }
+                } else {
+                    select = e.newSlot.coerceAtMost(replies.size - 1)
+                }
                 if (select != index) {
                     session.playerSide = replies[select]
                     settings.playSelectSound(session)
@@ -216,7 +229,7 @@ object ThemeChat : Theme<ThemeChatSettings>(), Listener {
         index: Int,
         endMessage: Boolean,
         canReply: Boolean,
-        noSpace: Boolean = false
+        noSpace: Boolean = false,
     ) {
         session.conversation.playerSide.checked(session).thenApply { replies ->
             // 最终效果
