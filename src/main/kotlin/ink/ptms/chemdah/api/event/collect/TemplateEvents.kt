@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.api.event.collect
 
 import ink.ptms.chemdah.core.quest.Template
-import ink.ptms.chemdah.core.quest.addon.AddonControl
+import ink.ptms.chemdah.core.quest.addon.data.Control
 import taboolib.platform.type.BukkitProxyEvent
 
 /**
@@ -13,11 +13,11 @@ import taboolib.platform.type.BukkitProxyEvent
  */
 class TemplateEvents {
 
-    class ControlHook(val template: Template, val type: String, val map: Map<String, Any>): BukkitProxyEvent() {
+    class ControlHook(val template: Template, val type: String, val map: Map<String, Any>) : BukkitProxyEvent() {
 
         override val allowCancelled: Boolean
             get() = false
 
-        var control: AddonControl.Control? = null
+        var control: Control? = null
     }
 }

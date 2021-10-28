@@ -10,12 +10,12 @@ theme-chat:
     - ''
     - '  &f" &7{npcSide}&r &f"'
     - ''
-    - '  {select} [ &7{playerSide}&r ]'
+    - '  {reply}'
     - ''
   select:
-    char: '>'
-    other: ' '
-    color: '&b&n'
+    reply:
+      1: '> &f&n{playerSide}&r &8(&7Press &6&lF&7 Key&8)'
+      0: '  &7{playerSide}&r'
     sound:
       name: ENTITY_EXPERIENCE_ORB_PICKUP
       p: 2

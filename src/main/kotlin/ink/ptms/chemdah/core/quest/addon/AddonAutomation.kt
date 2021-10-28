@@ -5,13 +5,13 @@ import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.api.ChemdahAPI.isChemdahProfileLoaded
 import ink.ptms.chemdah.core.quest.*
+import ink.ptms.chemdah.core.quest.addon.data.*
 import org.bukkit.Bukkit
 import taboolib.common.platform.Schedule
 import taboolib.common5.Coerce
 import taboolib.common5.RealTime
 import taboolib.common5.mirrorFuture
 import taboolib.library.configuration.ConfigurationSection
-import java.util.*
 import kotlin.random.Random
 
 /**
@@ -25,56 +25,11 @@ import kotlin.random.Random
 @Option(Option.Type.SECTION)
 class AddonAutomation(source: ConfigurationSection, questContainer: QuestContainer) : Addon(source, questContainer) {
 
-    class Plan(val type: PlanType, val count: Int, val group: String?) {
-
-        val nextTime: Long
-            get() = type.nextTime
-    }
-
-    abstract class PlanType(val realTime: RealTime, val unit: RealTime.Type, val value: Int) {
-
-        abstract val nextTime: Long
-    }
-
-    class PlanTypeHour(realTime: RealTime, unit: RealTime.Type, value: Int) : PlanType(realTime, unit, value) {
-
-        override val nextTime = Calendar.getInstance().run {
-            this.timeInMillis = realTime.nextTime(RealTime.Type.HOUR, value)
-            this.timeInMillis
-        }
-    }
-
-    class PlanTypeDaily(realTime: RealTime, unit: RealTime.Type, value: Int, hour: Int, minute: Int) : PlanType(realTime, unit, value) {
-
-        override val nextTime = Calendar.getInstance().run {
-            this.timeInMillis = realTime.nextTime(RealTime.Type.DAY, value)
-            this.add(Calendar.HOUR, hour)
-            this.add(Calendar.MINUTE, minute)
-            this.timeInMillis
-        }
-    }
-
-    class PlanTypeWeekly(realTime: RealTime, unit: RealTime.Type, value: Int, day: Int, hour: Int, minute: Int) : PlanType(realTime, unit, value) {
-
-        override val nextTime = Calendar.getInstance().run {
-            this.timeInMillis = realTime.nextTime(RealTime.Type.WEEK, value)
-            this.add(Calendar.DAY_OF_WEEK, day)
-            this.add(Calendar.HOUR, hour)
-            this.add(Calendar.MINUTE, minute)
-            this.timeInMillis
-        }
-    }
-
-    class Group(val groupId: String, val plan: Plan) {
-
-        val quests = ArrayList<Template>()
-    }
-
     val isAutoAccept = source.getBoolean("auto-accept")
 
     val plan = if (source.contains("plan")) {
-        val method = Enums.getIfPresent(RealTime::class.java, source.getString("plan.method").toString().toUpperCase()).or(RealTime.START_IN_MONDAY)
-        val args = source.getString("plan.type").toString().toLowerCase().split(" ")
+        val method = Enums.getIfPresent(RealTime::class.java, source.getString("plan.method").toString().uppercase()).or(RealTime.START_IN_MONDAY)
+        val args = source.getString("plan.type").toString().lowercase().split(" ")
         val type = when (args[0]) {
             "hour" -> PlanTypeHour(
                 method,
@@ -107,7 +62,7 @@ class AddonAutomation(source: ConfigurationSection, questContainer: QuestContain
         null
     }
 
-    val planGroup = source.getString("plan.group")
+    val planGroup: String? = source.getString("plan.group")
 
     companion object {
 
@@ -122,7 +77,7 @@ class AddonAutomation(source: ConfigurationSection, questContainer: QuestContain
             if (Bukkit.getOnlinePlayers().isEmpty()) {
                 return
             }
-            val groups = HashMap<String, Group>()
+            val groups = HashMap<String, PlanGroup>()
             val autoAccept = ArrayList<Template>()
             // 优先加载拥有主动逻辑的 Plan 计划
             ChemdahAPI.questTemplate.forEach { (_, quest) ->
@@ -132,7 +87,7 @@ class AddonAutomation(source: ConfigurationSection, questContainer: QuestContain
                     val plan = quest.plan()
                     if (plan != null) {
                         val id = if (plan.group != null) "@${plan.group}" else quest.id
-                        val group = groups.computeIfAbsent(id) { Group(id, plan) }
+                        val group = groups.computeIfAbsent(id) { PlanGroup(id, plan) }
                         group.quests.add(quest)
                     }
                 }

@@ -15,9 +15,8 @@ import taboolib.module.chat.colored
 class ThemeChatSettings(
     root: ConfigurationSection,
     val format: List<String> = root.getStringList("format").map { it.colored() },
-    val selectChar: String = root.getString("select.char", "")!!,
-    val selectOther: String = root.getString("select.other", "")!!,
-    val selectColor: String = root.getString("select.color", "")!!.colored(),
+    val select: String = root.getString("select.reply.1", "")!!.colored(),
+    val selectOther: String = root.getString("select.reply.0", "")!!.colored(),
     val talking: String = root.getString("talking", "")!!.colored(),
     val animation: Boolean = root.getBoolean("animation", true),
     val spaceLine: Int = root.getInt("space-line", 30),
@@ -33,13 +32,6 @@ class ThemeChatSettings(
     }
 
     override fun toString(): String {
-        return "ThemeChatSettings(" +
-                "format=$format, " +
-                "selectChar='$selectChar', " +
-                "selectOther='$selectOther', " +
-                "selectColor='$selectColor', " +
-                "talking='$talking', " +
-                "animation=$animation" +
-                ")"
+        return "ThemeChatSettings(format=$format, select='$select', selectOther='$selectOther', talking='$talking', animation=$animation, spaceLine=$spaceLine, useScroll=$useScroll, selectSound=$selectSound, selectSoundPitch=$selectSoundPitch, selectSoundVolume=$selectSoundVolume)"
     }
 }

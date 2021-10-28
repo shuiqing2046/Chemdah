@@ -32,7 +32,7 @@ class AddonUI(root: ConfigurationSection, questContainer: QuestContainer) : Addo
     /**
      * 显示图标
      */
-    val icon = root.getString("icon")
+    val icon: String? = root.getString("icon")
 
     /**
      * 显示介绍

@@ -11,7 +11,6 @@ import ink.ptms.chemdah.core.quest.addon.AddonParty.Companion.party
 import ink.ptms.chemdah.module.Module
 import ink.ptms.chemdah.module.Module.Companion.register
 import org.bukkit.entity.Player
-import org.bukkit.event.Listener
 import taboolib.common.platform.Awake
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.module.configuration.Config
@@ -19,7 +18,7 @@ import taboolib.module.configuration.SecuredFile
 import java.util.concurrent.ConcurrentHashMap
 
 @Awake
-object PartySystem : Module, Listener {
+object PartySystem : Module {
 
     @Config("module/party.yml")
     lateinit var conf: SecuredFile

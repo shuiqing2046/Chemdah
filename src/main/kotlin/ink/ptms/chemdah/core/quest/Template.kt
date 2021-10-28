@@ -5,6 +5,7 @@ import ink.ptms.chemdah.api.event.collect.QuestEvents
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.addon.AddonControl
 import ink.ptms.chemdah.core.quest.addon.AddonControl.Companion.control
+import ink.ptms.chemdah.core.quest.addon.data.ControlTrigger
 import ink.ptms.chemdah.core.quest.meta.Meta
 import taboolib.common.util.asList
 import taboolib.common5.mirrorFuture
@@ -58,7 +59,7 @@ class Template(id: String, config: ConfigurationSection) : QuestContainer(id, co
             if (it.type == AcceptResult.Type.SUCCESSFUL) {
                 val quest = Quest(id, profile)
                 val control = control()
-                control.signature(profile, AddonControl.Trigger.ACCEPT)
+                control.signature(profile, ControlTrigger.ACCEPT)
                 profile.registerQuest(quest)
                 agent(profile, AgentType.QUEST_ACCEPTED)
                 QuestEvents.Accept.Post(quest, profile).call()

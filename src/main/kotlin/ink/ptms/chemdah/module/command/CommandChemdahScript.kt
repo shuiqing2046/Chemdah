@@ -33,11 +33,11 @@ object CommandChemdahScript {
                 // ver
                 dynamic(commit = "args", optional = true) {
                     execute<CommandSender> { sender, context, argument ->
-                        commandRun(sender, context.argument(-2)!!, context.argument(-1), argument.split(" ").toTypedArray())
+                        commandRun(sender, context.argument(-2), context.argument(-1), argument.split(" ").toTypedArray())
                     }
                 }
                 execute<CommandSender> { sender, context, argument ->
-                    commandRun(sender, context.argument(-1)!!, argument)
+                    commandRun(sender, context.argument(-1), argument)
                 }
             }
             execute<CommandSender> { sender, _, argument ->
@@ -100,7 +100,7 @@ object CommandChemdahScript {
         dynamic(commit = "script") {
             execute<CommandSender> { sender, _, argument ->
                 try {
-                    KetherShell.eval(argument, sender = adaptCommandSender(sender)).thenApply { v ->
+                    KetherShell.eval(argument, namespace = listOf("chemdah", "adyeshach"), sender = adaptCommandSender(sender)).thenApply { v ->
                         sender.sendMessage("§c[System] §7Result: $v")
                     }
                 } catch (ex: Throwable) {

@@ -31,7 +31,7 @@ import kotlin.reflect.KClass
 
 object ChemdahAPI {
 
-    val workspace = Workspace(File(getDataFolder(), "module/script"), namespace = listOf("chemdah"))
+    val workspace = Workspace(File(getDataFolder(), "module/script"), namespace = listOf("chemdah", "adyeshach"))
 
     val conversation = HashMap<String, Conversation>()
     val conversationTheme = HashMap<String, Theme<*>>()

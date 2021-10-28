@@ -8,10 +8,8 @@ import ink.ptms.chemdah.core.quest.QuestDevelopment
 import ink.ptms.chemdah.core.quest.QuestDevelopment.hasTransmitMessages
 import ink.ptms.chemdah.core.quest.QuestDevelopment.releaseTransmit
 import net.md_5.bungee.api.chat.TextComponent
-import org.bukkit.event.Listener
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerItemHeldEvent
-import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.player.PlayerSwapHandItemsEvent
 import taboolib.common.platform.ProxyParticle
 import taboolib.common.platform.event.EventPriority
@@ -29,7 +27,6 @@ import taboolib.module.nms.PacketSendEvent
 import taboolib.platform.util.asLangText
 import taboolib.platform.util.toProxyLocation
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Chemdah
@@ -38,7 +35,7 @@ import java.util.concurrent.ConcurrentHashMap
  * @author sky
  * @since 2021/2/12 2:08 上午
  */
-object ThemeChat : Theme<ThemeChatSettings>(), Listener {
+object ThemeChat : Theme<ThemeChatSettings>() {
 
     /**
      * 屏蔽其他插件在对话过程中发送的动作栏信息
@@ -251,26 +248,20 @@ object ThemeChat : Theme<ThemeChatSettings>(), Listener {
                                 }
                             }
                         }
-                        it.contains("{playerSide}") -> {
+                        it.contains("{reply}") -> {
                             session.playerReplyForDisplay.clear()
                             session.playerReplyForDisplay.addAll(replies)
                             if (canReply) {
-                                replies.forEachIndexed { n, reply ->
+                                replies.forEachIndexed { idx, reply ->
                                     if (finally) {
                                         val text = reply.build(session)
-                                        if (session.playerSide == reply) {
-                                            json.append(it.replace("{select}", settings.selectChar).replace("{playerSide}", "${settings.selectColor}$text"))
-                                                .hoverText(text)
-                                                .runCommand("/session reply ${reply.uuid}")
-                                                .newLine()
-                                        } else {
-                                            json.append(it.replace("{select}", settings.selectOther).replace("{playerSide}", text))
-                                                .hoverText(text)
-                                                .runCommand("/session reply ${reply.uuid}")
-                                                .newLine()
-                                        }
+                                        val rep = if (session.playerSide == reply) settings.select else settings.selectOther
+                                        json.append(it.replace("{reply}", rep.replace("{playerSide}", text).replace("{index}", (idx + 1).toString())))
+                                            .hoverText(text)
+                                            .runCommand("/session reply ${reply.uuid}")
+                                            .newLine()
                                     } else {
-                                        if (n == 0) {
+                                        if (idx == 0) {
                                             json.append(settings.talking).newLine()
                                         } else {
                                             json.newLine()

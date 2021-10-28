@@ -4,12 +4,11 @@ import ink.ptms.chemdah.api.event.collect.PlayerEvents
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.module.Module
 import ink.ptms.chemdah.module.Module.Companion.register
-import taboolib.common5.Coerce
-import org.bukkit.event.Listener
 import taboolib.common.platform.Awake
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.warning
+import taboolib.common5.Coerce
 import taboolib.common5.compileJS
 import taboolib.module.configuration.Config
 import taboolib.module.configuration.SecuredFile
@@ -26,7 +25,7 @@ import javax.script.SimpleBindings
  * @since 2021/3/8 11:13 下午
  */
 @Awake
-object LevelSystem : Module, Listener {
+object LevelSystem : Module {
 
     @Config("module/level.yml")
     lateinit var conf: SecuredFile

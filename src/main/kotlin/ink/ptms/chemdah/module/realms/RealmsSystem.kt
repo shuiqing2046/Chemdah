@@ -4,7 +4,6 @@ import ink.ptms.chemdah.module.Module
 import ink.ptms.chemdah.module.Module.Companion.register
 import org.bukkit.Bukkit
 import org.bukkit.Location
-import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import taboolib.common.platform.Awake
@@ -15,7 +14,7 @@ import taboolib.module.nms.MinecraftVersion
 import taboolib.platform.BukkitPlugin
 
 @Awake
-object RealmsSystem : Module, Listener {
+object RealmsSystem : Module {
 
     @Config("module/realms.yml")
     lateinit var conf: SecuredFile

@@ -9,6 +9,7 @@ import ink.ptms.chemdah.core.quest.addon.AddonControl
 import ink.ptms.chemdah.core.quest.addon.AddonControl.Companion.control
 import ink.ptms.chemdah.core.quest.addon.AddonRestart.Companion.canRestart
 import ink.ptms.chemdah.core.quest.addon.AddonTimeout.Companion.isTimeout
+import ink.ptms.chemdah.core.quest.addon.data.ControlTrigger
 import org.bukkit.entity.Player
 import taboolib.common5.mirrorFuture
 
@@ -93,7 +94,7 @@ class Quest(val id: String, val profile: PlayerProfile, val persistentDataContai
                             if (it) {
                                 profile.persistentDataContainer["quest.complete.$id"] = System.currentTimeMillis()
                                 profile.unregisterQuest(this@Quest)
-                                template.control().signature(profile, AddonControl.Trigger.COMPLETE)
+                                template.control().signature(profile, ControlTrigger.COMPLETE)
                                 template.agent(profile, AgentType.QUEST_COMPLETED)
                                 QuestEvents.Complete.Post(this@Quest, profile).call()
                             }
@@ -124,7 +125,7 @@ class Quest(val id: String, val profile: PlayerProfile, val persistentDataContai
                 template.agent(profile, AgentType.QUEST_FAIL).thenAccept {
                     if (it) {
                         profile.unregisterQuest(this@Quest)
-                        template.control().signature(profile, AddonControl.Trigger.FAIL)
+                        template.control().signature(profile, ControlTrigger.FAIL)
                         template.agent(profile, AgentType.QUEST_FAILED)
                         QuestEvents.Fail.Post(this@Quest, profile).call()
                     }

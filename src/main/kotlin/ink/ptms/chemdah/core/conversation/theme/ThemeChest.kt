@@ -117,7 +117,7 @@ object ThemeChest : Theme<ThemeChestSetting>() {
 
     private fun rows(player: Player, size: Int): CompletableFuture<Int> {
         return try {
-            KetherShell.eval(settings.rows, sender = adaptPlayer(player), namespace = listOf("chemdah")) {
+            KetherShell.eval(settings.rows, sender = adaptPlayer(player), namespace = listOf("chemdah", "adyeshach")) {
                 rootFrame().variables().set("size", size)
             }.thenApply {
                 Coerce.toInteger(it)
