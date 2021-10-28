@@ -269,15 +269,11 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
             // 启用 Landmark 并在相同世界
             if (trackAddon.landmark.enable && trackCenter.world?.name == world.name && allow) {
                 mirrorNow("AddonTrack:refreshTrackingLandmark") {
-
                     val name = trackAddon.name ?: trackAddon.questContainer.displayName()
                     val distance = trackCenter.distance(location)
                     val direction = trackCenter.toVector().subtract(location.toVector()).normalize()
                     val pos = if (distance < trackAddon.landmark.distance) trackCenter else location.add(direction.multiply(trackAddon.landmark.distance))
-
-                    println(trackAddon.landmark.content)
                     if (hologramMap.containsKey(id)) {
-                        println(1)
                         hologramMap[id]!!.also { holo ->
                             holo.teleport(pos)
                             holo.update(trackAddon.landmark.content.map {
@@ -285,7 +281,6 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                             })
                         }
                     } else {
-                        println(2)
                         hologramMap[id] = AdyeshachAPI.createHologram(this, pos, trackAddon.landmark.content.map {
                             it.replace("{name}", name).replace("{distance}", Coerce.format(distance).toString())
                         })
