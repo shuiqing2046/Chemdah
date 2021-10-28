@@ -51,10 +51,10 @@ default-track:
         y: 0.2
       count: 20
       speed: 1
-      period: 40
+      period: 60
     arrow:
       type: DRIP_LAVA
-      y: 0.1
+      y: 0.2
       density: 12
       len: 0.5
       angle: 45
