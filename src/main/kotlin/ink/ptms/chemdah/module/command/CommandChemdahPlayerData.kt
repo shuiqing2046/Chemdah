@@ -6,8 +6,10 @@ import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import taboolib.common.platform.command.CommandBody
 import taboolib.common.platform.command.CommandHeader
+import taboolib.common.platform.command.mainCommand
 import taboolib.common.platform.command.subCommand
 import taboolib.common.platform.function.onlinePlayers
+import taboolib.expansion.createHelper
 import taboolib.platform.util.sendLang
 
 /**
@@ -19,6 +21,11 @@ import taboolib.platform.util.sendLang
  */
 @CommandHeader(name = "ChemdahPlayerData", aliases = ["chpd"], permission = "chemdah.command")
 object CommandChemdahPlayerData {
+
+    @CommandBody
+    val main = mainCommand {
+        createHelper()
+    }
 
     @CommandBody
     val set = subCommand {

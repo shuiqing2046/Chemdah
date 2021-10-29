@@ -10,8 +10,10 @@ import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import taboolib.common.platform.command.CommandBody
 import taboolib.common.platform.command.CommandHeader
+import taboolib.common.platform.command.mainCommand
 import taboolib.common.platform.command.subCommand
 import taboolib.common.platform.function.onlinePlayers
+import taboolib.expansion.createHelper
 import taboolib.platform.util.sendLang
 
 /**
@@ -25,6 +27,11 @@ import taboolib.platform.util.sendLang
 object CommandChemdahPlayerLevel {
 
     @CommandBody
+    val main = mainCommand {
+        createHelper()
+    }
+
+    @CommandBody
     val addlevel = subCommand { 
         dynamic(commit = "player") {
             suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
@@ -34,8 +41,8 @@ object CommandChemdahPlayerLevel {
                 // value
                 dynamic(commit = "value") {
                     execute<CommandSender> { sender, context, argument ->
-                        val playerExact = Bukkit.getPlayerExact(context.argument(-2)!!)!!
-                        val option = getLevelOption(context.argument(-1)!!)!!
+                        val playerExact = Bukkit.getPlayerExact(context.argument(-2))!!
+                        val option = getLevelOption(context.argument(-1))!!
                         val profile = playerExact.chemdahProfile
                         val level = option.toLevel(profile.getLevel(option))
                         level.addLevel(Coerce.toInteger(argument)).thenAccept {
@@ -60,8 +67,8 @@ object CommandChemdahPlayerLevel {
                 // value
                 dynamic(commit = "value") {
                     execute<CommandSender> { sender, context, argument ->
-                        val playerExact = Bukkit.getPlayerExact(context.argument(-2)!!)!!
-                        val option = getLevelOption(context.argument(-1)!!)!!
+                        val playerExact = Bukkit.getPlayerExact(context.argument(-2))!!
+                        val option = getLevelOption(context.argument(-1))!!
                         val profile = playerExact.chemdahProfile
                         val level = option.toLevel(profile.getLevel(option))
                         level.setLevel(Coerce.toInteger(argument)).thenAccept {
@@ -86,8 +93,8 @@ object CommandChemdahPlayerLevel {
                 // value
                 dynamic(commit = "value") {
                     execute<CommandSender> { sender, context, argument ->
-                        val playerExact = Bukkit.getPlayerExact(context.argument(-2)!!)!!
-                        val option = getLevelOption(context.argument(-1)!!)!!
+                        val playerExact = Bukkit.getPlayerExact(context.argument(-2))!!
+                        val option = getLevelOption(context.argument(-1))!!
                         val profile = playerExact.chemdahProfile
                         val level = option.toLevel(profile.getLevel(option))
                         level.addExperience(Coerce.toInteger(argument)).thenAccept {
@@ -112,8 +119,8 @@ object CommandChemdahPlayerLevel {
                 // value
                 dynamic(commit = "value") {
                     execute<CommandSender> { sender, context, argument ->
-                        val playerExact = Bukkit.getPlayerExact(context.argument(-2)!!)!!
-                        val option = getLevelOption(context.argument(-1)!!)!!
+                        val playerExact = Bukkit.getPlayerExact(context.argument(-2))!!
+                        val option = getLevelOption(context.argument(-1))!!
                         val profile = playerExact.chemdahProfile
                         val level = option.toLevel(profile.getLevel(option))
                         level.setExperience(Coerce.toInteger(argument)).thenAccept {

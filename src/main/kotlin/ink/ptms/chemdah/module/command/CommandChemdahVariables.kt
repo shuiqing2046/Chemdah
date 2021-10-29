@@ -4,7 +4,9 @@ import ink.ptms.chemdah.api.ChemdahAPI
 import org.bukkit.command.CommandSender
 import taboolib.common.platform.command.CommandBody
 import taboolib.common.platform.command.CommandHeader
+import taboolib.common.platform.command.mainCommand
 import taboolib.common.platform.command.subCommand
+import taboolib.expansion.createHelper
 import taboolib.platform.util.sendLang
 
 /**
@@ -16,6 +18,11 @@ import taboolib.platform.util.sendLang
  */
 @CommandHeader(name = "ChemdahVariables", aliases = ["chv"], permission = "chemdah.command")
 object CommandChemdahVariables {
+
+    @CommandBody
+    val main = mainCommand {
+        createHelper()
+    }
 
     @CommandBody
     val get = subCommand {
@@ -35,8 +42,8 @@ object CommandChemdahVariables {
             dynamic(commit = "value") {
                 execute<CommandSender> { sender, context, argument ->
                     val time = System.currentTimeMillis()
-                    ChemdahAPI.setVariable(context.argument(-1)!!, argument)
-                    sender.sendLang("command-variables-change", "${context.argument(-1)!!} §8= §f$argument §7(${System.currentTimeMillis() - time}ms)")
+                    ChemdahAPI.setVariable(context.argument(-1), argument)
+                    sender.sendLang("command-variables-change", "${context.argument(-1)} §8= §f$argument §7(${System.currentTimeMillis() - time}ms)")
                 }
             }
         }
@@ -49,8 +56,8 @@ object CommandChemdahVariables {
             dynamic(commit = "value") {
                 execute<CommandSender> { sender, context, argument ->
                     val time = System.currentTimeMillis()
-                    ChemdahAPI.setVariable(context.argument(-1)!!, argument, true)
-                    sender.sendLang("command-variables-change", "${context.argument(-1)!!} §8+= §f$argument §7(${System.currentTimeMillis() - time}ms)")
+                    ChemdahAPI.setVariable(context.argument(-1), argument, true)
+                    sender.sendLang("command-variables-change", "${context.argument(-1)} §8+= §f$argument §7(${System.currentTimeMillis() - time}ms)")
                 }
             }
         }

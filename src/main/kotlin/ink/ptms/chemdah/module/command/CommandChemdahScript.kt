@@ -5,8 +5,10 @@ import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import taboolib.common.platform.command.CommandBody
 import taboolib.common.platform.command.CommandHeader
+import taboolib.common.platform.command.mainCommand
 import taboolib.common.platform.command.subCommand
 import taboolib.common.platform.function.adaptCommandSender
+import taboolib.expansion.createHelper
 import taboolib.module.kether.Kether
 import taboolib.module.kether.KetherShell
 import taboolib.module.kether.ScriptContext
@@ -17,6 +19,11 @@ import taboolib.platform.util.sendLang
 object CommandChemdahScript {
 
     val workspace by lazy { ChemdahAPI.workspace }
+
+    @CommandBody
+    val main = mainCommand {
+        createHelper()
+    }
 
     @CommandBody
     val run = subCommand {

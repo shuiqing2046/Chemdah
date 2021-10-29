@@ -10,10 +10,12 @@ import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import taboolib.common.platform.command.CommandBody
 import taboolib.common.platform.command.CommandHeader
+import taboolib.common.platform.command.mainCommand
 import taboolib.common.platform.command.subCommand
 import taboolib.common.platform.function.onlinePlayers
 import taboolib.common.util.subList
 import taboolib.common5.Coerce
+import taboolib.expansion.createHelper
 import taboolib.platform.util.sendLang
 import kotlin.math.ceil
 
@@ -28,13 +30,18 @@ import kotlin.math.ceil
 object CommandChemdahQuest {
 
     @CommandBody
+    val main = mainCommand {
+        createHelper()
+    }
+
+    @CommandBody
     val accept = subCommand {
         dynamic(commit = "player") {
             suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
             dynamic(commit = "quest") {
                 suggestion<CommandSender> { _, _ -> ChemdahAPI.questTemplate.keys.toList() }
                 execute<CommandSender> { _, context, argument ->
-                    val playerExact = Bukkit.getPlayerExact(context.argument(-1)!!)!!
+                    val playerExact = Bukkit.getPlayerExact(context.argument(-1))!!
                     val quest = ChemdahAPI.getQuestTemplate(argument)!!
                     quest.acceptTo(playerExact.chemdahProfile)
                 }
@@ -49,7 +56,7 @@ object CommandChemdahQuest {
             dynamic(commit = "quest") {
                 suggestion<CommandSender>(uncheck = true) { _, _ -> ChemdahAPI.questTemplate.keys.toList() }
                 execute<CommandSender> { sender, context, argument ->
-                    val playerExact = Bukkit.getPlayerExact(context.argument(-1)!!)!!
+                    val playerExact = Bukkit.getPlayerExact(context.argument(-1))!!
                     val quest = playerExact.chemdahProfile.getQuestById(argument, openAPI = false)
                     if (quest == null) {
                         sender.sendLang("command-quest-not-accepted")
@@ -68,7 +75,7 @@ object CommandChemdahQuest {
             dynamic(commit = "quest") {
                 suggestion<CommandSender>(uncheck = true) { _, _ -> ChemdahAPI.questTemplate.keys.toList() }
                 execute<CommandSender> { sender, context, argument ->
-                    val playerExact = Bukkit.getPlayerExact(context.argument(-1)!!)!!
+                    val playerExact = Bukkit.getPlayerExact(context.argument(-1))!!
                     val quest = playerExact.chemdahProfile.getQuestById(argument, openAPI = false)
                     if (quest == null) {
                         sender.sendLang("command-quest-not-accepted")
@@ -87,7 +94,7 @@ object CommandChemdahQuest {
             dynamic(commit = "quest") {
                 suggestion<CommandSender>(uncheck = true) { _, _ -> ChemdahAPI.questTemplate.keys.toList() }
                 execute<CommandSender> { sender, context, argument ->
-                    val playerExact = Bukkit.getPlayerExact(context.argument(-1)!!)!!
+                    val playerExact = Bukkit.getPlayerExact(context.argument(-1))!!
                     val quest = playerExact.chemdahProfile.getQuestById(argument, openAPI = false)
                     if (quest == null) {
                         sender.sendLang("command-quest-not-accepted")
@@ -106,7 +113,7 @@ object CommandChemdahQuest {
             dynamic(commit = "quest") {
                 suggestion<CommandSender>(uncheck = true) { _, _ -> ChemdahAPI.questTemplate.keys.toList() }
                 execute<CommandSender> { sender, context, argument ->
-                    val playerExact = Bukkit.getPlayerExact(context.argument(-1)!!)!!
+                    val playerExact = Bukkit.getPlayerExact(context.argument(-1))!!
                     val quest = playerExact.chemdahProfile.getQuestById(argument, openAPI = false)
                     if (quest == null) {
                         sender.sendLang("command-quest-not-accepted")
@@ -124,7 +131,7 @@ object CommandChemdahQuest {
             suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
             dynamic(commit = "value") {
                 execute<CommandSender> { _, context, argument ->
-                    val playerExact = Bukkit.getPlayerExact(context.argument(-1)!!)!!
+                    val playerExact = Bukkit.getPlayerExact(context.argument(-1))!!
                     playerExact.callTrigger(argument)
                 }
             }
@@ -149,7 +156,7 @@ object CommandChemdahQuest {
             dynamic(commit = "quest", optional = true) {
                 suggestion<CommandSender>(uncheck = true) { _, _ -> ChemdahAPI.questTemplate.keys.toList() }
                 execute<CommandSender> { sender, context, argument ->
-                    commandInfo(sender, context.argument(-1)!!, Coerce.toInteger(argument))
+                    commandInfo(sender, context.argument(-1), Coerce.toInteger(argument))
                 }
             }
             execute<CommandSender> { sender, _, argument ->
@@ -165,7 +172,7 @@ object CommandChemdahQuest {
             dynamic(commit = "ui") {
                 suggestion<CommandSender> { _, _ -> UISystem.ui.keys.toList() }
                 execute<CommandSender> { _, context, argument ->
-                    val playerExact = Bukkit.getPlayerExact(context.argument(-1)!!)!!
+                    val playerExact = Bukkit.getPlayerExact(context.argument(-1))!!
                     val ui = UISystem.getUI(argument)!!
                     ui.open(playerExact.chemdahProfile)
                 }
@@ -180,7 +187,7 @@ object CommandChemdahQuest {
             dynamic(commit = "quest") {
                 suggestion<CommandSender> { _, _ -> ChemdahAPI.questTemplate.keys.toList() }
                 execute<CommandSender> { _, context, argument ->
-                    val playerExact = Bukkit.getPlayerExact(context.argument(-1)!!)!!
+                    val playerExact = Bukkit.getPlayerExact(context.argument(-1))!!
                     val quest = ChemdahAPI.getQuestTemplate(argument)
                     playerExact.chemdahProfile.trackQuest = quest
                 }

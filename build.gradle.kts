@@ -49,12 +49,14 @@ repositories {
 }
 
 dependencies {
+    compileOnly("net.milkbowl.vault:Vault:1:all")
     compileOnly("org.serverct.ersha.dungeon:DungeonPlus:1.1.3")
     compileOnly("com.github.angeschossen:LandsAPI:5.13.0")
     compileOnly("at.pcgamingfreaks:MarriageMaster-API-Bukkit:2.4")
     compileOnly("me.badbones69:crazycrates-plugin:1.10")
     compileOnly("com.sk89q.worldedit:WorldEdit:7:all")
     compileOnly("de.HyChrod:FriendsAPI:1.1.0.9.1")
+    compileOnly("public:QuickShop:4.0.9.1")
     compileOnly("public:nuvotifier:1.0.0")
     compileOnly("public:Jobs:1.0.0")
     compileOnly("public:even-more-fish:1.0.0")

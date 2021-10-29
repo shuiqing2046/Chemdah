@@ -4,5 +4,5 @@
 
 
 synchronous:
-  player-data-to-vault: money
-  player-level-to-minecraft: game
+  player-data-to-vault: ~
+  player-level-to-minecraft: ~

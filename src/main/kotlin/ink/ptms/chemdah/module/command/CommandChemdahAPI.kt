@@ -6,8 +6,10 @@ import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import taboolib.common.platform.command.CommandBody
 import taboolib.common.platform.command.CommandHeader
+import taboolib.common.platform.command.mainCommand
 import taboolib.common.platform.command.subCommand
 import taboolib.common.platform.function.onlinePlayers
+import taboolib.expansion.createHelper
 import taboolib.platform.util.sendLang
 
 /**
@@ -21,6 +23,11 @@ import taboolib.platform.util.sendLang
 object CommandChemdahAPI {
 
     @CommandBody
+    val main = mainCommand {
+        createHelper()
+    }
+
+    @CommandBody
     val createscenes = subCommand {
         dynamic(commit = "player") {
             suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
@@ -28,8 +35,8 @@ object CommandChemdahAPI {
                 suggestion<CommandSender> { _, _ -> ScenesSystem.scenesMap.keys.toMutableList() }
                 dynamic(commit = "index") {
                     execute<CommandSender> { sender, context, argument ->
-                        val playerExact = Bukkit.getPlayerExact(context.argument(-2)!!)!!
-                        val scenesFile = ScenesSystem.scenesMap[context.argument(-1)!!]
+                        val playerExact = Bukkit.getPlayerExact(context.argument(-2))!!
+                        val scenesFile = ScenesSystem.scenesMap[context.argument(-1)]
                         if (scenesFile == null) {
                             sender.sendLang("command-scenes-file-not-found")
                             return@execute
@@ -49,8 +56,8 @@ object CommandChemdahAPI {
                 suggestion<CommandSender> { _, _ -> ScenesSystem.scenesMap.keys.toMutableList() }
                 dynamic(commit = "index") {
                     execute<CommandSender> { sender, context, argument ->
-                        val playerExact = Bukkit.getPlayerExact(context.argument(-2)!!)!!
-                        val scenesFile = ScenesSystem.scenesMap[context.argument(-1)!!]
+                        val playerExact = Bukkit.getPlayerExact(context.argument(-2))!!
+                        val scenesFile = ScenesSystem.scenesMap[context.argument(-1)]
                         if (scenesFile == null) {
                             sender.sendLang("command-scenes-file-not-found")
                             return@execute
