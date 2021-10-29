@@ -2,6 +2,7 @@ plugins {
     java
     id("io.izzel.taboolib") version "1.31"
     id("org.jetbrains.kotlin.jvm") version "1.5.10"
+    id("org.jetbrains.dokka") version "1.4.32"
 }
 
 taboolib {
@@ -94,6 +95,7 @@ dependencies {
     compileOnly("ink.ptms:nms-all:1.0.0")
     compileOnly(kotlin("stdlib"))
     compileOnly(fileTree("libs"))
+    dokkaHtmlPlugin("org.jetbrains.dokka:kotlin-as-java-plugin:1.4.32")
 }
 
 tasks.withType<JavaCompile> {

@@ -26,6 +26,7 @@ theme-chat:
     name: ENTITY_ITEM_PICKUP
     p: 1
     v: 0
+  speed: 1
   space-line: 30
   use-scroll: false
 

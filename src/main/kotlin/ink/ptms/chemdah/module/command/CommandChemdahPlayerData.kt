@@ -27,8 +27,8 @@ object CommandChemdahPlayerData {
             dynamic(commit = "key") {
                 dynamic(commit = "value") {
                     execute<CommandSender> { sender, context, argument ->
-                        val playerExact = Bukkit.getPlayerExact(context.argument(-2)!!)!!
-                        playerExact.chemdahProfile.persistentDataContainer[context.argument(-1)!!] = argument
+                        val playerExact = Bukkit.getPlayerExact(context.argument(-2))!!
+                        playerExact.chemdahProfile.persistentDataContainer[context.argument(-1)] = argument
                         sender.sendLang("command-variables-change", "${context.argument(-1)} §8= §f${argument}")
                     }
                 }
@@ -43,8 +43,8 @@ object CommandChemdahPlayerData {
             dynamic(commit = "key") {
                 dynamic(commit = "value") {
                     execute<CommandSender> { sender, context, argument ->
-                        val playerExact = Bukkit.getPlayerExact(context.argument(-2)!!)!!
-                        val key = context.argument(-1)!!
+                        val playerExact = Bukkit.getPlayerExact(context.argument(-2))!!
+                        val key = context.argument(-1)
                         val persistentDataContainer = playerExact.chemdahProfile.persistentDataContainer
                         persistentDataContainer[key] = persistentDataContainer[key].increaseAny(argument)
                         sender.sendLang("command-variables-change", "$key §8+= §f${argument}")
@@ -60,7 +60,7 @@ object CommandChemdahPlayerData {
             suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
             dynamic(commit = "key") {
                 execute<CommandSender> { sender, context, argument ->
-                    val playerExact = Bukkit.getPlayerExact(context.argument(-1)!!)!!
+                    val playerExact = Bukkit.getPlayerExact(context.argument(-1))!!
                     playerExact.chemdahProfile.persistentDataContainer.remove(argument)
                     sender.sendLang("command-variables-change", "$argument §8= §fnull")
                 }

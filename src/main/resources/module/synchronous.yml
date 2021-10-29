@@ -1,0 +1,8 @@
+
+
+#         Powered by TabooLib 6.0         #
+
+
+synchronous:
+  player-data-to-vault: money
+  player-level-to-minecraft: game

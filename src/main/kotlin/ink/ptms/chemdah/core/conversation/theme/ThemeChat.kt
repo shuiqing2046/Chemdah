@@ -168,7 +168,7 @@ object ThemeChat : Theme<ThemeChatSettings>() {
         message.colored().map { if (settings.animation) it.printed("_") else listOf(it) }.forEachIndexed { index, messageText ->
             messageText.forEachIndexed { printIndex, printText ->
                 val endMessage = printIndex + 1 == messageText.size
-                submit(delay = d++) {
+                submit(delay = settings.speed * d++) {
                     if (session.isValid) {
                         if (session.npcTalking) {
                             future.npcTalk(session, message, printText, index, endMessage = endMessage, canReply = canReply)

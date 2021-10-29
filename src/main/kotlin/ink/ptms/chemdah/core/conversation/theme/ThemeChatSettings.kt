@@ -19,6 +19,7 @@ class ThemeChatSettings(
     val selectOther: String = root.getString("select.reply.0", "")!!.colored(),
     val talking: String = root.getString("talking", "")!!.colored(),
     val animation: Boolean = root.getBoolean("animation", true),
+    val speed: Long = root.getLong("speed", 1),
     val spaceLine: Int = root.getInt("space-line", 30),
     val useScroll: Boolean = root.getBoolean("use-scroll")
 ) : ThemeSettings(root) {
