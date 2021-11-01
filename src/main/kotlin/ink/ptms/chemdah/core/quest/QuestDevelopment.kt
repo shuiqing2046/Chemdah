@@ -1,8 +1,8 @@
 package ink.ptms.chemdah.core.quest
 
+import ink.ptms.blockdb.BlockFactory.createDataContainer
+import ink.ptms.blockdb.BlockFactory.getDataContainer
 import ink.ptms.blockdb.Data
-import ink.ptms.blockdb.createDataContainer
-import ink.ptms.blockdb.getDataContainer
 import ink.ptms.chemdah.api.ChemdahAPI.conversationSession
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
@@ -12,7 +12,9 @@ import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.getDataFolder
 import taboolib.common.reflect.Reflex.Companion.getProperty
+import taboolib.common5.Coerce
 import taboolib.module.configuration.SecuredFile
+import taboolib.module.nms.MinecraftVersion
 import taboolib.module.nms.PacketSendEvent
 import taboolib.module.nms.sendPacket
 import java.io.File
@@ -26,7 +28,7 @@ import java.util.concurrent.CopyOnWriteArrayList
  * @author sky
  * @since 2021/6/13 12:24 上午
  */
-object QuestDevelopment  {
+object QuestDevelopment {
 
     private val playerRelease = ConcurrentHashMap<String, MutableList<String>>()
 
@@ -58,11 +60,19 @@ object QuestDevelopment  {
     }
 
     @SubscribeEvent
-    fun e(e: PacketSendEvent): Boolean {
+    fun e(e: PacketSendEvent) {
         if (enableMessageTransmit && e.packet.name == "PacketPlayOutChat" && e.packet.read<Any>("b").toString() != "GAME_INFO") {
-            val a = e.packet.read<Any>("a").toString()
+            var a = e.packet.read<Any>("a").toString()
+            if (a == "null") {
+                if (MinecraftVersion.majorLegacy < 11700) {
+                    // 低版本的 Raw 信息可能来自其他字段
+                    kotlin.runCatching { a = Coerce.toList(e.packet.read<Any>("components")).toString() }
+                } else {
+                    return
+                }
+            }
             if (a.contains("PLEASE!PASS!ME!d3486345-e35d-326a-b5c5-787de3814770!") || playerRelease[e.player.name]?.contains(a) == true) {
-                return true
+                return
             }
             val message = playerMessageCache.computeIfAbsent(e.player.name) { CopyOnWriteArrayList() }
             message += e.packet.source
@@ -70,10 +80,9 @@ object QuestDevelopment  {
                 message.removeFirstOrNull()
             }
             if (e.player.conversationSession?.conversation?.option?.theme == "chat") {
-                return false
+                e.isCancelled = true
             }
         }
-        return true
     }
 
     fun Block.isPlaced(): Boolean {
@@ -88,17 +97,13 @@ object QuestDevelopment  {
         if (enableMessageTransmit) {
             val list = CopyOnWriteArrayList<String>()
             playerRelease[name] = list
-            playerMessageCache[name]?.forEachIndexed { index, packet ->
-                // 2021/06/13 03:00
-                // 因为聊天数据包会被重复拦截两次每次都不一样，1.12 和 1.16 均有该问题所以只发偶数包
-                // 删除 ViaVersion 测试同样如此
-                if (index % 2 == 0) {
-                    val value = packet.getProperty<Any>("a")
-                    if (value != null) {
-                        list.add(value.toString())
-                        sendPacket(packet)
-                    }
+            playerMessageCache[name]?.forEach { packet ->
+                var value = packet.getProperty<Any>("a").toString()
+                if (value == "null" && MinecraftVersion.majorLegacy < 11700) {
+                    kotlin.runCatching { value = Coerce.toList(packet.getProperty<Any>("components")).toString() }
                 }
+                list.add(value)
+                sendPacket(packet)
             }
         }
     }

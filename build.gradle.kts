@@ -87,7 +87,7 @@ dependencies {
     compileOnly("public:MythicMobs:1.0.1")
     compileOnly("public:ExecutableItems:1.0.0")
     compileOnly("public:Brewery:1.0.0")
-    compileOnly("ink.ptms:blockdb:1.0.0")
+    compileOnly("ink.ptms:Blockdb:1.1.0")
     compileOnly("ink.ptms:Zaphkiel:1.6.0")
     compileOnly("ink.ptms:Adyeshach:1.3.19")
     compileOnly("ink.ptms:Sandalphon:1.2.8")
