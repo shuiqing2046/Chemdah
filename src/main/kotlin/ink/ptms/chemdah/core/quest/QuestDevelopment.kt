@@ -64,7 +64,7 @@ object QuestDevelopment  {
             if (a.contains("PLEASE!PASS!ME!d3486345-e35d-326a-b5c5-787de3814770!") || playerRelease[e.player.name]?.contains(a) == true) {
                 return true
             }
-            val message = playerMessageCache.computeIfAbsent(e.player.name) { ArrayList() }
+            val message = playerMessageCache.computeIfAbsent(e.player.name) { CopyOnWriteArrayList() }
             message += e.packet.source
             if (message.size > 32) {
                 message.removeFirstOrNull()
