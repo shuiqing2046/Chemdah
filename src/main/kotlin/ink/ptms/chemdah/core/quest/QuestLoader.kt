@@ -220,7 +220,7 @@ object QuestLoader {
     fun loadTemplateGroup() {
         ChemdahAPI.questTemplateGroup.clear()
         groupConf.getConfigurationSection("group")?.getKeys(false)?.forEach { group ->
-            val groupList = ArrayList<Template>()
+            val groupList = HashSet<Template>()
             groupConf.getStringList("group.$group").forEach {
                 when {
                     it.startsWith("type:") -> {
