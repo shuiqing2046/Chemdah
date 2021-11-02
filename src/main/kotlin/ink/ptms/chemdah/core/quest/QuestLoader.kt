@@ -7,6 +7,7 @@ import ink.ptms.chemdah.api.event.collect.ObjectiveEvents
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.addon.Addon
 import ink.ptms.chemdah.core.quest.meta.Meta
+import ink.ptms.chemdah.core.quest.meta.MetaType.Companion.type
 import ink.ptms.chemdah.core.quest.objective.Abstract
 import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.Objective
@@ -21,6 +22,7 @@ import taboolib.common.platform.Schedule
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.function.*
 import taboolib.common5.mirrorNow
+import taboolib.module.configuration.Config
 import taboolib.module.configuration.SecuredFile
 import taboolib.module.nms.MinecraftVersion
 import java.io.File
@@ -33,6 +35,10 @@ import java.io.File
  * @since 2021/3/2 1:13 上午
  */
 object QuestLoader {
+
+    @Config("core/group.yml")
+    lateinit var groupConf: SecuredFile
+        private set
 
     @Schedule(period = 20, async = true)
     fun tick() {
@@ -95,6 +101,7 @@ object QuestLoader {
             }
         }
         loadTemplate()
+        loadTemplateGroup()
     }
 
     /**
@@ -111,9 +118,7 @@ object QuestLoader {
                     // 获取该监听器中的玩家对象
                     handler.apply(e)?.run {
                         if (isAsync) {
-                            submit(async = true) {
-                                handleEvent(this@run, e, this@register)
-                            }
+                            submit(async = true) { handleEvent(this@run, e, this@register) }
                         } else {
                             handleEvent(this, e, this@register)
                         }
@@ -181,7 +186,7 @@ object QuestLoader {
         ChemdahAPI.questTemplate.clear()
         ChemdahAPI.questTemplate.putAll(templates.map { it.id to it })
         refreshCache()
-        println("[Chemdah] ${ChemdahAPI.questTemplate.size} templates loaded.")
+        info("${ChemdahAPI.questTemplate.size} templates loaded.")
         // 重复检查
         templates.groupBy { it.id }.forEach { (id, c) ->
             if (c.size > 1) {
@@ -206,6 +211,30 @@ object QuestLoader {
             else -> {
                 emptyList()
             }
+        }
+    }
+
+    /**
+     * 加载任务组
+     */
+    fun loadTemplateGroup() {
+        ChemdahAPI.questTemplateGroup.clear()
+        groupConf.getConfigurationSection("group")?.getKeys(false)?.forEach { group ->
+            val groupList = ArrayList<Template>()
+            groupConf.getStringList("group.$group").forEach {
+                when {
+                    it.startsWith("type:") -> {
+                        groupList += ChemdahAPI.questTemplate.values.filter { tem -> it.substring("type:".length) in tem.type() }
+                    }
+                    else -> {
+                        val template = ChemdahAPI.getQuestTemplate(it)
+                        if (template != null) {
+                            groupList += template
+                        }
+                    }
+                }
+            }
+            ChemdahAPI.questTemplateGroup[group] = TemplateGroup(group, groupList)
         }
     }
 }

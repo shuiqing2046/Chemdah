@@ -1,5 +1,6 @@
 package ink.ptms.chemdah.core.quest.addon
 
+import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.api.event.collect.ObjectiveEvents
 import ink.ptms.chemdah.core.quest.Id
@@ -14,6 +15,10 @@ import taboolib.common.util.asList
  * Chemdah
  * ink.ptms.chemdah.core.quest.addon.AddonDepend
  *
+ * addon:
+ *   depend: quest
+ *   depend: group:quest
+ *
  * @author sky
  * @since 2021/3/4 9:04 上午
  */
@@ -21,7 +26,11 @@ import taboolib.common.util.asList
 @Option(Option.Type.TEXT)
 class AddonDepend(root: String, questContainer: QuestContainer) : Addon(root, questContainer) {
 
-    val depend = root.asList()
+    val depend = if (root.startsWith("group:")) {
+        ChemdahAPI.getQuestTemplateGroup(root)?.group?.map { it.id }?.toList()
+    } else {
+        root.asList()
+    }
 
     companion object {
 

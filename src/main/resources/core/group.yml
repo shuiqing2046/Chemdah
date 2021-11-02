@@ -1,0 +1,9 @@
+
+
+#         Powered by TabooLib 6.0         #
+
+
+group:
+  example-quest:
+    - 10_diamond_ore
+    - type:L2

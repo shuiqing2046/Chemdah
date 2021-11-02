@@ -8,6 +8,7 @@ import ink.ptms.chemdah.util.asMap
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
 import taboolib.common.platform.function.getDataFolder
+import taboolib.common.platform.function.info
 import taboolib.common.platform.function.releaseResourceFile
 import taboolib.common.platform.function.warning
 import taboolib.common.util.asList
@@ -40,7 +41,7 @@ object ConversationLoader {
         ChemdahAPI.conversation.clear()
         ChemdahAPI.conversation.putAll(conversations.map { it.id to it })
         ChemdahAPI.conversationTheme.values.forEach { it.reloadConfig() }
-        println("[Chemdah] ${ChemdahAPI.conversation.size} conversations loaded.")
+        info("${ChemdahAPI.conversation.size} conversations loaded.")
         // 重复检查
         conversations.groupBy { it.id }.forEach { (id, c) ->
             if (c.size > 1) {

@@ -10,6 +10,7 @@ import ink.ptms.chemdah.core.conversation.theme.Theme
 import ink.ptms.chemdah.core.database.Database
 import ink.ptms.chemdah.core.quest.QuestLoader
 import ink.ptms.chemdah.core.quest.Template
+import ink.ptms.chemdah.core.quest.TemplateGroup
 import ink.ptms.chemdah.core.quest.addon.Addon
 import ink.ptms.chemdah.core.quest.meta.Meta
 import ink.ptms.chemdah.core.quest.objective.Objective
@@ -18,7 +19,6 @@ import ink.ptms.chemdah.core.quest.objective.other.ITrigger
 import ink.ptms.chemdah.module.Module
 import ink.ptms.chemdah.util.increaseAny
 import org.bukkit.entity.Player
-import org.bukkit.event.Event
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
 import taboolib.common.platform.function.getDataFolder
@@ -39,6 +39,7 @@ object ChemdahAPI {
     val questMeta = HashMap<String, Class<out Meta<*>>>()
     val questAddon = HashMap<String, Class<out Addon>>()
     val questTemplate = HashMap<String, Template>()
+    val questTemplateGroup = HashMap<String, TemplateGroup>()
     val questObjective = HashMap<String, Objective<*>>()
 
     val playerProfile = ConcurrentHashMap<String, PlayerProfile>()
@@ -126,6 +127,20 @@ object ChemdahAPI {
      */
     fun addQuestTemplate(id: String, template: Template) {
         questTemplate[id] = template
+    }
+
+    /**
+     * 获取任务模板组
+     */
+    fun getQuestTemplateGroup(id: String): TemplateGroup? {
+        return questTemplateGroup[id]
+    }
+
+    /**
+     * 注册任务模板组
+     */
+    fun addQuestTemplateGroup(id: String, templateGroup: TemplateGroup) {
+        questTemplateGroup[id] = templateGroup
     }
 
     /**
@@ -226,6 +241,7 @@ object ChemdahAPI {
         ConversationManager.conf.reload()
         ConversationLoader.load()
         QuestLoader.loadTemplate()
+        QuestLoader.loadTemplateGroup()
         Module.reload()
     }
 
@@ -234,7 +250,7 @@ object ChemdahAPI {
         try {
             workspace.loadAll()
         } catch (e: Exception) {
-            warning("[Chemdah] An error occurred while loading the script")
+            warning("An error occurred while loading the script")
             e.printKetherErrorMessage()
         }
     }
