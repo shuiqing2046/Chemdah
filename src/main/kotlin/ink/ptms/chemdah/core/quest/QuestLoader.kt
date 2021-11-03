@@ -13,7 +13,6 @@ import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.Objective
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
-import org.bukkit.event.Event
 import taboolib.common.LifeCycle
 import taboolib.common.io.getInstance
 import taboolib.common.io.runningClasses
@@ -58,7 +57,7 @@ object QuestLoader {
                             // 检查任务自动完成
                             quest.checkComplete()
                         }
-                    }
+                     }
                 }
             }
         }

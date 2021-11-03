@@ -163,7 +163,7 @@ abstract class Objective<E : Any> {
      */
     open fun checkCondition(profile: PlayerProfile, task: Task, event: E): CompletableFuture<Boolean> {
         return if (conditions.all { it(profile, task, event) }) {
-            profile.checkAgent(task.condition["$"]?.data, event, conditionVars.mapNotNull { safely { it(event) } }.toMap())
+            profile.checkAgent(task.condition["$"]?.data, conditionVars.mapNotNull { safely { it(event) } }.toMap())
         } else {
             CompletableFuture.completedFuture(false)
         }

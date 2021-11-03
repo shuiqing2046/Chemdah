@@ -27,6 +27,9 @@ object ICustomLevel : ObjectiveCountableI<PlayerEvents.LevelChange>() {
     override val isListener = true
 
     init {
+        handler {
+            player
+        }
         addGoal { profile, task ->
             val option = LevelSystem.getLevelOption(task.goal["id"].toString()) ?: return@addGoal false
             profile.getLevel(option).level >= task.goal["level", 1].toInt()
