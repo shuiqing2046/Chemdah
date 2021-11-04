@@ -63,5 +63,12 @@ class AddonDepend(root: String, questContainer: QuestContainer) : Addon(root, qu
                 e.isCancelled = true
             }
         }
+
+        @SubscribeEvent
+        fun e(e: ObjectiveEvents.Complete.Pre) {
+            if (!e.task.isQuestDependCompleted(e.playerProfile.player)) {
+                e.isCancelled = true
+            }
+        }
     }
 }
