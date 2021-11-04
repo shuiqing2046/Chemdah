@@ -1,5 +1,6 @@
 plugins {
-    java
+    `java-library`
+    `maven-publish`
     id("io.izzel.taboolib") version "1.31"
     id("org.jetbrains.kotlin.jvm") version "1.5.10"
     id("org.jetbrains.dokka") version "1.4.32"
@@ -106,4 +107,25 @@ tasks.withType<JavaCompile> {
 configure<JavaPluginConvention> {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+publishing {
+    repositories {
+        maven {
+            url = uri("https://repo2s.ptms.ink/repository/maven-releases/")
+            credentials {
+                username = project.findProperty("user").toString()
+                password = project.findProperty("password").toString()
+            }
+            authentication {
+                create<BasicAuthentication>("basic")
+            }
+        }
+    }
+    publications {
+        create<MavenPublication>("library") {
+            from(components["java"])
+            groupId = "ink.ptms"
+        }
+    }
 }
