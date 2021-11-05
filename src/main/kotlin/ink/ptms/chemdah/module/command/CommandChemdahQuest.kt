@@ -184,6 +184,12 @@ object CommandChemdahQuest {
     val track = subCommand {
         dynamic(commit = "player") {
             suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
+            literal("cancel") {
+                execute<CommandSender> { _, context, _ ->
+                    val playerExact = Bukkit.getPlayerExact(context.argument(-1))!!
+                    playerExact.chemdahProfile.trackQuest = null
+                }
+            }
             dynamic(commit = "quest") {
                 suggestion<CommandSender> { _, _ -> ChemdahAPI.questTemplate.keys.toList() }
                 execute<CommandSender> { _, context, argument ->
