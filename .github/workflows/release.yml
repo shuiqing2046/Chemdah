@@ -1,4 +1,4 @@
-name: Chemdah Build
+name: Chemdah Release
 on: [ release ]
 jobs:
   build:
