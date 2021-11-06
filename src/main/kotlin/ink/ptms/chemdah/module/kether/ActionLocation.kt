@@ -1,10 +1,10 @@
 package ink.ptms.chemdah.module.kether
 
-import taboolib.module.kether.*
+import org.bukkit.Location
+import taboolib.common5.Coerce
 import taboolib.library.kether.ArgTypes
 import taboolib.library.kether.ParsedAction
-import taboolib.common5.Coerce
-import org.bukkit.Location
+import taboolib.module.kether.*
 import java.util.concurrent.CompletableFuture
 
 /**

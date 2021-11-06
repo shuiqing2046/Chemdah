@@ -1,9 +1,10 @@
 package ink.ptms.chemdah.module.kether.conversation
 
 import ink.ptms.chemdah.util.getSession
-import taboolib.module.kether.*
-import taboolib.library.kether.ArgTypes
-import taboolib.library.kether.ParsedAction
+import taboolib.module.kether.KetherParser
+import taboolib.module.kether.ScriptAction
+import taboolib.module.kether.ScriptFrame
+import taboolib.module.kether.scriptParser
 import java.util.concurrent.CompletableFuture
 
 /**

@@ -3,8 +3,6 @@ package ink.ptms.chemdah.module.kether.compat
 import com.sucy.skill.SkillAPI
 import com.sucy.skill.api.player.PlayerData
 import ink.ptms.chemdah.util.getPlayer
-import taboolib.library.kether.ArgTypes
-import taboolib.library.kether.ParsedAction
 import taboolib.module.kether.*
 import java.util.concurrent.CompletableFuture
 import java.util.function.Function

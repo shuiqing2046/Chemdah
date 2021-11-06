@@ -2,7 +2,9 @@ package ink.ptms.chemdah.module.kether
 
 import ink.ptms.chemdah.module.realms.RealmsSystem.getRealms
 import ink.ptms.chemdah.util.getPlayer
-import taboolib.module.kether.*
+import taboolib.module.kether.KetherParser
+import taboolib.module.kether.actionNow
+import taboolib.module.kether.scriptParser
 
 /**
  * Chemdah

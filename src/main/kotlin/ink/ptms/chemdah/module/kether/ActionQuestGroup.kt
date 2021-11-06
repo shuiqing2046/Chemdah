@@ -3,7 +3,10 @@ package ink.ptms.chemdah.module.kether
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.util.getProfile
 import taboolib.library.kether.ArgTypes
-import taboolib.module.kether.*
+import taboolib.module.kether.KetherParser
+import taboolib.module.kether.actionFuture
+import taboolib.module.kether.scriptParser
+import taboolib.module.kether.switch
 
 /**
  * Chemdah

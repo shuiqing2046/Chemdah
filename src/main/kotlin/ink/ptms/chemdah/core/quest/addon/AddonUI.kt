@@ -4,8 +4,8 @@ import ink.ptms.chemdah.core.quest.Id
 import ink.ptms.chemdah.core.quest.Option
 import ink.ptms.chemdah.core.quest.QuestContainer
 import ink.ptms.chemdah.core.quest.Template
-import taboolib.library.configuration.ConfigurationSection
 import taboolib.common.util.asList
+import taboolib.library.configuration.ConfigurationSection
 
 /**
  * Chemdah

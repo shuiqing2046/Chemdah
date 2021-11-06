@@ -5,7 +5,6 @@ import ink.ptms.chemdah.core.quest.Id
 import ink.ptms.chemdah.core.quest.Option
 import ink.ptms.chemdah.core.quest.QuestContainer
 import ink.ptms.chemdah.util.namespaceQuest
-import taboolib.common.platform.function.adaptCommandSender
 import taboolib.common.platform.function.adaptPlayer
 import taboolib.common.util.asList
 import taboolib.common5.Coerce

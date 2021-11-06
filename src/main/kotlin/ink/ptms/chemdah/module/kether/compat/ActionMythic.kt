@@ -2,9 +2,6 @@ package ink.ptms.chemdah.module.kether.compat
 
 import com.google.common.collect.Sets
 import ink.ptms.chemdah.util.getPlayer
-import taboolib.module.kether.*
-import taboolib.library.kether.ArgTypes
-import taboolib.library.kether.ParsedAction
 import io.lumine.xikage.mythicmobs.MythicMobs
 import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter
 import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitPlayer
@@ -13,6 +10,7 @@ import io.lumine.xikage.mythicmobs.skills.SkillMechanic
 import io.lumine.xikage.mythicmobs.skills.SkillMetadata
 import io.lumine.xikage.mythicmobs.skills.SkillTrigger
 import taboolib.common.platform.function.submit
+import taboolib.module.kether.*
 import java.util.concurrent.CompletableFuture
 
 

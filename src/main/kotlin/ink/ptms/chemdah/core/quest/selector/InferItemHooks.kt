@@ -4,12 +4,12 @@ import com.ssomar.executableitems.api.ExecutableItemsAPI
 import github.july_summer.julyitems.api.JItemAPI
 import ink.ptms.chemdah.api.event.InferItemHookEvent
 import ink.ptms.zaphkiel.ZaphkielAPI
-import taboolib.common5.Coerce
 import net.mmogroup.mmolib.MMOLib
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 import su.nightexpress.quantumrpg.stats.items.ItemStats
 import taboolib.common.platform.event.SubscribeEvent
+import taboolib.common5.Coerce
 import taboolib.module.nms.getItemTag
 import think.rpgitems.item.ItemManager
 

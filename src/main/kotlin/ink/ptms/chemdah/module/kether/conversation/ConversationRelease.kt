@@ -5,8 +5,11 @@ import ink.ptms.chemdah.core.conversation.theme.ThemeChatSettings
 import ink.ptms.chemdah.core.quest.QuestDevelopment.releaseTransmit
 import ink.ptms.chemdah.util.getPlayer
 import taboolib.common.platform.function.adaptCommandSender
-import taboolib.module.kether.*
 import taboolib.module.chat.TellrawJson
+import taboolib.module.kether.KetherParser
+import taboolib.module.kether.ScriptAction
+import taboolib.module.kether.ScriptFrame
+import taboolib.module.kether.scriptParser
 import java.util.concurrent.CompletableFuture
 
 /**

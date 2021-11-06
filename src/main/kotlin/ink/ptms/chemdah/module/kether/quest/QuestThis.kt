@@ -2,9 +2,10 @@ package ink.ptms.chemdah.module.kether.quest
 
 import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.util.getQuestContainer
-import taboolib.module.kether.*
+import taboolib.module.kether.KetherParser
 import taboolib.module.kether.ScriptAction
 import taboolib.module.kether.ScriptFrame
+import taboolib.module.kether.scriptParser
 import java.util.concurrent.CompletableFuture
 
 /**

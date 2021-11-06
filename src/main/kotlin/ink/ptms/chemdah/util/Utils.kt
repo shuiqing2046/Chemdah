@@ -3,13 +3,13 @@ package ink.ptms.chemdah.util
 import ink.ptms.chemdah.Chemdah
 import org.bukkit.Location
 import org.bukkit.block.Block
-import taboolib.library.configuration.ConfigurationSection
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.potion.PotionEffect
 import taboolib.common.reflect.Reflex.Companion.setProperty
 import taboolib.common5.Coerce
 import taboolib.common5.Demand.Companion.toDemand
+import taboolib.library.configuration.ConfigurationSection
 import taboolib.library.xseries.XBlock
 import taboolib.library.xseries.XMaterial
 import taboolib.module.configuration.SecuredFile

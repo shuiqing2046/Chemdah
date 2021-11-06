@@ -2,7 +2,7 @@ package ink.ptms.chemdah.core.conversation
 
 import ink.ptms.chemdah.api.event.collect.ConversationEvents
 import ink.ptms.chemdah.core.conversation.ConversationManager.sessions
-import ink.ptms.chemdah.util.*
+import ink.ptms.chemdah.util.namespaceConversationNPC
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import taboolib.common5.Coerce

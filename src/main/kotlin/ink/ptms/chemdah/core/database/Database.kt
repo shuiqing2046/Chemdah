@@ -18,11 +18,9 @@ import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
 import taboolib.common.platform.Schedule
 import taboolib.common.platform.event.SubscribeEvent
-import taboolib.common.platform.function.info
 import taboolib.common.platform.function.submit
 import taboolib.common5.mirrorNow
 import taboolib.platform.util.asLangText
-import java.lang.IllegalStateException
 
 /**
  * Chemdah

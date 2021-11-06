@@ -6,7 +6,6 @@ import ink.ptms.chemdah.module.Module
 import ink.ptms.chemdah.module.Module.Companion.register
 import ink.ptms.chemdah.module.level.LevelSystem
 import ink.ptms.chemdah.module.level.LevelSystem.getLevel
-import ink.ptms.chemdah.module.level.PlayerLevel
 import net.milkbowl.vault.economy.Economy
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player

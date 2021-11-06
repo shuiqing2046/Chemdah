@@ -4,9 +4,10 @@ import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.conversation.Session
 import ink.ptms.chemdah.util.getSession
 import ink.ptms.chemdah.util.vars
-import taboolib.module.kether.*
-import taboolib.library.kether.ArgTypes
-import taboolib.library.kether.ParsedAction
+import taboolib.module.kether.KetherParser
+import taboolib.module.kether.ScriptAction
+import taboolib.module.kether.ScriptFrame
+import taboolib.module.kether.scriptParser
 import java.util.concurrent.CompletableFuture
 
 /**

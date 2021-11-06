@@ -6,7 +6,6 @@ import taboolib.common.platform.Awake
 import taboolib.module.kether.Kether
 import taboolib.module.kether.PlayerOperator
 import taboolib.platform.compat.getBalance
-import java.io.Reader
 
 object KetherHook {
 

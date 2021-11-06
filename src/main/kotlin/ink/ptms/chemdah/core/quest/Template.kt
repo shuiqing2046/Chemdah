@@ -3,7 +3,6 @@ package ink.ptms.chemdah.core.quest
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.event.collect.QuestEvents
 import ink.ptms.chemdah.core.PlayerProfile
-import ink.ptms.chemdah.core.quest.addon.AddonControl
 import ink.ptms.chemdah.core.quest.addon.AddonControl.Companion.control
 import ink.ptms.chemdah.core.quest.addon.data.ControlTrigger
 import ink.ptms.chemdah.core.quest.meta.Meta

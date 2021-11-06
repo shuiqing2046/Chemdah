@@ -1,8 +1,8 @@
 package ink.ptms.chemdah.core.quest.objective.votifier
 
+import com.vexsoftware.votifier.model.VotifierEvent
 import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
-import com.vexsoftware.votifier.model.VotifierEvent
 import org.bukkit.Bukkit
 
 @Dependency("Votifier")

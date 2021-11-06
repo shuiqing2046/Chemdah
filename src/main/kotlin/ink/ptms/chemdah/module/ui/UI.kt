@@ -11,8 +11,6 @@ import taboolib.module.chat.colored
 import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 /**
  * Chemdah

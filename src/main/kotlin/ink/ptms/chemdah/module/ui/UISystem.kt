@@ -3,7 +3,6 @@ package ink.ptms.chemdah.module.ui
 import ink.ptms.chemdah.api.event.collect.PlayerEvents
 import ink.ptms.chemdah.module.Module
 import ink.ptms.chemdah.module.Module.Companion.register
-import org.bukkit.event.player.PlayerQuitEvent
 import taboolib.common.platform.Awake
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.module.configuration.Config

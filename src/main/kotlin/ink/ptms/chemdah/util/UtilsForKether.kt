@@ -10,7 +10,6 @@ import ink.ptms.chemdah.core.quest.Template
 import ink.ptms.chemdah.module.ui.UI
 import org.bukkit.entity.Player
 import taboolib.library.kether.QuestContext
-import taboolib.module.kether.ScriptContext
 import taboolib.module.kether.ScriptFrame
 import taboolib.module.kether.script
 

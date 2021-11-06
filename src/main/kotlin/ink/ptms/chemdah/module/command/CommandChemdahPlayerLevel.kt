@@ -5,7 +5,6 @@ import ink.ptms.chemdah.module.level.LevelSystem
 import ink.ptms.chemdah.module.level.LevelSystem.getLevel
 import ink.ptms.chemdah.module.level.LevelSystem.getLevelOption
 import ink.ptms.chemdah.module.level.LevelSystem.setLevel
-import taboolib.common5.Coerce
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import taboolib.common.platform.command.CommandBody
@@ -13,6 +12,7 @@ import taboolib.common.platform.command.CommandHeader
 import taboolib.common.platform.command.mainCommand
 import taboolib.common.platform.command.subCommand
 import taboolib.common.platform.function.onlinePlayers
+import taboolib.common5.Coerce
 import taboolib.expansion.createHelper
 import taboolib.platform.util.sendLang
 

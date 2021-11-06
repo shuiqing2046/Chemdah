@@ -7,9 +7,8 @@ import ink.ptms.chemdah.core.quest.objective.Abstract
 import ink.ptms.chemdah.core.quest.objective.Objective
 import ink.ptms.chemdah.core.quest.objective.Progress
 import ink.ptms.chemdah.core.quest.objective.Progress.Companion.progress
-import taboolib.common5.Coerce
-import org.bukkit.event.Event
 import org.bukkit.event.entity.EntityDamageEvent
+import taboolib.common5.Coerce
 
 /**
  * Chemdah

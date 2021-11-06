@@ -4,13 +4,13 @@ import ink.ptms.chemdah.module.kether.ActionScenes.Companion.createScenesBlock
 import ink.ptms.chemdah.module.kether.ActionScenes.Companion.createScenesFallingBlock
 import ink.ptms.chemdah.module.kether.ActionScenes.Companion.removeScenesBlock
 import ink.ptms.chemdah.util.namespaceQuest
-import taboolib.common5.Coerce
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import taboolib.common.platform.function.adaptCommandSender
 import taboolib.common.platform.function.submit
 import taboolib.common.util.Vector
 import taboolib.common.util.asList
+import taboolib.common5.Coerce
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.library.xseries.parseToMaterial
 import taboolib.module.kether.KetherShell
