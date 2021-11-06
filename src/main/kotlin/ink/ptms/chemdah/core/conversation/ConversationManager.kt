@@ -6,6 +6,7 @@ import ink.ptms.adyeshach.common.entity.EntityInstance
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.conversationSession
 import ink.ptms.chemdah.api.event.collect.ConversationEvents
+import ink.ptms.chemdah.api.event.collect.PlayerEvents
 import ink.ptms.chemdah.util.hidden
 import io.lumine.xikage.mythicmobs.MythicMobs
 import io.lumine.xikage.mythicmobs.mobs.ActiveMob
@@ -90,7 +91,7 @@ object ConversationManager {
     }
 
     @SubscribeEvent
-    internal fun e(e: PlayerQuitEvent) {
+    internal fun e(e: PlayerEvents.Released) {
         if (e.player.conversationSession?.conversation?.hasFlag("NO_EFFECT") == false) {
             effectFreeze.forEach { e.player.removePotionEffect(it.first) }
             effects.remove(e.player.name)?.forEach { e.player.addPotionEffect(it) }

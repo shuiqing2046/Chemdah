@@ -53,7 +53,7 @@ object CommandChemdah {
                 val playerExact = Bukkit.getPlayerExact(argument)!!
                 sender.sendLang("command-info-header")
                 sender.sendLang("command-info-body", "  §7Data:")
-                playerExact.chemdahProfile.persistentDataContainer.entries().forEach { e ->
+                playerExact.chemdahProfile.persistentDataContainer.entries().sortedBy { it.key }.forEach { e ->
                     sender.sendLang("command-info-body", "    §7${e.key.replace(".", "§f.§7")} §8= §f${e.value.data}")
                 }
                 val quests = playerExact.chemdahProfile.getQuests(openAPI = true)

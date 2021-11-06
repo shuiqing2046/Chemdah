@@ -232,7 +232,7 @@ class ActionScenes {
         }
 
         @SubscribeEvent
-        fun e(e: PlayerQuitEvent) {
+        fun e(e: PlayerEvents.Released) {
             scenesBlocks.remove(e.player.name)
         }
 

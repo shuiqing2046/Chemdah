@@ -18,6 +18,7 @@ import ink.ptms.chemdah.core.quest.objective.bukkit.EMPTY_EVENT
 import ink.ptms.chemdah.core.quest.objective.other.ITrigger
 import ink.ptms.chemdah.module.Module
 import ink.ptms.chemdah.util.increaseAny
+import ink.ptms.chemdah.util.namespace
 import org.bukkit.entity.Player
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
@@ -31,7 +32,7 @@ import kotlin.reflect.KClass
 
 object ChemdahAPI {
 
-    val workspace = Workspace(File(getDataFolder(), "module/script"), namespace = listOf("chemdah", "adyeshach"))
+    val workspace = Workspace(File(getDataFolder(), "module/script"), namespace = namespace)
 
     val conversation = HashMap<String, Conversation>()
     val conversationTheme = HashMap<String, Theme<*>>()

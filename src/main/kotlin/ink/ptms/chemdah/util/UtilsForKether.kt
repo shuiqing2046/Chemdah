@@ -14,6 +14,11 @@ import taboolib.module.kether.ScriptContext
 import taboolib.module.kether.ScriptFrame
 import taboolib.module.kether.script
 
+val namespace = listOf(
+    "adyeshach",
+    "chemdah",
+)
+
 val namespaceQuest = listOf(
     "adyeshach",
     "chemdah",

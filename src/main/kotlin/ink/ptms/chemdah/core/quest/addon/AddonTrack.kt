@@ -464,7 +464,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
         }
 
         @SubscribeEvent
-        internal fun onQuit(e: PlayerQuitEvent) {
+        internal fun onQuit(e: PlayerEvents.Released) {
             trackLandmarkHologramMap.remove(e.player.name)
             acceptedQuestsMap.remove(e.player.name)
             scoreboardBaffle.reset(e.player.name)

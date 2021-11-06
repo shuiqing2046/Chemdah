@@ -35,9 +35,6 @@ class DataContainer {
     val isChanged: Boolean
         get() = drops.isNotEmpty() || map.any { it.value.changed }
 
-    /**
-     * 函数内的所有数据修改行为不会记录变动（不更新数据库）
-     */
     fun unchanged(func: Consumer<DataContainer>) {
         locked = true
         func.accept(this)

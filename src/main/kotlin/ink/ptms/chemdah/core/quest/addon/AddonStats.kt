@@ -16,6 +16,7 @@ import org.bukkit.boss.BarColor
 import org.bukkit.boss.BarFlag
 import org.bukkit.boss.BarStyle
 import org.bukkit.boss.BossBar
+import org.bukkit.event.player.PlayerKickEvent
 import taboolib.library.configuration.ConfigurationSection
 import org.bukkit.event.player.PlayerQuitEvent
 import taboolib.common.platform.Schedule
@@ -180,7 +181,7 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
         }
 
         @SubscribeEvent
-        internal fun e(e: PlayerQuitEvent) {
+        internal fun e(e: PlayerEvents.Released) {
             statsMap.remove(e.player.name)
         }
 

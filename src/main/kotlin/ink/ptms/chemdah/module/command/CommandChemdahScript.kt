@@ -1,6 +1,7 @@
 package ink.ptms.chemdah.module.command
 
 import ink.ptms.chemdah.api.ChemdahAPI
+import ink.ptms.chemdah.util.namespace
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import taboolib.common.platform.command.CommandBody
@@ -107,7 +108,7 @@ object CommandChemdahScript {
         dynamic(commit = "script") {
             execute<CommandSender> { sender, _, argument ->
                 try {
-                    KetherShell.eval(argument, namespace = listOf("chemdah", "adyeshach"), sender = adaptCommandSender(sender)).thenApply { v ->
+                    KetherShell.eval(argument, namespace = namespace, sender = adaptCommandSender(sender)).thenApply { v ->
                         sender.sendMessage("§c[System] §7Result: $v")
                     }
                 } catch (ex: Throwable) {

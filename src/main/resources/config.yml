@@ -46,6 +46,7 @@ default-track:
     distance: 64
     point:
       type: CRIT
+      y: 0
       size:
         x: 0.2
         y: 0.2

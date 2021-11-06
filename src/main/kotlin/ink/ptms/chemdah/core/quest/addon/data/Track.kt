@@ -118,6 +118,7 @@ class TrackNavigation(val config: ConfigurationSection, val root: ConfigurationS
     } catch (ex: Throwable) {
         ProxyParticle.END_ROD
     }
+    val pointY = config.getDouble("navigation-option.point.y", root.getDouble("point.y"))
     val pointSizeX = config.getDouble("navigation-option.point.size.x", root.getDouble("point.size.x"))
     val pointSizeY = config.getDouble("navigation-option.point.size.y", root.getDouble("point.size.y"))
     val pointCount = config.getInt("navigation-option.point.count", root.getInt("point.count"))
@@ -155,7 +156,7 @@ class TrackNavigation(val config: ConfigurationSection, val root: ConfigurationS
                     submit(delay = index * pointSpeed) {
                         pointType.sendTo(
                             player = adaptPlayer(player),
-                            location = node.asBlockPos().toLocation(center.world!!).toCenter().toProxyLocation(),
+                            location = node.asBlockPos().toLocation(center.world!!).add(0.5, pointY, 0.5).toProxyLocation(),
                             offset = Vector(pointSizeX, pointSizeY, pointSizeX),
                             count = pointCount
                         )

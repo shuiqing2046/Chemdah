@@ -11,6 +11,7 @@ import ink.ptms.chemdah.core.quest.Quest
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerJoinEvent
+import org.bukkit.event.player.PlayerKickEvent
 import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import taboolib.common.LifeCycle
@@ -120,6 +121,16 @@ abstract class Database {
 
         @SubscribeEvent
         internal fun e(e: PlayerQuitEvent) {
+            PlayerEvents.Released(e.player).call()
+        }
+
+        @SubscribeEvent
+        internal fun e(e: PlayerKickEvent) {
+            PlayerEvents.Released(e.player).call()
+        }
+
+        @SubscribeEvent
+        internal fun e(e: PlayerEvents.Released) {
             val playerProfile = ChemdahAPI.playerProfile.remove(e.player.name)
             if (playerProfile?.isDataChanged == true) {
                 submit(async = true) {

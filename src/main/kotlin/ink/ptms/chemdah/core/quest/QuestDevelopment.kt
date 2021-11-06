@@ -4,6 +4,7 @@ import ink.ptms.blockdb.BlockFactory.createDataContainer
 import ink.ptms.blockdb.BlockFactory.getDataContainer
 import ink.ptms.blockdb.Data
 import ink.ptms.chemdah.api.ChemdahAPI.conversationSession
+import ink.ptms.chemdah.api.event.collect.PlayerEvents
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockPlaceEvent
@@ -47,7 +48,7 @@ object QuestDevelopment {
     }
 
     @SubscribeEvent
-    fun e(e: PlayerQuitEvent) {
+    fun e(e: PlayerEvents.Released) {
         playerRelease.remove(e.player.name)
         playerMessageCache.remove(e.player.name)
     }

@@ -1,5 +1,6 @@
 package ink.ptms.chemdah.module.ui
 
+import ink.ptms.chemdah.api.event.collect.PlayerEvents
 import ink.ptms.chemdah.module.Module
 import ink.ptms.chemdah.module.Module.Companion.register
 import org.bukkit.event.player.PlayerQuitEvent
@@ -32,7 +33,7 @@ object UISystem : Module {
     fun getUI(name: String) = ui[name]
 
     @SubscribeEvent
-    internal fun e(e: PlayerQuitEvent) {
+    internal fun e(e: PlayerEvents.Released) {
         ui.values.forEach { it.playerFilters.remove(e.player.uniqueId) }
     }
 

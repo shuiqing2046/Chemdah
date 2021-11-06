@@ -4,6 +4,7 @@ import ink.ptms.chemdah.api.event.collect.ConversationEvents
 import ink.ptms.chemdah.core.conversation.ConversationManager
 import ink.ptms.chemdah.core.conversation.PlayerReply
 import ink.ptms.chemdah.core.conversation.Session
+import ink.ptms.chemdah.util.namespace
 import ink.ptms.chemdah.util.setIcon
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -117,7 +118,7 @@ object ThemeChest : Theme<ThemeChestSetting>() {
 
     private fun rows(player: Player, size: Int): CompletableFuture<Int> {
         return try {
-            KetherShell.eval(settings.rows, sender = adaptPlayer(player), namespace = listOf("chemdah", "adyeshach")) {
+            KetherShell.eval(settings.rows, sender = adaptPlayer(player), namespace = namespace) {
                 rootFrame().variables().set("size", size)
             }.thenApply {
                 Coerce.toInteger(it)

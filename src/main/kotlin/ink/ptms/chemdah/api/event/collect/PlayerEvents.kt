@@ -26,6 +26,16 @@ class PlayerEvents {
     }
 
     /**
+     * 当玩家离开服务器时
+     * 包含 Quit 以及 Kick 事件
+     */
+    class Released(val player: Player) : BukkitProxyEvent() {
+
+        override val allowCancelled: Boolean
+            get() = false
+    }
+
+    /**
      * 当玩家数据更新时
      */
     class Updated(val player: Player, val playerProfile: PlayerProfile) : BukkitProxyEvent() {

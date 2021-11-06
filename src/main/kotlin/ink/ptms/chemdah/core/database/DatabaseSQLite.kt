@@ -1,6 +1,7 @@
 package ink.ptms.chemdah.core.database
 
 import ink.ptms.chemdah.Chemdah
+import ink.ptms.chemdah.api.event.collect.PlayerEvents
 import ink.ptms.chemdah.core.DataContainer
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Quest
@@ -344,7 +345,7 @@ class DatabaseSQLite : Database() {
         private val cacheQuestId = ConcurrentHashMap<String, MutableMap<String, String>>()
 
         @SubscribeEvent
-        internal fun e(e: PlayerQuitEvent) {
+        internal fun e(e: PlayerEvents.Released) {
             cacheQuestId.remove(e.player.name)
         }
     }
