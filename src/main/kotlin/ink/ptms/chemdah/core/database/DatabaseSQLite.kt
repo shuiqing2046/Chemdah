@@ -30,16 +30,6 @@ class DatabaseSQLite : Database() {
     val name: String
         get() = Chemdah.conf.getString("database.source.SQL.table", "chemdah")!!
 
-//    val tableUser = Table("${name}_user", host) {
-//        add("name") {
-//            type(ColumnTypeSQLite.TEXT, 36)
-//        }
-//        add("uuid") {
-//            type(ColumnTypeSQLite.TEXT, 36)
-//        }
-//        primaryKeyForLegacy += arrayOf("name", "uuid")
-//    }
-
     val tableUserData = Table("${name}_user_data", host) {
         // 对应玩家
         add("user") {
@@ -238,29 +228,6 @@ class DatabaseSQLite : Database() {
             }
         }
     }
-
-//    fun PlayerProfile.createUser(player: Player): CompletableFuture<Long> {
-//        val future = CompletableFuture<Long>()
-//        tableUser.insert(dataSource, "name", "uuid") {
-//            value(player.name, player.uniqueId.toString())
-//            onFinally {
-//                val userId = generatedKeys.run {
-//                    next()
-//                    Coerce.toLong(getObject(1))
-//                }
-//                cacheUserId[player.name] = userId
-//                tableUserData.insert(dataSource, "user", "key", "value", "mode") {
-//                    persistentDataContainer.forEach { (k, v) ->
-//                        value(userId, k, v.data, 1)
-//                    }
-//                }
-//                persistentDataContainer.flush()
-//                getQuests().forEach { player.createQuest(userId, it) }
-//                future.complete(userId)
-//            }
-//        }
-//        return future
-//    }
 
     fun Player.createQuest(quest: Quest) {
         val uuid = UUID.randomUUID().toString()
