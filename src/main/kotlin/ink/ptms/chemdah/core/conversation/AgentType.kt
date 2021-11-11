@@ -5,6 +5,11 @@ enum class AgentType(val namespace: String) {
     /**
      * 对话即将开始
      */
+    CONST("npc"),
+
+    /**
+     * 对话即将开始
+     */
     BEGIN("npc"),
 
     /**
