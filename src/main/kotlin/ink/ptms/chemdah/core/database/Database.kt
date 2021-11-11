@@ -109,9 +109,11 @@ abstract class Database {
         internal fun e(e: PlayerJoinEvent) {
             submit(delay = Chemdah.conf.getLong("join-select-delay", 20), async = true) {
                 mirrorNow("Database:select") {
-                    INSTANCE.select(e.player).also {
-                        ChemdahAPI.playerProfile[e.player.name] = it
-                        PlayerEvents.Selected(e.player, it).call()
+                    if (e.player.isOnline) {
+                        INSTANCE.select(e.player).also {
+                            ChemdahAPI.playerProfile[e.player.name] = it
+                            PlayerEvents.Selected(e.player, it).call()
+                        }
                     }
                 }
             }
