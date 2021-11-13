@@ -154,7 +154,7 @@ object QuestLoader {
             return
         }
         // 判断条件并进行该条目
-        objective.checkCondition(profile, task, event).thenAccept { cond ->
+        objective.checkCondition(profile, task, quest, event).thenAccept { cond ->
             if (cond && ObjectiveEvents.Continue.Pre(objective, task, quest, profile).call()) {
                 objective.onContinue(profile, task, quest, event)
                 task.agent(quest.profile, AgentType.TASK_CONTINUED)

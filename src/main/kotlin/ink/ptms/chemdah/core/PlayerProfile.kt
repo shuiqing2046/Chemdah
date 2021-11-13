@@ -154,11 +154,13 @@ class PlayerProfile(val uniqueId: UUID) {
     /**
      * 执行事件脚本代理
      */
-    fun checkAgent(agent: Any?, variables: Map<String, Any> = emptyMap()): CompletableFuture<Boolean> {
+    fun checkAgent(agent: Any?, quest: Quest? = null, variables: Map<String, Any> = emptyMap()): CompletableFuture<Boolean> {
         agent ?: return CompletableFuture.completedFuture(true)
         return try {
             KetherShell.eval(agent.asList(), sender = adaptCommandSender(player), namespace = namespaceQuest) {
                 rootFrame().variables().also {
+                    it.set("@QuestSelected", quest?.template?.node)
+                    it.set("@QuestContainer", quest)
                     variables.forEach { (t, u) -> it.set(t, u) }
                 }
             }.thenApply {

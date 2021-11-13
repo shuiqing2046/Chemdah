@@ -161,9 +161,9 @@ abstract class Objective<E : Any> {
      * 检查条目继续的所有条件
      * 当所有条件满足时再检查脚本代理
      */
-    open fun checkCondition(profile: PlayerProfile, task: Task, event: E): CompletableFuture<Boolean> {
+    open fun checkCondition(profile: PlayerProfile, task: Task, quest: Quest, event: E): CompletableFuture<Boolean> {
         return if (conditions.all { it(profile, task, event) }) {
-            profile.checkAgent(task.condition["$"]?.data, conditionVars.mapNotNull { safely { it(event) } }.toMap())
+            profile.checkAgent(task.condition["$"]?.data, quest, conditionVars.mapNotNull { safely { it(event) } }.toMap())
         } else {
             CompletableFuture.completedFuture(false)
         }
@@ -191,10 +191,10 @@ abstract class Objective<E : Any> {
      *
      * 当 "completed" 为 "true" 则强制判定为已完成
      */
-    open fun checkGoal(profile: PlayerProfile, task: Task): CompletableFuture<Boolean> {
+    open fun checkGoal(profile: PlayerProfile, quest: Quest, task: Task): CompletableFuture<Boolean> {
         return when {
             hasCompletedSignature(profile, task) -> CompletableFuture.completedFuture(false)
-            goals.all { it(profile, task) } -> profile.checkAgent(task.goal["$"]?.data)
+            goals.all { it(profile, task) } -> profile.checkAgent(task.goal["$"]?.data, quest)
             else -> CompletableFuture.completedFuture(false)
         }
     }
@@ -218,7 +218,7 @@ abstract class Objective<E : Any> {
                         }
                         finish(0)
                     } else {
-                        checkGoal(profile, task).thenAccept {
+                        checkGoal(profile, quest, task).thenAccept {
                             if (it && !hasCompletedSignature(profile, task)) {
                                 if (ObjectiveEvents.Complete.Pre(this@Objective, task, quest, profile).call()) {
                                     onComplete(profile, task, quest)
