@@ -6,12 +6,12 @@ import taboolib.common.platform.function.disablePlugin
 import taboolib.common.platform.function.warning
 import taboolib.common.util.Version
 import taboolib.module.configuration.Config
-import taboolib.module.configuration.SecuredFile
+import taboolib.module.configuration.Configuration
 
 object Chemdah : Plugin() {
 
     @Config
-    lateinit var conf: SecuredFile
+    lateinit var conf: Configuration
         private set
 
     override fun onLoad() {

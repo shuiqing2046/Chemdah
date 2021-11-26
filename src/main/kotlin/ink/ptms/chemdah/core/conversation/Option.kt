@@ -3,8 +3,8 @@ package ink.ptms.chemdah.core.conversation
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.conversation.theme.Theme
 import taboolib.library.configuration.ConfigurationSection
-import taboolib.library.configuration.YamlConfiguration
 import taboolib.module.chat.colored
+import taboolib.module.configuration.SecuredFile
 
 /**
  * Chemdah
@@ -24,6 +24,6 @@ data class Option(
 
     companion object {
 
-        val default = Option(YamlConfiguration().createSection("__option__"))
+        val default = Option(SecuredFile().createSection("__option__"))
     }
 }

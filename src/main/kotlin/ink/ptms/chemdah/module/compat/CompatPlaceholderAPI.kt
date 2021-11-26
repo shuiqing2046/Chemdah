@@ -19,7 +19,8 @@ object CompatPlaceholderAPI : PlaceholderExpansion {
     override val identifier: String
         get() = "chemdah"
 
-    override fun onPlaceholderRequest(player: Player, args: String): String {
+    override fun onPlaceholderRequest(player: Player?, args: String): String {
+        player ?: return "no player"
         return if (player.isChemdahProfileLoaded) {
             KetherFunction.parse("{{ $args }}", sender = adaptPlayer(player), namespace = namespaceQuest)
         } else {

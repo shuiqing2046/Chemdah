@@ -48,7 +48,7 @@ import java.util.concurrent.TimeUnit
 object ConversationManager {
 
     private val effects = ConcurrentHashMap<String, List<PotionEffect>>()
-    private val effectFreeze = setOf(PotionEffectType.BLINDNESS to 0, PotionEffectType.SLOW to 4)
+    private val effectFreeze = mapOf(PotionEffectType.BLINDNESS to 0, PotionEffectType.SLOW to 4)
 
     @Config("core/conversation.yml", migrate = true)
     lateinit var conf: SecuredFile
@@ -86,7 +86,7 @@ object ConversationManager {
     internal fun onDisable() {
         Bukkit.getOnlinePlayers().forEach { p ->
             if (p.conversationSession?.conversation?.hasFlag("NO_EFFECT") == false) {
-                effectFreeze.forEach { p.removePotionEffect(it.first) }
+                effectFreeze.forEach { p.removePotionEffect(it.key) }
                 effects.remove(p.name)?.forEach { p.addPotionEffect(it) }
             }
             p.conversationSession?.close(refuse = true)
@@ -96,7 +96,7 @@ object ConversationManager {
     @SubscribeEvent
     internal fun e(e: PlayerEvents.Released) {
         if (e.player.conversationSession?.conversation?.hasFlag("NO_EFFECT") == false) {
-            effectFreeze.forEach { e.player.removePotionEffect(it.first) }
+            effectFreeze.forEach { e.player.removePotionEffect(it.key) }
             effects.remove(e.player.name)?.forEach { e.player.addPotionEffect(it) }
         }
         e.player.conversationSession?.close(refuse = true)
@@ -107,15 +107,15 @@ object ConversationManager {
     @SubscribeEvent
     internal fun e(e: ConversationEvents.Begin) {
         if (!e.conversation.hasFlag("NO_EFFECT")) {
-            effects[e.session.player.name] = effectFreeze.mapNotNull { e.session.player.getPotionEffect(it.first) }.filter { it.duration in 10..9999 }
-            effectFreeze.forEach { e.session.player.addPotionEffect(PotionEffect(it.first, 99999, it.second).hidden()) }
+            effects[e.session.player.name] = effectFreeze.mapNotNull { e.session.player.getPotionEffect(it.key) }.filter { it.duration in 10..9999 }
+            effectFreeze.forEach { e.session.player.addPotionEffect(PotionEffect(it.key, 99999, it.value).hidden()) }
         }
     }
 
     @SubscribeEvent
     internal fun e(e: ConversationEvents.Closed) {
         if (!e.session.conversation.hasFlag("NO_EFFECT")) {
-            effectFreeze.forEach { e.session.player.removePotionEffect(it.first) }
+            effectFreeze.forEach { e.session.player.removePotionEffect(it.key) }
             effects.remove(e.session.player.name)?.forEach { e.session.player.addPotionEffect(it) }
         }
         // 视觉效果

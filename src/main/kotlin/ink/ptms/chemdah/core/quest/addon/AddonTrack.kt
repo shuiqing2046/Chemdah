@@ -63,21 +63,21 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
      * 引导开启的提示消息
      * 使用 $ 指向语言文件节点
      */
-    val message = config.get("message")?.asList()?.colored() ?: conf.getString("default-track.message").asList().colored()
+    val message = config["message"]?.asList()?.colored() ?: conf.getString("default-track.message")!!.asList().colored()
 
     /**
      * 记分板中的显示名称与描述
      */
     val name = config.getString("name")?.colored()
-    val description = config.get("description")?.asList()?.colored()
+    val description = config["description"]?.asList()?.colored()
 
     /**
      * 各引导效果
      */
-    val beacon = TrackBeacon(config, conf.getConfigurationSection("default-track.beacon"))
-    val landmark = TrackLandmark(config, conf.getConfigurationSection("default-track.landmark"))
-    val navigation = TrackNavigation(config, conf.getConfigurationSection("default-track.navigation"))
-    val scoreboard = TrackScoreboard(config, conf.getConfigurationSection("default-track.scoreboard"))
+    val beacon = TrackBeacon(config, conf.getConfigurationSection("default-track.beacon")!!)
+    val landmark = TrackLandmark(config, conf.getConfigurationSection("default-track.landmark")!!)
+    val navigation = TrackNavigation(config, conf.getConfigurationSection("default-track.navigation")!!)
+    val scoreboard = TrackScoreboard(config, conf.getConfigurationSection("default-track.scoreboard")!!)
 
     companion object {
 
@@ -94,11 +94,11 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
         private val chars = (1..50).map { '黑' + it }
 
         private val defaultContent by lazy {
-            conf.getList("default-track.scoreboard.content").filterNotNull().map { TrackScoreboard.Line(it.asList().colored()) }
+            conf.getList("default-track.scoreboard.content")!!.filterNotNull().map { TrackScoreboard.Line(it.asList().colored()) }
         }
 
         private val defaultMessage by lazy {
-            conf.get("default-track.message")?.asList()?.colored() ?: emptyList()
+            conf["default-track.message"]?.asList()?.colored() ?: emptyList()
         }
 
         private val defaultLength by lazy {

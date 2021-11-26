@@ -77,7 +77,7 @@ object LevelSystem : Module {
             val section = conf.getConfigurationSection(node)!!
             val algorithm = when (section.getString("experience.type")) {
                 "javascript" -> {
-                    val script = section.getString("experience.math").compileJS() ?: return@forEach
+                    val script = section.getString("experience.math")!!.compileJS() ?: return@forEach
                     object : Level.Algorithm() {
 
                         override val maxLevel: Int

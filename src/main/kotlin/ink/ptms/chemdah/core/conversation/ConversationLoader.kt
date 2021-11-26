@@ -13,7 +13,7 @@ import taboolib.common.platform.function.releaseResourceFile
 import taboolib.common.platform.function.warning
 import taboolib.common.util.asList
 import taboolib.library.configuration.ConfigurationSection
-import taboolib.library.configuration.FileConfiguration
+import taboolib.module.configuration.Configuration
 import taboolib.module.configuration.SecuredFile
 import java.io.File
 
@@ -50,7 +50,7 @@ object ConversationLoader {
         }
     }
 
-    fun load(file: FileConfiguration): List<Conversation> {
+    fun load(file: Configuration): List<Conversation> {
         val option = if (file.isConfigurationSection("__option__")) {
             Option(file.getConfigurationSection("__option__")!!)
         } else {
@@ -89,7 +89,7 @@ object ConversationLoader {
             root.name,
             file,
             root,
-            root.get("npc id")?.run {
+            root["npc id"]?.run {
                 Trigger(asList().map {
                     it.split(" ")
                 }.filter {
@@ -98,7 +98,7 @@ object ConversationLoader {
                     Trigger.Id(it[0], it[1])
                 })
             } ?: Trigger(emptyList()),
-            root.getStringList("npc"),
+            root.getStringList("npc").toMutableList(),
             root.getList("player")?.run {
                 PlayerSide(mapNotNull { it.asMap() }.map {
                     PlayerReply(

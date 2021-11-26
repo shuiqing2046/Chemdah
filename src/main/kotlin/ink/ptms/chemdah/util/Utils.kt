@@ -12,11 +12,12 @@ import taboolib.common5.Demand.Companion.toDemand
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.library.xseries.XBlock
 import taboolib.library.xseries.XMaterial
+import taboolib.module.configuration.Configuration
 import taboolib.module.configuration.SecuredFile
 import taboolib.module.nms.MinecraftVersion
 import taboolib.platform.util.modifyMeta
 
-val conf: SecuredFile
+val conf: Configuration
     get() = Chemdah.conf
 
 fun Any?.asMap(): Map<String, Any?> = when (this) {

@@ -212,5 +212,5 @@ class TrackScoreboard(val config: ConfigurationSection, val root: ConfigurationS
     /**
      * 记分板内容
      */
-    val content = config.getList("scoreboard-option.content", root.getList("content")).filterNotNull().map { Line(it.asList().colored()) }
+    val content = config.getList("scoreboard-option.content", root.getList("content"))!!.filterNotNull().map { Line(it.asList().colored()) }
 }

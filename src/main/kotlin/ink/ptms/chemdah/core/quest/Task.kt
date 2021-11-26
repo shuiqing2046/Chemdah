@@ -21,11 +21,11 @@ class Task(id: String, config: ConfigurationSection, val template: Template) : Q
     val goal = DataContainer()
 
     init {
-        config.getConfigurationSection("condition")?.getValues(false)?.forEach { (k, v) ->
-            condition[k] = v
+        config.getConfigurationSection("condition")?.toMap()?.forEach { (k, v) ->
+            condition[k] = v!!
         }
-        config.getConfigurationSection("goal")?.getValues(false)?.forEach { (k, v) ->
-            goal[k] = v
+        config.getConfigurationSection("goal")?.toMap()?.forEach { (k, v) ->
+            goal[k] = v!!
         }
     }
 

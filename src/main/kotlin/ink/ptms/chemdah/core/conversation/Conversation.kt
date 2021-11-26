@@ -76,65 +76,70 @@ data class Conversation(
                 ConversationEvents.Cancelled(this@Conversation, session, true).call()
                 return@mirrorFuture
             }
-            if (npcName != null) {
-                session.npcName = npcName
-                session.npcObject = npcObject
-            }
-            // 注册会话
-            sessions[player.name] = session
-            consumer.accept(session)
-            // 重置会话
-            session.reload()
-            // 判定条件
-            checkCondition(session).thenApply { condition ->
-                if (condition) {
-                    // 执行脚本代理
-                    agent(session, AgentType.BEGIN).thenApply {
-                        // 重置会话展示
-                        session.resetTheme().thenApply {
-                            // 判断是否被脚本代理否取消对话
-                            if (Coerce.toBoolean(session.variables["@Cancelled"])) {
-                                // 仅关闭上层会话，只有会话开启才能被关闭
-                                if (sessionTop != null) {
-                                    sessionTop.close().thenApply {
+            agent(session, AgentType.CONST).thenApply {
+                if (Coerce.toBoolean(session.variables["@Cancelled"])) {
+                    return@thenApply
+                }
+                if (npcName != null) {
+                    session.npcName = npcName
+                    session.npcObject = npcObject
+                }
+                // 注册会话
+                sessions[player.name] = session
+                consumer.accept(session)
+                // 重置会话
+                session.reload()
+                // 判定条件
+                checkCondition(session).thenApply { condition ->
+                    if (condition) {
+                        // 执行脚本代理
+                        agent(session, AgentType.BEGIN).thenApply {
+                            // 重置会话展示
+                            session.resetTheme().thenApply {
+                                // 判断是否被脚本代理否取消对话
+                                if (Coerce.toBoolean(session.variables["@Cancelled"])) {
+                                    // 仅关闭上层会话，只有会话开启才能被关闭
+                                    if (sessionTop != null) {
+                                        sessionTop.close().thenApply {
+                                            future.complete(session)
+                                            ConversationEvents.Cancelled(this@Conversation, session, true).call()
+                                        }
+                                    } else {
+                                        sessions.remove(player.name)
                                         future.complete(session)
-                                        ConversationEvents.Cancelled(this@Conversation, session, true).call()
+                                        ConversationEvents.Cancelled(this@Conversation, session, false).call()
                                     }
                                 } else {
-                                    sessions.remove(player.name)
-                                    future.complete(session)
-                                    ConversationEvents.Cancelled(this@Conversation, session, false).call()
-                                }
-                            } else {
-                                // 添加对话内容
-                                session.npcSide.addAll(npcSide.map {
-                                    try {
-                                        KetherFunction.parse(it, namespace = namespaceConversationNPC) {
-                                            extend(session.variables)
+                                    // 添加对话内容
+                                    session.npcSide.addAll(npcSide.map {
+                                        try {
+                                            KetherFunction.parse(it, namespace = namespaceConversationNPC) {
+                                                extend(session.variables)
+                                            }
+                                        } catch (e: Throwable) {
+                                            e.printKetherErrorMessage()
+                                            e.localizedMessage
                                         }
-                                    } catch (e: Throwable) {
-                                        e.printKetherErrorMessage()
-                                        e.localizedMessage
-                                    }
-                                })
-                                ConversationEvents.Begin(this@Conversation, session, sessionTop != null).call()
-                                // 渲染对话
-                                option.instanceTheme.onBegin(session).thenAccept {
-                                    // 脚本代理
-                                    agent(session, AgentType.START).thenAccept {
-                                        future.complete(session)
-                                        ConversationEvents.Post(this@Conversation, session, sessionTop != null).call()
+                                    })
+                                    ConversationEvents.Begin(this@Conversation, session, sessionTop != null).call()
+                                    // 渲染对话
+                                    option.instanceTheme.onBegin(session).thenAccept {
+                                        // 脚本代理
+                                        agent(session, AgentType.START).thenAccept {
+                                            future.complete(session)
+                                            ConversationEvents.Post(this@Conversation, session, sessionTop != null).call()
+                                        }
                                     }
                                 }
+                                finish(0)
                             }
-                            finish(0)
                         }
+                    } else {
+                        sessions.remove(player.name)
+                        future.complete(session)
+                        finish(0)
+                        ConversationEvents.Cancelled(this@Conversation, session, false).call()
                     }
-                } else {
-                    sessions.remove(player.name)
-                    future.complete(session)
-                    finish(0)
-                    ConversationEvents.Cancelled(this@Conversation, session, false).call()
                 }
             }
         }
@@ -178,10 +183,10 @@ data class Conversation(
             fun process(cur: Int) {
                 if (cur < agents.size) {
                     try {
-                        KetherShell.eval(agents[cur].action.toMutableList().also {
-                            it.add("agent")
-                        }, namespace = type.namespaceAll()) {
+                        val agent = agents[cur].action.toMutableList().also { it.add("agent") }
+                        KetherShell.eval(agent, namespace = type.namespaceAll()) {
                             extend(session.variables)
+                            rootFrame().variables()["@Session"] = session
                         }.thenApply {
                             if (Coerce.toBoolean(session.variables["@Cancelled"])) {
                                 future.complete(null)

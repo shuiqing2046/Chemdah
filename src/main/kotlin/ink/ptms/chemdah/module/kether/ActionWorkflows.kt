@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 object ActionWorkflows {
 
-    val data by lazy { createLocal("module/script/data/workflows.yml") }
+    val data by lazy { createLocal("module/script/data/workflows.json") }
     val fetchMap = ConcurrentHashMap<String, MutableList<ScriptContext>>()
 
     @SubscribeEvent
@@ -23,7 +23,7 @@ object ActionWorkflows {
             if (k.startsWith("workflows.fetch.")) {
                 e.playerProfile.persistentDataContainer.remove(k)
                 val id = k.substring("workflows.fetch.".length)
-                val fetch = data.getString(id)
+                val fetch = data.getString(id)!!
                 KetherShell.eval(fetch, sender = adaptPlayer(e.player), namespace = namespace)
             }
         }
