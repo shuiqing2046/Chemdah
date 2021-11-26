@@ -8,13 +8,14 @@ import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.adaptPlayer
 import taboolib.common.reflect.Reflex.Companion.getProperty
 import taboolib.library.kether.ArgTypes
+import taboolib.module.configuration.Type
 import taboolib.module.configuration.createLocal
 import taboolib.module.kether.*
 import java.util.concurrent.ConcurrentHashMap
 
 object ActionWorkflows {
 
-    val data by lazy { createLocal("module/script/data/workflows.json") }
+    val data by lazy { createLocal("module/script/data/workflows.json", type = Type.FAST_JSON) }
     val fetchMap = ConcurrentHashMap<String, MutableList<ScriptContext>>()
 
     @SubscribeEvent

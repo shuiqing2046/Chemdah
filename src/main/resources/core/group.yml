@@ -5,5 +5,5 @@
 
 group:
   example-quest:
-    - 10_diamond_ore
-    - type:L2
+    - '10_diamond_ore'
+    - 'type:L2'
