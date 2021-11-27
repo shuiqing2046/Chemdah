@@ -7,6 +7,8 @@ import ink.ptms.chemdah.core.conversation.Session
 import ink.ptms.chemdah.core.quest.QuestDevelopment
 import ink.ptms.chemdah.core.quest.QuestDevelopment.hasTransmitMessages
 import ink.ptms.chemdah.core.quest.QuestDevelopment.releaseTransmit
+import ink.ptms.chemdah.util.namespace
+import ink.ptms.chemdah.util.realLength
 import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerItemHeldEvent
@@ -22,6 +24,7 @@ import taboolib.common5.util.printed
 import taboolib.module.chat.TellrawJson
 import taboolib.module.chat.colored
 import taboolib.module.chat.uncolored
+import taboolib.module.kether.KetherFunction
 import taboolib.module.kether.isInt
 import taboolib.module.nms.PacketSendEvent
 import taboolib.platform.util.asLangText
@@ -230,62 +233,101 @@ object ThemeChat : Theme<ThemeChatSettings>() {
     ) {
         session.conversation.playerSide.checked(session).thenApply { replies ->
             // 最终效果
-            val finally = index + 1 >= messages.size && endMessage
+            val animationStopped = index + 1 >= messages.size && endMessage
             // 如果是最终效果并且存在对话转发，则不发送白信息
-            val json = if (noSpace || (finally && session.player.hasTransmitMessages() && !canReply)) TellrawJson().fixed() else newJson()
+            val json = if (noSpace || (animationStopped && session.player.hasTransmitMessages() && !canReply)) TellrawJson().fixed() else newJson()
             try {
-                settings.format.forEach {
-                    when {
-                        it.contains("{title}") -> {
-                            val title = session.variables["title"]?.toString() ?: session.conversation.option.title
-                            json.append(it.replace("{title}", title.replace("{name}", session.npcName))).newLine()
-                        }
-                        it.contains("{npcSide}") -> {
-                            messages.colored().forEachIndexed { i, fully ->
-                                when {
-                                    index > i -> json.append(it.replace("{npcSide}", fully)).newLine()
-                                    index == i -> json.append(it.replace("{npcSide}", message)).newLine()
-                                    else -> json.newLine()
+                // 老版本检测
+                if (settings.format.toString().contains("{npcSide}")) {
+                    json.append("§cYour §4conversation.yml §cfile is out of date, please regenerate!")
+                } else {
+                    settings.format.map { KetherFunction.parse(it, sender = adaptPlayer(session.player), namespace = namespace) }.forEach {
+                        when {
+                            it.contains("[title]") -> {
+                                val title = session.variables["title"]?.toString() ?: session.conversation.option.title
+                                json.append(it.replace("[title]", title.replace("[name]", session.npcName))).newLine()
+                            }
+                            it.contains("[npcSide]") -> {
+                                messages.colored().forEachIndexed { i, fully ->
+                                    when {
+                                        index > i -> json.append(it.replace("[npcSide]", fully)).newLine()
+                                        index == i -> json.append(it.replace("[npcSide]", message)).newLine()
+                                        else -> json.newLine()
+                                    }
                                 }
                             }
-                        }
-                        it.contains("{reply}") -> {
-                            session.playerReplyForDisplay.clear()
-                            session.playerReplyForDisplay.addAll(replies)
-                            if (canReply) {
-                                replies.forEachIndexed { idx, reply ->
-                                    if (finally) {
+                            it.contains("[reply]") -> {
+                                session.playerReplyForDisplay.clear()
+                                session.playerReplyForDisplay.addAll(replies)
+                                if (canReply) {
+                                    var len = 0
+                                    replies.forEachIndexed { idx, reply ->
+                                        var newLine = false
                                         val text = reply.build(session)
                                         val rep = if (session.playerSide == reply) settings.select else settings.selectOther
-                                        json.append(it.replace("{reply}", rep.replace("{playerSide}", text).replace("{index}", (idx + 1).toString())))
-                                            .hoverText(text)
-                                            .runCommand("/session reply ${reply.uuid}")
-                                            .newLine()
-                                    } else {
-                                        if (idx == 0) {
-                                            json.append(settings.talking).newLine()
+                                        // 在单行中显示回复内容
+                                        if (settings.singleLineEnable) {
+                                            len += text.realLength()
+                                            // 自动换行
+                                            if (len >= settings.singleLineAutoSwap) {
+                                                len = 0
+                                                newLine = true
+                                                if (animationStopped) {
+                                                    json.newLine()
+                                                }
+                                            }
+                                            if (animationStopped) {
+                                                json.append(it.replace("[reply]", rep.replace("[playerSide]", text).replace("[index]", (idx + 1).toString())))
+                                                    .hoverText(text)
+                                                    .runCommand("/session reply ${reply.uuid}")
+                                                // 分割字符
+                                                if (idx + 1 < replies.size) {
+                                                    json.append(settings.singleLineReplySeparator)
+                                                }
+                                            }
                                         } else {
-                                            json.newLine()
+                                            if (animationStopped) {
+                                                json.append(it.replace("[reply]", rep.replace("[playerSide]", text).replace("[index]", (idx + 1).toString())))
+                                                    .hoverText(text)
+                                                    .runCommand("/session reply ${reply.uuid}")
+                                                    .newLine()
+                                                newLine = true
+                                            }
+                                        }
+                                        if (!animationStopped) {
+                                            if (settings.singleLineEnable) {
+                                                if (idx == 0) {
+                                                    json.append(settings.talking)
+                                                } else if (newLine) {
+                                                    json.newLine()
+                                                }
+                                            } else {
+                                                if (idx == 0) {
+                                                    json.append(settings.talking).newLine()
+                                                } else {
+                                                    json.newLine()
+                                                }
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
-                        else -> {
-                            json.append(it).newLine()
+                            else -> {
+                                json.append(it).newLine()
+                            }
                         }
                     }
                 }
             } catch (ex: Throwable) {
                 ex.printStackTrace()
             }
-            if (finally && !canReply && QuestDevelopment.enableMessageTransmit) {
+            if (animationStopped && !canReply && QuestDevelopment.enableMessageTransmit) {
                 newJson().sendTo(adaptCommandSender(session.player))
                 session.player.releaseTransmit()
             }
             json.sendTo(adaptCommandSender(session.player))
             // 打印完成则结束演示
-            if (finally) {
+            if (animationStopped) {
                 complete(null)
             }
         }

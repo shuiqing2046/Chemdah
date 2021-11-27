@@ -8,7 +8,7 @@ default_0:
   max: 100
   experience:
     type: kether
-    math: |-
+    math: |
       if check &level <= *15 then {
           math add [ math mul [ *2 &level ] *7 ]
       } else if check &level <= *30 then {

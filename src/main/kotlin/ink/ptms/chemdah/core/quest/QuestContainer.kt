@@ -135,6 +135,7 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
                             }
                         }
                     } catch (e: Throwable) {
+                        warning("path: $path, agentType: $agentType, source: ${agent[cur].action}")
                         e.printKetherErrorMessage()
                     }
                 } else {

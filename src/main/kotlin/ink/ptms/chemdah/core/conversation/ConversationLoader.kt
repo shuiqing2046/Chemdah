@@ -1,6 +1,7 @@
 package ink.ptms.chemdah.core.conversation
 
 import ink.ptms.chemdah.api.ChemdahAPI
+import ink.ptms.chemdah.api.event.collect.ConversationEvents
 import ink.ptms.chemdah.core.conversation.AgentType.Companion.toAgentType
 import ink.ptms.chemdah.core.conversation.theme.ThemeChat
 import ink.ptms.chemdah.core.conversation.theme.ThemeChest
@@ -14,7 +15,6 @@ import taboolib.common.platform.function.warning
 import taboolib.common.util.asList
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.module.configuration.Configuration
-import taboolib.module.configuration.SecuredFile
 import java.io.File
 
 /**
@@ -31,8 +31,8 @@ object ConversationLoader {
         ChemdahAPI.addConversationTheme("chest", ThemeChest)
     }
 
-    @Awake(LifeCycle.ENABLE)
-    fun load() {
+    @Awake(LifeCycle.ACTIVE)
+    fun loadAll() {
         val file = File(getDataFolder(), "core/conversation")
         if (!file.exists()) {
             releaseResourceFile("core/conversation/example.yml", true)
@@ -50,77 +50,59 @@ object ConversationLoader {
         }
     }
 
+    fun load(file: File): List<Conversation> {
+        return when {
+            file.isDirectory -> file.listFiles()?.flatMap { load(it) }?.toList() ?: emptyList()
+            file.name.endsWith(".yml") -> load(Configuration.loadFromFile(file))
+            else -> emptyList()
+        }
+    }
+
     fun load(file: Configuration): List<Conversation> {
         val option = if (file.isConfigurationSection("__option__")) {
             Option(file.getConfigurationSection("__option__")!!)
         } else {
             Option.default
         }
-        return file.getKeys(false).filter { it != "__option__" && file.isConfigurationSection(it) }.map {
+        return file.getKeys(false).filter { it != "__option__" && file.isConfigurationSection(it) }.mapNotNull {
             load(null, option, file.getConfigurationSection(it)!!)
         }
     }
 
-    fun load(file: File): List<Conversation> {
-        return when {
-            file.isDirectory -> {
-                file.listFiles()?.flatMap { load(it) }?.toList() ?: emptyList()
-            }
-            file.name.endsWith(".yml") -> {
-                SecuredFile.loadConfiguration(file).run {
-                    val option = if (isConfigurationSection("__option__")) {
-                        Option(getConfigurationSection("__option__")!!)
-                    } else {
-                        Option.default
-                    }
-                    getKeys(false).filter { it != "__option__" && isConfigurationSection(it) }.map {
-                        load(file, option, getConfigurationSection(it)!!)
-                    }
-                }
-            }
-            else -> {
-                emptyList()
-            }
+    private fun load(file: File?, option: Option, root: ConfigurationSection): Conversation? {
+        if (ConversationEvents.Load(file, option, root).call()) {
+            val id = root["npc id"] ?: return null
+            val trigger = Trigger(id.asList().map { it.split(" ") }.filter { it.size == 2 }.map { Trigger.Id(it[0], it[1]) })
+            return Conversation(
+                root.name,
+                file,
+                root,
+                trigger,
+                root.getStringList("npc").toMutableList(),
+                root.getList("player")?.run {
+                    PlayerSide(mapNotNull { it.asMap() }.map {
+                        PlayerReply(
+                            it.toMutableMap(),
+                            it["if"]?.toString(),
+                            it["reply"].toString(),
+                            it["then"]?.asList()?.toMutableList() ?: ArrayList()
+                        )
+                    }.toMutableList())
+                } ?: PlayerSide(ArrayList()),
+                root.getString("condition"),
+                root.getKeys(false)
+                    .filter { it.startsWith("agent:") }
+                    .map {
+                        val args = it.substring("agent:".length).split("@").map { a -> a.trim() }
+                        Agent(
+                            args[0].toAgentType(),
+                            root.get(it)!!.asList(),
+                            args.getOrNull(1) ?: "self"
+                        )
+                    }.toMutableList(),
+                option
+            )
         }
-    }
-
-    private fun load(file: File?, option: Option, root: ConfigurationSection): Conversation {
-        return Conversation(
-            root.name,
-            file,
-            root,
-            root["npc id"]?.run {
-                Trigger(asList().map {
-                    it.split(" ")
-                }.filter {
-                    it.size == 2
-                }.map {
-                    Trigger.Id(it[0], it[1])
-                })
-            } ?: Trigger(emptyList()),
-            root.getStringList("npc").toMutableList(),
-            root.getList("player")?.run {
-                PlayerSide(mapNotNull { it.asMap() }.map {
-                    PlayerReply(
-                        it.toMutableMap(),
-                        it["if"]?.toString(),
-                        it["reply"].toString(),
-                        it["then"]?.asList()?.toMutableList() ?: ArrayList()
-                    )
-                }.toMutableList())
-            } ?: PlayerSide(ArrayList()),
-            root.getString("condition"),
-            root.getKeys(false)
-                .filter { it.startsWith("agent:") }
-                .map {
-                    val args = it.substring("agent:".length).split("@").map { a -> a.trim() }
-                    Agent(
-                        args[0].toAgentType(),
-                        root.get(it)!!.asList(),
-                        args.getOrNull(1) ?: "self"
-                    )
-                }.toMutableList(),
-            option
-        )
+        return null
     }
 }

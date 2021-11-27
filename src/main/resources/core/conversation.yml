@@ -5,48 +5,63 @@
 
 theme-chat:
   format:
-    - ''
-    - ' {title}:'
-    - ''
-    - '  &f" &7{npcSide}&r &f"'
-    - ''
-    - '  {reply}'
-    - ''
+    - ' '
+    - ' [title]:'
+    - ' '
+    - '  &f" &7[npcSide]&r &f"'
+    - ' '
+    - '  [reply]'
+    - ' '
   select:
     reply:
-      1: '> &f&n{playerSide}&r &8(&7Press &6&lF&7 Key&8)'
-      0: '  &7{playerSide}&r'
+      1: '&f> &n[playerSide]&r &8(&6&lF&8)'
+      0: '&8> &7[playerSide]&r'
     sound:
       name: ENTITY_EXPERIENCE_ORB_PICKUP
       p: 2
       v: 0
-  talking: '    &8...'
-  animation: true
   sound:
     name: ENTITY_ITEM_PICKUP
+    # Pitch
     p: 1
+    # Volume
     v: 0
+  # The reply content is displayed when the NPC is speaking
+  talking: '    &8...'
+  # Text animation
+  animation: true
+  # Text appearance speed
   speed: 1
+  # Blank line between each conversation
   space-line: 30
+  # Use the scroll wheel to switch the reply content
   use-scroll: false
+  # Display the reply "block" to one line
+  single-line:
+    enable: true
+    # Character length per line
+    auto-swap: 42
+    # Using only spaces characters
+    reply-separator: ' '
 
+# Not recommended
 theme-chest:
   ui:
-    title: 'Talking with {title}...'
+    title: 'Talking with [title]...'
     rows: 'max ceil math add [ math div [ &size *5 ] *2 ] *3'
   npc-side:
     item:
       material: book
-      name: '&f {title}'
+      name: '&f [title]'
       lore:
         - ' '
-        - ' &7{npcSide} '
+        - ' &7[npcSide] '
         - ' '
     slot: 10
   player-side:
     item:
       material: paper
-      name: '&7{index}. &f{playerSide}'
+      name: '&7[index]. &f[playerSide]'
     slot:
       - 12
       - 13

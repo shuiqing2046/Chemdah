@@ -240,7 +240,7 @@ object ChemdahAPI {
     fun reloadAll() {
         Chemdah.conf.reload()
         ConversationManager.conf.reload()
-        ConversationLoader.load()
+        ConversationLoader.loadAll()
         QuestLoader.loadTemplate()
         QuestLoader.loadTemplateGroup()
         Module.reload()

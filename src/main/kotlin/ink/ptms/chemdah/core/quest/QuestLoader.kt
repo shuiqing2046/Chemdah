@@ -4,6 +4,7 @@ import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.api.ChemdahAPI.isChemdahProfileLoaded
 import ink.ptms.chemdah.api.event.collect.ObjectiveEvents
+import ink.ptms.chemdah.api.event.collect.TemplateEvents
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.addon.Addon
 import ink.ptms.chemdah.core.quest.meta.Meta
@@ -22,6 +23,7 @@ import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.function.*
 import taboolib.common5.mirrorNow
 import taboolib.module.configuration.Config
+import taboolib.module.configuration.Configuration
 import taboolib.module.configuration.SecuredFile
 import taboolib.module.nms.MinecraftVersion
 import java.io.File
@@ -99,8 +101,6 @@ object QuestLoader {
                 }
             }
         }
-        loadTemplate()
-        loadTemplateGroup()
     }
 
     /**
@@ -173,6 +173,12 @@ object QuestLoader {
         ChemdahAPI.questTemplate.forEach { t -> t.value.taskMap.forEach { it.value.objective.using = true } }
     }
 
+    @Awake(LifeCycle.ACTIVE)
+    fun loadAll() {
+        loadTemplate()
+        loadTemplateGroup()
+    }
+
     /**
      * 载入所有任务模板
      */
@@ -203,8 +209,13 @@ object QuestLoader {
                 file.listFiles()?.flatMap { loadTemplate(it) }?.toList() ?: emptyList()
             }
             file.name.endsWith(".yml") -> {
-                SecuredFile.loadConfiguration(file).run {
-                    getKeys(false).map { Template(it, getConfigurationSection(it)!!) }
+                Configuration.loadFromFile(file).run {
+                    getKeys(false).mapNotNull {
+                        val section = getConfigurationSection(it)!!
+                        if (TemplateEvents.Load(file, it, section).call()) {
+                            Template(it, section)
+                        } else null
+                    }
                 }
             }
             else -> {

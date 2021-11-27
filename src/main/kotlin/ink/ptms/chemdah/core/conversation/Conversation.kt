@@ -46,7 +46,7 @@ data class Conversation(
     }
 
     fun isNPC(namespace: String, id: String): Boolean {
-        return npcId.id.any { it.namespace.equals(namespace, true) && it.value == id }
+        return npcId.id.any { it.isNPC(namespace, id) }
     }
 
     /**

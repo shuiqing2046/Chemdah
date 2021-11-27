@@ -58,8 +58,10 @@ object ConversationManager {
 
     val cooldown = Baffle.of(500, TimeUnit.MILLISECONDS)
 
-    fun getConversation(namespace: String, name: String): Conversation? {
-        return ChemdahAPI.conversation.values.firstOrNull { it.isNPC(namespace, name) }
+    fun getConversation(player: Player, namespace: String, name: String): Conversation? {
+        val conversation = ChemdahAPI.conversation.values.firstOrNull { it.isNPC(namespace, name) }
+        val event = ConversationEvents.Select(player, namespace, name, conversation)
+        return if (event.call()) event.conversation else null
     }
 
     @Schedule(period = 1, async = true)
@@ -136,9 +138,7 @@ object ConversationManager {
                 return
             }
             session.isClosed = true
-            submit {
-                session.close(refuse = true)
-            }
+            submit { session.close(refuse = true) }
         }
     }
 
@@ -179,7 +179,7 @@ object ConversationManager {
     internal fun e(e: PlayerInteractAtEntityEvent) {
         if (e.hand == EquipmentSlot.HAND && e.player.conversationSession == null && cooldown.hasNext(e.player.name)) {
             val name = e.rightClicked.getI18nName()
-            val conversation = getConversation("minecraft", name) ?: return
+            val conversation = getConversation(e.player, "minecraft", name) ?: return
             val origin = e.rightClicked.location.add(0.0, e.rightClicked.height, 0.0)
             conversation.open(e.player, origin, npcName = name, npcObject = e.rightClicked)
             e.isCancelled = true
@@ -224,7 +224,7 @@ object ConversationManager {
         @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
         fun e(e: AdyeshachEntityInteractEvent) {
             if (e.isMainHand && e.player.conversationSession == null && cooldown.hasNext(e.player.name)) {
-                getConversation("adyeshach", e.entity.id)?.run {
+                getConversation(e.player, "adyeshach", e.entity.id)?.run {
                     e.isCancelled = true
                     submit {
                         val origin = e.entity.getLocation().add(0.0, e.entity.entityType.entitySize.height, 0.0)
@@ -260,7 +260,7 @@ object ConversationManager {
             }
             if (e.hand == EquipmentSlot.HAND && e.rightClicked.hasMetadata("NPC") && e.player.conversationSession == null && cooldown.hasNext(e.player.name)) {
                 val npc = CitizensAPI.getNPCRegistry().getNPC(e.rightClicked) ?: return
-                getConversation("citizens", npc.id.toString())?.run {
+                getConversation(e.player, "citizens", npc.id.toString())?.run {
                     e.isCancelled = true
                     open(e.player, e.rightClicked.location.add(0.0, e.rightClicked.height, 0.0), npcName = npc.fullName, npcObject = npc)
                 }
@@ -290,7 +290,7 @@ object ConversationManager {
             }
             if (e.hand == EquipmentSlot.HAND && e.rightClicked is LivingEntity && e.player.conversationSession == null && cooldown.hasNext(e.player.name)) {
                 val mob = MythicMobs.inst().mobManager.getMythicMobInstance(e.rightClicked) ?: return
-                getConversation("mythicmobs", mob.type.internalName)?.run {
+                getConversation(e.player, "mythicmobs", mob.type.internalName)?.run {
                     e.isCancelled = true
                     open(e.player, e.rightClicked.location.add(0.0, e.rightClicked.height, 0.0), npcName = mob.displayName, npcObject = mob)
                 }

@@ -9,8 +9,10 @@ package ink.ptms.chemdah.core.conversation
  */
 data class Trigger(val id: List<Id>) {
 
-    data class Id(
-        val namespace: String,
-        val value: String
-    )
+    data class Id(val namespace: String, val value: String) {
+
+        fun isNPC(namespace: String, value: String): Boolean {
+            return namespace.equals(this.namespace, true) && value.equals(this.value, true)
+        }
+    }
 }

@@ -25,14 +25,14 @@ default:
       material: totem
       name: '&6&lQuests'
       lore:
-        - ''
+        - ' '
         - '&7 L1:'
         - '&7 [ {{ ui bar def [ L1 ] }} &7] {{ ui percent [ L1 ] }}%'
         - '&7 L2:'
         - '&7 [ {{ ui bar def [ L2 ] }} &7] {{ ui percent [ L2 ] }}%'
         - '&7 L3:'
         - '&7 [ {{ ui bar def [ L3 ] }} &7] {{ ui percent [ L3 ] }}%'
-        - ''
+        - ' '
         - '&8{{ ui percent [ L1 L2 L3 ] exclude [ S1 ] }}% total'
       bar:
         def:
@@ -44,7 +44,7 @@ default:
       name: '&e&lFilter'
       lore:
         - '&8- &f\{filter\}'
-        - ''
+        - ' '
         - '&8CLICK TO EDIT'
       all-key: ALL
     quest:
@@ -53,9 +53,9 @@ default:
         name: '&6&l\{name\}'
         lore:
           - '&eStarted...'
-          - ''
+          - ' '
           - '\{description\}'
-          - ''
+          - ' '
           - '&8CLICK TO TRACK'
         enchant:
           LUCK: 1
@@ -66,9 +66,9 @@ default:
         name: '&d&l\{name\} &5(Shared)'
         lore:
           - '&eStarted...'
-          - ''
+          - ' '
           - '\{description\}'
-          - ''
+          - ' '
           - '&8CLICK TO TRACK'
         enchant:
           LUCK: 1
@@ -79,27 +79,27 @@ default:
         name: '&a&l\{name\}'
         lore:
           - '&eCan start...'
-          - ''
+          - ' '
           - '\{descriptionv}'
-          - ''
+          - ' '
           - '&8CLICK TO TRACK'
       cannot-start:
         material: red_stained_glass_pane
         name: '&4&l\{name\}'
         lore:
           - '&cCannot started...'
-          - ''
+          - ' '
           - '\{description\}'
-          - ''
+          - ' '
           - '&8UNTRACKED'
       completed:
         material: black_stained_glass_pane
         name: '&7&l\{name\}'
         lore:
           - '&8Completed!'
-          - ''
+          - ' '
           - '\{description\}'
-          - ''
+          - ' '
           - '&8UNTRACKED'
       unavailable:
         material: gray_stained_glass_pane

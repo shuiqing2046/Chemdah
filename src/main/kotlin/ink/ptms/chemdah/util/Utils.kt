@@ -13,7 +13,6 @@ import taboolib.library.configuration.ConfigurationSection
 import taboolib.library.xseries.XBlock
 import taboolib.library.xseries.XMaterial
 import taboolib.module.configuration.Configuration
-import taboolib.module.configuration.SecuredFile
 import taboolib.module.nms.MinecraftVersion
 import taboolib.platform.util.modifyMeta
 
@@ -78,4 +77,9 @@ fun Location.toCenter(): Location {
     loc.y = blockY + 0.5
     loc.z = blockZ + 0.5
     return loc
+}
+
+fun String.realLength(): Int {
+    val regex = "[\u3091-\uFFe5]".toRegex()
+    return sumBy { if (it.toString().matches(regex)) 2 else 1 }
 }

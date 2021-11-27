@@ -157,7 +157,7 @@ abstract class Database {
 
         @Awake(LifeCycle.DISABLE)
         internal fun cancel() {
-            Bukkit.getOnlinePlayers().forEach {
+            Bukkit.getOnlinePlayers().filter { it.isChemdahProfileLoaded }.forEach {
                 INSTANCE.update(it, it.chemdahProfile)
             }
         }
