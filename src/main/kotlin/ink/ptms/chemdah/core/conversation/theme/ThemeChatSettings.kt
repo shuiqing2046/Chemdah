@@ -14,14 +14,15 @@ import taboolib.module.chat.colored
  */
 class ThemeChatSettings(root: ConfigurationSection) : ThemeSettings(root) {
 
-    val format: List<String> = root.getStringList("format").map { it.colored() }
-    val select: String = root.getString("select.reply.1", "")!!.colored()
-    val selectOther: String = root.getString("select.reply.0", "")!!.colored()
-    val talking: String = root.getString("talking", "")!!.colored()
-    val animation: Boolean = root.getBoolean("animation", true)
-    val speed: Long = root.getLong("speed", 1)
-    val spaceLine: Int = root.getInt("space-line", 30)
-    val useScroll: Boolean = root.getBoolean("use-scroll")
+    val format = root.getStringList("format")
+    val select = root.getString("select.reply.1", "")!!.colored()
+    val selectOther = root.getString("select.reply.0", "")!!.colored()
+    val talking = root.getString("talking", "")!!.colored()
+    val animation = root.getBoolean("animation", true)
+    val speed = root.getLong("speed", 1)
+    val hoverText = root.getBoolean("hover-text", true)
+    val spaceLine = root.getInt("space-line", 30)
+    val useScroll = root.getBoolean("use-scroll")
 
     val selectSound: XSound? = XSound.matchXSound(root.getString("select.sound.name").toString()).orElse(null)
     val selectSoundPitch = root.getDouble("select.sound.p").toFloat()

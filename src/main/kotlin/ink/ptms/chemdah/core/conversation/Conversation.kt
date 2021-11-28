@@ -5,6 +5,7 @@ import ink.ptms.chemdah.core.conversation.ConversationManager.sessions
 import ink.ptms.chemdah.util.namespaceConversationNPC
 import org.bukkit.Location
 import org.bukkit.entity.Player
+import taboolib.common.platform.function.info
 import taboolib.common5.Coerce
 import taboolib.common5.mirrorFuture
 import taboolib.library.configuration.ConfigurationSection

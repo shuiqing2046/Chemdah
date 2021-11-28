@@ -59,6 +59,17 @@ object ConversationLoader {
     }
 
     fun load(file: Configuration): List<Conversation> {
+        val str = file.saveToString()
+        if (str.contains("agent:begin") || str.contains("agent:refuge") || str.contains(": |-")) {
+            warning("Conversation \"${file.name}\" skip loading!")
+            warning("Starting from Chemdah (v0.1.13), \"agent:[type]\" and \"|-\" is not supported")
+            warning("Please replace with:")
+            warning("conversation:")
+            warning("  agent:")
+            warning("    begin: | <--- Remove \"-\" symbol")
+            warning("      ...")
+            return emptyList()
+        }
         val option = if (file.isConfigurationSection("__option__")) {
             Option(file.getConfigurationSection("__option__")!!)
         } else {
@@ -71,8 +82,12 @@ object ConversationLoader {
 
     private fun load(file: File?, option: Option, root: ConfigurationSection): Conversation? {
         if (ConversationEvents.Load(file, option, root).call()) {
-            val id = root["npc id"] ?: return null
-            val trigger = Trigger(id.asList().map { it.split(" ") }.filter { it.size == 2 }.map { Trigger.Id(it[0], it[1]) })
+            val id = root["npc id"]
+            val trigger = if (id != null) {
+                Trigger(id.asList().map { it.split(" ") }.filter { it.size == 2 }.map { Trigger.Id(it[0], it[1]) })
+            } else {
+                Trigger(emptyList())
+            }
             return Conversation(
                 root.name,
                 file,
@@ -90,16 +105,14 @@ object ConversationLoader {
                     }.toMutableList())
                 } ?: PlayerSide(ArrayList()),
                 root.getString("condition"),
-                root.getKeys(false)
-                    .filter { it.startsWith("agent:") }
-                    .map {
-                        val args = it.substring("agent:".length).split("@").map { a -> a.trim() }
-                        Agent(
-                            args[0].toAgentType(),
-                            root.get(it)!!.asList(),
-                            args.getOrNull(1) ?: "self"
-                        )
-                    }.toMutableList(),
+                root.getConfigurationSection("agent")?.getKeys(false)?.map {
+                    val args = it.split("@").map { a -> a.trim() }
+                    Agent(
+                        args[0].toAgentType(),
+                        root["agent.$it"]!!.asList(),
+                        args.getOrNull(1) ?: "self"
+                    )
+                }?.toMutableList() ?: ArrayList(),
                 option
             )
         }

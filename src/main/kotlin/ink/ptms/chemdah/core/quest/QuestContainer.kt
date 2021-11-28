@@ -68,10 +68,10 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
         }
 
     init {
-        // 简化写法
-        config.getKeys(false).filter { it.startsWith("agent:") }.forEach { loadAgent(it.substring("agent:".length), config.get(it)!!) }
-        config.getKeys(false).filter { it.startsWith("addon:") }.forEach { loadAddon(it.substring("addon:".length), it) }
-        config.getKeys(false).filter { it.startsWith("meta:") }.forEach { loadAddon(it.substring("meta:".length), it) }
+        // 简化写法 不再支持 eo-yaml 库
+//        config.getKeys(false).filter { it.startsWith("agent:") }.forEach { loadAgent(it.substring("agent:".length), config.get(it)!!) }
+//        config.getKeys(false).filter { it.startsWith("addon:") }.forEach { loadAddon(it.substring("addon:".length), it) }
+//        config.getKeys(false).filter { it.startsWith("meta:") }.forEach { loadAddon(it.substring("meta:".length), it) }
         // 容错写法
         config.getConfigurationSection("agent")?.getKeys(false)?.forEach { node -> loadAgent(node, config.get("agent.$node")!!) }
         config.getConfigurationSection("addon")?.getKeys(false)?.forEach { node -> loadAddon(node) }

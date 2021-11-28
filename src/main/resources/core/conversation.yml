@@ -14,8 +14,8 @@ theme-chat:
     - ' '
   select:
     reply:
-      1: '&f> &n[playerSide]&r &8(&6&lF&8)'
-      0: '&8> &7[playerSide]&r'
+      1: '&7▶ &f&n[playerSide]&r &8(&6&lF&8)'
+      0: '&8▶ &7[playerSide]&r   &r'
     sound:
       name: ENTITY_EXPERIENCE_ORB_PICKUP
       p: 2
@@ -34,13 +34,15 @@ theme-chat:
   speed: 1
   # Blank line between each conversation
   space-line: 30
+  # Hover Text on the reply
+  hover-text: true
   # Use the scroll wheel to switch the reply content
   use-scroll: false
   # Display the reply "block" to one line
   single-line:
     enable: true
     # Character length per line
-    auto-swap: 42
+    auto-swap: 36
     # Using only spaces characters
     reply-separator: ' '
 

@@ -4,6 +4,7 @@ import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.conversation.Session
 import ink.ptms.chemdah.util.getSession
 import ink.ptms.chemdah.util.vars
+import taboolib.common5.Coerce
 import taboolib.module.kether.KetherParser
 import taboolib.module.kether.ScriptAction
 import taboolib.module.kether.ScriptFrame

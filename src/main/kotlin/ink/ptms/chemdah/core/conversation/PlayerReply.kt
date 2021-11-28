@@ -25,6 +25,8 @@ data class PlayerReply(
     val uuid: UUID = UUID.randomUUID(),
 ) {
 
+    val swapLine = Coerce.toBoolean(root["swap"])
+
     fun build(session: Session): String {
         return try {
             KetherFunction.parse(text, namespace = namespaceConversationPlayer) { extend(session.variables) }.colored()

@@ -18,7 +18,7 @@ data class Session(
     var location: Location,
     val origin: Location,
     val player: Player,
-    val variables: MutableMap<String, Any?> = ConcurrentHashMap()
+    val variables: MutableMap<String, Any?> = HashMap()
 ) {
 
     /**

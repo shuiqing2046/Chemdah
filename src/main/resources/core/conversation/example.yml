@@ -45,10 +45,11 @@ conversation_0_2:
       then: |
         set choose to &chooseC
         goto conversation_0_3
-  agent:begin: |
-    set chooseA to round random 10
-    set chooseB to round random 10
-    set chooseC to round random 10
+  agent:
+    begin: |
+      set chooseA to round random 10
+      set chooseB to round random 10
+      set chooseC to round random 10
 
 conversation_0_3:
   player:
@@ -60,20 +61,21 @@ conversation_0_3:
       reply: 'Oh! Jesus.'
       then: |
         talk "Don't worry."
-  agent:begin: |
-    if check &choose is null then {
-      tell color *"&c[Error] &7no choosed."
-      cancel
-    } else {
-      set number to round random 10
-      set win to check &choose > &number
-      if &win then {
-        talk "{{ &choose }}!"
-        talk "You win! number is {{ &number }}"
+  agent:
+    begin: |
+      if check &choose is null then {
+        tell color *"&c[Error] &7no choosed."
+        cancel
       } else {
-        talk "{{ &choose }}?"
-        talk "You lose! number is {{ &number }}"
+        set number to round random 10
+        set win to check &choose > &number
+        if &win then {
+          talk "{{ &choose }}!"
+          talk "You win! number is {{ &number }}"
+        } else {
+          talk "{{ &choose }}?"
+          talk "You lose! number is {{ &number }}"
+        }
       }
-    }
-  agent:refuse: |
-    talk "All right, see you later."
+    refuse: |
+      talk "All right, see you later."

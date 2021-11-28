@@ -25,6 +25,7 @@ import taboolib.module.chat.TellrawJson
 import taboolib.module.chat.colored
 import taboolib.module.chat.uncolored
 import taboolib.module.kether.KetherFunction
+import taboolib.module.kether.extend
 import taboolib.module.kether.isInt
 import taboolib.module.nms.PacketSendEvent
 import taboolib.platform.util.asLangText
@@ -241,7 +242,10 @@ object ThemeChat : Theme<ThemeChatSettings>() {
                 if (settings.format.toString().contains("{npcSide}")) {
                     json.append("§cYour §4conversation.yml §cfile is out of date, please regenerate!")
                 } else {
-                    settings.format.map { KetherFunction.parse(it, sender = adaptPlayer(session.player), namespace = namespace) }.forEach {
+                    settings.format.map {
+                        // 识别内联脚本并继承会话变量
+                        KetherFunction.parse(it, sender = adaptPlayer(session.player), namespace = namespace) { extend(session.variables) }
+                    }.colored().forEach {
                         when {
                             it.contains("[title]") -> {
                                 val title = session.variables["title"]?.toString() ?: session.conversation.option.title
@@ -267,7 +271,7 @@ object ThemeChat : Theme<ThemeChatSettings>() {
                                         val rep = if (session.playerSide == reply) settings.select else settings.selectOther
                                         // 在单行中显示回复内容
                                         if (settings.singleLineEnable) {
-                                            len += text.realLength()
+                                            len += text.uncolored().realLength()
                                             // 自动换行
                                             if (len >= settings.singleLineAutoSwap) {
                                                 len = 0
@@ -276,10 +280,20 @@ object ThemeChat : Theme<ThemeChatSettings>() {
                                                     json.newLine()
                                                 }
                                             }
+                                            // 主动换行
+                                            if (reply.swapLine) {
+                                                newLine = true
+                                                if (animationStopped) {
+                                                    json.newLine()
+                                                }
+                                            }
                                             if (animationStopped) {
                                                 json.append(it.replace("[reply]", rep.replace("[playerSide]", text).replace("[index]", (idx + 1).toString())))
-                                                    .hoverText(text)
                                                     .runCommand("/session reply ${reply.uuid}")
+                                                // 是否启用鼠标悬停显示
+                                                if (settings.hoverText) {
+                                                    json.hoverText(text)
+                                                }
                                                 // 分割字符
                                                 if (idx + 1 < replies.size) {
                                                     json.append(settings.singleLineReplySeparator)
@@ -288,9 +302,11 @@ object ThemeChat : Theme<ThemeChatSettings>() {
                                         } else {
                                             if (animationStopped) {
                                                 json.append(it.replace("[reply]", rep.replace("[playerSide]", text).replace("[index]", (idx + 1).toString())))
-                                                    .hoverText(text)
                                                     .runCommand("/session reply ${reply.uuid}")
-                                                    .newLine()
+                                                if (settings.hoverText) {
+                                                    json.hoverText(text)
+                                                }
+                                                json.newLine()
                                                 newLine = true
                                             }
                                         }
