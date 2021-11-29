@@ -119,10 +119,10 @@ object ConversationManager {
         if (!e.session.conversation.hasFlag("NO_EFFECT")) {
             effectFreeze.forEach { e.session.player.removePotionEffect(it.key) }
             effects.remove(e.session.player.name)?.forEach { e.session.player.addPotionEffect(it) }
-        }
-        // 视觉效果
-        if (!e.session.player.hasPotionEffect(PotionEffectType.BLINDNESS)) {
-            e.session.player.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS, 20, 0))
+            // 视觉效果
+            if (!e.session.player.hasPotionEffect(PotionEffectType.BLINDNESS)) {
+                e.session.player.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS, 20, 0))
+            }
         }
     }
 
