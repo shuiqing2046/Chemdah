@@ -46,10 +46,6 @@ abstract class Theme<T : ThemeSettings> {
 
     abstract fun onDisplay(session: Session, message: List<String>, canReply: Boolean = true): CompletableFuture<Void>
 
-    protected fun Session.createTitle(): String {
-        return conversation.option.title.replace("{name}", npcName)
-    }
-
     protected fun Session.createDisplay(func: Consumer<List<PlayerReply>>): CompletableFuture<Void> {
         val future = CompletableFuture<Void>()
         npcTalking = true
