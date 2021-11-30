@@ -1,5 +1,6 @@
 package ink.ptms.chemdah.core.conversation
 
+import ink.ptms.chemdah.api.event.collect.ConversationEvents
 import ink.ptms.chemdah.util.namespaceConversationPlayer
 import taboolib.common5.Coerce
 import taboolib.module.chat.colored
@@ -57,6 +58,7 @@ data class PlayerReply(
                 if (session.isNext) {
                     session.isNext = false
                 } else {
+                    ConversationEvents.ReplyClosed(session).call()
                     session.close()
                 }
             }

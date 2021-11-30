@@ -81,7 +81,7 @@ object ChemdahAPI {
         chemdahProfile.getQuests(openAPI = true).forEach { quest ->
             quest.tasks.forEach { task ->
                 val trigger = task.objective as? ITrigger
-                if (trigger?.getValue(task) == value) {
+                if (trigger?.getValues(task)?.contains(value) == true) {
                     QuestLoader.handleTask(chemdahProfile, task, quest, EMPTY_EVENT)
                 }
             }

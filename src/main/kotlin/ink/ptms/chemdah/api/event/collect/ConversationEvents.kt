@@ -69,7 +69,17 @@ class ConversationEvents {
     /**
      * 当对话结束之后
      */
-    class Closed(val session: Session, val refust: Boolean = false): BukkitProxyEvent() {
+    class Closed(val session: Session, val refuse: Boolean = false): BukkitProxyEvent() {
+
+        override val allowCancelled: Boolean
+            get() = false
+    }
+
+    /**
+     * 当玩家通过正常途径（回复）结束对话时
+     * 该事件在 Closed 事件之前触发
+     */
+    class ReplyClosed(val session: Session): BukkitProxyEvent() {
 
         override val allowCancelled: Boolean
             get() = false

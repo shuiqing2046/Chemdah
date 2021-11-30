@@ -140,7 +140,7 @@ object ThemeChat : Theme<ThemeChatSettings>() {
 
     @SubscribeEvent
     fun e(e: ConversationEvents.Closed) {
-        if (e.refust && !e.session.npcTalking && QuestDevelopment.enableMessageTransmit) {
+        if (e.refuse && !e.session.npcTalking && QuestDevelopment.enableMessageTransmit) {
             newJson().sendTo(adaptCommandSender(e.session.player))
             e.session.player.releaseTransmit()
         }

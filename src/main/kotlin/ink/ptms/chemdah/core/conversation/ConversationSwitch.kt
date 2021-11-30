@@ -23,7 +23,7 @@ import java.util.concurrent.CompletableFuture
  */
 data class ConversationSwitch(val file: File?, val root: ConfigurationSection, var npcId: Trigger) {
 
-    val cases = root.getMapList("when").map { Case(it["if"].toString(), it["open"].toString()) }
+    val cases = root.getMapList("when").map { Case((it["if"] ?: it["condition"]).toString(), it["open"].toString()) }
 
     fun getConversation(player: Player): CompletableFuture<Conversation?> {
         val future = CompletableFuture<Conversation?>()

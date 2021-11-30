@@ -28,7 +28,7 @@ object ITrigger : ObjectiveCountableI<Event>() {
         }
     }
 
-    fun getValue(task: Task): String? {
-        return task.condition["value"]?.toString()
+    fun getValues(task: Task): List<String> {
+        return (task.condition["value"] ?: task.condition["values"])?.asList() ?: emptyList()
     }
 }
