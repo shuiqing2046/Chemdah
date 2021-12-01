@@ -88,6 +88,7 @@ object ConversationLoader {
             } else {
                 Trigger(emptyList())
             }
+            println(root.getConfigurationSection("agent")?.toMap())
             return Conversation(
                 root.name,
                 file,

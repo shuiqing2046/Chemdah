@@ -5,7 +5,6 @@ import ink.ptms.chemdah.core.conversation.ConversationManager.sessions
 import ink.ptms.chemdah.util.namespaceConversationNPC
 import org.bukkit.Location
 import org.bukkit.entity.Player
-import taboolib.common.platform.function.info
 import taboolib.common5.Coerce
 import taboolib.common5.mirrorFuture
 import taboolib.library.configuration.ConfigurationSection
@@ -187,6 +186,7 @@ data class Conversation(
                         val agent = agents[cur].action.toMutableList().also { it.add("agent") }
                         KetherShell.eval(agent, namespace = type.namespaceAll()) {
                             extend(session.variables)
+                            rootFrame().variables()["type"] = type.name
                             rootFrame().variables()["@Session"] = session
                         }.thenApply {
                             if (Coerce.toBoolean(session.variables["@Cancelled"])) {
