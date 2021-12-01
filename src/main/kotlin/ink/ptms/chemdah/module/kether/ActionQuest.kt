@@ -6,6 +6,7 @@ import ink.ptms.chemdah.core.quest.addon.AddonStats.Companion.hiddenStats
 import ink.ptms.chemdah.core.quest.addon.AddonStats.Companion.refreshStats
 import ink.ptms.chemdah.core.quest.addon.AddonStats.Companion.refreshStatusAlwaysType
 import ink.ptms.chemdah.core.quest.addon.AddonTrack.Companion.trackQuest
+import ink.ptms.chemdah.core.quest.meta.MetaType.Companion.type
 import ink.ptms.chemdah.util.getProfile
 import ink.ptms.chemdah.util.getQuestSelected
 import ink.ptms.chemdah.util.increaseAny
@@ -211,10 +212,26 @@ class ActionQuest {
          *
          * 任务阶段
          * quest progress (value|target|percent|percent100) [task {action}]
+         *
+         * 任务数量
+         * quest count with X
          */
         @KetherParser(["quest"], shared = true)
         fun parser1() = scriptParser {
             it.switch {
+                case("count") {
+                    it.mark()
+                    val filter = try {
+                        it.expect("with")
+                        it.nextToken()
+                    } catch (ex: Exception) {
+                        it.reset()
+                        null
+                    }
+                    actionNow {
+                        getProfile().getQuests(openAPI = true).count { filter == null || it.template.type().contains(filter) }
+                    }
+                }
                 case("select") {
                     val quest = it.next(ArgTypes.ACTION)
                     actionNow {
