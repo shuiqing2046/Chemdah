@@ -9,6 +9,7 @@ jobs:
       - name: cache gradle packages
         uses: actions/cache@v2
         with:
+          key: ${{ runner.os }}-build-${{ env.cache-name }}
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
