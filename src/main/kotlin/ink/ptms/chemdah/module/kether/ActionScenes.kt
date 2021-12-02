@@ -168,8 +168,8 @@ class ActionScenes {
                 case("reset") {
                     val loc = it.next(ArgTypes.ACTION)
                     actionNow {
-                        newFrame(loc).run<Location>().thenAccept {
-                            getPlayer().removeScenesBlock(it)
+                        newFrame(loc).run<Location>().thenAccept { loc ->
+                            getPlayer().removeScenesBlock(loc)
                         }
                     }
                 }
@@ -193,14 +193,14 @@ class ActionScenes {
                 } else {
                     e.packet.read<Any>("a")!!
                 }
-                val vec = Vector(pos.invokeMethod<Int>("getX")!!, pos.invokeMethod<Int>("getY")!!, pos.invokeMethod<Int>("getZ")!!)
+                val vec = Vector(pos.invokeMethod<Number>("getX")!!.toInt(), pos.invokeMethod<Number>("getY")!!.toInt(), pos.invokeMethod<Number>("getZ")!!.toInt())
                 val data = scenesBlocks[e.player.name]?.get(e.player.world.name)?.get(vec) ?: return
                 PlayerEvents.ScenesBlockInteract(e.player, data).call()
                 e.isCancelled = true
             }
             if (e.packet.name == "PacketPlayInBlockDig") {
                 val pos = e.packet.read<Any>("a") ?: return
-                val vec = Vector(pos.invokeMethod<Int>("getX")!!, pos.invokeMethod<Int>("getY")!!, pos.invokeMethod<Int>("getZ")!!)
+                val vec = Vector(pos.invokeMethod<Number>("getX")!!.toInt(), pos.invokeMethod<Number>("getY")!!.toInt(), pos.invokeMethod<Number>("getZ")!!.toInt())
                 val data = scenesBlocks[e.player.name]?.get(e.player.world.name)?.get(vec) ?: return
                 if (e.packet.read<Any>("c").toString() == "STOP_DESTROY_BLOCK") {
                     if (!PlayerEvents.ScenesBlockBreak(e.player, data).call()) {
