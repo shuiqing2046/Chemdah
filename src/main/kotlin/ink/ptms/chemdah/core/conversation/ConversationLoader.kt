@@ -59,17 +59,6 @@ object ConversationLoader {
     }
 
     fun load(file: Configuration): List<Conversation> {
-        val str = file.saveToString()
-        if (str.contains("agent:begin") || str.contains("agent:refuge") || str.contains(": |-")) {
-            warning("Conversation \"${file.name}\" skip loading!")
-            warning("Starting from Chemdah (v0.1.13), \"agent:[type]\" and \"|-\" is not supported")
-            warning("Please replace with:")
-            warning("conversation:")
-            warning("  agent:")
-            warning("    begin: | <--- Remove \"-\" symbol")
-            warning("      ...")
-            return emptyList()
-        }
         val option = if (file.isConfigurationSection("__option__")) {
             Option(file.getConfigurationSection("__option__")!!)
         } else {
@@ -88,7 +77,6 @@ object ConversationLoader {
             } else {
                 Trigger(emptyList())
             }
-            println(root.getConfigurationSection("agent")?.toMap())
             return Conversation(
                 root.name,
                 file,
