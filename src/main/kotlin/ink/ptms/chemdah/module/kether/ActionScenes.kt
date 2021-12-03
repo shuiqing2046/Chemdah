@@ -194,14 +194,25 @@ class ActionScenes {
                 } else {
                     e.packet.read<Any>("a")!!
                 }
-                val vec = Vector(pos.getProperty<Number>("x")!!.toInt(), pos.getProperty<Number>("y")!!.toInt(), pos.getProperty<Number>("z")!!.toInt())
+                // 1.18 Supported
+                val vec = if (MinecraftVersion.major >= 10) {
+                    Vector(pos.getProperty<Number>("x")!!.toInt(), pos.getProperty<Number>("y")!!.toInt(), pos.getProperty<Number>("z")!!.toInt())
+                } else {
+                    // 在老版本中字段名称为 a, b, c
+                    Vector(pos.invokeMethod<Number>("getX")!!.toInt(), pos.invokeMethod<Number>("getY")!!.toInt(), pos.invokeMethod<Number>("getZ")!!.toInt())
+                }
                 val data = scenesBlocks[e.player.name]?.get(e.player.world.name)?.get(vec) ?: return
                 PlayerEvents.ScenesBlockInteract(e.player, data).call()
                 e.isCancelled = true
             }
             if (e.packet.name == "PacketPlayInBlockDig") {
                 val pos = e.packet.read<Any>("a") ?: return
-                val vec = Vector(pos.getProperty<Number>("x")!!.toInt(), pos.getProperty<Number>("y")!!.toInt(), pos.getProperty<Number>("z")!!.toInt())
+                // 1.18 Supported
+                val vec = if (MinecraftVersion.major >= 10) {
+                    Vector(pos.getProperty<Number>("x")!!.toInt(), pos.getProperty<Number>("y")!!.toInt(), pos.getProperty<Number>("z")!!.toInt())
+                } else {
+                    Vector(pos.invokeMethod<Number>("getX")!!.toInt(), pos.invokeMethod<Number>("getY")!!.toInt(), pos.invokeMethod<Number>("getZ")!!.toInt())
+                }
                 val data = scenesBlocks[e.player.name]?.get(e.player.world.name)?.get(vec) ?: return
                 if (e.packet.read<Any>("c").toString() == "STOP_DESTROY_BLOCK") {
                     if (!PlayerEvents.ScenesBlockBreak(e.player, data).call()) {
