@@ -13,7 +13,7 @@ import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.getDataFolder
 import taboolib.common.reflect.Reflex.Companion.getProperty
 import taboolib.common5.Coerce
-import taboolib.module.configuration.SecuredFile
+import taboolib.module.configuration.Configuration
 import taboolib.module.nms.MinecraftVersion
 import taboolib.module.nms.PacketSendEvent
 import taboolib.module.nms.sendPacket
@@ -40,7 +40,7 @@ object QuestDevelopment {
     init {
         val file = File(getDataFolder(), "development.yml")
         if (file.exists()) {
-            val conf = SecuredFile.loadConfiguration(file)
+            val conf = Configuration.loadFromFile(file)
             enableUniqueBlock = conf.getBoolean("enable-unique-block")
             enableMessageTransmit = conf.getBoolean("enable-message-transmit")
         }
@@ -64,8 +64,8 @@ object QuestDevelopment {
         if (enableMessageTransmit && e.packet.name == "PacketPlayOutChat" && e.packet.read<Any>("b").toString() != "GAME_INFO") {
             var a = e.packet.read<Any>("a").toString()
             if (a == "null") {
-                if (MinecraftVersion.majorLegacy < 11700) {
-                    // 低版本的 Raw 信息可能来自其他字段
+                // 1.18 的聊天低版本的 Raw 信息可能来自其他字段
+                if (MinecraftVersion.major >= 10 || MinecraftVersion.majorLegacy < 11700) {
                     kotlin.runCatching { a = Coerce.toList(e.packet.read<Any>("components")).toString() }
                 } else {
                     return
