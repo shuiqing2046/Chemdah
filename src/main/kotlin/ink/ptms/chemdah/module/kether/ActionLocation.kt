@@ -5,6 +5,7 @@ import taboolib.common5.Coerce
 import taboolib.library.kether.ArgTypes
 import taboolib.library.kether.ParsedAction
 import taboolib.module.kether.*
+import taboolib.platform.util.toBukkitLocation
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -20,9 +21,9 @@ class ActionLocation {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Any> {
             val future = CompletableFuture<Any>()
-            frame.newFrame(location).run<Location>().thenApply { location ->
+            frame.newFrame(location).run<taboolib.common.util.Location>().thenApply {
                 frame.newFrame(value).run<Any>().thenApply { value ->
-                    future.complete(func(location, value))
+                    future.complete(func(it.toBukkitLocation(), value))
                 }
             }
             return future
@@ -37,13 +38,9 @@ class ActionLocation {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Double> {
             val future = CompletableFuture<Double>()
-            frame.newFrame(loc1).run<Location>().thenApply { loc1 ->
-                frame.newFrame(loc2).run<Location>().thenApply { loc2 ->
-                    if (loc1.world!!.name == loc2.world!!.name) {
-                        loc1.distance(loc2)
-                    } else {
-                        -1
-                    }
+            frame.newFrame(loc1).run<taboolib.common.util.Location>().thenApply { loc1 ->
+                frame.newFrame(loc2).run<taboolib.common.util.Location>().thenApply { loc2 ->
+                    if (loc1.world == loc2.world) loc1.distance(loc2) else -1
                 }
             }
             return future
@@ -101,9 +98,7 @@ class ActionLocation {
                 }
             } catch (ex: Exception) {
                 it.reset()
-                LocationFunc(input, ParsedAction.noop<Any>()) { loc, _ ->
-                    loc.y
-                }
+                LocationFunc(input, ParsedAction.noop<Any>()) { loc, _ -> loc.y }
             }
         }
 
@@ -126,9 +121,7 @@ class ActionLocation {
                 }
             } catch (ex: Exception) {
                 it.reset()
-                LocationFunc(input, ParsedAction.noop<Any>()) { loc, _ ->
-                    loc.z
-                }
+                LocationFunc(input, ParsedAction.noop<Any>()) { loc, _ -> loc.z }
             }
         }
 
@@ -151,9 +144,7 @@ class ActionLocation {
                 }
             } catch (ex: Exception) {
                 it.reset()
-                LocationFunc(input, ParsedAction.noop<Any>()) { loc, _ ->
-                    loc.yaw
-                }
+                LocationFunc(input, ParsedAction.noop<Any>()) { loc, _ -> loc.yaw }
             }
         }
 
@@ -175,9 +166,7 @@ class ActionLocation {
                 }
             } catch (ex: Exception) {
                 it.reset()
-                LocationFunc(input, ParsedAction.noop<Any>()) { loc, _ ->
-                    loc.pitch
-                }
+                LocationFunc(input, ParsedAction.noop<Any>()) { loc, _ -> loc.pitch }
             }
         }
 

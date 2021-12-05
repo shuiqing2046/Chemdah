@@ -8,7 +8,7 @@ import com.sk89q.worldedit.math.BlockVector3
 import com.sk89q.worldedit.math.transform.AffineTransform
 import com.sk89q.worldedit.session.ClipboardHolder
 import com.sk89q.worldedit.util.io.Closer
-import org.bukkit.Location
+import org.bukkit.Bukkit
 import taboolib.common.platform.function.warning
 import taboolib.common5.Coerce
 import taboolib.library.kether.ArgTypes
@@ -37,7 +37,7 @@ class ActionSchematic(
 
     override fun run(frame: ScriptFrame): CompletableFuture<Void> {
         return frame.newFrame(name).run<Any>().thenAccept { name ->
-            frame.newFrame(location).run<Location>().thenAccept { location ->
+            frame.newFrame(location).run<taboolib.common.util.Location>().thenAccept { location ->
                 frame.newFrame(rotation).run<Any?>().thenAccept { rotation ->
                     var f = File("plugins/WorldEdit/schematics/${name}.schematic")
                     if (!f.exists()) {
@@ -52,7 +52,7 @@ class ActionSchematic(
                         } else {
                             try {
                                 Closer.create().use { closer ->
-                                    val editSession = WorldEdit.getInstance().editSessionFactory.getEditSession(BukkitWorld(location.world), -1)
+                                    val session = WorldEdit.getInstance().editSessionFactory.getEditSession(BukkitWorld(Bukkit.getWorld(location.world!!)), -1)
                                     val fis = closer.register(FileInputStream(f))
                                     val bis = closer.register(BufferedInputStream(fis))
                                     val reader = format.getReader(bis)
@@ -65,7 +65,7 @@ class ActionSchematic(
                                     val holder = ClipboardHolder(clipboard)
                                     holder.transform = holder.transform.combine(transform)
                                     Operations.complete(
-                                        holder.createPaste(editSession)
+                                        holder.createPaste(session)
                                             .to(BlockVector3.at(location.blockX, location.blockY, location.blockZ))
                                             .ignoreAirBlocks(ignoreAir)
                                             .build()
