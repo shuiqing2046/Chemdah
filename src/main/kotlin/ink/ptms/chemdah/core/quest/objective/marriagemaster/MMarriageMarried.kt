@@ -14,7 +14,7 @@ object MMarriageMarried : ObjectiveCountableI<MarryEvent>() {
         handler {
             player1.playerOnline
         }
-        addCondition("position") {
+        addSimpleCondition("position") {
             toPosition().inside(it.player1.playerOnline!!.location) && toPosition().inside(it.player2.playerOnline!!.location)
         }
     }

@@ -21,10 +21,10 @@ object IPlayerCommand : ObjectiveCountableI<PlayerCommandPreprocessEvent>() {
         handler {
             player
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.player.location)
         }
-        addCondition("command") { e ->
+        addSimpleCondition("command") { e ->
             e.message.startsWith(toString(), true)
         }
         addConditionVariable("command") {

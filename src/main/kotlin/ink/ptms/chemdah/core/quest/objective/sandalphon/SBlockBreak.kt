@@ -21,13 +21,13 @@ object SBlockBreak : ObjectiveCountableI<BlockBreakEvent>() {
         handler {
             player
         }
-        addCondition("position") {
+        addSimpleCondition("position") {
             toPosition().inside(it.bukkitEvent.block.location)
         }
-        addCondition("material") {
+        addSimpleCondition("material") {
             toInferBlock().isBlock(it.bukkitEvent.block)
         }
-        addCondition("id") {
+        addSimpleCondition("id") {
             toString().equals(it.blockData.id, true)
         }
         addConditionVariable("id") {

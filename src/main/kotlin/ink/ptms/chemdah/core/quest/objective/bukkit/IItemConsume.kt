@@ -23,13 +23,13 @@ object IItemConsume : ObjectiveCountableI<PlayerItemConsumeEvent>() {
         handler {
             player
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.player.location)
         }
-        addCondition("item") { e ->
+        addSimpleCondition("item") { e ->
             toInferItem().isItem(e.item)
         }
-        addCondition("item:replacement") { e ->
+        addSimpleCondition("item:replacement") { e ->
             toInferItem().isItem(e.invokeMethod<ItemStack>("getReplacement") ?: AIR)
         }
     }

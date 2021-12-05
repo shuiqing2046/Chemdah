@@ -17,8 +17,8 @@ object IAlways : Objective<Event>() {
     override val isListener = false
 
     init {
-        addCondition { profile, task, _ ->
-            !task.condition.containsKey(name) || task.condition["position"]!!.toPosition().inside(profile.player.location)
+        addFullCondition("position") { profile, task, _ ->
+            task.condition["position"]!!.toPosition().inside(profile.player.location)
         }
     }
 }

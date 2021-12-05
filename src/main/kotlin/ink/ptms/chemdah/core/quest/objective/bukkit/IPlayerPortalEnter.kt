@@ -22,7 +22,7 @@ object IPlayerPortalEnter : ObjectiveCountableI<EntityPortalEnterEvent>() {
         handler {
             entity as? Player
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.location)
         }
     }

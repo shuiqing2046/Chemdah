@@ -21,10 +21,10 @@ object SSkillUnlock : ObjectiveCountableI<PlayerSkillUnlockEvent>() {
         handler {
             playerData.player
         }
-        addCondition("position") {
+        addSimpleCondition("position") {
             toPosition().inside(it.playerData.player.location)
         }
-        addCondition("skill") {
+        addSimpleCondition("skill") {
             toString().equals(it.unlockedSkill.status.name, true)
         }
         addConditionVariable("skill") {

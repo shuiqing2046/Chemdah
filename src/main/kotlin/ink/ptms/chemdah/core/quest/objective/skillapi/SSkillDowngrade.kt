@@ -22,10 +22,10 @@ object SSkillDowngrade : ObjectiveCountableI<PlayerSkillDowngradeEvent>() {
         handler {
             playerData.player
         }
-        addCondition("position") {
+        addSimpleCondition("position") {
             toPosition().inside(it.playerData.player.location)
         }
-        addCondition("skill") {
+        addSimpleCondition("skill") {
             toString().equals(it.downgradedSkill.status.name, true)
         }
         addConditionVariable("skill") {

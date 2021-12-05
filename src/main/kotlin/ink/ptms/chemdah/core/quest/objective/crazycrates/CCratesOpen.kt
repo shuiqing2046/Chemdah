@@ -14,10 +14,10 @@ object CCratesOpen : ObjectiveCountableI<PlayerPrizeEvent>() {
         handler {
             player
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.player.location)
         }
-        addCondition("name") { e ->
+        addSimpleCondition("name") { e ->
             asList().any { it.equals(e.crate.name, true) }
         }
         addConditionVariable("name") {

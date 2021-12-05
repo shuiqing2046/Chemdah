@@ -14,7 +14,7 @@ object MMarriageKiss : ObjectiveCountableI<KissEvent>() {
         handler {
             player.playerOnline
         }
-        addCondition("position") {
+        addSimpleCondition("position") {
             toPosition().inside(it.player.playerOnline!!.location)
         }
     }

@@ -23,25 +23,25 @@ object IPlayerStatistic : ObjectiveCountableI<PlayerStatisticIncrementEvent>() {
         handler {
             player
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.player.location)
         }
-        addCondition("statistic") { e ->
+        addSimpleCondition("statistic") { e ->
             asList().any { it.equals(e.statistic.name, true) }
         }
-        addCondition("type:entity") { e ->
+        addSimpleCondition("type:entity") { e ->
             asList().any { it.equals(e.entityType?.name, true) }
         }
-        addCondition("type:material") { e ->
+        addSimpleCondition("type:material") { e ->
             asList().any { it.equals(e.material?.name, true) }
         }
-        addCondition("value") { e ->
+        addSimpleCondition("value") { e ->
             toInt() <= e.newValue
         }
-        addCondition("value:new") { e ->
+        addSimpleCondition("value:new") { e ->
             toInt() <= e.newValue
         }
-        addCondition("value:previous") { e ->
+        addSimpleCondition("value:previous") { e ->
             toInt() <= e.previousValue
         }
         addConditionVariable("value") {

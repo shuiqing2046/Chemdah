@@ -21,13 +21,13 @@ object IPlayerRespawn : ObjectiveCountableI<PlayerRespawnEvent>() {
         handler {
             player
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.respawnLocation)
         }
-        addCondition("spawn:bed") { e ->
+        addSimpleCondition("spawn:bed") { e ->
             toBoolean() == e.isBedSpawn
         }
-        addCondition("spawn:anchor") { e ->
+        addSimpleCondition("spawn:anchor") { e ->
             toBoolean() == e.isAnchorSpawn
         }
     }

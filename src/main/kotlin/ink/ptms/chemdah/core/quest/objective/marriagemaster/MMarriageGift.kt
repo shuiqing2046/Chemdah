@@ -14,10 +14,10 @@ object MMarriageGift : ObjectiveCountableI<GiftEvent>() {
         handler {
             player.playerOnline
         }
-        addCondition("position") {
+        addSimpleCondition("position") {
             toPosition().inside(it.player.playerOnline!!.location)
         }
-        addCondition("item") {
+        addSimpleCondition("item") {
             toInferItem().isItem(it.itemStack)
         }
     }

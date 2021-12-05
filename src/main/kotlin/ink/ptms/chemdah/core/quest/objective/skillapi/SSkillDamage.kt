@@ -22,10 +22,10 @@ object SSkillDamage : ObjectiveCountableI<SkillDamageEvent>() {
         handler {
             damager as? Player
         }
-        addCondition("position") {
+        addSimpleCondition("position") {
             toPosition().inside(it.damager.location)
         }
-        addCondition("damage") {
+        addSimpleCondition("damage") {
             toDouble() <= it.damage
         }
         addConditionVariable("damage") {

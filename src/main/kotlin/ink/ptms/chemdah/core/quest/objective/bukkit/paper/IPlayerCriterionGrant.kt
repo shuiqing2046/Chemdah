@@ -21,13 +21,13 @@ object IPlayerCriterionGrant : ObjectiveCountableI<PlayerAdvancementCriterionGra
         handler {
             player
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.player.location)
         }
-        addCondition("advancement") { e ->
+        addSimpleCondition("advancement") { e ->
             asList().any { it.equals(e.advancement.key.toString(), true) }
         }
-        addCondition("criterion") { e ->
+        addSimpleCondition("criterion") { e ->
             asList().any { it.equals(e.criterion, true) }
         }
     }

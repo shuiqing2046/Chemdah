@@ -22,25 +22,25 @@ object IPlayerShootBow : ObjectiveCountableI<EntityShootBowEvent>() {
         handler {
             entity as? Player
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.entity.location)
         }
-        addCondition("arrow") { e ->
+        addSimpleCondition("arrow") { e ->
             toInferEntity().isEntity(e.projectile)
         }
-        addCondition("item") { e ->
+        addSimpleCondition("item") { e ->
             toInferItem().isItem(e.bow ?: AIR)
         }
-        addCondition("item:consumable") { e ->
+        addSimpleCondition("item:consumable") { e ->
             toInferItem().isItem(e.consumable ?: AIR)
         }
-        addCondition("hand") { e ->
+        addSimpleCondition("hand") { e ->
             asList().any { it.equals(e.hand.name, true) }
         }
-        addCondition("force") { e ->
+        addSimpleCondition("force") { e ->
             toDouble() <= e.force
         }
-        addCondition("consumable") { e ->
+        addSimpleCondition("consumable") { e ->
             toBoolean() == e.shouldConsumeItem()
         }
         addConditionVariable("force") {

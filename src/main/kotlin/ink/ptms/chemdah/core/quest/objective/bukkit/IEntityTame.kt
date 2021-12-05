@@ -22,10 +22,10 @@ object IEntityTame : ObjectiveCountableI<EntityTameEvent>() {
         handler {
             owner as? Player
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.entity.location)
         }
-        addCondition("entity") { e ->
+        addSimpleCondition("entity") { e ->
             toInferEntity().isEntity(e.entity)
         }
     }

@@ -22,22 +22,22 @@ object ANPCInteract : ObjectiveCountableI<AdyeshachEntityInteractEvent>() {
         handler {
             player
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.entity.getLocation())
         }
-        addCondition("position:clicked") { e ->
+        addSimpleCondition("position:clicked") { e ->
             toVector().inside(Vector(e.vector.x, e.vector.y, e.vector.z))
         }
-        addCondition("id") { e ->
+        addSimpleCondition("id") { e ->
             asList().any { it.equals(e.entity.id, true) }
         }
-        addCondition("type") { e ->
+        addSimpleCondition("type") { e ->
             asList().any { it.equals(e.entity.entityType.name, true) }
         }
-        addCondition("hand") { e ->
+        addSimpleCondition("hand") { e ->
             toBoolean() == e.isMainHand
         }
-        addCondition("item") { e ->
+        addSimpleCondition("item") { e ->
             toInferItem().isItem(if (e.isMainHand) e.player.inventory.itemInMainHand else e.player.inventory.itemInOffHand)
         }
         addConditionVariable("id") {

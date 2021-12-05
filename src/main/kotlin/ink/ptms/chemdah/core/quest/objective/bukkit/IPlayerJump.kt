@@ -22,7 +22,7 @@ object IPlayerJump : ObjectiveCountableI<PlayerJumpEvent>() {
         handler {
             player
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.player.location)
         }
     }

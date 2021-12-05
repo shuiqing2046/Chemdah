@@ -21,10 +21,10 @@ object BBarrelDestroy : ObjectiveCountableI<BarrelDestroyEvent>() {
         handler {
             playerOptional
         }
-        addCondition("position") {
+        addSimpleCondition("position") {
             toPosition().inside(it.broken.location)
         }
-        addCondition("reason") { e ->
+        addSimpleCondition("reason") { e ->
             asList().any { it.equals(e.reason.name, true) }
         }
     }

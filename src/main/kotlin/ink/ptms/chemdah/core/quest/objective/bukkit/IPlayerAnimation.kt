@@ -21,10 +21,10 @@ object IPlayerAnimation : ObjectiveCountableI<PlayerAnimationEvent>() {
         handler {
             player
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.player.location)
         }
-        addCondition("animation") { e ->
+        addSimpleCondition("animation") { e ->
             asList().any { it.equals(e.animationType.name, true) }
         }
     }

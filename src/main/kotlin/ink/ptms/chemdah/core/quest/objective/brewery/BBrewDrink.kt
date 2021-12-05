@@ -23,16 +23,16 @@ object BBrewDrink : ObjectiveCountableI<BrewDrinkEvent>() {
         handler {
             player
         }
-        addCondition("position") {
+        addSimpleCondition("position") {
             toPosition().inside(it.player.location)
         }
-        addCondition("brew") {
+        addSimpleCondition("brew") {
             toInferItem().isItem(ItemStack(Material.POTION).also { item -> item.itemMeta = it.itemMeta })
         }
-        addCondition("alcohol") {
+        addSimpleCondition("alcohol") {
             toInt() <= it.addedAlcohol
         }
-        addCondition("quality") {
+        addSimpleCondition("quality") {
             toInt() <= it.quality
         }
         addConditionVariable("alcohol") {

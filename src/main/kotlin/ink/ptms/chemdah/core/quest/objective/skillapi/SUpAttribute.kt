@@ -22,10 +22,10 @@ object SUpAttribute : ObjectiveCountableI<PlayerUpAttributeEvent>() {
         handler {
             playerData.player
         }
-        addCondition("position") {
+        addSimpleCondition("position") {
             toPosition().inside(it.playerData.player.location)
         }
-        addCondition("attribute") {
+        addSimpleCondition("attribute") {
             toString().equals(it.attribute, true)
         }
         addConditionVariable("attribute") {

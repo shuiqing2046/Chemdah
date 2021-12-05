@@ -3,9 +3,6 @@ package ink.ptms.chemdah.core.quest.objective.bukkit
 import ink.ptms.chemdah.api.event.collect.ConversationEvents
 import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
-import org.bukkit.entity.Player
-import org.bukkit.event.entity.EntityDamageByEntityEvent
-import taboolib.platform.util.attacker
 
 /**
  * Chemdah
@@ -25,10 +22,10 @@ object IPlayerConversation : ObjectiveCountableI<ConversationEvents.ReplyClosed>
         handler {
             session.player
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.session.origin)
         }
-        addCondition("id") { e ->
+        addSimpleCondition("id") { e ->
             asList().any { it.equals(e.session.conversation.id, true) }
         }
     }

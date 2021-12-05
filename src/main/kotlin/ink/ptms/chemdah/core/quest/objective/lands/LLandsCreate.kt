@@ -14,7 +14,7 @@ object LLandsCreate : ObjectiveCountableI<LandCreateEvent>() {
         handler {
             landPlayer.player
         }
-        addCondition("position") {
+        addSimpleCondition("position") {
             toPosition().inside(it.landPlayer.player.location)
         }
     }

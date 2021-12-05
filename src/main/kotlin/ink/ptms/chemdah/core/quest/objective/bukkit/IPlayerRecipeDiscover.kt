@@ -21,10 +21,10 @@ object IPlayerRecipeDiscover : ObjectiveCountableI<PlayerRecipeDiscoverEvent>() 
         handler {
             player
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.player.location)
         }
-        addCondition("recipe") { e ->
+        addSimpleCondition("recipe") { e ->
             asList().any { it.equals(e.recipe.toString(), true) }
         }
     }

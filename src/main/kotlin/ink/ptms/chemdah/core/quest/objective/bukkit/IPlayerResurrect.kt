@@ -26,11 +26,11 @@ object IPlayerResurrect : ObjectiveCountableI<EntityResurrectEvent>() {
         handler {
             entity as? Player
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.entity.location)
         }
-        addCondition("item") { e ->
-            toInferItem().isItem((e.entity as Player).getUsingItem(totem) ?: return@addCondition false)
+        addSimpleCondition("item") { e ->
+            toInferItem().isItem((e.entity as Player).getUsingItem(totem) ?: return@addSimpleCondition false)
         }
     }
 }

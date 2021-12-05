@@ -23,16 +23,16 @@ object IPlayerLevelChange : ObjectiveCountableI<PlayerLevelChangeEvent>() {
         handler {
             player
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.player.location)
         }
-        addCondition("level") { e ->
+        addSimpleCondition("level") { e ->
             toInt() <= e.newLevel - e.oldLevel
         }
-        addCondition("level:new") { e ->
+        addSimpleCondition("level:new") { e ->
             toInt() <= e.newLevel
         }
-        addCondition("level:old") { e ->
+        addSimpleCondition("level:old") { e ->
             toInt() <= e.oldLevel
         }
         addConditionVariable("level") { e ->

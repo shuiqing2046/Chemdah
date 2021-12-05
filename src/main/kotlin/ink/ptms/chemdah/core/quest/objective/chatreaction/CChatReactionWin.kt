@@ -14,7 +14,7 @@ object CChatReactionWin : ObjectiveCountableI<ReactionWinEvent>() {
         handler {
             winner
         }
-        addCondition("position") {
+        addSimpleCondition("position") {
             toPosition().inside(it.winner.location)
         }
     }

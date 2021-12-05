@@ -23,13 +23,13 @@ object IPlayerJumpHorse : ObjectiveCountableI<HorseJumpEvent>() {
         handler {
             entity.passengers[0] as? Player
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.entity.location)
         }
-        addCondition("entity") { e ->
+        addSimpleCondition("entity") { e ->
             toInferEntity().isEntity(e.entity)
         }
-        addCondition("power") { e ->
+        addSimpleCondition("power") { e ->
             toDouble() <= e.power
         }
         addConditionVariable("power") {

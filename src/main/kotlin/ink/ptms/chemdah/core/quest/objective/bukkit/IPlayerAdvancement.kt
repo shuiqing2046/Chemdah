@@ -21,10 +21,10 @@ object IPlayerAdvancement : ObjectiveCountableI<PlayerAdvancementDoneEvent>() {
         handler {
             player
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.player.location)
         }
-        addCondition("advancement") { e ->
+        addSimpleCondition("advancement") { e ->
             asList().any { it.equals(e.advancement.key.toString(), true) }
         }
     }

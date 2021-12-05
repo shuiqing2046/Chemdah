@@ -21,7 +21,7 @@ object BBarrelCreate : ObjectiveCountableI<BarrelCreateEvent>() {
         handler {
             player
         }
-        addCondition("position") {
+        addSimpleCondition("position") {
             toPosition().inside(it.barrel.spigot.location)
         }
     }

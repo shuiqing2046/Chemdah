@@ -15,7 +15,7 @@ object LlandsInvite : ObjectiveCountableI<LandInvitePlayerEvent>() {
         handler {
             Bukkit.getPlayer(target)
         }
-        addCondition("position") {
+        addSimpleCondition("position") {
             toPosition().inside(Bukkit.getPlayer(it.target)!!.location)
         }
     }

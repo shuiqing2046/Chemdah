@@ -22,13 +22,13 @@ object SCombo : ObjectiveCountableI<PlayerComboFinishEvent>() {
         handler {
             player
         }
-        addCondition("position") {
+        addSimpleCondition("position") {
             toPosition().inside(it.player.location)
         }
-        addCondition("skill") {
+        addSimpleCondition("skill") {
             toString().equals(it.skill.name, true)
         }
-        addCondition("combo") {
+        addSimpleCondition("combo") {
             toInt() <= it.combo
         }
         addConditionVariable("combo") {

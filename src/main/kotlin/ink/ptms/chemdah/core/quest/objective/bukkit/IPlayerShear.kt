@@ -21,16 +21,16 @@ object IPlayerShear : ObjectiveCountableI<PlayerShearEntityEvent>() {
         handler {
             player
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.entity.location)
         }
-        addCondition("entity") { e ->
+        addSimpleCondition("entity") { e ->
             toInferEntity().isEntity(e.entity)
         }
-        addCondition("item") { e ->
+        addSimpleCondition("item") { e ->
             toInferItem().isItem(e.item)
         }
-        addCondition("hand") { e ->
+        addSimpleCondition("hand") { e ->
             asList().any { it.equals(e.hand.name, true) }
         }
     }

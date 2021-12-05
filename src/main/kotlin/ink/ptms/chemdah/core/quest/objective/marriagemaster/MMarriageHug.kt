@@ -14,7 +14,7 @@ object MMarriageHug : ObjectiveCountableI<HugEvent>() {
         handler {
             player.playerOnline
         }
-        addCondition("position") {
+        addSimpleCondition("position") {
             toPosition().inside(it.player.playerOnline!!.location)
         }
     }

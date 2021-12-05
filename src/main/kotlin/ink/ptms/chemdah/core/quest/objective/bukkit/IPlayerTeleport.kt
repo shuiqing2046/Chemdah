@@ -22,16 +22,16 @@ object IPlayerTeleport : ObjectiveCountableI<PlayerTeleportEvent>() {
         handler {
             player
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.to!!)
         }
-        addCondition("position:to") { e ->
+        addSimpleCondition("position:to") { e ->
             toPosition().inside(e.to ?: EMPTY)
         }
-        addCondition("position:from") { e ->
+        addSimpleCondition("position:from") { e ->
             toPosition().inside(e.from)
         }
-        addCondition("cause") { e ->
+        addSimpleCondition("cause") { e ->
             asList().any { it.equals(e.cause.name, true) }
         }
     }

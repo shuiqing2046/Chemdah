@@ -14,7 +14,7 @@ object LLandsClaim : ObjectiveCountableI<ChunkPostClaimEvent>() {
         handler {
             landPlayer.player
         }
-        addCondition("position") {
+        addSimpleCondition("position") {
             toPosition().inside(it.landPlayer.player.location)
         }
     }

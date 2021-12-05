@@ -24,13 +24,13 @@ object IItemFurnace : ObjectiveCountableI<FurnaceExtractEvent>() {
         handler {
             player
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.block.location)
         }
-        addCondition("item") { e ->
+        addSimpleCondition("item") { e ->
             toInferItem().isItem(ItemStack(e.itemType))
         }
-        addCondition("exp") { e ->
+        addSimpleCondition("exp") { e ->
             toInt() <= e.expToDrop
         }
         addConditionVariable("exp") {

@@ -21,16 +21,16 @@ object IPlayerShoot : ObjectiveCountableI<PlayerLaunchProjectileEvent>() {
         handler {
             player
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.player.location)
         }
-        addCondition("projectile") { e ->
+        addSimpleCondition("projectile") { e ->
             toInferEntity().isEntity(e.projectile)
         }
-        addCondition("item") { e ->
+        addSimpleCondition("item") { e ->
             toInferItem().isItem(e.itemStack)
         }
-        addCondition("consume") { e ->
+        addSimpleCondition("consume") { e ->
             toBoolean() == e.shouldConsume()
         }
     }

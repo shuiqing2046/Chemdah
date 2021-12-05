@@ -21,16 +21,16 @@ object IPlayerChangeWorld : ObjectiveCountableI<PlayerChangedWorldEvent>() {
         handler {
             player
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.player.location)
         }
-        addCondition("world") { e ->
+        addSimpleCondition("world") { e ->
             asList().any { it.equals(e.player.world.name, true) }
         }
-        addCondition("world:to") { e ->
+        addSimpleCondition("world:to") { e ->
             asList().any { it.equals(e.player.world.name, true) }
         }
-        addCondition("world:from") { e ->
+        addSimpleCondition("world:from") { e ->
             asList().any { it.equals(e.from.name, true) }
         }
     }

@@ -22,10 +22,10 @@ object SClassChange : ObjectiveCountableI<PlayerClassChangeEvent>() {
         handler {
             playerData.player
         }
-        addCondition("position") {
+        addSimpleCondition("position") {
             toPosition().inside(it.playerData.player.location)
         }
-        addCondition("class") {
+        addSimpleCondition("class") {
             toString().equals(it.newClass.name, true)
         }
         addConditionVariable("class") {

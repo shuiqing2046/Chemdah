@@ -23,22 +23,22 @@ object IBlockFarm : ObjectiveCountableI<PlayerInteractEvent>() {
         handler {
             if (action == Action.RIGHT_CLICK_BLOCK && clickedBlock!!.type.isFarmable() && item?.type?.name?.endsWith("_HOE") == true) player else null
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.clickedBlock!!.location)
         }
-        addCondition("material") { e ->
+        addSimpleCondition("material") { e ->
             toInferBlock().isBlock(e.clickedBlock!!)
         }
-        addCondition("action") { e ->
+        addSimpleCondition("action") { e ->
             asList().any { it.equals(e.action.name, true) }
         }
-        addCondition("face") { e ->
+        addSimpleCondition("face") { e ->
             asList().any { it.equals(e.blockFace.name, true) }
         }
-        addCondition("hand") { e ->
+        addSimpleCondition("hand") { e ->
             asList().any { it.equals(e.hand?.name, true) }
         }
-        addCondition("item") { e ->
+        addSimpleCondition("item") { e ->
             toInferItem().isItem(e.item!!)
         }
     }

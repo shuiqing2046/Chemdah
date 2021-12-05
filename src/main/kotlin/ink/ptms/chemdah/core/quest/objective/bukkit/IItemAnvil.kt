@@ -22,19 +22,19 @@ object IItemAnvil : ObjectiveCountableI<PrepareAnvilEvent>() {
         handler {
             viewers[0] as Player
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.inventory.location ?: EMPTY)
         }
-        addCondition("text") { e ->
+        addSimpleCondition("text") { e ->
             toString() in e.inventory.renameText.toString()
         }
-        addCondition("cost") { e ->
+        addSimpleCondition("cost") { e ->
             toInt() <= e.inventory.repairCost
         }
-        addCondition("item") { e ->
+        addSimpleCondition("item") { e ->
             toInferItem().isItem(e.inventory.getItem(2) ?: AIR)
         }
-        addCondition("item:matrix") { e ->
+        addSimpleCondition("item:matrix") { e ->
             toInferItem().run {
                 isItem(e.inventory.getItem(0) ?: AIR) || isItem(e.inventory.getItem(1) ?: AIR)
             }

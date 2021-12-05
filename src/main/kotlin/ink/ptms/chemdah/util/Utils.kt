@@ -53,9 +53,11 @@ fun ItemStack.setIcon(value: String) {
 fun <T> safely(func: () -> T): T? {
     try {
         return func()
-    } catch (ex: NoSuchFieldError) {
-    } catch (ex: NoSuchMethodError) {
-    } catch (ex: NoClassDefFoundError) {
+    } catch (_: NoSuchFieldError) {
+    } catch (_: NoSuchFileException) {
+    } catch (_: NoSuchMethodError) {
+    } catch (_: NoSuchMethodException) {
+    } catch (_: NoClassDefFoundError) {
     }
     return null
 }
@@ -65,7 +67,7 @@ fun PotionEffect.hidden(): PotionEffect {
         try {
             setProperty("icon", false)
             setProperty("particles", false)
-        } catch (ex: Throwable) {
+        } catch (_: Throwable) {
         }
     }
     return this

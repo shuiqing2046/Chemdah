@@ -22,10 +22,10 @@ object SSkillUpgrade : ObjectiveCountableI<PlayerSkillUpgradeEvent>() {
         handler {
             playerData.player
         }
-        addCondition("position") {
+        addSimpleCondition("position") {
             toPosition().inside(it.playerData.player.location)
         }
-        addCondition("skill") {
+        addSimpleCondition("skill") {
             toString().equals(it.upgradedSkill.status.name, true)
         }
         addConditionVariable("skill") {

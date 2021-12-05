@@ -20,25 +20,25 @@ abstract class APlayerBucket<T : PlayerBucketEvent> : ObjectiveCountableI<T>() {
         handler {
             player
         }
-        addCondition("position") {
+        addSimpleCondition("position") {
             toPosition().inside(it.block.location)
         }
-        addCondition("material") {
+        addSimpleCondition("material") {
             toInferBlock().isBlock(it.block)
         }
-        addCondition("material:clicked") {
+        addSimpleCondition("material:clicked") {
             toInferBlock().isBlock(it.blockClicked)
         }
-        addCondition("item") {
+        addSimpleCondition("item") {
             toInferItem().isItem(it.itemStack ?: AIR)
         }
-        addCondition("item:bucket") {
+        addSimpleCondition("item:bucket") {
             toInferItem().isItem(ItemStack(it.bucket))
         }
-        addCondition("face") { e ->
+        addSimpleCondition("face") { e ->
             asList().any { it.equals(e.blockFace.name, true) }
         }
-        addCondition("hand") { e ->
+        addSimpleCondition("hand") { e ->
             asList().any { it.equals(e.invokeMethod<Any>("getHand").toString(), true) }
         }
     }

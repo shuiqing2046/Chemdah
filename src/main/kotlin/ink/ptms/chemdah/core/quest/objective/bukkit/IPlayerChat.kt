@@ -21,10 +21,10 @@ object IPlayerChat : ObjectiveCountableI<AsyncPlayerChatEvent>() {
         handler {
             player
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.player.location)
         }
-        addCondition("message") { e ->
+        addSimpleCondition("message") { e ->
             toString() in e.message
         }
         addConditionVariable("message") {

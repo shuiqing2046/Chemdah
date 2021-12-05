@@ -14,7 +14,7 @@ object QShopCreate : ObjectiveCountableI<ShopCreateEvent>() {
         handler {
             player
         }
-        addCondition("position") {
+        addSimpleCondition("position") {
             toPosition().inside(it.player!!.location)
         }
     }

@@ -21,13 +21,13 @@ object IPlayerBedEnter : ObjectiveCountableI<PlayerBedEnterEvent>() {
         handler {
             player
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.bed.location)
         }
-        addCondition("bed") { e ->
+        addSimpleCondition("bed") { e ->
             toInferBlock().isBlock(e.bed)
         }
-        addCondition("reason") { e ->
+        addSimpleCondition("reason") { e ->
             asList().any { it.equals(e.bedEnterResult.name, true) }
         }
     }

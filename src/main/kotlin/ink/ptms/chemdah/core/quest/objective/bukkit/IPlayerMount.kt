@@ -22,10 +22,10 @@ object IPlayerMount : ObjectiveCountableI<EntityMountEvent>() {
         handler {
             entity as? Player
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.mount.location)
         }
-        addCondition("entity") { e ->
+        addSimpleCondition("entity") { e ->
             toInferEntity().isEntity(e.mount)
         }
     }

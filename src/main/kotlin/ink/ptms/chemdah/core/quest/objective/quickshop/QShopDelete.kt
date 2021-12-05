@@ -15,7 +15,7 @@ object QShopDelete : ObjectiveCountableI<ShopDeleteEvent>() {
         handler {
             if (shop != null) Bukkit.getPlayer(shop.owner) else null
         }
-        addCondition("position") {
+        addSimpleCondition("position") {
             toPosition().inside(Bukkit.getPlayer(it.shop.owner)!!.location)
         }
     }

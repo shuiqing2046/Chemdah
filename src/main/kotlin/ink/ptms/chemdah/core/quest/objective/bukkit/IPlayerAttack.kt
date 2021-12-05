@@ -23,7 +23,7 @@ object IPlayerAttack : AEntityDamage<EntityDamageByEntityEvent>() {
         handler {
             attacker as? Player
         }
-        addCondition("weapon") { e ->
+        addSimpleCondition("weapon") { e ->
             toInferItem().isItem((e.attacker as Player).inventory.itemInMainHand)
         }
     }

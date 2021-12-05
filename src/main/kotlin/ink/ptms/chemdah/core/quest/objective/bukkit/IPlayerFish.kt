@@ -21,19 +21,19 @@ object IPlayerFish : ObjectiveCountableI<PlayerFishEvent>() {
         handler {
             player
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.player.location)
         }
-        addCondition("entity") { e ->
+        addSimpleCondition("entity") { e ->
             toInferEntity().isEntity(e.caught)
         }
-        addCondition("entity:hook") { e ->
+        addSimpleCondition("entity:hook") { e ->
             toInferEntity().isEntity(e.hook)
         }
-        addCondition("state") { e ->
+        addSimpleCondition("state") { e ->
             asList().any { it.equals(e.state.name, true) }
         }
-        addCondition("exp") { e ->
+        addSimpleCondition("exp") { e ->
             toInt() <= e.expToDrop
         }
         addConditionVariable("exp") {

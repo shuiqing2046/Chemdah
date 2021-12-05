@@ -24,16 +24,16 @@ object IItemInteract : ObjectiveCountableI<PlayerInteractEvent>() {
         handler {
             if (action != Action.PHYSICAL && item.isNotAir()) player else null
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.player.location)
         }
-        addCondition("action") { e ->
+        addSimpleCondition("action") { e ->
             asList().any { it.equals(e.action.name, true) }
         }
-        addCondition("hand") { e ->
+        addSimpleCondition("hand") { e ->
             asList().any { it.equals(e.hand?.name, true) }
         }
-        addCondition("item") { e ->
+        addSimpleCondition("item") { e ->
             toInferItem().isItem(e.item!!)
         }
     }

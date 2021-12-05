@@ -21,10 +21,10 @@ object IPlayerBedLeave : ObjectiveCountableI<PlayerBedLeaveEvent>() {
         handler {
             player
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.bed.location)
         }
-        addCondition("bed") { e ->
+        addSimpleCondition("bed") { e ->
             toInferBlock().isBlock(e.bed)
         }
     }

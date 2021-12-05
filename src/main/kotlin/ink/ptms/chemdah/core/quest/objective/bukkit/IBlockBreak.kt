@@ -23,19 +23,19 @@ object IBlockBreak : ObjectiveCountableI<BlockBreakEvent>() {
         handler {
             player
         }
-        addCondition("position") { 
+        addSimpleCondition("position") {
             toPosition().inside(it.block.location)
         }
-        addCondition("material") {
+        addSimpleCondition("material") {
             toInferBlock().isBlock(it.block)
         }
-        addCondition("exp") { 
+        addSimpleCondition("exp") {
             toInt() <= it.expToDrop
         }
-        addCondition("unique") {
+        addSimpleCondition("unique") {
             toBoolean() == it.block.isPlaced()
         }
-        addCondition("no-silk-touch") {
+        addSimpleCondition("no-silk-touch") {
             if (it.player.inventory.itemInMainHand.itemMeta?.hasEnchant(Enchantment.SILK_TOUCH) == true) toBoolean() else true
         }
         addConditionVariable("exp") {

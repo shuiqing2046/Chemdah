@@ -14,7 +14,7 @@ object QShopPurchase : ObjectiveCountableI<ShopPurchaseEvent>() {
         handler {
             player
         }
-        addCondition("position") {
+        addSimpleCondition("position") {
             toPosition().inside(it.player!!.location)
         }
     }

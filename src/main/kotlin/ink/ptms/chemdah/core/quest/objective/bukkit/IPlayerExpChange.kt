@@ -25,13 +25,13 @@ object IPlayerExpChange : ObjectiveCountableI<PlayerExpChangeEvent>() {
         handler {
             player
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.player.location)
         }
-        addCondition("amount") { e ->
+        addSimpleCondition("amount") { e ->
             toInt() <= e.amount
         }
-        addCondition("entity") { e ->
+        addSimpleCondition("entity") { e ->
             toInferEntity().isEntity(e.invokeMethod<Entity>("getSource"))
         }
         addConditionVariable("amount") {

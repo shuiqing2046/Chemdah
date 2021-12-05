@@ -16,25 +16,25 @@ import taboolib.common.reflect.Reflex.Companion.invokeMethod
 abstract class AEntityDeath<T : EntityDeathEvent> : ObjectiveCountableI<T>() {
 
     init {
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.entity.location)
         }
-        addCondition("damage") { e ->
+        addSimpleCondition("damage") { e ->
             toInt() <= (e.entity.lastDamageCause?.damage ?: 0.0)
         }
-        addCondition("damage:final") { e ->
+        addSimpleCondition("damage:final") { e ->
             toInt() <= (e.entity.lastDamageCause?.finalDamage ?: 0.0)
         }
-        addCondition("cause") { e ->
+        addSimpleCondition("cause") { e ->
             asList().any { it.equals(e.entity.lastDamageCause?.cause?.name.toString(), true) }
         }
-        addCondition("drops") { e ->
+        addSimpleCondition("drops") { e ->
             e.drops.any { toInferItem().isItem(it) }
         }
-        addCondition("exp") { e ->
+        addSimpleCondition("exp") { e ->
             toInt() <= e.droppedExp
         }
-        addCondition("revive-health") { e ->
+        addSimpleCondition("revive-health") { e ->
             toInt() <= e.invokeMethod<Int>("getReviveHealth")!!
         }
         addConditionVariable("damage") { e ->

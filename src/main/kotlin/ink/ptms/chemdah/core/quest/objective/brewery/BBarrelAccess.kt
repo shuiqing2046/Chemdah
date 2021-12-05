@@ -21,13 +21,13 @@ object BBarrelAccess : ObjectiveCountableI<BarrelAccessEvent>() {
         handler {
             player
         }
-        addCondition("position") {
+        addSimpleCondition("position") {
             toPosition().inside(it.clickedBlock.location)
         }
-        addCondition("material") { e ->
+        addSimpleCondition("material") { e ->
             toInferBlock().isBlock(e.clickedBlock!!)
         }
-        addCondition("face") { e ->
+        addSimpleCondition("face") { e ->
             asList().any { it.equals(e.clickedBlockFace.name, true) }
         }
     }

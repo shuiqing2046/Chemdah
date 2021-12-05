@@ -21,10 +21,10 @@ object SLevelUp : ObjectiveCountableI<PlayerLevelUpEvent>() {
         handler {
             playerData.player
         }
-        addCondition("position") {
+        addSimpleCondition("position") {
             toPosition().inside(it.playerData.player.location)
         }
-        addCondition("level") {
+        addSimpleCondition("level") {
             toInt() <= it.level
         }
         addConditionVariable("level") {

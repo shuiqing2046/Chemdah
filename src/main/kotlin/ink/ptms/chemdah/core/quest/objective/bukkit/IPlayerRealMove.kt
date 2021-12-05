@@ -22,13 +22,13 @@ object IPlayerRealMove : ObjectiveCountableI<PlayerMoveEvent>() {
         handler {
             if (from.x.toInt() != to!!.x.toInt() || from.z.toInt() != to!!.z.toInt()) player else null
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.to!!)
         }
-        addCondition("position:to") { e ->
+        addSimpleCondition("position:to") { e ->
             toPosition().inside(e.to!!)
         }
-        addCondition("position:from") { e ->
+        addSimpleCondition("position:from") { e ->
             toPosition().inside(e.from)
         }
     }

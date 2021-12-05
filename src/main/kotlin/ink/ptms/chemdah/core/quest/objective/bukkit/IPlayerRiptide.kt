@@ -21,10 +21,10 @@ object IPlayerRiptide : ObjectiveCountableI<PlayerRiptideEvent>() {
         handler {
             player
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.player.location)
         }
-        addCondition("item") { e ->
+        addSimpleCondition("item") { e ->
             toInferItem().isItem(e.item)
         }
     }

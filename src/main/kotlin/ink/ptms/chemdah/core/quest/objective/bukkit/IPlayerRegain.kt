@@ -25,16 +25,16 @@ object IPlayerRegain : ObjectiveCountableF<EntityRegainHealthEvent>() {
         handler {
             entity as? Player
         }
-        addCondition("position") { e ->
+        addSimpleCondition("position") { e ->
             toPosition().inside(e.entity.location)
         }
-        addCondition("amount") { e ->
+        addSimpleCondition("amount") { e ->
             toInt() <= e.amount
         }
-        addCondition("reason") { e ->
+        addSimpleCondition("reason") { e ->
             asList().any { it.equals(e.regainReason.name, true) }
         }
-        addCondition("fast") { e ->
+        addSimpleCondition("fast") { e ->
             toBoolean() == e.invokeMethod("isFastRegen")
         }
         addConditionVariable("amount") {
