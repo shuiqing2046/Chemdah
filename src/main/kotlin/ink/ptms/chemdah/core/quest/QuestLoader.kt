@@ -111,7 +111,7 @@ object QuestLoader {
         // 是否注册监听器
         if (isListener) {
             // 对该条目注册独立监听器
-            registerListener(event.java, EventPriority.values()[priority.ordinal], ignoreCancelled) { e ->
+            registerBukkitListener(event.java, EventPriority.values()[priority.ordinal], ignoreCancelled) { e ->
                 // 若该事件被任何任务使用
                 if (using) {
                     // 获取该监听器中的玩家对象
