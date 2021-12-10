@@ -249,7 +249,7 @@ object ThemeChat : Theme<ThemeChatSettings>() {
                         when {
                             it.contains("[title]") -> {
                                 val title = session.variables["title"]?.toString() ?: session.conversation.option.title
-                                json.append(it.replace("[title]", title.replace("[name]", session.npcName))).newLine()
+                                json.append(it.replace("[title]", title.replace("[name]", session.source.name.toString()))).newLine()
                             }
                             it.contains("[npcSide]") -> {
                                 messages.colored().forEachIndexed { i, fully ->

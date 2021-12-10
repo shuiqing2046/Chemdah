@@ -22,6 +22,8 @@ data class Option(
     val instanceTheme: Theme<*>
         get() = ChemdahAPI.getConversationTheme(theme) ?: error("theme $theme not supported.")
 
+    val globalFlags = root.getStringList("global-flags")
+
     companion object {
 
         val default = Option(SecuredFile().createSection("__option__"))

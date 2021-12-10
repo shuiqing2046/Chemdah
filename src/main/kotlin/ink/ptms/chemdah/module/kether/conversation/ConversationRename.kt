@@ -21,7 +21,7 @@ class ConversationRename(val rename: ParsedAction<*>) : ScriptAction<Void>() {
 
     override fun run(frame: ScriptFrame): CompletableFuture<Void> {
         return frame.newFrame(rename).run<Any>().thenAccept {
-            frame.rootVariables().get<Session>("@Session").get().npcName = it.toString()
+            frame.rootVariables().get<Session>("@Session").get().source.name = it.toString()
         }
     }
 

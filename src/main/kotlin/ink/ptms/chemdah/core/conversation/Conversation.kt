@@ -3,8 +3,8 @@ package ink.ptms.chemdah.core.conversation
 import ink.ptms.chemdah.api.event.collect.ConversationEvents
 import ink.ptms.chemdah.core.conversation.ConversationManager.sessions
 import ink.ptms.chemdah.util.namespaceConversationNPC
-import org.bukkit.Location
 import org.bukkit.entity.Player
+import taboolib.common.platform.function.warning
 import taboolib.common5.Coerce
 import taboolib.common5.mirrorFuture
 import taboolib.library.configuration.ConfigurationSection
@@ -39,7 +39,14 @@ data class Conversation(
      * 对话约束
      * 例如控制是否允许玩家跳过对话，或在对话中移动等
      */
-    val flags = root.getStringList("flags").toMutableList()
+    val flags = root.getStringList("flags").toMutableList().also {
+        it.addAll(option.globalFlags)
+    }
+
+    /**
+     * 对话转移
+     */
+    var transfer = ConversationTransfer(root.getConfigurationSection("transfer") ?: root.createSection("transfer"))
 
     fun hasFlag(value: String): Boolean {
         return value in flags
@@ -58,17 +65,15 @@ data class Conversation(
      * @param origin 原点（对话实体的头顶坐标）
      * @param sessionTop 上层会话（继承关系）
      */
-    fun open(
+    fun <T> open(
         player: Player,
-        origin: Location,
+        source: Source<T>,
         sessionTop: Session? = null,
-        npcName: String? = null,
-        npcObject: Any? = null,
         consumer: Consumer<Session> = Consumer {},
     ): CompletableFuture<Session> {
         val future = CompletableFuture<Session>()
         mirrorFuture<Int>("Conversation:open") {
-            val session = sessionTop ?: Session(this@Conversation, player.location.clone(), origin.clone(), player)
+            val session = sessionTop ?: Session(this@Conversation, player.location.clone(), source.getOriginLocation(source.entity), player, source)
             // 事件
             if (!ConversationEvents.Pre(this@Conversation, session, sessionTop != null).call()) {
                 future.complete(session)
@@ -76,70 +81,66 @@ data class Conversation(
                 ConversationEvents.Cancelled(this@Conversation, session, true).call()
                 return@mirrorFuture
             }
-            agent(session, AgentType.CONST).thenApply {
-                if (Coerce.toBoolean(session.variables["@Cancelled"])) {
-                    return@thenApply
-                }
-                if (npcName != null) {
-                    session.npcName = npcName
-                    session.npcObject = npcObject
-                }
-                // 注册会话
-                sessions[player.name] = session
-                consumer.accept(session)
-                // 重置会话
-                session.reload()
-                // 判定条件
-                checkCondition(session).thenApply { condition ->
-                    if (condition) {
-                        // 执行脚本代理
-                        agent(session, AgentType.BEGIN).thenApply {
-                            // 重置会话展示
-                            session.resetTheme().thenApply {
-                                // 判断是否被脚本代理否取消对话
-                                if (Coerce.toBoolean(session.variables["@Cancelled"])) {
-                                    // 仅关闭上层会话，只有会话开启才能被关闭
-                                    if (sessionTop != null) {
-                                        sessionTop.close().thenApply {
-                                            future.complete(session)
-                                            ConversationEvents.Cancelled(this@Conversation, session, true).call()
-                                        }
-                                    } else {
-                                        sessions.remove(player.name)
+            // 判定条件
+            checkCondition(session).thenApply { condition ->
+                if (condition) {
+                    // 会话转移
+                    if (transfer.id != null && !source.transfer(player, transfer.id!!)) {
+                        warning("Unable to conversation transfer to $transfer (conversation: ${id}, player: ${player.name})")
+                    }
+                    // 注册会话
+                    sessions[player.name] = session
+                    consumer.accept(session)
+                    // 重置会话
+                    session.source = source
+                    session.reload()
+                    // 执行脚本代理
+                    agent(session, AgentType.BEGIN).thenApply {
+                        // 重置会话展示
+                        session.resetTheme().thenApply {
+                            // 判断是否被脚本代理否取消对话
+                            if (Coerce.toBoolean(session.variables["@Cancelled"])) {
+                                // 仅关闭上层会话，只有会话开启才能被关闭
+                                if (sessionTop != null) {
+                                    sessionTop.close().thenApply {
                                         future.complete(session)
-                                        ConversationEvents.Cancelled(this@Conversation, session, false).call()
+                                        ConversationEvents.Cancelled(this@Conversation, session, true).call()
                                     }
                                 } else {
-                                    // 添加对话内容
-                                    session.npcSide.addAll(npcSide.map {
-                                        try {
-                                            KetherFunction.parse(it, namespace = namespaceConversationNPC) {
-                                                extend(session.variables)
-                                            }
-                                        } catch (e: Throwable) {
-                                            e.printKetherErrorMessage()
-                                            e.localizedMessage
+                                    sessions.remove(player.name)
+                                    future.complete(session)
+                                    ConversationEvents.Cancelled(this@Conversation, session, false).call()
+                                }
+                            } else {
+                                // 添加对话内容
+                                session.npcSide.addAll(npcSide.map {
+                                    try {
+                                        KetherFunction.parse(it, namespace = namespaceConversationNPC) {
+                                            extend(session.variables)
                                         }
-                                    })
-                                    ConversationEvents.Begin(this@Conversation, session, sessionTop != null).call()
-                                    // 渲染对话
-                                    option.instanceTheme.onBegin(session).thenAccept {
-                                        // 脚本代理
-                                        agent(session, AgentType.START).thenAccept {
-                                            future.complete(session)
-                                            ConversationEvents.Post(this@Conversation, session, sessionTop != null).call()
-                                        }
+                                    } catch (e: Throwable) {
+                                        e.printKetherErrorMessage()
+                                        e.localizedMessage
+                                    }
+                                })
+                                ConversationEvents.Begin(this@Conversation, session, sessionTop != null).call()
+                                // 渲染对话
+                                option.instanceTheme.onBegin(session).thenAccept {
+                                    // 脚本代理
+                                    agent(session, AgentType.START).thenAccept {
+                                        future.complete(session)
+                                        ConversationEvents.Post(this@Conversation, session, sessionTop != null).call()
                                     }
                                 }
-                                finish(0)
                             }
+                            finish(0)
                         }
-                    } else {
-                        sessions.remove(player.name)
-                        future.complete(session)
-                        finish(0)
-                        ConversationEvents.Cancelled(this@Conversation, session, false).call()
                     }
+                } else {
+                    sessions.remove(player.name)
+                    future.complete(session)
+                    finish(0)
+                    ConversationEvents.Cancelled(this@Conversation, session, false).call()
                 }
             }
         }
@@ -153,9 +154,7 @@ data class Conversation(
                 return@also
             }
             try {
-                KetherShell.eval(condition!!, namespace = namespaceConversationNPC) {
-                    extend(session.variables)
-                }.thenApply {
+                KetherShell.eval(condition!!, namespace = namespaceConversationNPC) { extend(session.variables) }.thenApply {
                     future.complete(Coerce.toBoolean(it))
                 }
             } catch (e: Throwable) {

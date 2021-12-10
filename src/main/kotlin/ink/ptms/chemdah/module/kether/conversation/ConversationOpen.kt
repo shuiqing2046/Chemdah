@@ -2,9 +2,7 @@ package ink.ptms.chemdah.module.kether.conversation
 
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.conversation.Session
-import ink.ptms.chemdah.util.getSession
 import ink.ptms.chemdah.util.rootVariables
-import ink.ptms.chemdah.util.vars
 import taboolib.module.kether.KetherParser
 import taboolib.module.kether.ScriptAction
 import taboolib.module.kether.ScriptFrame
@@ -25,7 +23,7 @@ class ConversationOpen(val conversation: String) : ScriptAction<Session>() {
         val variables = frame.rootVariables()
         val session = variables.get<Session>("@Session").get()
         variables.set("@Cancelled", true)
-        return conversation.open(session.player, session.origin)
+        return conversation.open(session.player, session.source)
     }
 
     companion object {

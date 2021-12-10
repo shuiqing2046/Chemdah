@@ -13,6 +13,8 @@ import io.lumine.xikage.mythicmobs.mobs.ActiveMob
 import net.citizensnpcs.api.CitizensAPI
 import net.citizensnpcs.api.npc.NPC
 import org.bukkit.Bukkit
+import org.bukkit.Location
+import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityDamageEvent
@@ -31,6 +33,7 @@ import taboolib.common.platform.event.OptionalEvent
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
 import taboolib.common5.Baffle
+import taboolib.common5.Coerce
 import taboolib.module.ai.controllerLookAt
 import taboolib.module.configuration.Config
 import taboolib.module.configuration.SecuredFile
@@ -106,11 +109,19 @@ object ConversationManager {
         cooldown.reset(e.player.name)
     }
 
+    @Suppress("UNCHECKED_CAST")
     @SubscribeEvent
     internal fun e(e: ConversationEvents.Begin) {
         if (!e.conversation.hasFlag("NO_EFFECT")) {
             effects[e.session.player.name] = effectFreeze.mapNotNull { e.session.player.getPotionEffect(it.key) }.filter { it.duration in 10..9999 }
             effectFreeze.forEach { e.session.player.addPotionEffect(PotionEffect(it.key, 99999, it.value).hidden()) }
+        }
+        if (e.conversation.hasFlag("FORCE_LOOK")) {
+            val source = e.session.source as Source<Any>
+            val direction = source.getOriginLocation(source.entity).subtract(e.session.player.eyeLocation).toVector().normalize()
+            val temp = e.session.player.location.clone()
+            temp.direction = direction
+            e.session.player.teleport(temp)
         }
     }
 
@@ -144,8 +155,8 @@ object ConversationManager {
 
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
     internal fun e(e: PlayerMoveEvent) {
-        if (e.player.conversationSession?.conversation?.hasFlag("NO_MOVE") == true && (e.from.x != e.to!!.x || e.from.z != e.to!!.z)) {
-            e.isCancelled = true
+        if (e.player.conversationSession?.conversation?.hasFlag("NO_MOVE") == true) {
+            e.setTo(e.from)
         }
     }
 
@@ -178,11 +189,22 @@ object ConversationManager {
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
     internal fun e(e: PlayerInteractAtEntityEvent) {
         if (e.hand == EquipmentSlot.HAND && e.player.conversationSession == null && cooldown.hasNext(e.player.name)) {
-            val name = e.rightClicked.getI18nName()
+            val name = e.rightClicked.getI18nName(e.player)
             val conversation = getConversation(e.player, "minecraft", name) ?: return
-            val origin = e.rightClicked.location.add(0.0, e.rightClicked.height, 0.0)
-            conversation.open(e.player, origin, npcName = name, npcObject = e.rightClicked)
             e.isCancelled = true
+            conversation.open(e.player, object : Source<Entity>(name, e.rightClicked) {
+
+                override fun transfer(player: Player, newId: String): Boolean {
+                    val nearby = e.rightClicked.getNearbyEntities(10.0, 10.0, 10.0).firstOrNull { it.getI18nName(e.player) == newId } ?: return false
+                    this.name = nearby.getI18nName(e.player)
+                    entity = nearby
+                    return true
+                }
+
+                override fun getOriginLocation(entity: Entity): Location {
+                    return entity.location.add(0.0, entity.height, 0.0)
+                }
+            })
         }
     }
 
@@ -198,7 +220,7 @@ object ConversationManager {
 
         @SubscribeEvent
         fun e(e: ConversationEvents.Begin) {
-            val npc = e.session.npcObject
+            val npc = e.session.source.entity
             if (npc is EntityInstance) {
                 npc.setTag("isFreeze", "true")
                 npc.setTag("conversation:${e.session.player.name}", "conversation")
@@ -211,7 +233,7 @@ object ConversationManager {
 
         @SubscribeEvent
         fun e(e: ConversationEvents.Closed) {
-            val npc = e.session.npcObject
+            val npc = e.session.source.entity
             if (npc is EntityInstance) {
                 npc.removeTag("conversation:${e.session.player.name}")
                 // 若没有玩家在与该 NPC 对话
@@ -227,8 +249,21 @@ object ConversationManager {
                 getConversation(e.player, "adyeshach", e.entity.id)?.run {
                     e.isCancelled = true
                     submit {
-                        val origin = e.entity.getLocation().add(0.0, e.entity.entityType.entitySize.height, 0.0)
-                        open(e.player, origin, npcName = e.entity.getDisplayName(), npcObject = e.entity) {
+                        open(e.player, object : Source<EntityInstance>(e.entity.getDisplayName(), e.entity) {
+
+                            override fun transfer(player: Player, newId: String): Boolean {
+                                val nearby = e.entity.manager?.getEntities()
+                                    ?.filter { it.getWorld() == player.world && it.getLocation().distance(e.entity.getLocation()) < 10.0 }
+                                    ?.firstOrNull { it.id == newId } ?: return false
+                                name = nearby.getDisplayName()
+                                entity = nearby
+                                return true
+                            }
+
+                            override fun getOriginLocation(entity: EntityInstance): Location {
+                                return entity.getLocation().add(0.0, entity.entityType.entitySize.height, 0.0)
+                            }
+                        }) {
                             it.variables["@manager"] = e.entity.manager
                             it.variables["@entities"] = listOf(e.entity)
                         }
@@ -247,7 +282,7 @@ object ConversationManager {
             if (!isCitizensHooked) {
                 return
             }
-            val npc = e.session.npcObject
+            val npc = e.session.source.entity
             if (npc is NPC && e.conversation.hasFlag("LOOK_PLAYER")) {
                 npc.faceLocation(e.session.player.eyeLocation)
             }
@@ -262,7 +297,22 @@ object ConversationManager {
                 val npc = CitizensAPI.getNPCRegistry().getNPC(e.rightClicked) ?: return
                 getConversation(e.player, "citizens", npc.id.toString())?.run {
                     e.isCancelled = true
-                    open(e.player, e.rightClicked.location.add(0.0, e.rightClicked.height, 0.0), npcName = npc.fullName, npcObject = npc)
+                    // 打开对话
+                    open(e.player, object : Source<NPC>(npc.fullName, npc) {
+
+                        override fun transfer(player: Player, newId: String): Boolean {
+                            val nearby = e.rightClicked.getNearbyEntities(10.0, 10.0, 10.0)
+                                .mapNotNull { CitizensAPI.getNPCRegistry().getNPC(e.rightClicked) }
+                                .firstOrNull { it.id == Coerce.toInteger(newId) } ?: return false
+                            name = npc.fullName
+                            this.entity = nearby
+                            return true
+                        }
+
+                        override fun getOriginLocation(entity: NPC): Location {
+                            return entity.entity.location.add(0.0, entity.entity.height, 0.0)
+                        }
+                    })
                 }
             }
         }
@@ -277,7 +327,7 @@ object ConversationManager {
             if (!isMythicMobsHooked) {
                 return
             }
-            val npc = e.session.npcObject
+            val npc = e.session.source.entity
             if (npc is ActiveMob && npc.entity.bukkitEntity is LivingEntity && e.conversation.hasFlag("LOOK_PLAYER")) {
                 (npc.entity.bukkitEntity as LivingEntity).controllerLookAt(e.session.player)
             }
@@ -292,7 +342,23 @@ object ConversationManager {
                 val mob = MythicMobs.inst().mobManager.getMythicMobInstance(e.rightClicked) ?: return
                 getConversation(e.player, "mythicmobs", mob.type.internalName)?.run {
                     e.isCancelled = true
-                    open(e.player, e.rightClicked.location.add(0.0, e.rightClicked.height, 0.0), npcName = mob.displayName, npcObject = mob)
+                    // 打开对话
+                    open(e.player, object : Source<ActiveMob>(mob.displayName, mob) {
+
+                        override fun transfer(player: Player, newId: String): Boolean {
+                            val nearby = e.rightClicked.getNearbyEntities(10.0, 10.0, 10.0)
+                                .mapNotNull { MythicMobs.inst().mobManager.getMythicMobInstance(e.rightClicked) }
+                                .firstOrNull { it.type.internalName == newId } ?: return false
+                            name = nearby.displayName
+                            entity = nearby
+                            return true
+                        }
+
+                        override fun getOriginLocation(entity: ActiveMob): Location {
+                            val be = entity.entity.bukkitEntity
+                            return be.location.add(0.0, be.height, 0.0)
+                        }
+                    })
                 }
             }
         }

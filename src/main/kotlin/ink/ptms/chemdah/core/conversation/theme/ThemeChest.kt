@@ -114,7 +114,7 @@ object ThemeChest : Theme<ThemeChestSetting>() {
     }
 
     private fun String.toTitle(session: Session): String {
-        val str = replace("[title]", session.conversation.option.title.replace("[name]", session.npcName)).colored()
+        val str = replace("[title]", session.conversation.option.title.replace("[name]", session.source?.name.toString())).colored()
         return KetherFunction.parse(str, sender = adaptPlayer(session.player), namespace = namespace)
     }
 

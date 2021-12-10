@@ -4,7 +4,6 @@ import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.conversation.Session
 import ink.ptms.chemdah.util.getSession
 import ink.ptms.chemdah.util.vars
-import taboolib.common5.Coerce
 import taboolib.module.kether.KetherParser
 import taboolib.module.kether.ScriptAction
 import taboolib.module.kether.ScriptFrame
@@ -28,7 +27,7 @@ class ConversationGoto(val conversation: String) : ScriptAction<Session>() {
         session.variables.clear()
         session.variables.putAll(frame.vars())
         session.conversation = conversation
-        return conversation.open(session.player, session.origin, sessionTop = session)
+        return conversation.open(session.player, session.source, session)
     }
 
     companion object {
