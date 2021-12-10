@@ -196,7 +196,7 @@ object ConversationManager {
 
                 override fun transfer(player: Player, newId: String): Boolean {
                     val nearby = e.rightClicked.getNearbyEntities(10.0, 10.0, 10.0).firstOrNull { it.getI18nName(e.player) == newId } ?: return false
-                    this.name = nearby.getI18nName(e.player)
+                    this.name = nearby.getI18nName()
                     entity = nearby
                     return true
                 }
