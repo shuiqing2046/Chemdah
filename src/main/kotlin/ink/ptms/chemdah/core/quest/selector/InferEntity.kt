@@ -99,7 +99,7 @@ class InferEntity(val entities: List<Entity>) {
             val flag = ArrayList<Flags>()
             if (indexOf('[') > -1 && endsWith(']')) {
                 type = substring(0, indexOf('['))
-                data.putAll(substring(indexOf('[') + 1, length - 1).split("[,;]".toRegex()).map {
+                data.putAll(substring(indexOf('[') + 1, length - 1).split(",").map {
                     it.trim().split("=").run { get(0) to (getOrNull(1) ?: get(0)) }
                 })
             } else {

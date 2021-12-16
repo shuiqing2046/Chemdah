@@ -1,15 +1,21 @@
 package ink.ptms.chemdah.module.command
 
+import ink.ptms.chemdah.api.ChemdahAPI
+import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.module.scenes.ScenesSystem
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
+import taboolib.common.io.newFile
 import taboolib.common.platform.command.CommandBody
 import taboolib.common.platform.command.CommandHeader
 import taboolib.common.platform.command.mainCommand
 import taboolib.common.platform.command.subCommand
+import taboolib.common.platform.function.getDataFolder
 import taboolib.common.platform.function.onlinePlayers
 import taboolib.common5.Coerce
 import taboolib.expansion.createHelper
+import taboolib.module.configuration.Configuration
+import taboolib.module.configuration.Type
 import taboolib.platform.util.sendLang
 
 /**
@@ -66,6 +72,26 @@ object CommandChemdahAPI {
                     }
                 }
             }
+        }
+    }
+
+    @CommandBody
+    val generate = subCommand {
+        execute<CommandSender> { sender, _, _ ->
+            val json = Configuration.empty(Type.JSON)
+            ChemdahAPI.questObjective.values.sortedBy { it.name }.forEach {
+                val plugin = if (it.javaClass.isAnnotationPresent(Dependency::class.java)) {
+                    val plugin = it.javaClass.getAnnotation(Dependency::class.java).plugin
+                    if (plugin == "minecraft") "Minecraft" else plugin
+                } else {
+                    "Minecraft"
+                }
+                json["objective.$plugin.${it.name}.condition"] = it.conditions.keys
+                json["objective.$plugin.${it.name}.goal"] = it.goals.keys.flatMap { k -> k.split(",") }.filter { k -> k != "null" }
+            }
+            val file = newFile(getDataFolder(), "api.json")
+            json.saveToFile(file)
+            sender.sendMessage("Generated api file: ${file.path}")
         }
     }
 }

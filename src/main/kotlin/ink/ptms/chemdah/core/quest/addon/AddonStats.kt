@@ -50,17 +50,17 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
     /**
      * 注入接口
      */
-    val agent = config.get("$", "pass")!!.asList()
+    val agent = config["$", "pass"]!!.asList()
 
     /**
      * 是否可见（一段时间后隐藏）
      */
-    val visible = config.get("visible") == "true"
+    val visible = config["visible"] == "true"
 
     /**
      * 是否持续可见
      */
-    val visibleAlways = config.get("visible") == "always"
+    val visibleAlways = config["visible"] == "always"
 
     /**
      * BOSS 音效

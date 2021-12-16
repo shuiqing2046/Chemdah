@@ -17,6 +17,6 @@ object INever : Objective<Event>() {
     override val isListener = false
 
     init {
-        addGoal { _, _ -> false }
+        addGoal("null") { _, _ -> false }
     }
 }

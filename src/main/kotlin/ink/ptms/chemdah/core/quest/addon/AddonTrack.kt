@@ -442,8 +442,9 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                         if (message.startsWith('$')) {
                             e.player.sendLang(message.substring(1))
                         } else {
-                            TellrawJson().append(message.replace("{name}", e.trackingQuest.displayName()))
-                                .hoverText(message.replace("{name}", e.trackingQuest.displayName()))
+                            val name = e.trackingQuest.track()?.name ?: e.trackingQuest.displayName()
+                            TellrawJson().append(message.replace("{name}", name))
+                                .hoverText(message.replace("{name}", name))
                                 .runCommand("/ChemdahTrackCancel")
                                 .sendTo(adaptCommandSender(e.player))
                         }

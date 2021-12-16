@@ -68,10 +68,11 @@ object QuestLoader {
     @Suppress("UNCHECKED_CAST")
     @Awake(LifeCycle.ENABLE)
     fun registerAll() {
+        val checkDependency = !File(getDataFolder(), "api.json").exists()
         runningClasses.forEach {
             if (Objective::class.java.isAssignableFrom(it) && !it.isAnnotationPresent(Abstract::class.java)) {
                 // 检测依赖环境
-                if (it.isAnnotationPresent(Dependency::class.java)) {
+                if (checkDependency && it.isAnnotationPresent(Dependency::class.java)) {
                     val dependency = it.getAnnotation(Dependency::class.java)
                     // 不支持的扩展
                     if (dependency.plugin != "minecraft" && Bukkit.getPluginManager().getPlugin(dependency.plugin) == null) {

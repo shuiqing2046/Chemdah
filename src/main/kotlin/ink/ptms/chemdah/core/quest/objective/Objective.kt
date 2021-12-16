@@ -35,22 +35,22 @@ abstract class Objective<E : Any> {
     /**
      * 条目继续的条件
      */
-    private val conditions = HashMap<String, (PlayerProfile, Task, E) -> Boolean>()
+    internal val conditions = HashMap<String, (PlayerProfile, Task, E) -> Boolean>()
 
     /**
      * 在条目继续的条件中的额外脚本变量
      */
-    private val conditionVars = ArrayList<(E) -> Pair<String, Any>>()
+    internal val conditionVars = ArrayList<(E) -> Pair<String, Any>>()
 
     /**
      * 条目完成的条件
      */
-    private val goals = ArrayList<(PlayerProfile, Task) -> Boolean>()
+    internal val goals = HashMap<String, (PlayerProfile, Task) -> Boolean>()
 
     /**
      * 在条目完成的条件中的额外脚本变量
      */
-    private val goalVars = ArrayList<(PlayerProfile, Task) -> Pair<String, Any>>()
+    internal val goalVars = ArrayList<(PlayerProfile, Task) -> Pair<String, Any>>()
 
     /**
      * 条件序号
@@ -167,15 +167,15 @@ abstract class Objective<E : Any> {
     /**
      * 添加条目完成的条件
      */
-    fun addGoal(func: Function2<PlayerProfile, Task, Boolean>) {
-        addGoal { profile, task -> func(profile, task) }
+    fun addGoal(name: String, func: Function2<PlayerProfile, Task, Boolean>) {
+        addGoal(name) { profile, task -> func(profile, task) }
     }
 
     /**
      * 内部接口
      */
-    internal fun addGoal(func: (PlayerProfile, Task) -> Boolean) {
-        goals += func
+    internal fun addGoal(name: String, func: (PlayerProfile, Task) -> Boolean) {
+        goals[name] = func
     }
 
     /**
@@ -187,7 +187,7 @@ abstract class Objective<E : Any> {
     open fun checkGoal(profile: PlayerProfile, quest: Quest, task: Task): CompletableFuture<Boolean> {
         return when {
             hasCompletedSignature(profile, task) -> CompletableFuture.completedFuture(false)
-            goals.all { it(profile, task) } -> profile.checkAgent(task.goal["$"]?.data, quest)
+            goals.all { it.value(profile, task) } -> profile.checkAgent(task.goal["$"]?.data, quest)
             else -> CompletableFuture.completedFuture(false)
         }
     }

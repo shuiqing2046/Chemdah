@@ -17,7 +17,7 @@ import taboolib.common5.Coerce
 abstract class ObjectiveCountableF<E : Any> : Objective<E>() {
 
     init {
-        addGoal { profile, task ->
+        addGoal("amount") { profile, task ->
             profile.dataOperator(task) {
                 get("amount", 0).toDouble() >= task.goal["amount", 1].toDouble()
             }

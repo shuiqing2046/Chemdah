@@ -37,7 +37,7 @@ class AddonUI(root: ConfigurationSection, questContainer: QuestContainer) : Addo
     /**
      * 显示介绍
      */
-    val description = root.get("description")?.asList()
+    val description = root["description"]?.asList()
 
     companion object {
 

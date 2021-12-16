@@ -96,7 +96,7 @@ dependencies {
     compileOnly("ink.ptms.core:v11800:11800:universal")
     compileOnly("ink.ptms.core:v11400:11400:all")
     compileOnly("ink.ptms:nms-all:1.0.0")
-    compileOnly(kotlin("stdlib"))
+    implementation(kotlin("stdlib"))
     compileOnly(fileTree("libs"))
     dokkaHtmlPlugin("org.jetbrains.dokka:kotlin-as-java-plugin:1.4.32")
 }

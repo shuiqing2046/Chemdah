@@ -56,7 +56,7 @@ class InferBlock(val mats: List<Block>) {
                 type = substring(0, indexOf('['))
                 // 只有 1.13+ 才允许加载 BlockData 选择器
                 if (MinecraftVersion.majorLegacy >= 11300) {
-                    data.putAll(substring(indexOf('[') + 1, length - 1).split("[,;]".toRegex()).map {
+                    data.putAll(substring(indexOf('[') + 1, length - 1).split(",").map {
                         it.trim().split("=").run { get(0) to (getOrNull(1) ?: get(0)) }
                     })
                 }

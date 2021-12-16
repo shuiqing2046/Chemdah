@@ -42,7 +42,7 @@ abstract class AEntityDamage<E : EntityDamageEvent> : Objective<E>() {
         addConditionVariable("damage:final") {
             it.finalDamage
         }
-        addGoal { profile, task ->
+        addGoal("damage") { profile, task ->
             profile.dataOperator(task) {
                 get("damage", 0).toDouble() >= task.goal["damage", 1].toDouble()
             }

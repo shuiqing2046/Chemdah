@@ -23,7 +23,7 @@ object IPlayerData : ObjectiveCountableI<Event>() {
     override val isListener = false
 
     init {
-        addGoal { profile, task ->
+        addGoal("key,value") { profile, task ->
             profile.persistentDataContainer[task.goal["key"].toString()].toString() == task.goal["value"].toString()
         }
     }

@@ -16,7 +16,7 @@ import ink.ptms.chemdah.core.quest.objective.Progress.Companion.progress
 abstract class ObjectiveCountableI<E : Any> : Objective<E>() {
 
     init {
-        addGoal { profile, task ->
+        addGoal("amount") { profile, task ->
             profile.dataOperator(task) {
                 get("amount", 0).toInt() >= task.goal["amount", 1].toInt()
             }
