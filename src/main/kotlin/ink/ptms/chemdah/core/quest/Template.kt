@@ -28,7 +28,7 @@ class Template(id: String, config: ConfigurationSection) : QuestContainer(id, co
     /**
      * 元数据引用
      */
-    private val metaImport = config.get("meta.import")?.asList() ?: emptyList()
+    private val metaImport = config["meta.import"]?.asList() ?: emptyList()
 
     init {
         config.getKeys(false).filter { it.startsWith("task:") }.forEach { loadTask(it.substring("task:".length), it) }

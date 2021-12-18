@@ -25,10 +25,14 @@ class InferBlock(val mats: List<Block>) {
 
     fun isBlock(block: org.bukkit.block.Block): Boolean {
         val type = block.type.name.toLowerCase()
-        val data = if (MinecraftVersion.majorLegacy >= 11300) {
-            block.blockData.getProperty<Any>("state")!!.invokeMethod<ImmutableMap<Any, Any>>("getStateMap")!!.mapKeys { it.key.invokeMethod<String>("getName")!! }
-        } else {
-            emptyMap()
+        val data = when {
+            MinecraftVersion.majorLegacy >= 11800 -> {
+                block.blockData.getProperty<Any>("state")!!.invokeMethod<Map<Any, Any>>("getValues")!!.mapKeys { it.key.invokeMethod<String>("getName")!! }
+            }
+            MinecraftVersion.majorLegacy >= 11300 -> {
+                block.blockData.getProperty<Any>("state")!!.invokeMethod<Map<Any, Any>>("getStateMap")!!.mapKeys { it.key.invokeMethod<String>("getName")!! }
+            }
+            else -> emptyMap()
         }
         return mats.any { mat -> mat.matchFlags(type) && mat.matchBlockData(data) }
     }

@@ -35,7 +35,7 @@ default-track:
     value: true
     content:
       - '&a[ - {name} - ]'
-      - '({distance}m)'
+      - '&f({distance}m)'
     distance: 3
   navigation:
     value: true

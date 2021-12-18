@@ -22,7 +22,12 @@ class Task(id: String, config: ConfigurationSection, val template: Template) : Q
 
     init {
         config.getConfigurationSection("condition")?.toMap()?.forEach { (k, v) ->
-            condition[k] = v!!
+            // 适配 Chemdah Lab
+            if (v is String) {
+                condition[k] = v.split(";").map { it.trim() }
+            } else {
+                condition[k] = v!!
+            }
         }
         config.getConfigurationSection("goal")?.toMap()?.forEach { (k, v) ->
             goal[k] = v!!

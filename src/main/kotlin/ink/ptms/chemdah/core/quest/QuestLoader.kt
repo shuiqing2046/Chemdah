@@ -209,13 +209,15 @@ object QuestLoader {
             file.isDirectory -> {
                 file.listFiles()?.flatMap { loadTemplate(it) }?.toList() ?: emptyList()
             }
-            file.name.endsWith(".yml") -> {
+            file.name.endsWith(".yml") || file.name.endsWith(".json") -> {
                 Configuration.loadFromFile(file).run {
                     getKeys(false).mapNotNull {
                         val section = getConfigurationSection(it)!!
                         if (TemplateEvents.Load(file, it, section).call()) {
                             Template(it, section)
-                        } else null
+                        } else {
+                            null
+                        }
                     }
                 }
             }

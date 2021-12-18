@@ -72,17 +72,17 @@ class TrackLandmark(val config: ConfigurationSection, val root: ConfigurationSec
     /**
      * 显示内容
      */
-    val content = config.get("landmark-option.content", root.get("content"))?.asList()?.colored() ?: emptyList()
+    val content = if (config.contains("landmark-option.content")) {
+        // 适配 Chemdah Lab
+        config["landmark-option.content"]!!.asList().flatMap { it.lines() }.colored()
+    } else {
+        root["content"]!!.asList().colored()
+    }
 
     /**
      * 显示距离
      */
     val distance = config.getDouble("landmark-option.distance", root.getDouble("distance"))
-
-    /**
-     * 刷新周期
-     */
-    val period = Baffle.of(config.getInt("landmark-option.period", root.getInt("period")))
 }
 
 class TrackNavigation(val config: ConfigurationSection, val root: ConfigurationSection) {
@@ -114,7 +114,7 @@ class TrackNavigation(val config: ConfigurationSection, val root: ConfigurationS
     val pointType = try {
         ProxyParticle.valueOf(config.getString("navigation-option.point.type", root.getString("point.type"))!!.uppercase())
     } catch (ex: Throwable) {
-        ProxyParticle.END_ROD
+        ProxyParticle.CRIT
     }
     val pointY = config.getDouble("navigation-option.point.y", root.getDouble("point.y"))
     val pointSizeX = config.getDouble("navigation-option.point.size.x", root.getDouble("point.size.x"))
@@ -212,5 +212,10 @@ class TrackScoreboard(val config: ConfigurationSection, val root: ConfigurationS
     /**
      * 记分板内容
      */
-    val content = config.getList("scoreboard-option.content", root.getList("content"))!!.filterNotNull().map { Line(it.asList().colored()) }
+    val content = if (config.contains("scoreboard-option.content")) {
+        // 适配 Chemdah Lab
+        config.getList("scoreboard-option.content")!!.filterNotNull().map { Line((if (it is String) it.lines() else it.asList()).colored()) }
+    } else {
+        root.getList("content")!!.filterNotNull().map { Line(it.asList().colored()) }
+    }
 }

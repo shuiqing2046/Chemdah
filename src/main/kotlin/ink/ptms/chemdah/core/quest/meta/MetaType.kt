@@ -17,7 +17,7 @@ import taboolib.common.util.asList
 @Option(Option.Type.ANY)
 class MetaType(source: Any?, questContainer: QuestContainer) : Meta<Any?>(source, questContainer) {
 
-    val type = source?.asList() ?: emptyList()
+    val type = source?.asList()?.flatMap { it.split(";") }?.map { it.trim() } ?: emptyList()
 
     companion object {
 
