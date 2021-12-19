@@ -1,5 +1,6 @@
 package ink.ptms.chemdah.core.quest.addon
 
+import com.google.common.cache.CacheBuilder
 import ink.ptms.adyeshach.api.AdyeshachAPI
 import ink.ptms.adyeshach.api.Hologram
 import ink.ptms.chemdah.api.ChemdahAPI
@@ -13,15 +14,13 @@ import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.*
 import ink.ptms.chemdah.core.quest.addon.AddonDepend.Companion.isQuestDependCompleted
 import ink.ptms.chemdah.core.quest.addon.AddonUI.Companion.ui
-import ink.ptms.chemdah.core.quest.addon.data.TrackBeacon
-import ink.ptms.chemdah.core.quest.addon.data.TrackLandmark
-import ink.ptms.chemdah.core.quest.addon.data.TrackNavigation
-import ink.ptms.chemdah.core.quest.addon.data.TrackScoreboard
+import ink.ptms.chemdah.core.quest.addon.data.*
 import ink.ptms.chemdah.core.quest.meta.MetaName.Companion.displayName
 import ink.ptms.chemdah.core.quest.selector.InferArea
 import ink.ptms.chemdah.module.party.PartySystem.getMembers
 import ink.ptms.chemdah.util.conf
 import org.bukkit.Bukkit
+import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerCommandPreprocessEvent
 import org.bukkit.event.player.PlayerMoveEvent
@@ -41,6 +40,7 @@ import taboolib.module.chat.colored
 import taboolib.module.nms.sendScoreboard
 import taboolib.platform.util.sendLang
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.TimeUnit
 
 /**
  * Chemdah
@@ -56,8 +56,37 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
     /**
      * 引导的目的地
      */
-    val center = if (config.contains("center")) InferArea.Single(config.getString("center").toString(), false).positions[0] else null
-        get() = field?.clone()
+    val center by lazy {
+        val center = config.getString("center")
+        when {
+            center == null || center.isEmpty() -> object : TrackCenter {
+
+                override fun getLocation(player: Player): Location? {
+                    return null
+                }
+            }
+            center.startsWith("adyeshach") -> object : TrackCenter {
+
+                val cache = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.SECONDS).build<String, Location>()
+
+                override fun getLocation(player: Player): Location? {
+                    val loc = cache.get(player.name) {
+                        AdyeshachAPI.getEntityFromId(center.substring("adyeshach".length).trim(), player)?.getLocation() ?: NullLocation
+                    }
+                    if (loc is NullLocation) {
+                        return null
+                    }
+                    return loc
+                }
+            }
+            else -> object : TrackCenter {
+
+                override fun getLocation(player: Player): Location {
+                    return InferArea.Single(config.getString("center").toString(), false).positions[0].clone()
+                }
+            }
+        }
+    }
 
     /**
      * 引导开启的提示消息
@@ -188,7 +217,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
          * 播放烽火效果
          */
         private fun Player.displayTrackBeacon(trackAddon: AddonTrack) {
-            val center = trackAddon.center ?: return
+            val center = trackAddon.center.getLocation(this) ?: return
             if (center.world != null && center.world!!.name == world.name && trackAddon.beacon.enable) {
                 val distance = center.distance(location)
                 if (distance > trackAddon.beacon.distance) {
@@ -204,7 +233,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
          * 播放寻路效果
          */
         private fun Player.displayTrackNavigation(trackAddon: AddonTrack) {
-            val center = trackAddon.center ?: return
+            val center = trackAddon.center.getLocation(this) ?: return
             val nav = trackAddon.navigation
             if (nav.enable && center.world?.name == world.name && center.distance(location) < nav.distance) {
                 when (nav.type) {
@@ -263,7 +292,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
          * 创建或更新任务地标
          */
         private fun Player.displayTrackLandmark(trackAddon: AddonTrack, id: String, allow: Boolean) {
-            val trackCenter = trackAddon.center ?: return
+            val trackCenter = trackAddon.center.getLocation(this) ?: return
             val hologramMap = trackLandmarkHologramMap.computeIfAbsent(name) { ConcurrentHashMap() }
             // 启用 Landmark 并在相同世界
             if (trackAddon.landmark.enable && trackCenter.world?.name == world.name && allow) {

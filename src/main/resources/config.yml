@@ -58,7 +58,7 @@ default-track:
       len: 0.5
       angle: 45
       speed: 1
-      period: 150
+      period: 100
   scoreboard:
     value: true
     length: 64

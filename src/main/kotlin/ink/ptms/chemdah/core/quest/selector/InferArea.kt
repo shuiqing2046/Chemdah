@@ -84,10 +84,19 @@ abstract class InferArea(val source: String, val noWorld: Boolean) {
         init {
             source.split("&").forEach {
                 val args = it.trim().split(" ")
-                positions += if (args.size == 3) {
-                    Location(null, Coerce.toDouble(args[0]), Coerce.toDouble(args[1]), Coerce.toDouble(args[2]))
-                } else {
-                    Location(Bukkit.getWorld(args[0]), Coerce.toDouble(args[1]), Coerce.toDouble(args[2]), Coerce.toDouble(args[3]))
+                if (args.isEmpty()) {
+                    return@forEach
+                }
+                positions += when (args.size) {
+                    3 -> {
+                        Location(null, Coerce.toDouble(args[0]), Coerce.toDouble(args[1]), Coerce.toDouble(args[2]))
+                    }
+                    4 -> {
+                        Location(Bukkit.getWorld(args[0]), Coerce.toDouble(args[1]), Coerce.toDouble(args[2]), Coerce.toDouble(args[3]))
+                    }
+                    else -> {
+                        error("Unsupported ${it.trim()}")
+                    }
                 }
             }
         }

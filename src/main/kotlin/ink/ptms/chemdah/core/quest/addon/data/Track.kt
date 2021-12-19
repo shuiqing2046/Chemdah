@@ -16,6 +16,13 @@ import taboolib.module.navigation.NodeEntity
 import taboolib.module.navigation.createPathfinder
 import taboolib.platform.util.toProxyLocation
 
+object NullLocation : Location(null, 0.0, 0.0, 0.0)
+
+interface TrackCenter {
+
+    fun getLocation(player: Player): Location?
+}
+
 class TrackBeacon(val config: ConfigurationSection, val root: ConfigurationSection) {
 
     /**
@@ -74,7 +81,7 @@ class TrackLandmark(val config: ConfigurationSection, val root: ConfigurationSec
      */
     val content = if (config.contains("landmark-option.content")) {
         // 适配 Chemdah Lab
-        config["landmark-option.content"]!!.asList().flatMap { it.lines() }.colored()
+        config["landmark-option.content"]!!.asList().flatMap { it.lines() }.colored().ifEmpty { root["content"]!!.asList().colored() }
     } else {
         root["content"]!!.asList().colored()
     }
@@ -212,7 +219,7 @@ class TrackScoreboard(val config: ConfigurationSection, val root: ConfigurationS
     /**
      * 记分板内容
      */
-    val content = if (config.contains("scoreboard-option.content")) {
+    val content = if (config.getList("scoreboard-option.content")?.isNotEmpty() == true) {
         // 适配 Chemdah Lab
         config.getList("scoreboard-option.content")!!.filterNotNull().map { Line((if (it is String) it.lines() else it.asList()).colored()) }
     } else {
