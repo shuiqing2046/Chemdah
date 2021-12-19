@@ -1,7 +1,6 @@
+not-support: '&4[Chemdah] &c抱歉, Chemdah 暂不支持当前服务端版本.'
 theme-chat-help: '使用 &e数字键 (1-9) &f选择对话并按下 &eF &f键回复.'
-
 track-cancel: '&7追踪已取消.'
-
 command-reload: '重载配置'
 command-info: '查看玩家信息'
 command-info-header: '&c[Chemdah] &7玩家信息:'
@@ -75,6 +74,5 @@ command-script-list-all:
   - '&c[Chemdah] &7运行脚本: &f{1}'
 command-script-reload-all:
   - '&c[Chemdah] &7重载完成.'
-
 database-error: '&4&l错误! &r插件 &4&lChemdah&r 的数据库未完成初始化.'
 database-error-username: '&4&l警告! &r插件 &4&lChemdah&r 阻止改用户名进入服务器.'

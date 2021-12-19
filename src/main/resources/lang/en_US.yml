@@ -1,7 +1,6 @@
+not-support: '&4[Chemdah] &cSorry, The Chemdah not supported this minecraft version.'
 theme-chat-help: 'Use the &eNUMBER KEY (1-9) &fto select the reply and press the &eF &fto select it.'
-
 track-cancel: '&7Tracking cancelled.'
-
 command-reload: 'Reload configuration'
 command-info: 'Browse player''s info'
 command-info-header: '&c[Chemdah] &7Player''s Data:'
@@ -75,6 +74,5 @@ command-script-list-all:
   - '&c[Chemdah] &7Scripts Running: &f{1}'
 command-script-reload-all:
   - '&c[Chemdah] &7Scripts has been reloaded.'
-
 database-error: '&4&lERROR! &rThe &4&lChemdah&r database failed to initialize.'
 database-error-username: '&4&lWARNING! &rThe &4&lChemdah&r blocked this username.'

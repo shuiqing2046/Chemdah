@@ -1,12 +1,14 @@
 package ink.ptms.chemdah
 
-import org.bukkit.Bukkit
 import taboolib.common.platform.Plugin
+import taboolib.common.platform.function.console
 import taboolib.common.platform.function.disablePlugin
-import taboolib.common.platform.function.warning
-import taboolib.common.util.Version
 import taboolib.module.configuration.Config
 import taboolib.module.configuration.Configuration
+import taboolib.module.kether.Kether
+import taboolib.module.lang.sendLang
+import taboolib.module.nms.MinecraftVersion
+import taboolib.platform.BukkitPlugin
 
 object Chemdah : Plugin() {
 
@@ -14,10 +16,18 @@ object Chemdah : Plugin() {
     lateinit var conf: Configuration
         private set
 
+    val plugin by lazy {
+        BukkitPlugin.getInstance()
+    }
+
     override fun onLoad() {
-        if (Version(Bukkit.getPluginManager().getPlugin("Adyeshach")!!.description.version) < Version("1.3.13")) {
-            warning("Adyeshach < 1.3.13")
+        if (MinecraftVersion.majorLegacy < 10900 || !MinecraftVersion.isSupported) {
+            console().sendLang("not-support")
             disablePlugin()
         }
+    }
+
+    override fun onEnable() {
+        Kether.isAllowToleranceParser = true
     }
 }
