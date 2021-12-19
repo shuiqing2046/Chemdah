@@ -87,14 +87,14 @@ open class Data {
 
     fun toVector(): InferArea {
         if (lazyCache !is InferArea) {
-            lazyCache = data.toString().toInferArea(true)
+            lazyCache = toString().toInferArea(true)
         }
         return lazyCache as InferArea
     }
 
     fun toPosition(): InferArea {
         if (lazyCache !is InferArea) {
-            lazyCache = data.toString().toInferArea()
+            lazyCache = toString().toInferArea()
         }
         return lazyCache as InferArea
     }
