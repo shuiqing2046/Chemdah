@@ -125,6 +125,9 @@ open class Data {
     }
 
     override fun toString(): String {
+        if (data is List<*> && data.size == 1) {
+            return data[0].toString()
+        }
         return data.toString()
     }
 
