@@ -64,7 +64,7 @@ data class ConversationSwitch(val file: File?, val root: ConfigurationSection, v
 
         @SubscribeEvent
         internal fun e(e: ConversationEvents.Select) {
-            if (e.conversation != null) {
+            if (e.conversation == null) {
                 try {
                     val ele = switchMap.firstOrNull { it.npcId.id.any { it.isNPC(e.namespace, e.id) } } ?: return
                     ele.getConversation(e.player).thenAccept { con ->
