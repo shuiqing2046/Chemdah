@@ -5,6 +5,7 @@ import ink.ptms.chemdah.util.namespaceQuest
 import org.bukkit.entity.Player
 import taboolib.common.platform.function.adaptPlayer
 import taboolib.module.kether.KetherFunction
+import taboolib.module.kether.KetherShell
 import taboolib.platform.compat.PlaceholderExpansion
 
 /**
@@ -20,9 +21,9 @@ object CompatPlaceholderAPI : PlaceholderExpansion {
         get() = "chemdah"
 
     override fun onPlaceholderRequest(player: Player?, args: String): String {
-        player ?: return "no player"
+        player ?: return "<NO_PLAYER>"
         return if (player.isChemdahProfileLoaded) {
-            KetherFunction.parse("{{ $args }}", sender = adaptPlayer(player), namespace = namespaceQuest)
+            KetherShell.eval(args, sender = adaptPlayer(player), namespace = namespaceQuest).getNow("<TIMEOUT>").toString()
         } else {
             "..."
         }
