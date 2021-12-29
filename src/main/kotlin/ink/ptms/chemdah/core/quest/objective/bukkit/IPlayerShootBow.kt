@@ -20,28 +20,28 @@ object IPlayerShootBow : ObjectiveCountableI<EntityShootBowEvent>() {
 
     init {
         handler {
-            entity as? Player
+            it.entity as? Player
         }
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.entity.location)
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.entity.location)
         }
-        addSimpleCondition("arrow") { e ->
-            toInferEntity().isEntity(e.projectile)
+        addSimpleCondition("arrow") { data, e ->
+            data.toInferEntity().isEntity(e.projectile)
         }
-        addSimpleCondition("item") { e ->
-            toInferItem().isItem(e.bow ?: AIR)
+        addSimpleCondition("item") { data, e ->
+            data.toInferItem().isItem(e.bow ?: AIR)
         }
-        addSimpleCondition("item:consumable") { e ->
-            toInferItem().isItem(e.consumable ?: AIR)
+        addSimpleCondition("item:consumable") { data, e ->
+            data.toInferItem().isItem(e.consumable ?: AIR)
         }
-        addSimpleCondition("hand") { e ->
-            asList().any { it.equals(e.hand.name, true) }
+        addSimpleCondition("hand") { data, e ->
+            data.asList().any { it.equals(e.hand.name, true) }
         }
-        addSimpleCondition("force") { e ->
-            toDouble() <= e.force
+        addSimpleCondition("force") { data, e ->
+            data.toDouble() <= e.force
         }
-        addSimpleCondition("consumable") { e ->
-            toBoolean() == e.shouldConsumeItem()
+        addSimpleCondition("consumable") { data, e ->
+            data.toBoolean() == e.shouldConsumeItem()
         }
         addConditionVariable("force") {
             it.force

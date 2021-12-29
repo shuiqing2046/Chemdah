@@ -20,25 +20,25 @@ object ANPCInteract : ObjectiveCountableI<AdyeshachEntityInteractEvent>() {
 
     init {
         handler {
-            player
+            it.player
         }
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.entity.getLocation())
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.entity.getLocation())
         }
-        addSimpleCondition("position:clicked") { e ->
-            toVector().inside(Vector(e.vector.x, e.vector.y, e.vector.z))
+        addSimpleCondition("position:clicked") { data, e ->
+            data.toVector().inside(Vector(e.vector.x, e.vector.y, e.vector.z))
         }
-        addSimpleCondition("id") { e ->
-            asList().any { it.equals(e.entity.id, true) }
+        addSimpleCondition("id") { data, e ->
+            data.asList().any { it.equals(e.entity.id, true) }
         }
-        addSimpleCondition("type") { e ->
-            asList().any { it.equals(e.entity.entityType.name, true) }
+        addSimpleCondition("type") { data, e ->
+            data.asList().any { it.equals(e.entity.entityType.name, true) }
         }
-        addSimpleCondition("hand") { e ->
-            toBoolean() == e.isMainHand
+        addSimpleCondition("hand") { data, e ->
+            data.toBoolean() == e.isMainHand
         }
-        addSimpleCondition("item") { e ->
-            toInferItem().isItem(if (e.isMainHand) e.player.inventory.itemInMainHand else e.player.inventory.itemInOffHand)
+        addSimpleCondition("item") { data, e ->
+            data.toInferItem().isItem(if (e.isMainHand) e.player.inventory.itemInMainHand else e.player.inventory.itemInOffHand)
         }
         addConditionVariable("id") {
             it.entity.id

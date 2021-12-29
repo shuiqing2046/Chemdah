@@ -19,13 +19,13 @@ object BPuke : ObjectiveCountableI<PlayerPukeEvent>() {
 
     init {
         handler {
-            player
+            it.player
         }
-        addSimpleCondition("position") {
-            toPosition().inside(it.player.location)
+        addSimpleCondition("position") { data, it ->
+            data.toPosition().inside(it.player.location)
         }
-        addSimpleCondition("count") {
-            toInt() <= it.count
+        addSimpleCondition("count") { data, it ->
+            data.toInt() <= it.count
         }
         addConditionVariable("count") {
             it.count

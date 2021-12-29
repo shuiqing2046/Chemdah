@@ -22,16 +22,16 @@ object IItemFurnace : ObjectiveCountableI<FurnaceExtractEvent>() {
 
     init {
         handler {
-            player
+            it.player
         }
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.block.location)
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.block.location)
         }
-        addSimpleCondition("item") { e ->
-            toInferItem().isItem(ItemStack(e.itemType))
+        addSimpleCondition("item") { data, e ->
+            data.toInferItem().isItem(ItemStack(e.itemType))
         }
-        addSimpleCondition("exp") { e ->
-            toInt() <= e.expToDrop
+        addSimpleCondition("exp") { data, e ->
+            data.toInt() <= e.expToDrop
         }
         addConditionVariable("exp") {
             it.expToDrop

@@ -21,20 +21,20 @@ import taboolib.common5.Coerce
 abstract class AEntityDamage<E : EntityDamageEvent> : Objective<E>() {
 
     init {
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.entity.location)
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.entity.location)
         }
-        addSimpleCondition("victim") { e ->
-            toInferEntity().isEntity(e.entity)
+        addSimpleCondition("victim") { data, e ->
+            data.toInferEntity().isEntity(e.entity)
         }
-        addSimpleCondition("damage") { e ->
-            toInt() <= e.damage
+        addSimpleCondition("damage") { data, e ->
+            data.toInt() <= e.damage
         }
-        addSimpleCondition("damage:final") { e ->
-            toInt() <= e.finalDamage
+        addSimpleCondition("damage:final") { data, e ->
+            data.toInt() <= e.finalDamage
         }
-        addSimpleCondition("cause") { e ->
-            asList().any { it.equals(e.cause.name, true) }
+        addSimpleCondition("cause") { data, e ->
+            data.asList().any { it.equals(e.cause.name, true) }
         }
         addConditionVariable("damage") {
             it.damage

@@ -13,19 +13,19 @@ object MMythicKillType : ObjectiveCountableI<MythicMobDeathEvent>() {
 
     init {
         handler {
-            killer as? Player
+            it.killer as? Player
         }
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.killer.killer!!.location)
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.killer.killer!!.location)
         }
-        addSimpleCondition("name") { e ->
-            asList().any { it.equals(e.mobType.internalName, true) }
+        addSimpleCondition("name") { data, e ->
+            data.asList().any { it.equals(e.mobType.internalName, true) }
         }
-        addSimpleCondition("level") { e ->
-            toDouble() == e.mobLevel
+        addSimpleCondition("level") { data, e ->
+            data.toDouble() == e.mobLevel
         }
-        addSimpleCondition("min-level") { e ->
-            toDouble() <= e.mobLevel
+        addSimpleCondition("min-level") { data, e ->
+            data.toDouble() <= e.mobLevel
         }
         addConditionVariable("name") {
             it.mobType.internalName

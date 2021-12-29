@@ -18,28 +18,28 @@ abstract class APlayerBucket<T : PlayerBucketEvent> : ObjectiveCountableI<T>() {
 
     init {
         handler {
-            player
+            it.player
         }
-        addSimpleCondition("position") {
-            toPosition().inside(it.blockClicked.location)
+        addSimpleCondition("position") { data, it ->
+            data.toPosition().inside(it.blockClicked.location)
         }
-        addSimpleCondition("material") {
-            toInferBlock().isBlock(it.blockClicked)
+        addSimpleCondition("material") { data, it ->
+            data.toInferBlock().isBlock(it.blockClicked)
         }
-        addSimpleCondition("material:clicked") {
-            toInferBlock().isBlock(it.blockClicked)
+        addSimpleCondition("material:clicked") { data, it ->
+            data.toInferBlock().isBlock(it.blockClicked)
         }
-        addSimpleCondition("item") {
-            toInferItem().isItem(it.itemStack ?: AIR)
+        addSimpleCondition("item") { data, it ->
+            data.toInferItem().isItem(it.itemStack ?: AIR)
         }
-        addSimpleCondition("item:bucket") {
-            toInferItem().isItem(ItemStack(it.bucket))
+        addSimpleCondition("item:bucket") { data, it ->
+            data.toInferItem().isItem(ItemStack(it.bucket))
         }
-        addSimpleCondition("face") { e ->
-            asList().any { it.equals(e.blockFace.name, true) }
+        addSimpleCondition("face") { data, e ->
+            data.asList().any { it.equals(e.blockFace.name, true) }
         }
-        addSimpleCondition("hand") { e ->
-            asList().any { it.equals(e.invokeMethod<Any>("getHand").toString(), true) }
+        addSimpleCondition("hand") { data, e ->
+            data.asList().any { it.equals(e.invokeMethod<Any>("getHand").toString(), true) }
         }
     }
 }

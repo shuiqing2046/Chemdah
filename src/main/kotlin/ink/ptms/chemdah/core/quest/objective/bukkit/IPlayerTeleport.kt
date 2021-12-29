@@ -20,19 +20,19 @@ object IPlayerTeleport : ObjectiveCountableI<PlayerTeleportEvent>() {
 
     init {
         handler {
-            player
+            it.player
         }
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.to!!)
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.to!!)
         }
-        addSimpleCondition("position:to") { e ->
-            toPosition().inside(e.to ?: EMPTY)
+        addSimpleCondition("position:to") { data, e ->
+            data.toPosition().inside(e.to ?: EMPTY)
         }
-        addSimpleCondition("position:from") { e ->
-            toPosition().inside(e.from)
+        addSimpleCondition("position:from") { data, e ->
+            data.toPosition().inside(e.from)
         }
-        addSimpleCondition("cause") { e ->
-            asList().any { it.equals(e.cause.name, true) }
+        addSimpleCondition("cause") { data, e ->
+            data.asList().any { it.equals(e.cause.name, true) }
         }
     }
 }

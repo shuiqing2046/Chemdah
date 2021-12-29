@@ -7,9 +7,7 @@ import ink.ptms.chemdah.core.quest.AgentType
 import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.addon.AddonRestart.Companion.canRestart
-import ink.ptms.chemdah.util.Function2
-import ink.ptms.chemdah.util.Function3
-import ink.ptms.chemdah.util.safely
+import ink.ptms.chemdah.util.*
 import org.bukkit.entity.Player
 import taboolib.common.platform.event.EventPriority
 import taboolib.common5.mirrorFuture
@@ -34,22 +32,22 @@ abstract class Objective<E : Any> {
     /**
      * 条目继续的条件
      */
-    internal val conditions = HashMap<String, (PlayerProfile, Task, E) -> Boolean>()
+    internal val conditions = HashMap<String, Function3<PlayerProfile, Task, E, Boolean>>()
 
     /**
      * 在条目继续的条件中的额外脚本变量
      */
-    internal val conditionVars = ArrayList<(E) -> Pair<String, Any>>()
+    internal val conditionVars = ArrayList<Function<E, Couple<String, Any>>>()
 
     /**
      * 条目完成的条件
      */
-    internal val goals = HashMap<String, (PlayerProfile, Task) -> Boolean>()
+    internal val goals = HashMap<String, Function2<PlayerProfile, Task, Boolean>>()
 
     /**
      * 在条目完成的条件中的额外脚本变量
      */
-    internal val goalVars = ArrayList<(PlayerProfile, Task) -> Pair<String, Any>>()
+    internal val goalVars = ArrayList<Function2<PlayerProfile, Task, Couple<String, Any>>>()
 
     /**
      * 条件序号
@@ -90,16 +88,16 @@ abstract class Objective<E : Any> {
     /**
      * 获取事件中的玩家
      */
-    protected fun handler(handle: Function<E, Player?>) {
+    fun handler(handle: Function<E, Player?>) {
         this.handler = handle
     }
 
-    /**
-     * 内部方法
-     */
-    protected fun handler(handle: E.() -> Player?) {
-        this.handler = Function { handle(it) }
-    }
+//    /**
+//     * 内部方法
+//     */
+//    internal fun handler(handle: E.() -> Player?) {
+//        this.handler = Function { handle(it) }
+//    }
 
     /**
      * 当条目继续时
@@ -126,30 +124,30 @@ abstract class Objective<E : Any> {
      * 简化版本
      */
     fun addSimpleCondition(name: String, func: Function2<Data, E, Boolean>) {
-        addSimpleCondition(name) { event -> func(this, event) }
+        conditions[name] = Function3 { _, task, e -> func(task.condition[name]!!, e) }
     }
 
-    /**
-     * 内部接口
-     */
-    internal fun addSimpleCondition(name: String, func: Data.(E) -> Boolean) {
-        conditions[name] = { _, task, e -> func(task.condition[name]!!, e) }
-    }
+//    /**
+//     * 内部接口
+//     */
+//    internal fun addSimpleCondition(name: String, func: Data.(E) -> Boolean) {
+//        conditions[name] = { _, task, e -> func(task.condition[name]!!, e) }
+//    }
 
     /**
      * 添加条目继续的条件
      * 完整版本
      */
     fun addFullCondition(name: String, func: Function3<PlayerProfile, Task, E, Boolean>) {
-        addFullCondition(name) { playerProfile, task, event -> func(playerProfile, task, event) }
-    }
-
-    /**
-     * 内部接口
-     */
-    internal fun addFullCondition(name: String, func: (PlayerProfile, Task, E) -> Boolean) {
         conditions[name] = func
     }
+
+//    /**
+//     * 内部接口
+//     */
+//    internal fun addFullCondition(name: String, func: (PlayerProfile, Task, E) -> Boolean) {
+//        conditions[name] = func
+//    }
 
     /**
      * 检查条目继续的所有条件
@@ -157,7 +155,7 @@ abstract class Objective<E : Any> {
      */
     open fun checkCondition(profile: PlayerProfile, task: Task, quest: Quest, event: E): CompletableFuture<Boolean> {
         return if (conditions.all { (name, cond) -> !task.condition.containsKey(name) || cond(profile, task, event) }) {
-            profile.checkAgent(task.condition["$"]?.data, quest, conditionVars.mapNotNull { safely { it(event) } }.toMap())
+            profile.checkAgent(task.condition["$"]?.data, quest, conditionVars.mapNotNull { safely { it.apply(event) } }.toMap())
         } else {
             CompletableFuture.completedFuture(false)
         }
@@ -167,15 +165,15 @@ abstract class Objective<E : Any> {
      * 添加条目完成的条件
      */
     fun addGoal(name: String, func: Function2<PlayerProfile, Task, Boolean>) {
-        addGoal(name) { profile, task -> func(profile, task) }
-    }
-
-    /**
-     * 内部接口
-     */
-    internal fun addGoal(name: String, func: (PlayerProfile, Task) -> Boolean) {
         goals[name] = func
     }
+
+//    /**
+//     * 内部接口
+//     */
+//    internal fun addGoal(name: String, func: (PlayerProfile, Task) -> Boolean) {
+//        goals[name] = func
+//    }
 
     /**
      * 检查条目完成的所有条件
@@ -255,27 +253,27 @@ abstract class Objective<E : Any> {
      * 增加在条目继续的条件中的额外脚本变量
      */
     fun addConditionVariable(name: String, func: Function<E, Any>) {
-        addConditionVariable(name) { func.apply(it) }
+        conditionVars += Function { Couple(name, func) }
     }
 
-    /**
-     * 内部接口
-     */
-    internal fun addConditionVariable(name: String, func: (E) -> Any) {
-        conditionVars += { name to func(it) }
-    }
+//    /**
+//     * 内部接口
+//     */
+//    internal fun addConditionVariable(name: String, func: (E) -> Any) {
+//        conditionVars += { name to func(it) }
+//    }
 
     /**
      * 增加在条目完成的条件中的额外脚本变量
      */
     fun addGoalVariable(name: String, func: Function2<PlayerProfile, Task, Any>) {
-        addGoalVariable(name) { playerProfile, task -> func(playerProfile, task) }
+        goalVars += Function2 { profile, task -> Couple(name, func(profile, task)) }
     }
 
-    /**
-     * 内部接口
-     */
-    internal fun addGoalVariable(name: String, func: (PlayerProfile, Task) -> Any) {
-        goalVars += { profile, task -> name to func(profile, task) }
-    }
+//    /**
+//     * 内部接口
+//     */
+//    internal fun addGoalVariable(name: String, func: (PlayerProfile, Task) -> Any) {
+//        goalVars += { profile, task -> name to func(profile, task) }
+//    }
 }

@@ -19,19 +19,19 @@ object ANPCDamage : ObjectiveCountableI<AdyeshachEntityDamageEvent>() {
 
     init {
         handler {
-            player
+            it.player
         }
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.entity.getLocation())
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.entity.getLocation())
         }
-        addSimpleCondition("id") { e ->
-            asList().any { it.equals(e.entity.id, true) }
+        addSimpleCondition("id") { data, e ->
+            data.asList().any { it.equals(e.entity.id, true) }
         }
-        addSimpleCondition("type") { e ->
-            asList().any { it.equals(e.entity.entityType.name, true) }
+        addSimpleCondition("type") { data, e ->
+            data.asList().any { it.equals(e.entity.entityType.name, true) }
         }
-        addSimpleCondition("item") { e ->
-            toInferItem().isItem(e.player.inventory.itemInMainHand)
+        addSimpleCondition("item") { data, e ->
+            data.toInferItem().isItem(e.player.inventory.itemInMainHand)
         }
         addConditionVariable("id") {
             it.entity.id

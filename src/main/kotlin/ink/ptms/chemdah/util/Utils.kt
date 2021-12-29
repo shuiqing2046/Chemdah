@@ -85,3 +85,24 @@ fun String.realLength(): Int {
     val regex = "[\u3091-\uFFe5]".toRegex()
     return sumBy { if (it.toString().matches(regex)) 2 else 1 }
 }
+
+fun <K, V, M : MutableMap<in K, in V>> Iterable<Couple<K, V>>.toMap(destination: M): M = destination.apply { putAll(this@toMap) }
+
+fun <K, V> Iterable<Couple<K, V>>.toMap(): Map<K, V> {
+    if (this is Collection) {
+        return when (size) {
+            0 -> emptyMap()
+            1 -> mapOf(if (this is List) this[0] else iterator().next())
+            else -> toMap(LinkedHashMap())
+        }
+    }
+    return toMap(LinkedHashMap())
+}
+
+fun <K, V> MutableMap<in K, in V>.putAll(couples: Iterable<Couple<K, V>>) {
+    for ((key, value) in couples) {
+        put(key, value)
+    }
+}
+
+fun <K, V> mapOf(couple: Couple<K, V>): Map<K, V> = java.util.Collections.singletonMap(couple.key, couple.value)

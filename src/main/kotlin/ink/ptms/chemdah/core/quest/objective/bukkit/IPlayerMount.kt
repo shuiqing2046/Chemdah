@@ -20,13 +20,13 @@ object IPlayerMount : ObjectiveCountableI<EntityMountEvent>() {
 
     init {
         handler {
-            entity as? Player
+            it.entity as? Player
         }
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.mount.location)
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.mount.location)
         }
-        addSimpleCondition("entity") { e ->
-            toInferEntity().isEntity(e.mount)
+        addSimpleCondition("entity") { data, e ->
+            data.toInferEntity().isEntity(e.mount)
         }
     }
 }

@@ -12,10 +12,10 @@ object MMarriageHug : ObjectiveCountableI<HugEvent>() {
 
     init {
         handler {
-            player.playerOnline
+            it.player.playerOnline
         }
-        addSimpleCondition("position") {
-            toPosition().inside(it.player.playerOnline!!.location)
+        addSimpleCondition("position") { data, it ->
+            data.toPosition().inside(it.player.playerOnline!!.location)
         }
     }
 }

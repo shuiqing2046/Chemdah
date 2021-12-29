@@ -43,7 +43,7 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
 
     class StatsMap {
 
-        val bossBar = ConcurrentHashMap<String, Pair<BossBar, Long>>()
+        val bossBar = ConcurrentHashMap<String, Couple<BossBar, Long>>()
         val bossBarAlways = ConcurrentHashMap<String, BossBar>()
     }
 
@@ -356,7 +356,7 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
                         if (bossBar == null) {
                             statsDisplay(profile).thenApply { bar ->
                                 if (bar != null) {
-                                    statsMap.bossBar.put(path, Pair(bar, System.currentTimeMillis() + (stats.stay * 50L)))?.key?.removeAll()
+                                    statsMap.bossBar.put(path, Couple(bar, System.currentTimeMillis() + (stats.stay * 50L)))?.key?.removeAll()
                                 }
                                 finish(0)
                             }

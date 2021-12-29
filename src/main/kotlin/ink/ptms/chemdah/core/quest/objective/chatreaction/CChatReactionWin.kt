@@ -12,10 +12,10 @@ object CChatReactionWin : ObjectiveCountableI<ReactionWinEvent>() {
 
     init {
         handler {
-            winner
+            it.winner
         }
-        addSimpleCondition("position") {
-            toPosition().inside(it.winner.location)
+        addSimpleCondition("position") { data, it ->
+            data.toPosition().inside(it.winner.location)
         }
     }
 }

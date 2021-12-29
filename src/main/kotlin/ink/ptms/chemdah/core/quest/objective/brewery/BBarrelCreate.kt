@@ -1,8 +1,10 @@
 package ink.ptms.chemdah.core.quest.objective.brewery
 
 import com.dre.brewery.api.events.barrel.BarrelCreateEvent
+import ink.ptms.chemdah.core.Data
 import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
+import ink.ptms.chemdah.util.Function2
 
 /**
  * Chemdah
@@ -19,10 +21,10 @@ object BBarrelCreate : ObjectiveCountableI<BarrelCreateEvent>() {
 
     init {
         handler {
-            player
+            it.player
         }
-        addSimpleCondition("position") {
-            toPosition().inside(it.barrel.spigot.location)
+        addSimpleCondition("position") { data, it ->
+            data.toPosition().inside(it.barrel.spigot.location)
         }
     }
 }

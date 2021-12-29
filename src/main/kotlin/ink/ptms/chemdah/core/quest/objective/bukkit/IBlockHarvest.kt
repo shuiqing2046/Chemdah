@@ -19,16 +19,16 @@ object IBlockHarvest : ObjectiveCountableI<PlayerHarvestBlockEvent>() {
 
     init {
         handler {
-            player
+            it.player
         }
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.harvestedBlock.location)
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.harvestedBlock.location)
         }
-        addSimpleCondition("material") { e ->
-            toInferBlock().isBlock(e.harvestedBlock)
+        addSimpleCondition("material") { data, e ->
+            data.toInferBlock().isBlock(e.harvestedBlock)
         }
-        addSimpleCondition("item") { e ->
-            e.itemsHarvested.any { toInferItem().isItem(it) }
+        addSimpleCondition("item") { data, e ->
+            e.itemsHarvested.any { data.toInferItem().isItem(it) }
         }
     }
 }

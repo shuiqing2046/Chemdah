@@ -12,10 +12,10 @@ object QShopPurchase : ObjectiveCountableI<ShopPurchaseEvent>() {
 
     init {
         handler {
-            player
+            it.player
         }
-        addSimpleCondition("position") {
-            toPosition().inside(it.player!!.location)
+        addSimpleCondition("position") { data, it ->
+            data.toPosition().inside(it.player!!.location)
         }
     }
 }

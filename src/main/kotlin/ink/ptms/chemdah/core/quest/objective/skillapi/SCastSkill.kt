@@ -19,16 +19,16 @@ object SCastSkill : ObjectiveCountableI<PlayerCastSkillEvent>() {
 
     init {
         handler {
-            player
+            it.player
         }
-        addSimpleCondition("position") {
-            toPosition().inside(it.player.location)
+        addSimpleCondition("position") { data, it ->
+            data.toPosition().inside(it.player.location)
         }
-        addSimpleCondition("skill") {
+        addSimpleCondition("skill") { data, it ->
             toString().equals(it.skill.status.name, true)
         }
-        addSimpleCondition("mana") {
-            toDouble() <= it.skill.manaCost
+        addSimpleCondition("mana") { data, it ->
+            data.toDouble() <= it.skill.manaCost
         }
         addConditionVariable("mana") {
             it.skill.manaCost

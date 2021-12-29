@@ -12,13 +12,13 @@ object CCratesOpen : ObjectiveCountableI<PlayerPrizeEvent>() {
 
     init {
         handler {
-            player
+            it.player
         }
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.player.location)
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.player.location)
         }
-        addSimpleCondition("name") { e ->
-            asList().any { it.equals(e.crate.name, true) }
+        addSimpleCondition("name") { data, e ->
+            data.asList().any { it.equals(e.crate.name, true) }
         }
         addConditionVariable("name") {
             it.crate.name

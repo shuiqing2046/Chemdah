@@ -12,10 +12,10 @@ object LLandsClaim : ObjectiveCountableI<ChunkPostClaimEvent>() {
 
     init {
         handler {
-            landPlayer.player
+            it.landPlayer.player
         }
-        addSimpleCondition("position") {
-            toPosition().inside(it.landPlayer.player.location)
+        addSimpleCondition("position") { data, it ->
+            data.toPosition().inside(it.landPlayer.player.location)
         }
     }
 }

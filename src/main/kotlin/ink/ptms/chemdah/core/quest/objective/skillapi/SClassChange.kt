@@ -20,12 +20,12 @@ object SClassChange : ObjectiveCountableI<PlayerClassChangeEvent>() {
 
     init {
         handler {
-            playerData.player
+            it.playerData.player
         }
-        addSimpleCondition("position") {
-            toPosition().inside(it.playerData.player.location)
+        addSimpleCondition("position") { data, it ->
+            data.toPosition().inside(it.playerData.player.location)
         }
-        addSimpleCondition("class") {
+        addSimpleCondition("class") { data, it ->
             toString().equals(it.newClass.name, true)
         }
         addConditionVariable("class") {

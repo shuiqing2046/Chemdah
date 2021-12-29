@@ -22,19 +22,19 @@ object IItemPickExp : ObjectiveCountableI<PlayerPickupExperienceEvent>() {
 
     init {
         handler {
-            player
+            it.player
         }
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.player.location)
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.player.location)
         }
-        addSimpleCondition("reason") { e ->
-            asList().any { it.equals(e.experienceOrb.invokeMethod<Any?>("getSpawnReason").toString(), true) }
+        addSimpleCondition("reason") { data, e ->
+            data.asList().any { it.equals(e.experienceOrb.invokeMethod<Any?>("getSpawnReason").toString(), true) }
         }
-        addSimpleCondition("exp") { e ->
-            toInt() <= e.experienceOrb.experience
+        addSimpleCondition("exp") { data, e ->
+            data.toInt() <= e.experienceOrb.experience
         }
-        addSimpleCondition("orb") { e ->
-            toInferEntity().isEntity(e.experienceOrb)
+        addSimpleCondition("orb") { data, e ->
+            data.toInferEntity().isEntity(e.experienceOrb)
         }
         addConditionVariable("exp") {
             it.experienceOrb.experience

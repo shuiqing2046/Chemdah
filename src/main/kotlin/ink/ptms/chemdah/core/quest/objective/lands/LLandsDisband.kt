@@ -13,10 +13,10 @@ object LLandsDisband : ObjectiveCountableI<LandDeleteEvent>() {
 
     init {
         handler {
-            Bukkit.getPlayer(land.ownerUID)
+            Bukkit.getPlayer(it.land.ownerUID)
         }
-        addSimpleCondition("position") {
-            toPosition().inside(Bukkit.getPlayer(it.land.ownerUID)!!.location)
+        addSimpleCondition("position") { data, it ->
+            data.toPosition().inside(Bukkit.getPlayer(it.land.ownerUID)!!.location)
         }
     }
 }

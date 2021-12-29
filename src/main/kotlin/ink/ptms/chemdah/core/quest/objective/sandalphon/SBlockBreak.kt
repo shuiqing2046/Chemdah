@@ -19,15 +19,15 @@ object SBlockBreak : ObjectiveCountableI<BlockBreakEvent>() {
 
     init {
         handler {
-            player
+            it.player
         }
-        addSimpleCondition("position") {
-            toPosition().inside(it.bukkitEvent.block.location)
+        addSimpleCondition("position") { data, it ->
+            data.toPosition().inside(it.bukkitEvent.block.location)
         }
-        addSimpleCondition("material") {
-            toInferBlock().isBlock(it.bukkitEvent.block)
+        addSimpleCondition("material") { data, it ->
+            data.toInferBlock().isBlock(it.bukkitEvent.block)
         }
-        addSimpleCondition("id") {
+        addSimpleCondition("id") { data, it ->
             toString().equals(it.blockData.id, true)
         }
         addConditionVariable("id") {

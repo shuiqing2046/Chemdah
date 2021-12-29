@@ -20,22 +20,22 @@ object IItemAnvil : ObjectiveCountableI<PrepareAnvilEvent>() {
 
     init {
         handler {
-            viewers[0] as Player
+            it.viewers[0] as Player
         }
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.inventory.location ?: EMPTY)
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.inventory.location ?: EMPTY)
         }
-        addSimpleCondition("text") { e ->
+        addSimpleCondition("text") { data, e ->
             toString() in e.inventory.renameText.toString()
         }
-        addSimpleCondition("cost") { e ->
-            toInt() <= e.inventory.repairCost
+        addSimpleCondition("cost") { data, e ->
+            data.toInt() <= e.inventory.repairCost
         }
-        addSimpleCondition("item") { e ->
-            toInferItem().isItem(e.inventory.getItem(2) ?: AIR)
+        addSimpleCondition("item") { data, e ->
+            data.toInferItem().isItem(e.inventory.getItem(2) ?: AIR)
         }
-        addSimpleCondition("item:matrix") { e ->
-            toInferItem().run {
+        addSimpleCondition("item:matrix") { data, e ->
+            data.toInferItem().run {
                 isItem(e.inventory.getItem(0) ?: AIR) || isItem(e.inventory.getItem(1) ?: AIR)
             }
         }

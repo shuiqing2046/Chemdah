@@ -16,26 +16,26 @@ import taboolib.common.reflect.Reflex.Companion.invokeMethod
 abstract class AEntityDeath<T : EntityDeathEvent> : ObjectiveCountableI<T>() {
 
     init {
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.entity.location)
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.entity.location)
         }
-        addSimpleCondition("damage") { e ->
-            toInt() <= (e.entity.lastDamageCause?.damage ?: 0.0)
+        addSimpleCondition("damage") { data, e ->
+            data.toInt() <= (e.entity.lastDamageCause?.damage ?: 0.0)
         }
-        addSimpleCondition("damage:final") { e ->
-            toInt() <= (e.entity.lastDamageCause?.finalDamage ?: 0.0)
+        addSimpleCondition("damage:final") { data, e ->
+            data.toInt() <= (e.entity.lastDamageCause?.finalDamage ?: 0.0)
         }
-        addSimpleCondition("cause") { e ->
-            asList().any { it.equals(e.entity.lastDamageCause?.cause?.name.toString(), true) }
+        addSimpleCondition("cause") { data, e ->
+            data.asList().any { it.equals(e.entity.lastDamageCause?.cause?.name.toString(), true) }
         }
-        addSimpleCondition("drops") { e ->
-            e.drops.any { toInferItem().isItem(it) }
+        addSimpleCondition("drops") { data, e ->
+            e.drops.any { data.toInferItem().isItem(it) }
         }
-        addSimpleCondition("exp") { e ->
-            toInt() <= e.droppedExp
+        addSimpleCondition("exp") { data, e ->
+            data.toInt() <= e.droppedExp
         }
-        addSimpleCondition("revive-health") { e ->
-            toInt() <= e.invokeMethod<Int>("getReviveHealth")!!
+        addSimpleCondition("revive-health") { data, e ->
+            data.toInt() <= e.invokeMethod<Int>("getReviveHealth")!!
         }
         addConditionVariable("damage") { e ->
             e.entity.lastDamageCause?.damage ?: 0.0

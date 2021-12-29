@@ -18,13 +18,13 @@ object IPlayerKill : AEntityDeath<EntityDeathEvent>() {
 
     init {
         handler {
-            entity.killer
+            it.entity.killer
         }
-        addSimpleCondition("weapon") { e ->
-            toInferItem().isItem(e.entity.killer!!.inventory.itemInMainHand)
+        addSimpleCondition("weapon") { data, e ->
+            data.toInferItem().isItem(e.entity.killer!!.inventory.itemInMainHand)
         }
-        addSimpleCondition("victim") { e ->
-            toInferEntity().isEntity(e.entity)
+        addSimpleCondition("victim") { data, e ->
+            data.toInferEntity().isEntity(e.entity)
         }
     }
 }

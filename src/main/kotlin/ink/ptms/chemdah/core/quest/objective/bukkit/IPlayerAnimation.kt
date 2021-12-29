@@ -19,13 +19,13 @@ object IPlayerAnimation : ObjectiveCountableI<PlayerAnimationEvent>() {
 
     init {
         handler {
-            player
+            it.player
         }
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.player.location)
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.player.location)
         }
-        addSimpleCondition("animation") { e ->
-            asList().any { it.equals(e.animationType.name, true) }
+        addSimpleCondition("animation") { data, e ->
+            data.asList().any { it.equals(e.animationType.name, true) }
         }
     }
 }

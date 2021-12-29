@@ -19,19 +19,19 @@ object IBlockPlace : ObjectiveCountableI<BlockPlaceEvent>() {
 
     init {
         handler {
-            player
+            it.player
         }
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.block.location)
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.block.location)
         }
-        addSimpleCondition("material") { e ->
-            toInferBlock().isBlock(e.block)
+        addSimpleCondition("material") { data, e ->
+            data.toInferBlock().isBlock(e.block)
         }
-        addSimpleCondition("material:against") { e ->
-            toInferBlock().isBlock(e.blockAgainst)
+        addSimpleCondition("material:against") { data, e ->
+            data.toInferBlock().isBlock(e.blockAgainst)
         }
-        addSimpleCondition("hand") { e ->
-            asList().any { it.equals(e.hand.name, true) }
+        addSimpleCondition("hand") { data, e ->
+            data.asList().any { it.equals(e.hand.name, true) }
         }
     }
 }

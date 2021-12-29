@@ -20,16 +20,16 @@ object IPlayerMove : ObjectiveCountableI<PlayerMoveEvent>() {
 
     init {
         handler {
-            if (from.x != to!!.x || from.z != to!!.z) player else null
+            if (it.from.x != it.to!!.x || it.from.z != it.to!!.z) it.player else null
         }
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.to!!)
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.to!!)
         }
-        addSimpleCondition("position:to") { e ->
-            toPosition().inside(e.to!!)
+        addSimpleCondition("position:to") { data, e ->
+            data.toPosition().inside(e.to!!)
         }
-        addSimpleCondition("position:from") { e ->
-            toPosition().inside(e.from)
+        addSimpleCondition("position:from") { data, e ->
+            data.toPosition().inside(e.from)
         }
     }
 }

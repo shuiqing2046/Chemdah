@@ -19,13 +19,13 @@ object BBarrelDestroy : ObjectiveCountableI<BarrelDestroyEvent>() {
 
     init {
         handler {
-            playerOptional
+            it.playerOptional
         }
-        addSimpleCondition("position") {
-            toPosition().inside(it.broken.location)
+        addSimpleCondition("position") { data, it ->
+            data.toPosition().inside(it.broken.location)
         }
-        addSimpleCondition("reason") { e ->
-            asList().any { it.equals(e.reason.name, true) }
+        addSimpleCondition("reason") { data, e ->
+            data.asList().any { it.equals(e.reason.name, true) }
         }
     }
 }

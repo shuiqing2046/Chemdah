@@ -21,16 +21,16 @@ object IItemPickArrow : ObjectiveCountableI<PlayerPickupArrowEvent>() {
 
     init {
         handler {
-            player
+            it.player
         }
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.player.location)
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.player.location)
         }
-        addSimpleCondition("item") { e ->
-            toInferItem().isItem(e.item.itemStack)
+        addSimpleCondition("item") { data, e ->
+            data.toInferItem().isItem(e.item.itemStack)
         }
-        addSimpleCondition("amount") { e ->
-            toInt() <= e.item.itemStack.amount
+        addSimpleCondition("amount") { data, e ->
+            data.toInt() <= e.item.itemStack.amount
         }
         addConditionVariable("amount") {
             it.item.itemStack.amount

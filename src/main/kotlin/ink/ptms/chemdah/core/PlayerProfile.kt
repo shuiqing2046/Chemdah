@@ -6,7 +6,7 @@ import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.core.quest.QuestDataOperator
 import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.Template
-import ink.ptms.chemdah.util.Pair
+import ink.ptms.chemdah.util.Couple
 import ink.ptms.chemdah.util.namespaceQuest
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -175,9 +175,9 @@ class PlayerProfile(val uniqueId: UUID) {
     /**
      * 通过事件获取所有正在进行中的有效条目（有效任务）
      */
-    fun tasks(event: Any, func: Consumer<Pair<Quest, Task>>) {
+    fun tasks(event: Any, func: Consumer<Couple<Quest, Task>>) {
         getQuests(openAPI = true).forEach { q ->
-            q.tasks.filter { it.objective.isListener && it.objective.event.isInstance(event) }.forEach { func.accept(Pair(q, it)) }
+            q.tasks.filter { it.objective.isListener && it.objective.event.isInstance(event) }.forEach { func.accept(Couple(q, it)) }
         }
     }
 

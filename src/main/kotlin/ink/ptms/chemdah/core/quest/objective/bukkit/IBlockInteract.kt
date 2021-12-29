@@ -19,25 +19,25 @@ object IBlockInteract : ObjectiveCountableI<PlayerInteractEvent>() {
 
     init {
         handler {
-            if (clickedBlock != null) player else null
+            if (it.clickedBlock != null) it.player else null
         }
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.clickedBlock!!.location)
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.clickedBlock!!.location)
         }
-        addSimpleCondition("material") { e ->
-            toInferBlock().isBlock(e.clickedBlock!!)
+        addSimpleCondition("material") { data, e ->
+            data.toInferBlock().isBlock(e.clickedBlock!!)
         }
-        addSimpleCondition("action") { e ->
-            asList().any { it.equals(e.action.name, true) }
+        addSimpleCondition("action") { data, e ->
+            data.asList().any { it.equals(e.action.name, true) }
         }
-        addSimpleCondition("face") { e ->
-            asList().any { it.equals(e.blockFace.name, true) }
+        addSimpleCondition("face") { data, e ->
+            data.asList().any { it.equals(e.blockFace.name, true) }
         }
-        addSimpleCondition("hand") { e ->
-            asList().any { it.equals(e.hand?.name, true) }
+        addSimpleCondition("hand") { data, e ->
+            data.asList().any { it.equals(e.hand?.name, true) }
         }
-        addSimpleCondition("item") { e ->
-            toInferItem().isItem(e.item!!)
+        addSimpleCondition("item") { data, e ->
+            data.toInferItem().isItem(e.item!!)
         }
     }
 }

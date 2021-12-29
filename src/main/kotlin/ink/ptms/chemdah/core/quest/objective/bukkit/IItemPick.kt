@@ -22,16 +22,16 @@ object IItemPick : ObjectiveCountableI<EntityPickupItemEvent>() {
 
     init {
         handler {
-            entity as? Player
+            it.entity as? Player
         }
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.entity.location)
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.entity.location)
         }
-        addSimpleCondition("item") { e ->
-            toInferItem().isItem(e.item.itemStack)
+        addSimpleCondition("item") { data, e ->
+            data.toInferItem().isItem(e.item.itemStack)
         }
-        addSimpleCondition("amount") { e ->
-            toInt() <= e.item.itemStack.amount
+        addSimpleCondition("amount") { data, e ->
+            data.toInt() <= e.item.itemStack.amount
         }
         addConditionVariable("amount") {
             it.item.itemStack.amount

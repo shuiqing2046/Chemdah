@@ -19,19 +19,19 @@ object IBlockIgnite : ObjectiveCountableI<BlockIgniteEvent>() {
 
     init {
         handler {
-            player
+            it.player
         }
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.block.location)
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.block.location)
         }
-        addSimpleCondition("material") { e ->
-            toInferBlock().isBlock(e.block)
+        addSimpleCondition("material") { data, e ->
+            data.toInferBlock().isBlock(e.block)
         }
-        addSimpleCondition("material:igniting") { e ->
-            toInferBlock().isBlock(e.ignitingBlock ?: return@addSimpleCondition false)
+        addSimpleCondition("material:igniting") { data, e ->
+            data.toInferBlock().isBlock(e.ignitingBlock ?: return@addSimpleCondition false)
         }
-        addSimpleCondition("cause") { e ->
-            asList().any { it.equals(e.cause.name, true) }
+        addSimpleCondition("cause") { data, e ->
+            data.asList().any { it.equals(e.cause.name, true) }
         }
     }
 }

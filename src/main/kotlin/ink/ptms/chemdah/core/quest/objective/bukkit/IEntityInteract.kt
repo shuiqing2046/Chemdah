@@ -19,22 +19,22 @@ object IEntityInteract : ObjectiveCountableI<PlayerInteractAtEntityEvent>() {
 
     init {
         handler {
-            player
+            it.player
         }
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.rightClicked.location)
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.rightClicked.location)
         }
-        addSimpleCondition("position:clicked") { e ->
-            toVector().inside(e.clickedPosition)
+        addSimpleCondition("position:clicked") { data, e ->
+            data.toVector().inside(e.clickedPosition)
         }
-        addSimpleCondition("entity") { e ->
-            toInferEntity().isEntity(e.rightClicked)
+        addSimpleCondition("entity") { data, e ->
+            data.toInferEntity().isEntity(e.rightClicked)
         }
-        addSimpleCondition("hand") { e ->
-            asList().any { it.equals(e.hand.name, true) }
+        addSimpleCondition("hand") { data, e ->
+            data.asList().any { it.equals(e.hand.name, true) }
         }
-        addSimpleCondition("item") { e ->
-            toInferItem().isItem(e.player.equipment!!.getItem(e.hand))
+        addSimpleCondition("item") { data, e ->
+            data.toInferItem().isItem(e.player.equipment!!.getItem(e.hand))
         }
     }
 }

@@ -13,22 +13,22 @@ object CNPCDamage : ObjectiveCountableI<NPCDamageByEntityEvent>() {
 
     init {
         handler {
-            damager as? Player
+            it.damager as? Player
         }
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.damager.location)
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.damager.location)
         }
-        addSimpleCondition("name") { e ->
-            asList().any { it.equals(e.npc.name, true) }
+        addSimpleCondition("name") { data, e ->
+            data.asList().any { it.equals(e.npc.name, true) }
         }
-        addSimpleCondition("id") { e ->
-            toInt() == e.npc.id
+        addSimpleCondition("id") { data, e ->
+            data.toInt() == e.npc.id
         }
-        addSimpleCondition("type") { e ->
-            asList().any { it.equals(e.npc.entity.type.name, true) }
+        addSimpleCondition("type") { data, e ->
+            data.asList().any { it.equals(e.npc.entity.type.name, true) }
         }
-        addSimpleCondition("damage") {
-            toInt() <= it.damage
+        addSimpleCondition("damage") { data, it ->
+            data.toInt() <= it.damage
         }
         addConditionVariable("name") {
             it.npc.name

@@ -21,16 +21,16 @@ object IPlayerJumpHorse : ObjectiveCountableI<HorseJumpEvent>() {
 
     init {
         handler {
-            entity.passengers[0] as? Player
+            it.entity.passengers[0] as? Player
         }
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.entity.location)
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.entity.location)
         }
-        addSimpleCondition("entity") { e ->
-            toInferEntity().isEntity(e.entity)
+        addSimpleCondition("entity") { data, e ->
+            data.toInferEntity().isEntity(e.entity)
         }
-        addSimpleCondition("power") { e ->
-            toDouble() <= e.power
+        addSimpleCondition("power") { data, e ->
+            data.toDouble() <= e.power
         }
         addConditionVariable("power") {
             it.power

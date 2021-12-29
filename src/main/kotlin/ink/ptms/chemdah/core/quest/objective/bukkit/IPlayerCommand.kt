@@ -19,12 +19,12 @@ object IPlayerCommand : ObjectiveCountableI<PlayerCommandPreprocessEvent>() {
 
     init {
         handler {
-            player
+            it.player
         }
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.player.location)
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.player.location)
         }
-        addSimpleCondition("command") { e ->
+        addSimpleCondition("command") { data, e ->
             e.message.startsWith(toString(), true)
         }
         addConditionVariable("command") {

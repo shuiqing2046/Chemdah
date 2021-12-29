@@ -19,13 +19,13 @@ object IPlayerRecipeDiscover : ObjectiveCountableI<PlayerRecipeDiscoverEvent>() 
 
     init {
         handler {
-            player
+            it.player
         }
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.player.location)
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.player.location)
         }
-        addSimpleCondition("recipe") { e ->
-            asList().any { it.equals(e.recipe.toString(), true) }
+        addSimpleCondition("recipe") { data, e ->
+            data.asList().any { it.equals(e.recipe.toString(), true) }
         }
     }
 }

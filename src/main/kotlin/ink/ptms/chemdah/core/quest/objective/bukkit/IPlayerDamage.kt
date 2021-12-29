@@ -19,7 +19,7 @@ object IPlayerDamage : AEntityDamage<EntityDamageEvent>() {
 
     init {
         handler {
-            entity as? Player
+            it.entity as? Player
         }
     }
 }

@@ -19,19 +19,19 @@ object IPlayerElytraBoost : ObjectiveCountableI<PlayerElytraBoostEvent>() {
 
     init {
         handler {
-            player
+            it.player
         }
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.player.location)
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.player.location)
         }
-        addSimpleCondition("item") { e ->
-            toInferItem().isItem(e.itemStack)
+        addSimpleCondition("item") { data, e ->
+            data.toInferItem().isItem(e.itemStack)
         }
-        addSimpleCondition("consume") { e ->
-            toBoolean() == e.shouldConsume()
+        addSimpleCondition("consume") { data, e ->
+            data.toBoolean() == e.shouldConsume()
         }
-        addSimpleCondition("firework") { e ->
-            toInferEntity().isEntity(e.firework)
+        addSimpleCondition("firework") { data, e ->
+            data.toInferEntity().isEntity(e.firework)
         }
     }
 }

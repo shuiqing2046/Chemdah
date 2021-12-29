@@ -20,13 +20,13 @@ object IPlayerConversation : ObjectiveCountableI<ConversationEvents.ReplyClosed>
 
     init {
         handler {
-            session.player
+            it.session.player
         }
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.session.origin)
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.session.origin)
         }
-        addSimpleCondition("id") { e ->
-            asList().any { it.equals(e.session.conversation.id, true) }
+        addSimpleCondition("id") { data, e ->
+            data.asList().any { it.equals(e.session.conversation.id, true) }
         }
     }
 }

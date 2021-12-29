@@ -20,25 +20,25 @@ object IPlayerBreed : ObjectiveCountableI<EntityBreedEvent>() {
 
     init {
         handler {
-            breeder as? Player
+            it.breeder as? Player
         }
-        addSimpleCondition("position") {
-            toPosition().inside(it.entity.location)
+        addSimpleCondition("position") { data, it ->
+            data.toPosition().inside(it.entity.location)
         }
-        addSimpleCondition("entity") {
-            toInferEntity().isEntity(it.entity)
+        addSimpleCondition("entity") { data, it ->
+            data.toInferEntity().isEntity(it.entity)
         }
-        addSimpleCondition("entity:father") {
-            toInferEntity().isEntity(it.father)
+        addSimpleCondition("entity:father") { data, it ->
+            data.toInferEntity().isEntity(it.father)
         }
-        addSimpleCondition("entity:mother") {
-            toInferEntity().isEntity(it.mother)
+        addSimpleCondition("entity:mother") { data, it ->
+            data.toInferEntity().isEntity(it.mother)
         }
-        addSimpleCondition("item") {
-            toInferItem().isItem(it.bredWith ?: AIR)
+        addSimpleCondition("item") { data, it ->
+            data.toInferItem().isItem(it.bredWith ?: AIR)
         }
-        addSimpleCondition("exp") {
-            toInt() < it.experience
+        addSimpleCondition("exp") { data, it ->
+            data.toInt() <= it.experience
         }
         addConditionVariable("exp") {
             it.experience

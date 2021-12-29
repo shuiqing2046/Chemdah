@@ -20,10 +20,10 @@ object IPlayerJump : ObjectiveCountableI<PlayerJumpEvent>() {
 
     init {
         handler {
-            player
+            it.player
         }
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.player.location)
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.player.location)
         }
     }
 }

@@ -19,19 +19,19 @@ object IItemEnchant : ObjectiveCountableI<EnchantItemEvent>() {
 
     init {
         handler {
-            enchanter
+            it.enchanter
         }
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.enchantBlock.location)
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.enchantBlock.location)
         }
-        addSimpleCondition("item") { e ->
-            toInferItem().isItem(e.item)
+        addSimpleCondition("item") { data, e ->
+            data.toInferItem().isItem(e.item)
         }
-        addSimpleCondition("type") { e ->
-            asList().any { e.enchantsToAdd.any { e -> e.key.name.equals(it, true) } }
+        addSimpleCondition("type") { data, e ->
+            data.asList().any { e.enchantsToAdd.any { e -> e.key.name.equals(it, true) } }
         }
-        addSimpleCondition("cost") { e ->
-            toInt() <= e.expLevelCost
+        addSimpleCondition("cost") { data, e ->
+            data.toInt() <= e.expLevelCost
         }
         addConditionVariable("cost") {
             it.expLevelCost

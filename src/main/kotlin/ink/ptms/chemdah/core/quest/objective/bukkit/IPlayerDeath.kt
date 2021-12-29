@@ -20,17 +20,17 @@ object IPlayerDeath : AEntityDeath<PlayerDeathEvent>() {
 
     init {
         handler {
-            entity
+            it.entity
         }
-        addSimpleCondition("weapon") { e ->
+        addSimpleCondition("weapon") { data, e ->
             val el = e.entity.lastDamageCause as? EntityDamageByEntityEvent ?: return@addSimpleCondition false
-            toInferItem().isItem(el.attacker?.equipment?.itemInMainHand ?: AIR)
+            data.toInferItem().isItem(el.attacker?.equipment?.itemInMainHand ?: AIR)
         }
-        addSimpleCondition("attacker") { e ->
+        addSimpleCondition("attacker") { data, e ->
             val el = e.entity.lastDamageCause as? EntityDamageByEntityEvent ?: return@addSimpleCondition false
-            toInferEntity().isEntity(el.attacker ?: return@addSimpleCondition false)
+            data.toInferEntity().isEntity(el.attacker ?: return@addSimpleCondition false)
         }
-        addSimpleCondition("message") { e ->
+        addSimpleCondition("message") { data, e ->
             toString() in e.deathMessage.toString()
         }
         addConditionVariable("message") { e ->

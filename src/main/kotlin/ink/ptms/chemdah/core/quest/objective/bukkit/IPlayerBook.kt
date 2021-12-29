@@ -19,21 +19,21 @@ object IPlayerBook : ObjectiveCountableI<PlayerEditBookEvent>() {
 
     init {
         handler {
-            player
+            it.player
         }
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.player.location)
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.player.location)
         }
-        addSimpleCondition("signing") { e ->
-            toBoolean() == e.isSigning
+        addSimpleCondition("signing") { data, e ->
+            data.toBoolean() == e.isSigning
         }
-        addSimpleCondition("page") { e ->
-            toInt() <= e.newBookMeta.pageCount
+        addSimpleCondition("page") { data, e ->
+            data.toInt() <= e.newBookMeta.pageCount
         }
-        addSimpleCondition("title") { e ->
+        addSimpleCondition("title") { data, e ->
             toString() in e.newBookMeta.title.toString()
         }
-        addSimpleCondition("content") { e ->
+        addSimpleCondition("content") { data, e ->
             toString() in e.newBookMeta.pages.toString()
         }
         addConditionVariable("page") {

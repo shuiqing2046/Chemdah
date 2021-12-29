@@ -19,19 +19,19 @@ object BPush : ObjectiveCountableI<PlayerPushEvent>() {
 
     init {
         handler {
-            player
+            it.player
         }
-        addSimpleCondition("position") {
-            toPosition().inside(it.player.location)
+        addSimpleCondition("position") { data, it ->
+            data.toPosition().inside(it.player.location)
         }
-        addSimpleCondition("x") {
-            toInt() <= it.push.x
+        addSimpleCondition("x") { data, it ->
+            data.toInt() <= it.push.x
         }
-        addSimpleCondition("y") {
-            toInt() <= it.push.y
+        addSimpleCondition("y") { data, it ->
+            data.toInt() <= it.push.y
         }
-        addSimpleCondition("z") {
-            toInt() <= it.push.z
+        addSimpleCondition("z") { data, it ->
+            data.toInt() <= it.push.z
         }
         addConditionVariable("x") {
             it.push.x

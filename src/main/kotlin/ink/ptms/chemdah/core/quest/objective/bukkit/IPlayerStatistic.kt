@@ -21,28 +21,28 @@ object IPlayerStatistic : ObjectiveCountableI<PlayerStatisticIncrementEvent>() {
 
     init {
         handler {
-            player
+            it.player
         }
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.player.location)
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.player.location)
         }
-        addSimpleCondition("statistic") { e ->
-            asList().any { it.equals(e.statistic.name, true) }
+        addSimpleCondition("statistic") { data, e ->
+            data.asList().any { it.equals(e.statistic.name, true) }
         }
-        addSimpleCondition("type:entity") { e ->
-            asList().any { it.equals(e.entityType?.name, true) }
+        addSimpleCondition("type:entity") { data, e ->
+            data.asList().any { it.equals(e.entityType?.name, true) }
         }
-        addSimpleCondition("type:material") { e ->
-            asList().any { it.equals(e.material?.name, true) }
+        addSimpleCondition("type:material") { data, e ->
+            data.asList().any { it.equals(e.material?.name, true) }
         }
-        addSimpleCondition("value") { e ->
-            toInt() <= e.newValue
+        addSimpleCondition("value") { data, e ->
+            data.toInt() <= e.newValue
         }
-        addSimpleCondition("value:new") { e ->
-            toInt() <= e.newValue
+        addSimpleCondition("value:new") { data, e ->
+            data.toInt() <= e.newValue
         }
-        addSimpleCondition("value:previous") { e ->
-            toInt() <= e.previousValue
+        addSimpleCondition("value:previous") { data, e ->
+            data.toInt() <= e.previousValue
         }
         addConditionVariable("value") {
             it.newValue

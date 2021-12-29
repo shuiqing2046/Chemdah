@@ -22,16 +22,16 @@ object IPlayerFoodChange : ObjectiveCountableI<FoodLevelChangeEvent>() {
 
     init {
         handler {
-            entity as Player
+            it.entity as Player
         }
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.entity.location)
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.entity.location)
         }
-        addSimpleCondition("amount") { e ->
-            toInt() <= e.foodLevel
+        addSimpleCondition("amount") { data, e ->
+            data.toInt() <= e.foodLevel
         }
-        addSimpleCondition("item") { e ->
-            toInferItem().isItem(e.item ?: AIR)
+        addSimpleCondition("item") { data, e ->
+            data.toInferItem().isItem(e.item ?: AIR)
         }
         addConditionVariable("amount") {
             it.foodLevel

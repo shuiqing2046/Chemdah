@@ -13,10 +13,10 @@ object VVotifierVote : ObjectiveCountableI<VotifierEvent>() {
 
     init {
         handler {
-            Bukkit.getPlayerExact(vote.username)
+            Bukkit.getPlayerExact(it.vote.username)
         }
-        addSimpleCondition("position") {
-            toPosition().inside(Bukkit.getPlayer(it.vote.username)!!.location)
+        addSimpleCondition("position") { data, it ->
+            data.toPosition().inside(Bukkit.getPlayer(it.vote.username)!!.location)
         }
     }
 }

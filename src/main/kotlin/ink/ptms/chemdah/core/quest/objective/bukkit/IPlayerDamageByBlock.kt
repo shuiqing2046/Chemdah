@@ -19,10 +19,10 @@ object IPlayerDamageByBlock : AEntityDamage<EntityDamageByBlockEvent>() {
 
     init {
         handler {
-            if (damager != null) entity as? Player else null
+            if (it.damager != null) it.entity as? Player else null
         }
-        addSimpleCondition("block") { e ->
-            toInferBlock().isBlock(e.damager!!)
+        addSimpleCondition("block") { data, e ->
+            data.toInferBlock().isBlock(e.damager!!)
         }
     }
 }

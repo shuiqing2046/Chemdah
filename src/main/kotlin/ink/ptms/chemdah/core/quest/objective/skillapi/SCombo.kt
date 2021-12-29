@@ -20,16 +20,16 @@ object SCombo : ObjectiveCountableI<PlayerComboFinishEvent>() {
 
     init {
         handler {
-            player
+            it.player
         }
-        addSimpleCondition("position") {
-            toPosition().inside(it.player.location)
+        addSimpleCondition("position") { data, it ->
+            data.toPosition().inside(it.player.location)
         }
-        addSimpleCondition("skill") {
+        addSimpleCondition("skill") { data, it ->
             toString().equals(it.skill.name, true)
         }
-        addSimpleCondition("combo") {
-            toInt() <= it.combo
+        addSimpleCondition("combo") { data, it ->
+            data.toInt() <= it.combo
         }
         addConditionVariable("combo") {
             it.combo

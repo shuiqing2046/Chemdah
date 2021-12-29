@@ -19,13 +19,13 @@ object IItemDrop : ObjectiveCountableI<PlayerDropItemEvent>() {
 
     init {
         handler {
-            player
+            it.player
         }
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.player.location)
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.player.location)
         }
-        addSimpleCondition("item") { e ->
-            toInferItem().isItem(e.itemDrop.itemStack)
+        addSimpleCondition("item") { data, e ->
+            data.toInferItem().isItem(e.itemDrop.itemStack)
         }
     }
 }

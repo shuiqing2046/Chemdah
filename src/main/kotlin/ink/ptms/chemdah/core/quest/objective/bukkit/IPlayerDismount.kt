@@ -20,13 +20,13 @@ object IPlayerDismount : ObjectiveCountableI<EntityDismountEvent>() {
 
     init {
         handler {
-            entity as? Player
+            it.entity as? Player
         }
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.dismounted.location)
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.dismounted.location)
         }
-        addSimpleCondition("entity") { e ->
-            toInferEntity().isEntity(e.dismounted)
+        addSimpleCondition("entity") { data, e ->
+            data.toInferEntity().isEntity(e.dismounted)
         }
     }
 }

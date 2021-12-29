@@ -12,19 +12,19 @@ object CNPCInteract : ObjectiveCountableI<NPCRightClickEvent>() {
 
     init {
         handler {
-            clicker
+            it.clicker
         }
-        addSimpleCondition("position") { e ->
-            toPosition().inside(e.npc.entity.location)
+        addSimpleCondition("position") { data, e ->
+            data.toPosition().inside(e.npc.entity.location)
         }
-        addSimpleCondition("id") { e ->
-            toInt() == e.npc.id
+        addSimpleCondition("id") { data, e ->
+            data.toInt() == e.npc.id
         }
-        addSimpleCondition("name") { e ->
-            asList().any { it.equals(e.npc.name, true)}
+        addSimpleCondition("name") { data, e ->
+            data.asList().any { it.equals(e.npc.name, true)}
         }
-        addSimpleCondition("type") { e ->
-            asList().any { it.equals(e.npc.entity.type.name, true) }
+        addSimpleCondition("type") { data, e ->
+            data.asList().any { it.equals(e.npc.entity.type.name, true) }
         }
         addConditionVariable("id") {
             it.npc.id
