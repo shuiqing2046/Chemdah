@@ -8,7 +8,7 @@ import me.angeschossen.lands.api.events.ChunkPostClaimEvent
 object LLandsClaim : ObjectiveCountableI<ChunkPostClaimEvent>() {
 
     override val name = "lands claim"
-    override val event = ChunkPostClaimEvent::class
+    override val event = ChunkPostClaimEvent::class.java
 
     init {
         handler {

@@ -16,7 +16,7 @@ import org.bukkit.util.Vector
 object ANPCInteract : ObjectiveCountableI<AdyeshachEntityInteractEvent>() {
 
     override val name = "anpc interact"
-    override val event = AdyeshachEntityInteractEvent::class
+    override val event = AdyeshachEntityInteractEvent::class.java
 
     init {
         handler {

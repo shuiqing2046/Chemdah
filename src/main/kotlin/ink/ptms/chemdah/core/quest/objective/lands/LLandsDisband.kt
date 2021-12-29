@@ -9,7 +9,7 @@ import org.bukkit.Bukkit
 object LLandsDisband : ObjectiveCountableI<LandDeleteEvent>() {
 
     override val name = "lands disband"
-    override val event = LandDeleteEvent::class
+    override val event = LandDeleteEvent::class.java
 
     init {
         handler {

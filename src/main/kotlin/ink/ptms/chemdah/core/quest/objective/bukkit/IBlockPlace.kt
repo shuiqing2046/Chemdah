@@ -15,7 +15,7 @@ import org.bukkit.event.block.BlockPlaceEvent
 object IBlockPlace : ObjectiveCountableI<BlockPlaceEvent>() {
 
     override val name = "block place"
-    override val event = BlockPlaceEvent::class
+    override val event = BlockPlaceEvent::class.java
 
     init {
         handler {

@@ -17,7 +17,7 @@ import org.bukkit.event.player.PlayerStatisticIncrementEvent
 object IPlayerStatistic : ObjectiveCountableI<PlayerStatisticIncrementEvent>() {
 
     override val name = "player statistic"
-    override val event = PlayerStatisticIncrementEvent::class
+    override val event = PlayerStatisticIncrementEvent::class.java
 
     init {
         handler {

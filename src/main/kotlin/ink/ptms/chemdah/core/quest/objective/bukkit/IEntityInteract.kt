@@ -15,7 +15,7 @@ import org.bukkit.event.player.PlayerInteractAtEntityEvent
 object IEntityInteract : ObjectiveCountableI<PlayerInteractAtEntityEvent>() {
 
     override val name = "entity interact"
-    override val event = PlayerInteractAtEntityEvent::class
+    override val event = PlayerInteractAtEntityEvent::class.java
 
     init {
         handler {

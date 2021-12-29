@@ -16,7 +16,7 @@ import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 object SSkillDowngrade : ObjectiveCountableI<PlayerSkillDowngradeEvent>() {
 
     override val name = "skillapi skill downgrade"
-    override val event = PlayerSkillDowngradeEvent::class
+    override val event = PlayerSkillDowngradeEvent::class.java
 
     init {
         handler {

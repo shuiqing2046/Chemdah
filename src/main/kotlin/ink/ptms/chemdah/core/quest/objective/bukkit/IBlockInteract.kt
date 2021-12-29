@@ -15,7 +15,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 object IBlockInteract : ObjectiveCountableI<PlayerInteractEvent>() {
 
     override val name = "block interact"
-    override val event = PlayerInteractEvent::class
+    override val event = PlayerInteractEvent::class.java
 
     init {
         handler {

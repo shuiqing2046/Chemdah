@@ -9,7 +9,7 @@ import org.bukkit.Bukkit
 object VVotifierVote : ObjectiveCountableI<VotifierEvent>() {
 
     override val name = "votifier vote"
-    override val event = VotifierEvent::class
+    override val event = VotifierEvent::class.java
 
     init {
         handler {

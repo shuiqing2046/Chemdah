@@ -9,7 +9,7 @@ import org.bukkit.entity.Player
 object CNPCDamage : ObjectiveCountableI<NPCDamageByEntityEvent>() {
 
     override val name = "cnpc damage"
-    override val event = NPCDamageByEntityEvent::class
+    override val event = NPCDamageByEntityEvent::class.java
 
     init {
         handler {

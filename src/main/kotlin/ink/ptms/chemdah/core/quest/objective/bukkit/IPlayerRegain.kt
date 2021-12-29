@@ -19,7 +19,7 @@ import taboolib.common.reflect.Reflex.Companion.invokeMethod
 object IPlayerRegain : ObjectiveCountableF<EntityRegainHealthEvent>() {
 
     override val name = "health regain"
-    override val event = EntityRegainHealthEvent::class
+    override val event = EntityRegainHealthEvent::class.java
 
     init {
         handler {

@@ -16,7 +16,7 @@ import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 object SClassChange : ObjectiveCountableI<PlayerClassChangeEvent>() {
 
     override val name = "skillapi class change"
-    override val event = PlayerClassChangeEvent::class
+    override val event = PlayerClassChangeEvent::class.java
 
     init {
         handler {

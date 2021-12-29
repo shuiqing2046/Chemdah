@@ -17,7 +17,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 object IBlockFarm : ObjectiveCountableI<PlayerInteractEvent>() {
 
     override val name = "block farm"
-    override val event = PlayerInteractEvent::class
+    override val event = PlayerInteractEvent::class.java
 
     init {
         handler {

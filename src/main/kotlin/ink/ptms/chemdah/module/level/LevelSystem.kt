@@ -9,7 +9,6 @@ import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.warning
 import taboolib.common5.Coerce
-import taboolib.common5.compileJS
 import taboolib.module.configuration.Config
 import taboolib.module.configuration.SecuredFile
 import taboolib.module.kether.KetherShell
@@ -76,18 +75,18 @@ object LevelSystem : Module {
         conf.getKeys(false).forEach { node ->
             val section = conf.getConfigurationSection(node)!!
             val algorithm = when (section.getString("experience.type")) {
-                "javascript" -> {
-                    val script = section.getString("experience.math")!!.compileJS() ?: return@forEach
-                    object : Level.Algorithm() {
-
-                        override val maxLevel: Int
-                            get() = section.getInt("max")
-
-                        override fun getExp(level: Int): CompletableFuture<Int> {
-                            return CompletableFuture.completedFuture(Coerce.toInteger(script.eval(SimpleBindings(mapOf("level" to level)))))
-                        }
-                    }
-                }
+//                "javascript" -> {
+//                    val script = section.getString("experience.math")!!.compileJS() ?: return@forEach
+//                    object : Level.Algorithm() {
+//
+//                        override val maxLevel: Int
+//                            get() = section.getInt("max")
+//
+//                        override fun getExp(level: Int): CompletableFuture<Int> {
+//                            return CompletableFuture.completedFuture(Coerce.toInteger(script.eval(SimpleBindings(mapOf("level" to level)))))
+//                        }
+//                    }
+//                }
                 "kether" -> {
                     object : Level.Algorithm() {
 

@@ -16,7 +16,7 @@ import taboolib.platform.util.attacker
 object IPlayerDamageByEntity : AEntityDamage<EntityDamageByEntityEvent>() {
 
     override val name = "player damage by entity"
-    override val event = EntityDamageByEntityEvent::class
+    override val event = EntityDamageByEntityEvent::class.java
 
     init {
         handler {

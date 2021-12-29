@@ -9,7 +9,7 @@ import org.maxgamer.quickshop.event.ShopDeleteEvent
 object QShopDelete : ObjectiveCountableI<ShopDeleteEvent>() {
 
     override val name = "quickshop delete"
-    override val event = ShopDeleteEvent::class
+    override val event = ShopDeleteEvent::class.java
 
     init {
         handler {

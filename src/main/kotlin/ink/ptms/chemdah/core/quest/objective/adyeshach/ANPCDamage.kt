@@ -15,7 +15,7 @@ import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 object ANPCDamage : ObjectiveCountableI<AdyeshachEntityDamageEvent>() {
 
     override val name = "anpc damage"
-    override val event = AdyeshachEntityDamageEvent::class
+    override val event = AdyeshachEntityDamageEvent::class.java
 
     init {
         handler {

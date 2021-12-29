@@ -8,7 +8,7 @@ import me.badbones69.crazycrates.api.events.PlayerPrizeEvent
 object CCratesOpen : ObjectiveCountableI<PlayerPrizeEvent>() {
 
     override val name = "cc open"
-    override val event = PlayerPrizeEvent::class
+    override val event = PlayerPrizeEvent::class.java
 
     init {
         handler {

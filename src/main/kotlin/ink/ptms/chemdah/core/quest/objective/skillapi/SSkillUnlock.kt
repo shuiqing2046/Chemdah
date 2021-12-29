@@ -15,7 +15,7 @@ import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 object SSkillUnlock : ObjectiveCountableI<PlayerSkillUnlockEvent>() {
 
     override val name = "skillapi skillunlock"
-    override val event = PlayerSkillUnlockEvent::class
+    override val event = PlayerSkillUnlockEvent::class.java
 
     init {
         handler {

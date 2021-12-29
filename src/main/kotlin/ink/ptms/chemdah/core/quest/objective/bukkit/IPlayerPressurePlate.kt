@@ -16,7 +16,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 object IPlayerPressurePlate : ObjectiveCountableI<PlayerInteractEvent>() {
 
     override val name = "pressure plate"
-    override val event = PlayerInteractEvent::class
+    override val event = PlayerInteractEvent::class.java
 
     init {
         handler {

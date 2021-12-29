@@ -8,7 +8,7 @@ import me.angeschossen.lands.api.events.LandCreateEvent
 object LLandsCreate : ObjectiveCountableI<LandCreateEvent>() {
 
     override val name = "lands create"
-    override val event = LandCreateEvent::class
+    override val event = LandCreateEvent::class.java
 
     init {
         handler {

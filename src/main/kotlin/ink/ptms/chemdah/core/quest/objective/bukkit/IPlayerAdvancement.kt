@@ -15,7 +15,7 @@ import org.bukkit.event.player.PlayerAdvancementDoneEvent
 object IPlayerAdvancement : ObjectiveCountableI<PlayerAdvancementDoneEvent>() {
 
     override val name = "player advancement"
-    override val event = PlayerAdvancementDoneEvent::class
+    override val event = PlayerAdvancementDoneEvent::class.java
 
     init {
         handler {

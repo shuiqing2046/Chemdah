@@ -16,7 +16,7 @@ import org.bukkit.event.entity.EntityShootBowEvent
 object IPlayerShootBow : ObjectiveCountableI<EntityShootBowEvent>() {
 
     override val name = "shoot bow"
-    override val event = EntityShootBowEvent::class
+    override val event = EntityShootBowEvent::class.java
 
     init {
         handler {

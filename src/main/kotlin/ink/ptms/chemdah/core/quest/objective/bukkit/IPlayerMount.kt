@@ -16,7 +16,7 @@ import org.spigotmc.event.entity.EntityMountEvent
 object IPlayerMount : ObjectiveCountableI<EntityMountEvent>() {
 
     override val name = "entity mount"
-    override val event = EntityMountEvent::class
+    override val event = EntityMountEvent::class.java
 
     init {
         handler {

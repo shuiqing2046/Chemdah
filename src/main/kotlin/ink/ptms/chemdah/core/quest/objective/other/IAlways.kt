@@ -13,7 +13,7 @@ import org.bukkit.event.Event
 object IAlways : Objective<Event>() {
 
     override val name = "always"
-    override val event = Event::class
+    override val event = Event::class.java
     override val isListener = false
 
     init {

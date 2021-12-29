@@ -17,7 +17,7 @@ import org.bukkit.event.player.PlayerPickupArrowEvent
 object IItemPickArrow : ObjectiveCountableI<PlayerPickupArrowEvent>() {
 
     override val name = "pickup arrow"
-    override val event = PlayerPickupArrowEvent::class
+    override val event = PlayerPickupArrowEvent::class.java
 
     init {
         handler {

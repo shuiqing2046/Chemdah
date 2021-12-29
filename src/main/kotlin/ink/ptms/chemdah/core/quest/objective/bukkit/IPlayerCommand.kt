@@ -15,7 +15,7 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent
 object IPlayerCommand : ObjectiveCountableI<PlayerCommandPreprocessEvent>() {
 
     override val name = "player command"
-    override val event = PlayerCommandPreprocessEvent::class
+    override val event = PlayerCommandPreprocessEvent::class.java
 
     init {
         handler {

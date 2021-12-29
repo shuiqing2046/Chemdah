@@ -19,7 +19,7 @@ import org.bukkit.event.Event
 object ITrigger : ObjectiveCountableI<Event>() {
 
     override val name = "trigger"
-    override val event = Event::class
+    override val event = Event::class.java
     override val isListener = false
 
     init {

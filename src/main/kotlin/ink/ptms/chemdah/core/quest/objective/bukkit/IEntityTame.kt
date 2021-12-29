@@ -16,7 +16,7 @@ import org.bukkit.event.entity.EntityTameEvent
 object IEntityTame : ObjectiveCountableI<EntityTameEvent>() {
 
     override val name = "entity tame"
-    override val event = EntityTameEvent::class
+    override val event = EntityTameEvent::class.java
 
     init {
         handler {

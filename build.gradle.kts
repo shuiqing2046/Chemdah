@@ -1,9 +1,9 @@
 plugins {
     `java-library`
     `maven-publish`
-    id("io.izzel.taboolib") version "1.32"
+    id("io.izzel.taboolib") version "1.33"
     id("org.jetbrains.kotlin.jvm") version "1.5.10"
-    id("org.jetbrains.dokka") version "1.4.32"
+    id("org.jetbrains.dokka") version "1.6.0"
 }
 
 taboolib {
@@ -37,10 +37,11 @@ taboolib {
     install("platform-bukkit")
     install("expansion-command-helper")
     classifier = null
-    version = "6.0.6-27"
+    version = "6.0.7-6"
 }
 
 repositories {
+    maven { url = uri("https://repo.tabooproject.org/storages/public/releases") }
     maven { url = uri("https://repo.pcgamingfreaks.at/repository/maven-everything") }
     maven { url = uri("https://nexus.badbones69.com/repository/maven-releases") }
     maven { url = uri("https://jitpack.io") }
@@ -49,12 +50,12 @@ repositories {
 }
 
 dependencies {
-    compileOnly("net.milkbowl.vault:Vault:1:all")
+    compileOnly("net.milkbowl.vault:Vault:1")
     compileOnly("org.serverct.ersha.dungeon:DungeonPlus:1.1.3")
     compileOnly("com.github.angeschossen:LandsAPI:5.13.0")
     compileOnly("at.pcgamingfreaks:MarriageMaster-API-Bukkit:2.4")
     compileOnly("me.badbones69:crazycrates-plugin:1.10")
-    compileOnly("com.sk89q.worldedit:WorldEdit:7:all")
+    compileOnly("com.sk89q.worldedit:WorldEdit:7")
     compileOnly("public:FriendsAPI:1.1.0.9.1")
     compileOnly("public:QuickShop:4.0.9.1")
     compileOnly("public:nuvotifier:1.0.0")
@@ -90,15 +91,13 @@ dependencies {
     compileOnly("ink.ptms:Blockdb:1.1.0")
     compileOnly("ink.ptms:Zaphkiel:1.6.0")
     compileOnly("ink.ptms:Adyeshach:1.3.19")
-    compileOnly("ink.ptms:sandalphon:1.3.0")
+    compileOnly("ink.ptms:Sandalphon:1.3.0")
     compileOnly("ink.ptms.core:v11800:11800:api")
-    compileOnly("ink.ptms.core:v11800:11800:mapped")
-    compileOnly("ink.ptms.core:v11800:11800:universal")
-    compileOnly("ink.ptms.core:v11400:11400:all")
+    compileOnly("ink.ptms.core:v11400:11400")
     compileOnly("ink.ptms:nms-all:1.0.0")
     implementation(kotlin("stdlib"))
     compileOnly(fileTree("libs"))
-    dokkaHtmlPlugin("org.jetbrains.dokka:kotlin-as-java-plugin:1.4.32")
+    dokkaHtmlPlugin("org.jetbrains.dokka:kotlin-as-java-plugin:1.6.0")
 }
 
 tasks.withType<JavaCompile> {
@@ -113,10 +112,10 @@ configure<JavaPluginConvention> {
 publishing {
     repositories {
         maven {
-            url = uri("https://repo2s.ptms.ink/repository/maven-releases/")
+            url = uri("https://repo.tabooproject.org/storages/public/releases")
             credentials {
-                username = project.findProperty("user").toString()
-                password = project.findProperty("password").toString()
+                username = project.findProperty("taboolibUsername").toString()
+                password = project.findProperty("taboolibPassword").toString()
             }
             authentication {
                 create<BasicAuthentication>("basic")

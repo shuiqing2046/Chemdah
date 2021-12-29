@@ -16,7 +16,7 @@ import org.bukkit.event.entity.EntityBreedEvent
 object IPlayerBreed : ObjectiveCountableI<EntityBreedEvent>() {
 
     override val name = "entity breed"
-    override val event = EntityBreedEvent::class
+    override val event = EntityBreedEvent::class.java
 
     init {
         handler {

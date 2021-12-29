@@ -15,7 +15,7 @@ import taboolib.platform.event.PlayerJumpEvent
 object IPlayerJump : ObjectiveCountableI<PlayerJumpEvent>() {
 
     override val name = "player jump"
-    override val event = PlayerJumpEvent::class
+    override val event = PlayerJumpEvent::class.java
     override val isAsync = true
 
     init {

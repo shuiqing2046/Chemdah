@@ -17,7 +17,7 @@ import org.bukkit.inventory.ItemStack
 object BBrewDrink : ObjectiveCountableI<BrewDrinkEvent>() {
 
     override val name = "brewery drink"
-    override val event = BrewDrinkEvent::class
+    override val event = BrewDrinkEvent::class.java
 
     init {
         handler {

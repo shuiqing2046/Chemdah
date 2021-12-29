@@ -14,5 +14,5 @@ import org.bukkit.event.player.PlayerBucketFillEvent
 object IPlayerBucketFill : APlayerBucket<PlayerBucketFillEvent>() {
 
     override val name = "bucket fill"
-    override val event = PlayerBucketFillEvent::class
+    override val event = PlayerBucketFillEvent::class.java
 }

@@ -8,7 +8,7 @@ import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 object MMarriageGift : ObjectiveCountableI<GiftEvent>() {
 
     override val name = "marriage gift"
-    override val event = GiftEvent::class
+    override val event = GiftEvent::class.java
 
     init {
         handler {

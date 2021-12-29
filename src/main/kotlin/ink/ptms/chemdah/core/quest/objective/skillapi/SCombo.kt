@@ -16,7 +16,7 @@ import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 object SCombo : ObjectiveCountableI<PlayerComboFinishEvent>() {
 
     override val name = "skillapi combo"
-    override val event = PlayerComboFinishEvent::class
+    override val event = PlayerComboFinishEvent::class.java
 
     init {
         handler {

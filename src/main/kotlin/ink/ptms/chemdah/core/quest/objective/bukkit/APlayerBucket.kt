@@ -21,10 +21,10 @@ abstract class APlayerBucket<T : PlayerBucketEvent> : ObjectiveCountableI<T>() {
             player
         }
         addSimpleCondition("position") {
-            toPosition().inside(it.block.location)
+            toPosition().inside(it.blockClicked.location)
         }
         addSimpleCondition("material") {
-            toInferBlock().isBlock(it.block)
+            toInferBlock().isBlock(it.blockClicked)
         }
         addSimpleCondition("material:clicked") {
             toInferBlock().isBlock(it.blockClicked)

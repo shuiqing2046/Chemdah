@@ -18,7 +18,7 @@ import org.bukkit.event.entity.EntityPickupItemEvent
 object IItemPick : ObjectiveCountableI<EntityPickupItemEvent>() {
 
     override val name = "pickup item"
-    override val event = EntityPickupItemEvent::class
+    override val event = EntityPickupItemEvent::class.java
 
     init {
         handler {

@@ -8,7 +8,7 @@ import org.maxgamer.quickshop.event.ShopPurchaseEvent
 object QShopPurchase : ObjectiveCountableI<ShopPurchaseEvent>() {
 
     override val name = "quickshop purchase"
-    override val event = ShopPurchaseEvent::class
+    override val event = ShopPurchaseEvent::class.java
 
     init {
         handler {

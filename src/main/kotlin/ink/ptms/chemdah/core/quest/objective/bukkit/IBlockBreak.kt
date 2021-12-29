@@ -17,7 +17,7 @@ import org.bukkit.event.block.BlockBreakEvent
 object IBlockBreak : ObjectiveCountableI<BlockBreakEvent>() {
 
     override val name = "block break"
-    override val event = BlockBreakEvent::class
+    override val event = BlockBreakEvent::class.java
 
     init {
         handler {

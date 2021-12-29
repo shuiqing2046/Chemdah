@@ -8,7 +8,7 @@ import net.citizensnpcs.api.event.NPCRightClickEvent
 object CNPCInteract : ObjectiveCountableI<NPCRightClickEvent>() {
 
     override val name = "cnpc interact"
-    override val event = NPCRightClickEvent::class
+    override val event = NPCRightClickEvent::class.java
 
     init {
         handler {

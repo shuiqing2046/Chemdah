@@ -19,7 +19,7 @@ import taboolib.common.reflect.Reflex.Companion.invokeMethod
 object IPlayerExpChange : ObjectiveCountableI<PlayerExpChangeEvent>() {
 
     override val name = "exp change"
-    override val event = PlayerExpChangeEvent::class
+    override val event = PlayerExpChangeEvent::class.java
 
     init {
         handler {

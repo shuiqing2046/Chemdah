@@ -15,7 +15,7 @@ import org.bukkit.event.player.PlayerFishEvent
 object IPlayerFish : ObjectiveCountableI<PlayerFishEvent>() {
 
     override val name = "player fish"
-    override val event = PlayerFishEvent::class
+    override val event = PlayerFishEvent::class.java
 
     init {
         handler {

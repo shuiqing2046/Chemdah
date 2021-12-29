@@ -16,7 +16,7 @@ import org.bukkit.event.entity.HorseJumpEvent
 object IPlayerJumpHorse : ObjectiveCountableI<HorseJumpEvent>() {
 
     override val name = "horse jump"
-    override val event = HorseJumpEvent::class
+    override val event = HorseJumpEvent::class.java
     override val isAsync = true
 
     init {

@@ -15,7 +15,7 @@ import org.bukkit.event.player.PlayerAnimationEvent
 object IPlayerAnimation : ObjectiveCountableI<PlayerAnimationEvent>() {
 
     override val name = "player animation"
-    override val event = PlayerAnimationEvent::class
+    override val event = PlayerAnimationEvent::class.java
 
     init {
         handler {

@@ -15,7 +15,7 @@ import org.bukkit.event.player.PlayerRecipeDiscoverEvent
 object IPlayerRecipeDiscover : ObjectiveCountableI<PlayerRecipeDiscoverEvent>() {
 
     override val name = "recipe discover"
-    override val event = PlayerRecipeDiscoverEvent::class
+    override val event = PlayerRecipeDiscoverEvent::class.java
 
     init {
         handler {

@@ -9,7 +9,7 @@ import org.bukkit.Bukkit
 object LLandsJoin : ObjectiveCountableI<LandTrustPlayerEvent>() {
 
     override val name = "lands join"
-    override val event = LandTrustPlayerEvent::class
+    override val event = LandTrustPlayerEvent::class.java
 
     init {
         handler {

@@ -9,12 +9,12 @@ default_0:
   experience:
     type: kether
     math: |
-      if check &level <= *15 then {
-          math add [ math mul [ *2 &level ] *7 ]
-      } else if check &level <= *30 then {
-          math sub [ math mul [ *5 &level ] *38 ]
+      if check &level <= 15 then {
+          math &level * 2 + 7
+      } else if check &level <= 30 then {
+          math &level * 5 - 38
       } else {
-          math sub [ math mul [ *9 &level ] *158 ]
+          math &level * 9 - 158
       }
   reward:
     5: tell colored inline *"&aLevel up! &f{{ &level }}!"

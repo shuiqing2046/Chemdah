@@ -16,7 +16,7 @@ import org.bukkit.event.inventory.PrepareAnvilEvent
 object IItemAnvil : ObjectiveCountableI<PrepareAnvilEvent>() {
 
     override val name = "player anvil"
-    override val event = PrepareAnvilEvent::class
+    override val event = PrepareAnvilEvent::class.java
 
     init {
         handler {

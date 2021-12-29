@@ -11,7 +11,7 @@ conversation_0:
     - reply: 'Hi!'
       then: |
         goto conversation_0_1
-    - if: permission *admin
+    - if: permission admin
       reply: 'You know Mr.Black?'
       then: |
         talk "Yes, I know him very well."
@@ -64,7 +64,7 @@ conversation_0_3:
   agent:
     begin: |
       if check &choose is null then {
-        tell color *"&c[Error] &7no choosed."
+        tell color "&c[Error] &7no choosed."
         cancel
       } else {
         set number to round random 10

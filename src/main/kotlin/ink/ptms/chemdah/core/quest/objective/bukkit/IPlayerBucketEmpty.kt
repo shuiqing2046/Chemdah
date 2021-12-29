@@ -14,5 +14,5 @@ import org.bukkit.event.player.PlayerBucketEmptyEvent
 object IPlayerBucketEmpty : APlayerBucket<PlayerBucketEmptyEvent>() {
 
     override val name = "bucket empty"
-    override val event = PlayerBucketEmptyEvent::class
+    override val event = PlayerBucketEmptyEvent::class.java
 }

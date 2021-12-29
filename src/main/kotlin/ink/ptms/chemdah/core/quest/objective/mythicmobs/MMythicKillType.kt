@@ -9,7 +9,7 @@ import org.bukkit.entity.Player
 object MMythicKillType : ObjectiveCountableI<MythicMobDeathEvent>() {
 
     override val name = "mythicmobs kill"
-    override val event = MythicMobDeathEvent::class
+    override val event = MythicMobDeathEvent::class.java
 
     init {
         handler {

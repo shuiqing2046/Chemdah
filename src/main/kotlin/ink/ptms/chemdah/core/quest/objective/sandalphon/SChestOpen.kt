@@ -15,7 +15,7 @@ import ink.ptms.sandalphon.module.impl.treasurechest.event.ChestOpenEvent
 object SChestOpen : ObjectiveCountableI<ChestOpenEvent>() {
 
     override val name = "sandalphon chest open"
-    override val event = ChestOpenEvent::class
+    override val event = ChestOpenEvent::class.java
 
     init {
         handler {

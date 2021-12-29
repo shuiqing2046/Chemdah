@@ -23,7 +23,7 @@ import ink.ptms.chemdah.module.level.LevelSystem.getLevel
 object ICustomLevel : ObjectiveCountableI<PlayerEvents.LevelChange>() {
 
     override val name = "custom level"
-    override val event = PlayerEvents.LevelChange::class
+    override val event = PlayerEvents.LevelChange::class.java
     override val isListener = true
 
     init {

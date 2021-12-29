@@ -15,7 +15,7 @@ import org.bukkit.event.enchantment.EnchantItemEvent
 object IItemEnchant : ObjectiveCountableI<EnchantItemEvent>() {
 
     override val name = "enchant item"
-    override val event = EnchantItemEvent::class
+    override val event = EnchantItemEvent::class.java
 
     init {
         handler {

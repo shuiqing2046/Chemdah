@@ -8,7 +8,7 @@ import me.clip.chatreaction.events.ReactionWinEvent
 object CChatReactionWin : ObjectiveCountableI<ReactionWinEvent>() {
 
     override val name = "chatreaction win"
-    override val event = ReactionWinEvent::class
+    override val event = ReactionWinEvent::class.java
 
     init {
         handler {

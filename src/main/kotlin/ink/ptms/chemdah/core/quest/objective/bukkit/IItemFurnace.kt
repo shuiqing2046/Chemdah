@@ -18,7 +18,7 @@ import org.bukkit.inventory.ItemStack
 object IItemFurnace : ObjectiveCountableI<FurnaceExtractEvent>() {
 
     override val name = "furnace extract"
-    override val event = FurnaceExtractEvent::class
+    override val event = FurnaceExtractEvent::class.java
 
     init {
         handler {

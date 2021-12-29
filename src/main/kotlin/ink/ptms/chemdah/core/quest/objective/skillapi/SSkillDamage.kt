@@ -16,7 +16,7 @@ import org.bukkit.entity.Player
 object SSkillDamage : ObjectiveCountableI<SkillDamageEvent>() {
 
     override val name = "skillapi skill damage"
-    override val event = SkillDamageEvent::class
+    override val event = SkillDamageEvent::class.java
 
     init {
         handler {

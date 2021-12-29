@@ -15,7 +15,7 @@ import org.bukkit.event.player.PlayerRespawnEvent
 object IPlayerRespawn : ObjectiveCountableI<PlayerRespawnEvent>() {
 
     override val name = "player respawn"
-    override val event = PlayerRespawnEvent::class
+    override val event = PlayerRespawnEvent::class.java
 
     init {
         handler {

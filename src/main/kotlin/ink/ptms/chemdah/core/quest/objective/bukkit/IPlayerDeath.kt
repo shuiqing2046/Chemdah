@@ -16,7 +16,7 @@ import taboolib.platform.util.attacker
 object IPlayerDeath : AEntityDeath<PlayerDeathEvent>() {
 
     override val name = "player death"
-    override val event = PlayerDeathEvent::class
+    override val event = PlayerDeathEvent::class.java
 
     init {
         handler {

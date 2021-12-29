@@ -15,7 +15,7 @@ import org.bukkit.event.player.PlayerBedLeaveEvent
 object IPlayerBedLeave : ObjectiveCountableI<PlayerBedLeaveEvent>() {
 
     override val name = "bed leave"
-    override val event = PlayerBedLeaveEvent::class
+    override val event = PlayerBedLeaveEvent::class.java
 
     init {
         handler {

@@ -15,7 +15,7 @@ import org.bukkit.event.player.PlayerBedEnterEvent
 object IPlayerBedEnter : ObjectiveCountableI<PlayerBedEnterEvent>() {
 
     override val name = "bed enter"
-    override val event = PlayerBedEnterEvent::class
+    override val event = PlayerBedEnterEvent::class.java
 
     init {
         handler {

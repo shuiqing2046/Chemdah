@@ -14,7 +14,7 @@ import org.bukkit.event.entity.EntityDeathEvent
 object IPlayerKill : AEntityDeath<EntityDeathEvent>() {
 
     override val name = "player kill"
-    override val event = EntityDeathEvent::class
+    override val event = EntityDeathEvent::class.java
 
     init {
         handler {

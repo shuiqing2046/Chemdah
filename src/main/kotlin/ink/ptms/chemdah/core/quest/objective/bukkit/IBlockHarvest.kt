@@ -15,7 +15,7 @@ import org.bukkit.event.player.PlayerHarvestBlockEvent
 object IBlockHarvest : ObjectiveCountableI<PlayerHarvestBlockEvent>() {
 
     override val name = "harvest block"
-    override val event = PlayerHarvestBlockEvent::class
+    override val event = PlayerHarvestBlockEvent::class.java
 
     init {
         handler {

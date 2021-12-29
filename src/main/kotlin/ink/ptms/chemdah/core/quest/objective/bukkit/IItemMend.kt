@@ -17,7 +17,7 @@ import org.bukkit.event.player.PlayerItemMendEvent
 object IItemMend : ObjectiveCountableI<PlayerItemMendEvent>() {
 
     override val name = "item mend"
-    override val event = PlayerItemMendEvent::class
+    override val event = PlayerItemMendEvent::class.java
 
     init {
         handler {

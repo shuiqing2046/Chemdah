@@ -16,7 +16,7 @@ import org.bukkit.event.entity.EntityCombustByEntityEvent
 object IEntityCombust : ObjectiveCountableI<EntityCombustByEntityEvent>() {
 
     override val name = "entity combust"
-    override val event = EntityCombustByEntityEvent::class
+    override val event = EntityCombustByEntityEvent::class.java
 
     init {
         handler {

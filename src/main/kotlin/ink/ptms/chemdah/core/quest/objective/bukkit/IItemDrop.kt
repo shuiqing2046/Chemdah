@@ -15,7 +15,7 @@ import org.bukkit.event.player.PlayerDropItemEvent
 object IItemDrop : ObjectiveCountableI<PlayerDropItemEvent>() {
 
     override val name = "drop item"
-    override val event = PlayerDropItemEvent::class
+    override val event = PlayerDropItemEvent::class.java
 
     init {
         handler {

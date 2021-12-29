@@ -16,7 +16,7 @@ import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 object SUpAttribute : ObjectiveCountableI<PlayerUpAttributeEvent>() {
 
     override val name = "skillapi up attribute"
-    override val event = PlayerUpAttributeEvent::class
+    override val event = PlayerUpAttributeEvent::class.java
 
     init {
         handler {

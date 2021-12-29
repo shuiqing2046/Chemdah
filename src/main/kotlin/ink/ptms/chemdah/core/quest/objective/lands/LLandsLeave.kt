@@ -9,7 +9,7 @@ import org.bukkit.Bukkit
 object LLandsLeave : ObjectiveCountableI<LandUntrustPlayerEvent>() {
 
     override val name = "lands leave"
-    override val event = LandUntrustPlayerEvent::class
+    override val event = LandUntrustPlayerEvent::class.java
 
     init {
         handler {

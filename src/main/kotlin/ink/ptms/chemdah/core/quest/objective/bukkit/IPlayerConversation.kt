@@ -15,7 +15,7 @@ import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 object IPlayerConversation : ObjectiveCountableI<ConversationEvents.ReplyClosed>() {
 
     override val name = "player conversation"
-    override val event = ConversationEvents.ReplyClosed::class
+    override val event = ConversationEvents.ReplyClosed::class.java
     override val isAsync = true
 
     init {

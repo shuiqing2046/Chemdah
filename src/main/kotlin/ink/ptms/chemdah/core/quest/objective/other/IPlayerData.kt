@@ -19,7 +19,7 @@ import org.bukkit.event.Event
 object IPlayerData : ObjectiveCountableI<Event>() {
 
     override val name = "player data"
-    override val event = Event::class
+    override val event = Event::class.java
     override val isListener = false
 
     init {

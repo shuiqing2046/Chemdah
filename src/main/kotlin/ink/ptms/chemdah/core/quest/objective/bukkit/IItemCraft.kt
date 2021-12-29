@@ -17,7 +17,7 @@ import taboolib.platform.util.isNotAir
 object IItemCraft : ObjectiveCountableI<CraftItemEvent>() {
 
     override val name = "craft item"
-    override val event = CraftItemEvent::class
+    override val event = CraftItemEvent::class.java
 
     init {
         handler {

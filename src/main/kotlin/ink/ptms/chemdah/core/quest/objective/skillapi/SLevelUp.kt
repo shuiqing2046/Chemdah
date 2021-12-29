@@ -15,7 +15,7 @@ import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 object SLevelUp : ObjectiveCountableI<PlayerLevelUpEvent>() {
 
     override val name = "skillapi levelup"
-    override val event = PlayerLevelUpEvent::class
+    override val event = PlayerLevelUpEvent::class.java
 
     init {
         handler {

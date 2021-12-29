@@ -15,7 +15,7 @@ import ink.ptms.sandalphon.module.impl.blockmine.event.BlockBreakEvent
 object SBlockBreak : ObjectiveCountableI<BlockBreakEvent>() {
 
     override val name = "sandalphon block break"
-    override val event = BlockBreakEvent::class
+    override val event = BlockBreakEvent::class.java
 
     init {
         handler {

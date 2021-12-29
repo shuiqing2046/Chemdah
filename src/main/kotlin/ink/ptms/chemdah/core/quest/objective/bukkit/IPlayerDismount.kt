@@ -16,7 +16,7 @@ import org.spigotmc.event.entity.EntityDismountEvent
 object IPlayerDismount : ObjectiveCountableI<EntityDismountEvent>() {
 
     override val name = "entity dismount"
-    override val event = EntityDismountEvent::class
+    override val event = EntityDismountEvent::class.java
 
     init {
         handler {

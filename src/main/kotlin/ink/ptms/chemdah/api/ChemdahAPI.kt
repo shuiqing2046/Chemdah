@@ -53,19 +53,19 @@ object ChemdahAPI {
      */
     val Player.chemdahProfile: PlayerProfile
         @Throws(NullPointerException::class)
-        get() = playerProfile[name]!!
+        get() = ChemdahAPI.playerProfile[name]!!
 
     /**
      * 玩家数据已经加载完成
      */
     val Player.isChemdahProfileLoaded: Boolean
-        get() = playerProfile.containsKey(name)
+        get() = ChemdahAPI.playerProfile.containsKey(name)
 
     /**
      * 玩家数据尚未加载完成
      */
     val Player.nonChemdahProfileLoaded: Boolean
-        get() = !playerProfile.containsKey(name)
+        get() = !ChemdahAPI.playerProfile.containsKey(name)
 
     /**
      * 获取玩家正在进行的会话

@@ -15,7 +15,7 @@ import org.bukkit.event.player.PlayerRiptideEvent
 object IPlayerRiptide : ObjectiveCountableI<PlayerRiptideEvent>() {
 
     override val name = "player riptide"
-    override val event = PlayerRiptideEvent::class
+    override val event = PlayerRiptideEvent::class.java
 
     init {
         handler {

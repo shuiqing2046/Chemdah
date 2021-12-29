@@ -15,7 +15,7 @@ import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 object IPlayerCriterionGrant : ObjectiveCountableI<PlayerAdvancementCriterionGrantEvent>() {
 
     override val name = "criterion grant"
-    override val event = PlayerAdvancementCriterionGrantEvent::class
+    override val event = PlayerAdvancementCriterionGrantEvent::class.java
 
     init {
         handler {

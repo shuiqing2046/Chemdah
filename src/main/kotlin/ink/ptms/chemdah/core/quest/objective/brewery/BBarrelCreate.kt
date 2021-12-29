@@ -15,7 +15,7 @@ import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 object BBarrelCreate : ObjectiveCountableI<BarrelCreateEvent>() {
 
     override val name = "brewery barrel create"
-    override val event = BarrelCreateEvent::class
+    override val event = BarrelCreateEvent::class.java
 
     init {
         handler {

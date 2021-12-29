@@ -9,7 +9,7 @@ import org.bukkit.Bukkit
 object LlandsInvite : ObjectiveCountableI<LandInvitePlayerEvent>() {
 
     override val name = "lands invite"
-    override val event = LandInvitePlayerEvent::class
+    override val event = LandInvitePlayerEvent::class.java
 
     init {
         handler {

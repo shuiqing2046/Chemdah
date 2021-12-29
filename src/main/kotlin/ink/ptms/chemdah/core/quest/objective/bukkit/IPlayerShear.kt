@@ -15,7 +15,7 @@ import org.bukkit.event.player.PlayerShearEntityEvent
 object IPlayerShear : ObjectiveCountableI<PlayerShearEntityEvent>() {
 
     override val name = "player shear"
-    override val event = PlayerShearEntityEvent::class
+    override val event = PlayerShearEntityEvent::class.java
 
     init {
         handler {

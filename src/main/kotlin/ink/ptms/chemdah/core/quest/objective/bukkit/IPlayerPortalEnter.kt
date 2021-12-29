@@ -16,7 +16,7 @@ import org.bukkit.event.entity.EntityPortalEnterEvent
 object IPlayerPortalEnter : ObjectiveCountableI<EntityPortalEnterEvent>() {
 
     override val name = "portal enter"
-    override val event = EntityPortalEnterEvent::class
+    override val event = EntityPortalEnterEvent::class.java
 
     init {
         handler {

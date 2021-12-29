@@ -18,7 +18,7 @@ import org.bukkit.event.entity.FoodLevelChangeEvent
 object IPlayerFoodChange : ObjectiveCountableI<FoodLevelChangeEvent>() {
 
     override val name = "food change"
-    override val event = FoodLevelChangeEvent::class
+    override val event = FoodLevelChangeEvent::class.java
 
     init {
         handler {

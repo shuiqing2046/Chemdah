@@ -15,7 +15,7 @@ import org.bukkit.event.entity.EntityDamageEvent
 object IPlayerDamage : AEntityDamage<EntityDamageEvent>() {
 
     override val name = "player damage"
-    override val event = EntityDamageEvent::class
+    override val event = EntityDamageEvent::class.java
 
     init {
         handler {

@@ -15,7 +15,7 @@ import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 object IPlayerElytraBoost : ObjectiveCountableI<PlayerElytraBoostEvent>() {
 
     override val name = "elytra boost"
-    override val event = PlayerElytraBoostEvent::class
+    override val event = PlayerElytraBoostEvent::class.java
 
     init {
         handler {

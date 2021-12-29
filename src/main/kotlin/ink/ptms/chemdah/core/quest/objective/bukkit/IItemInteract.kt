@@ -17,7 +17,7 @@ import taboolib.platform.util.isNotAir
 object IItemInteract : ObjectiveCountableI<PlayerInteractEvent>() {
 
     override val name = "item interact"
-    override val event = PlayerInteractEvent::class
+    override val event = PlayerInteractEvent::class.java
     override val isAsync = true
 
     init {

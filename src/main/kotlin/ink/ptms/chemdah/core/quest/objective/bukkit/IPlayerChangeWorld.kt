@@ -15,7 +15,7 @@ import org.bukkit.event.player.PlayerChangedWorldEvent
 object IPlayerChangeWorld : ObjectiveCountableI<PlayerChangedWorldEvent>() {
 
     override val name = "change world"
-    override val event = PlayerChangedWorldEvent::class
+    override val event = PlayerChangedWorldEvent::class.java
 
     init {
         handler {

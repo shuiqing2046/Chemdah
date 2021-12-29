@@ -15,7 +15,7 @@ import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 object BPush : ObjectiveCountableI<PlayerPushEvent>() {
 
     override val name = "brewery push"
-    override val event = PlayerPushEvent::class
+    override val event = PlayerPushEvent::class.java
 
     init {
         handler {

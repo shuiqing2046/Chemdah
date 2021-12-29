@@ -15,7 +15,7 @@ import org.bukkit.event.player.PlayerItemBreakEvent
 object IItemBreak : ObjectiveCountableI<PlayerItemBreakEvent>() {
 
     override val name = "item break"
-    override val event = PlayerItemBreakEvent::class
+    override val event = PlayerItemBreakEvent::class.java
 
     init {
         handler {

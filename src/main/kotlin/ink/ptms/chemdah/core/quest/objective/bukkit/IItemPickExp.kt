@@ -18,7 +18,7 @@ import taboolib.common.reflect.Reflex.Companion.invokeMethod
 object IItemPickExp : ObjectiveCountableI<PlayerPickupExperienceEvent>() {
 
     override val name = "pickup exp"
-    override val event = PlayerPickupExperienceEvent::class
+    override val event = PlayerPickupExperienceEvent::class.java
 
     init {
         handler {

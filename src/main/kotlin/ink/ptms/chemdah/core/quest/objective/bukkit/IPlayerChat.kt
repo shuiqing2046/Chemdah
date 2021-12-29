@@ -15,7 +15,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent
 object IPlayerChat : ObjectiveCountableI<AsyncPlayerChatEvent>() {
 
     override val name = "player chat"
-    override val event = AsyncPlayerChatEvent::class
+    override val event = AsyncPlayerChatEvent::class.java
 
     init {
         handler {

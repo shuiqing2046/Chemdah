@@ -15,7 +15,7 @@ import org.bukkit.event.player.PlayerTeleportEvent
 object IPlayerTeleport : ObjectiveCountableI<PlayerTeleportEvent>() {
 
     override val name = "player teleport"
-    override val event = PlayerTeleportEvent::class
+    override val event = PlayerTeleportEvent::class.java
     override val isAsync = true
 
     init {

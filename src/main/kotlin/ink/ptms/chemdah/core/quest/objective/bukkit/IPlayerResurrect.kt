@@ -18,7 +18,7 @@ import taboolib.platform.util.getUsingItem
 object IPlayerResurrect : ObjectiveCountableI<EntityResurrectEvent>() {
 
     override val name = "player resurrect"
-    override val event = EntityResurrectEvent::class
+    override val event = EntityResurrectEvent::class.java
 
     val totem by lazy { XMaterial.TOTEM_OF_UNDYING.parseMaterial()!! }
 

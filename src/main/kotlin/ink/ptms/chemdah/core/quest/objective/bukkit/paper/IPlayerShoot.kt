@@ -15,7 +15,7 @@ import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 object IPlayerShoot : ObjectiveCountableI<PlayerLaunchProjectileEvent>() {
 
     override val name = "shoot projectile"
-    override val event = PlayerLaunchProjectileEvent::class
+    override val event = PlayerLaunchProjectileEvent::class.java
 
     init {
         handler {

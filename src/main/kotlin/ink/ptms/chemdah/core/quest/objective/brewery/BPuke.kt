@@ -15,7 +15,7 @@ import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 object BPuke : ObjectiveCountableI<PlayerPukeEvent>() {
 
     override val name = "brewery puke"
-    override val event = PlayerPukeEvent::class
+    override val event = PlayerPukeEvent::class.java
 
     init {
         handler {

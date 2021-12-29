@@ -15,7 +15,7 @@ import org.bukkit.event.block.BlockIgniteEvent
 object IBlockIgnite : ObjectiveCountableI<BlockIgniteEvent>() {
 
     override val name = "block ignite"
-    override val event = BlockIgniteEvent::class
+    override val event = BlockIgniteEvent::class.java
 
     init {
         handler {

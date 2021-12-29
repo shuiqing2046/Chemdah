@@ -15,7 +15,7 @@ import org.bukkit.event.player.PlayerMoveEvent
 object IPlayerRealMove : ObjectiveCountableI<PlayerMoveEvent>() {
 
     override val name = "player real move"
-    override val event = PlayerMoveEvent::class
+    override val event = PlayerMoveEvent::class.java
     override val isAsync = true
 
     init {

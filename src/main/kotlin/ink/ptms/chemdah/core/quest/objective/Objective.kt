@@ -15,7 +15,6 @@ import taboolib.common.platform.event.EventPriority
 import taboolib.common5.mirrorFuture
 import java.util.concurrent.CompletableFuture
 import java.util.function.Function
-import kotlin.reflect.KClass
 
 /**
  * Chemdah
@@ -60,7 +59,7 @@ abstract class Objective<E : Any> {
     /**
      * 事件类型
      */
-    abstract val event: KClass<E>
+    abstract val event: Class<E>
 
     /**
      * 事件优先级

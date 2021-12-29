@@ -17,7 +17,7 @@ import taboolib.common.reflect.Reflex.Companion.invokeMethod
 object IItemConsume : ObjectiveCountableI<PlayerItemConsumeEvent>() {
 
     override val name = "item consume"
-    override val event = PlayerItemConsumeEvent::class
+    override val event = PlayerItemConsumeEvent::class.java
 
     init {
         handler {

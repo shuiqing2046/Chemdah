@@ -17,7 +17,7 @@ import org.bukkit.event.player.PlayerLevelChangeEvent
 object IPlayerLevelChange : ObjectiveCountableI<PlayerLevelChangeEvent>() {
 
     override val name = "level change"
-    override val event = PlayerLevelChangeEvent::class
+    override val event = PlayerLevelChangeEvent::class.java
 
     init {
         handler {

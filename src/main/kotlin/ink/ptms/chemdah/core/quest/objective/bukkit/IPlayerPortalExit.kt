@@ -16,7 +16,7 @@ import org.bukkit.event.entity.EntityPortalExitEvent
 object IPlayerPortalExit : ObjectiveCountableI<EntityPortalExitEvent>() {
 
     override val name = "portal exit"
-    override val event = EntityPortalExitEvent::class
+    override val event = EntityPortalExitEvent::class.java
 
     init {
         handler {
