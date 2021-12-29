@@ -21,4 +21,4 @@ jobs:
         env:
           NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
           NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
-        run: ./gradlew publish -Puser=$NEXUS_USERNAME -Ppassword=$NEXUS_PASSWORD
+        run: ./gradlew publish -PtaboolibUsername=$NEXUS_USERNAME -PtaboolibPassword=$NEXUS_PASSWORD
