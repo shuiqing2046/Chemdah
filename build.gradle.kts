@@ -1,7 +1,7 @@
 plugins {
     `java-library`
     `maven-publish`
-    id("io.izzel.taboolib") version "1.33"
+    id("io.izzel.taboolib") version "1.34"
     id("org.jetbrains.kotlin.jvm") version "1.5.10"
     id("org.jetbrains.dokka") version "1.6.0"
 }
@@ -37,11 +37,10 @@ taboolib {
     install("platform-bukkit")
     install("expansion-command-helper")
     classifier = null
-    version = "6.0.7-6"
+    version = "6.0.7-12"
 }
 
 repositories {
-    maven { url = uri("https://repo.tabooproject.org/storages/public/releases") }
     maven { url = uri("https://repo.pcgamingfreaks.at/repository/maven-everything") }
     maven { url = uri("https://nexus.badbones69.com/repository/maven-releases") }
     maven { url = uri("https://jitpack.io") }
@@ -112,7 +111,7 @@ configure<JavaPluginConvention> {
 publishing {
     repositories {
         maven {
-            url = uri("https://repo.tabooproject.org/storages/public/releases")
+            url = uri("https://repo.tabooproject.org/repository/releases")
             credentials {
                 username = project.findProperty("taboolibUsername").toString()
                 password = project.findProperty("taboolibPassword").toString()

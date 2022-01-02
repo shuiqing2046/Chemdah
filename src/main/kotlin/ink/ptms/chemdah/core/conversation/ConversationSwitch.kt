@@ -50,7 +50,7 @@ data class ConversationSwitch(val file: File?, val root: ConfigurationSection, v
 
     companion object {
 
-        val switchMap = ArrayList<ConversationSwitch>()
+        val switchMap = HashMap<String, ConversationSwitch>()
 
         @SubscribeEvent
         internal fun e(e: ConversationEvents.Load) {
@@ -58,7 +58,7 @@ data class ConversationSwitch(val file: File?, val root: ConfigurationSection, v
                 e.isCancelled = true
                 val id = e.root["npc id"] ?: return
                 val trigger = Trigger(id.asList().map { it.split(" ") }.filter { it.size == 2 }.map { Trigger.Id(it[0], it[1]) })
-                switchMap += ConversationSwitch(e.file, e.root, trigger)
+                switchMap[e.root.name] = ConversationSwitch(e.file, e.root, trigger)
             }
         }
 
@@ -66,7 +66,7 @@ data class ConversationSwitch(val file: File?, val root: ConfigurationSection, v
         internal fun e(e: ConversationEvents.Select) {
             if (e.conversation == null) {
                 try {
-                    val ele = switchMap.firstOrNull { it.npcId.id.any { it.isNPC(e.namespace, e.id) } } ?: return
+                    val ele = switchMap.values.firstOrNull { it.npcId.id.any { it.isNPC(e.namespace, e.id) } } ?: return
                     ele.getConversation(e.player).thenAccept { con ->
                         e.conversation = con
                     }
