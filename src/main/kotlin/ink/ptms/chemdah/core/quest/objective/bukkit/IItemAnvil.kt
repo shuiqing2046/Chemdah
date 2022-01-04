@@ -26,7 +26,7 @@ object IItemAnvil : ObjectiveCountableI<PrepareAnvilEvent>() {
             data.toPosition().inside(e.inventory.location ?: EMPTY)
         }
         addSimpleCondition("text") { data, e ->
-            toString() in e.inventory.renameText.toString()
+            data.toString() in e.inventory.renameText.toString()
         }
         addSimpleCondition("cost") { data, e ->
             data.toInt() <= e.inventory.repairCost

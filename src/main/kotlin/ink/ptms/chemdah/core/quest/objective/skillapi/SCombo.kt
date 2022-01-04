@@ -26,7 +26,7 @@ object SCombo : ObjectiveCountableI<PlayerComboFinishEvent>() {
             data.toPosition().inside(it.player.location)
         }
         addSimpleCondition("skill") { data, it ->
-            toString().equals(it.skill.name, true)
+            data.toString().equals(it.skill.name, true)
         }
         addSimpleCondition("combo") { data, it ->
             data.toInt() <= it.combo

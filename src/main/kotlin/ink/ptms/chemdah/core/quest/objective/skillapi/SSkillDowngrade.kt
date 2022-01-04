@@ -26,7 +26,7 @@ object SSkillDowngrade : ObjectiveCountableI<PlayerSkillDowngradeEvent>() {
             data.toPosition().inside(it.playerData.player.location)
         }
         addSimpleCondition("skill") { data, it ->
-            toString().equals(it.downgradedSkill.status.name, true)
+            data.toString().equals(it.downgradedSkill.status.name, true)
         }
         addConditionVariable("skill") {
             it.downgradedSkill.status.name

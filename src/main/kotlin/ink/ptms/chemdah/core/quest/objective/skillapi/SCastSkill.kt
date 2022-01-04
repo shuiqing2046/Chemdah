@@ -25,7 +25,7 @@ object SCastSkill : ObjectiveCountableI<PlayerCastSkillEvent>() {
             data.toPosition().inside(it.player.location)
         }
         addSimpleCondition("skill") { data, it ->
-            toString().equals(it.skill.status.name, true)
+            data.toString().equals(it.skill.status.name, true)
         }
         addSimpleCondition("mana") { data, it ->
             data.toDouble() <= it.skill.manaCost

@@ -25,7 +25,7 @@ object SChestOpen : ObjectiveCountableI<ChestOpenEvent>() {
             data.toPosition().inside(it.chestData.block)
         }
         addSimpleCondition("title") { data, it ->
-            toString().equals(it.chestData.title, true)
+            data.toString().equals(it.chestData.title, true)
         }
         addConditionVariable("title") {
             it.chestData.title

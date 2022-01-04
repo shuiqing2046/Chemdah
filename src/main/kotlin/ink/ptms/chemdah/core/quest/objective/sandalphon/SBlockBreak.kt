@@ -28,7 +28,7 @@ object SBlockBreak : ObjectiveCountableI<BlockBreakEvent>() {
             data.toInferBlock().isBlock(it.bukkitEvent.block)
         }
         addSimpleCondition("id") { data, it ->
-            toString().equals(it.blockData.id, true)
+            data.toString().equals(it.blockData.id, true)
         }
         addConditionVariable("id") {
             it.blockData.id

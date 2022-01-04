@@ -26,7 +26,7 @@ object SClassChange : ObjectiveCountableI<PlayerClassChangeEvent>() {
             data.toPosition().inside(it.playerData.player.location)
         }
         addSimpleCondition("class") { data, it ->
-            toString().equals(it.newClass.name, true)
+            data.toString().equals(it.newClass.name, true)
         }
         addConditionVariable("class") {
             it.newClass.name

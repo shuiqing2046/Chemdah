@@ -26,7 +26,7 @@ object SUpAttribute : ObjectiveCountableI<PlayerUpAttributeEvent>() {
             data.toPosition().inside(it.playerData.player.location)
         }
         addSimpleCondition("attribute") { data, it ->
-            toString().equals(it.attribute, true)
+            data.toString().equals(it.attribute, true)
         }
         addConditionVariable("attribute") {
             it.attribute

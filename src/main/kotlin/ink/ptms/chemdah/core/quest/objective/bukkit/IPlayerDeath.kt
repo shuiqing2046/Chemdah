@@ -31,7 +31,7 @@ object IPlayerDeath : AEntityDeath<PlayerDeathEvent>() {
             data.toInferEntity().isEntity(el.attacker ?: return@addSimpleCondition false)
         }
         addSimpleCondition("message") { data, e ->
-            toString() in e.deathMessage.toString()
+            data.toString() in e.deathMessage.toString()
         }
         addConditionVariable("message") { e ->
             e.deathMessage.toString()

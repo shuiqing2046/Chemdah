@@ -25,7 +25,7 @@ object IPlayerChat : ObjectiveCountableI<AsyncPlayerChatEvent>() {
             data.toPosition().inside(e.player.location)
         }
         addSimpleCondition("message") { data, e ->
-            toString() in e.message
+            data.toString() in e.message
         }
         addConditionVariable("message") {
             it.message

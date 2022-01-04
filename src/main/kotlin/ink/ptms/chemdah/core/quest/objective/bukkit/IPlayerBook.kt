@@ -31,10 +31,10 @@ object IPlayerBook : ObjectiveCountableI<PlayerEditBookEvent>() {
             data.toInt() <= e.newBookMeta.pageCount
         }
         addSimpleCondition("title") { data, e ->
-            toString() in e.newBookMeta.title.toString()
+            data.toString() in e.newBookMeta.title.toString()
         }
         addSimpleCondition("content") { data, e ->
-            toString() in e.newBookMeta.pages.toString()
+            data.toString() in e.newBookMeta.pages.toString()
         }
         addConditionVariable("page") {
             it.newBookMeta.pageCount
