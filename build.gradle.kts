@@ -89,7 +89,7 @@ dependencies {
     compileOnly("public:Brewery:1.0.0")
     compileOnly("ink.ptms:Blockdb:1.1.0")
     compileOnly("ink.ptms:Zaphkiel:1.6.0")
-    compileOnly("ink.ptms:Adyeshach:1.3.19")
+    compileOnly("ink.ptms:Adyeshach:1.4.21")
     compileOnly("ink.ptms:Sandalphon:1.3.0")
     compileOnly("ink.ptms.core:v11800:11800:api")
     compileOnly("ink.ptms.core:v11400:11400")
