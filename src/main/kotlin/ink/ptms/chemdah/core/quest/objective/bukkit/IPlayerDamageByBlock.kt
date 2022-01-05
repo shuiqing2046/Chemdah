@@ -16,6 +16,7 @@ object IPlayerDamageByBlock : AEntityDamage<EntityDamageByBlockEvent>() {
 
     override val name = "player damage by block"
     override val event = EntityDamageByBlockEvent::class.java
+    override val isAsync = true
 
     init {
         handler {

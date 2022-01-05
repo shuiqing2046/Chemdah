@@ -17,10 +17,11 @@ object IPlayerDamageByEntity : AEntityDamage<EntityDamageByEntityEvent>() {
 
     override val name = "player damage by entity"
     override val event = EntityDamageByEntityEvent::class.java
+    override val isAsync = true
 
     init {
         handler {
-            it.attacker as? Player
+            it.entity as? Player
         }
         addSimpleCondition("attacker") { data, e ->
             data.toInferEntity().isEntity(e.attacker)
