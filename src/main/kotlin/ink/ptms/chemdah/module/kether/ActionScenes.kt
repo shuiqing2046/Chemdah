@@ -285,7 +285,7 @@ class ActionScenes {
                 (it as AdyFallingBlock).setMaterial(material, data)
             }
             npc.setTag("chemdah:scenes", if (toSolid) "SOLID" else "NONE")
-            npc.registerController(AdyeshachAPI.getKnownController("Gravity")!!.get.apply(npc))
+            npc.registerController(AdyeshachAPI.getControllerGenerator("Gravity")!!.generator.apply(npc))
         }
 
         @SubscribeEvent
