@@ -35,9 +35,9 @@ class AddonUI(root: ConfigurationSection, questContainer: QuestContainer) : Addo
     val icon: String? = root.getString("icon")
 
     /**
-     * 显示介绍
+     * 显示介绍，适配 Chemdah Lab
      */
-    val description = root["description"]?.asList()
+    val description = root["description"]?.asList()?.flatMap { it.lines() }
 
     companion object {
 

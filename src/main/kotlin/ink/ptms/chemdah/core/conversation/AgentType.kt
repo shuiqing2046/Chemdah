@@ -40,7 +40,7 @@ enum class AgentType(val namespace: String) {
 
         fun String.toAgentType(): AgentType {
             return try {
-                valueOf(toUpperCase())
+                valueOf(uppercase())
             } catch (ignored: Exception) {
                 NONE
             }

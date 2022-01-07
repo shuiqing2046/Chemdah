@@ -22,7 +22,7 @@ class InferEntity(val entities: List<Entity>) {
 
     open class Entity(val name: String, val flags: List<Flags>, val data: Map<String, String>) {
 
-        open fun match(entity: org.bukkit.entity.Entity) = matchType(entity.type.name.toLowerCase()) && matchData(entity)
+        open fun match(entity: org.bukkit.entity.Entity) = matchType(entity.type.name.lowercase()) && matchData(entity)
 
         open fun matchType(type: String) = flags.any { it.match(type, name) }
 

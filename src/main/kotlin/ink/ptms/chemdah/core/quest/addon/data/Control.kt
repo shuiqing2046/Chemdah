@@ -22,7 +22,7 @@ enum class ControlTrigger {
 
     companion object {
 
-        fun fromName(name: String) = Enums.getIfPresent(ControlTrigger::class.java, name.toUpperCase()).or(COMPLETE)!!
+        fun fromName(name: String) = Enums.getIfPresent(ControlTrigger::class.java, name.uppercase()).or(COMPLETE)!!
     }
 }
 
@@ -69,13 +69,13 @@ class ControlCooldown(val type: ControlTrigger, val time: TimeCycle, val group: 
         get() = type
 
     override fun check(profile: PlayerProfile, template: Template): CompletableFuture<ControlResult> {
-        val id = "quest.cooldown.${if (group != null) "@$group" else template.id}.${type.name.toLowerCase()}"
+        val id = "quest.cooldown.${if (group != null) "@$group" else template.id}.${type.name.lowercase()}"
         val start = profile.persistentDataContainer[id, 0L].toLong()
         return CompletableFuture.completedFuture(time.start(start).isTimeout(start).toResult("cooldown"))
     }
 
     override fun signature(profile: PlayerProfile, template: Template) {
-        val id = "quest.cooldown.${if (group != null) "@$group" else template.id}.${type.name.toLowerCase()}"
+        val id = "quest.cooldown.${if (group != null) "@$group" else template.id}.${type.name.lowercase()}"
         profile.persistentDataContainer[id] = System.currentTimeMillis()
     }
 }
@@ -103,7 +103,7 @@ class ControlRepeat(val type: ControlTrigger, val amount: Int, val period: TimeC
         get() = type
 
     override fun check(profile: PlayerProfile, template: Template): CompletableFuture<ControlResult> {
-        val id = "quest.repeat.${if (group != null) "@$group" else template.id}.${type.name.toLowerCase()}"
+        val id = "quest.repeat.${if (group != null) "@$group" else template.id}.${type.name.lowercase()}"
         val time = profile.persistentDataContainer["$id.time", 0L].toLong()
         // 超出重复限时
         if (period != null && period.start(time).isTimeout(time)) {
@@ -113,7 +113,7 @@ class ControlRepeat(val type: ControlTrigger, val amount: Int, val period: TimeC
     }
 
     override fun signature(profile: PlayerProfile, template: Template) {
-        val id = "quest.repeat.${if (group != null) "@$group" else template.id}.${type.name.toLowerCase()}"
+        val id = "quest.repeat.${if (group != null) "@$group" else template.id}.${type.name.lowercase()}"
         val time = profile.persistentDataContainer["$id.time", 0L].toLong()
         // 超出重复限时
         if (period != null && period.start(time).isTimeout(time)) {

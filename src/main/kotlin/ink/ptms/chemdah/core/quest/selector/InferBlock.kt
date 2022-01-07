@@ -23,7 +23,7 @@ import taboolib.module.nms.MinecraftVersion
 class InferBlock(val mats: List<Block>) {
 
     fun isBlock(block: org.bukkit.block.Block): Boolean {
-        val type = block.type.name.toLowerCase()
+        val type = block.type.name.lowercase()
         val data = when {
             MinecraftVersion.majorLegacy >= 11800 -> {
                 block.blockData.getProperty<Any>("state")!!.invokeMethod<Map<Any, Any>>("getValues")!!.mapKeys { it.key.invokeMethod<String>("getName")!! }

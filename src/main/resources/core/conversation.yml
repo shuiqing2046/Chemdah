@@ -6,16 +6,16 @@
 theme-chat:
   format:
     - ' '
-    - ' [title]:'
+    - ' {title}:'
     - ' '
-    - '  &f" &7[npcSide]&r &f"'
+    - '  &f" &7{npc_side}&r &f"'
     - ' '
-    - '  [reply]'
+    - '  {reply}'
     - ' '
   select:
     reply:
-      1: '&7▶ &f&n[playerSide]&r &8(&6&lF&8)'
-      0: '&8▶ &7[playerSide]&r   &r'
+      1: '&7▶ &f&n{player_side}&r &8(&6&lF&8)'
+      0: '&8▶ &7{player_side}&r   &r'
     sound:
       name: ENTITY_EXPERIENCE_ORB_PICKUP
       p: 2
@@ -49,21 +49,21 @@ theme-chat:
 # Not recommended
 theme-chest:
   ui:
-    title: 'Talking with [title]...'
+    title: 'Talking with {title}...'
     rows: 'max ceil math add [ math div [ &size 5 ] 2 ] 3'
   npc-side:
     item:
       material: book
-      name: '&f [title]'
+      name: '&f {title}'
       lore:
         - ' '
-        - ' &7[npcSide] '
+        - ' &7{npc_side} '
         - ' '
     slot: 10
   player-side:
     item:
       material: paper
-      name: '&7[index]. &f[playerSide]'
+      name: '&7{index}. &f{player_side}'
     slot:
       - 12
       - 13

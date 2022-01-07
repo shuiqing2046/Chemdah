@@ -1,6 +1,6 @@
 __option__:
   theme: 'chat'
-  title: 'Mr.[name]'
+  title: 'Mr.{name}'
 
 conversation_0:
   npc id: 'adyeshach test'

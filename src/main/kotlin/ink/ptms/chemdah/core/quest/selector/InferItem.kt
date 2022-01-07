@@ -40,7 +40,7 @@ class InferItem(val items: List<Item>) {
 
     open class Item(val material: String, val flags: List<Flags>, val data: Map<String, String>) {
 
-        open fun match(item: ItemStack) = matchType(item.type.name.toLowerCase()) && matchMetaData(item)
+        open fun match(item: ItemStack) = matchType(item.type.name.lowercase()) && matchMetaData(item)
 
         open fun matchType(type: String) = flags.any { it.match(type, material) }
 

@@ -81,7 +81,7 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
      * 任务进度样式
      */
     val style = try {
-        BarStyle.valueOf(config.getString("style", conf.getString("default-stats.style"))!!.toUpperCase())
+        BarStyle.valueOf(config.getString("style", conf.getString("default-stats.style"))!!.uppercase())
     } catch (ignored: Throwable) {
         BarStyle.SOLID
     }
@@ -90,7 +90,7 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
      * 任务进度颜色
      */
     val color = try {
-        BarColor.valueOf(config.getString("color", conf.getString("default-stats.color"))!!.toUpperCase())
+        BarColor.valueOf(config.getString("color", conf.getString("default-stats.color"))!!.uppercase())
     } catch (ignored: Throwable) {
         BarColor.WHITE
     }
@@ -103,11 +103,12 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
     /**
      * 进度格式化后的内容
      */
-    fun getTitle(task: QuestContainer, progress: Progress) = content
-        .replace("{name}", task.displayName())
-        .replace("{value}", progress.value.toString())
-        .replace("{target}", progress.target.toString())
-        .replace("{percent}", Coerce.format(progress.percent * 100).toString())
+    fun getTitle(task: QuestContainer, progress: Progress) = content.replaces(
+        "name" to task.displayName(),
+        "value" to progress.value,
+        "target" to progress.target,
+        "percent" to Coerce.format(progress.percent * 100)
+    )
 
     /**
      * 获取进度
@@ -162,7 +163,7 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
         }
     }
 
-    companion object  {
+    companion object {
 
         private val statsMap = ConcurrentHashMap<String, StatsMap>()
 

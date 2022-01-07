@@ -86,7 +86,9 @@ fun String.realLength(): Int {
     return sumBy { if (it.toString().matches(regex)) 2 else 1 }
 }
 
-fun <K, V, M : MutableMap<in K, in V>> Iterable<Couple<K, V>>.toMap(destination: M): M = destination.apply { putAll(this@toMap) }
+fun <K, V, M : MutableMap<in K, in V>> Iterable<Couple<K, V>>.toMap(destination: M): M {
+    return destination.apply { putAll(this@toMap) }
+}
 
 fun <K, V> Iterable<Couple<K, V>>.toMap(): Map<K, V> {
     if (this is Collection) {
@@ -105,4 +107,13 @@ fun <K, V> MutableMap<in K, in V>.putAll(couples: Iterable<Couple<K, V>>) {
     }
 }
 
-fun <K, V> mapOf(couple: Couple<K, V>): Map<K, V> = java.util.Collections.singletonMap(couple.key, couple.value)
+fun <K, V> mapOf(couple: Couple<K, V>): Map<K, V> {
+    return java.util.Collections.singletonMap(couple.key, couple.value)
+}
+
+fun String.replaces(vararg vars: Pair<String, Any>): String {
+    var r = this
+    vars.forEach { r = r.replace("[\\[{]${it.first}[]}]".toRegex(), it.second.toString()) }
+    return r
+}
+

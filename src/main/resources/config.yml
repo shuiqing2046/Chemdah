@@ -34,7 +34,7 @@ default-track:
   landmark:
     value: true
     content:
-      - '&a[ - {name} - ]'
+      - '&a{name}'
       - '&f({distance}m)'
     distance: 3
   navigation:
@@ -63,8 +63,8 @@ default-track:
     value: true
     length: 64
     content:
-      - '&6&lCHEMDAH TRACKS'
+      - '&6&lTRACKING'
       - - ''
-        - ' &f{name}:'
-        - ' {description}'
+        - ' &e{name}:'
+        - ' &f{description}'
       - ''

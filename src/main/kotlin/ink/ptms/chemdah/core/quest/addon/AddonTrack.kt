@@ -19,6 +19,8 @@ import ink.ptms.chemdah.core.quest.meta.MetaName.Companion.displayName
 import ink.ptms.chemdah.core.quest.selector.InferArea
 import ink.ptms.chemdah.module.party.PartySystem.getMembers
 import ink.ptms.chemdah.util.conf
+import ink.ptms.chemdah.util.namespaceQuestUI
+import ink.ptms.chemdah.util.replaces
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
@@ -37,6 +39,8 @@ import taboolib.common5.mirrorNow
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.module.chat.TellrawJson
 import taboolib.module.chat.colored
+import taboolib.module.kether.KetherFunction
+import taboolib.module.kether.KetherShell
 import taboolib.module.nms.sendScoreboard
 import taboolib.platform.util.sendLang
 import java.util.concurrent.ConcurrentHashMap
@@ -98,7 +102,11 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
      * 记分板中的显示名称与描述
      */
     val name = config.getString("name")?.colored()
-    val description = config["description"]?.asList()?.colored()
+
+    /**
+     * 适配 Chemdah Lab
+     */
+    val description = config["description"]?.asList()?.flatMap { it.lines() }?.colored()
 
     /**
      * 各引导效果
@@ -305,12 +313,12 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                         hologramMap[id]!!.also { holo ->
                             holo.teleport(pos)
                             holo.update(trackAddon.landmark.content.map {
-                                it.replace("{name}", name).replace("{distance}", Coerce.format(distance).toString())
+                                it.replaces("name" to name, "distance" to Coerce.format(distance))
                             })
                         }
                     } else {
                         hologramMap[id] = AdyeshachAPI.createHologram(this, pos, trackAddon.landmark.content.map {
-                            it.replace("{name}", name).replace("{distance}", Coerce.format(distance).toString())
+                            it.replaces("name" to name, "distance" to Coerce.format(distance))
                         })
                     }
                 }
@@ -348,11 +356,15 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                         track.scoreboard.content.flatMap {
                             if (it.isQuestFormat) {
                                 it.content.flatMap { contentLine ->
-                                    if (contentLine.contains("{description}")) {
-                                        val description = track.description ?: quest.ui()?.description ?: emptyList()
-                                        description.split(track.scoreboard.length).map { desc -> contentLine.replace("{description}", desc) }
+                                    if (contentLine.contains("description")) {
+                                        val description = KetherFunction.parse(track.description ?: quest.ui()?.description ?: emptyList(),
+                                            namespace = namespaceQuestUI,
+                                            sender = adaptCommandSender(this),
+                                            vars = KetherShell.VariableMap("@QuestSelected" to quest.node)
+                                        )
+                                        description.split(track.scoreboard.length).map { desc -> contentLine.replaces("description" to desc) }
                                     } else {
-                                        contentLine.replace("{name}", track.name ?: quest.displayName()).asList()
+                                        contentLine.replaces("name" to (track.name ?: quest.displayName())).asList()
                                     }
                                 }
                             } else {
@@ -366,12 +378,16 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                                     val taskTrack = task.track()
                                     if (taskTrack != null && !task.isCompleted(chemdahProfile) && task.isQuestDependCompleted(this)) {
                                         it.content.flatMap { contentLine ->
-                                            if (contentLine.contains("{description}")) {
-                                                val description = taskTrack.description ?: quest.ui()?.description ?: emptyList()
+                                            if (contentLine.contains("description")) {
+                                                val description = KetherFunction.parse(taskTrack.description ?: quest.ui()?.description ?: emptyList(),
+                                                    namespace = namespaceQuestUI,
+                                                    sender = adaptCommandSender(this),
+                                                    vars = KetherShell.VariableMap("@QuestSelected" to quest.node)
+                                                )
                                                 val size = quest.track()?.scoreboard?.length ?: defaultLength
-                                                description.split(size).map { d -> contentLine.replace("{description}", d) }
+                                                description.split(size).map { d -> contentLine.replaces("description" to d) }
                                             } else {
-                                                contentLine.replace("{name}", taskTrack.name ?: task.displayName()).asList()
+                                                contentLine.replaces("name" to (taskTrack.name ?: task.displayName())).asList()
                                             }
                                         }
                                     } else {
@@ -404,6 +420,19 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                     e.player.cancelTrackScoreboard(e.playerProfile.trackQuest!!)
                     e.player.displayTrackLandmark()
                     e.player.displayTrackScoreboard()
+                }
+            }
+        }
+
+        /**
+         * 条目更新刷新任务追踪
+         * 已完成的条目不再显示于记分板中
+         */
+        @SubscribeEvent
+        internal fun onContinue(e: ObjectiveEvents.Continue.Post) {
+            e.quest.getMembers(self = true).forEach {
+                if (it.chemdahProfile.trackQuest == e.task.template) {
+                    it.displayTrackScoreboard()
                 }
             }
         }
@@ -472,8 +501,8 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                             e.player.sendLang(message.substring(1))
                         } else {
                             val name = e.trackingQuest.track()?.name ?: e.trackingQuest.displayName()
-                            TellrawJson().append(message.replace("{name}", name))
-                                .hoverText(message.replace("{name}", name))
+                            TellrawJson().append(message.replaces("name" to name))
+                                .hoverText(message.replaces("name" to name))
                                 .runCommand("/ChemdahTrackCancel")
                                 .sendTo(adaptCommandSender(e.player))
                         }

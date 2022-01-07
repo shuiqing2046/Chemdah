@@ -17,12 +17,13 @@ import taboolib.module.chat.colored
 @Option(Option.Type.TEXT)
 class MetaName(source: String?, questContainer: QuestContainer) : Meta<String?>(source, questContainer) {
 
-    val displayName = source?.colored()
+    val displayName = source
 
     companion object {
 
-        fun QuestContainer.displayName(): String {
-            return meta<MetaName>("name")?.displayName ?: if (this is Task) template.displayName() else id
+        fun QuestContainer.displayName(colored: Boolean = true): String {
+            val displayName = meta<MetaName>("name")?.displayName ?: if (this is Task) template.displayName(colored) else id
+            return if (colored) displayName.colored() else displayName
         }
     }
 }

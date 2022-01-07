@@ -24,7 +24,7 @@ internal object InferItemHooks  {
 
     @SubscribeEvent
     fun e(e: InferItemHookEvent) {
-        when (e.id.toLowerCase()) {
+        when (e.id.lowercase()) {
             "zaphkiel" -> {
                 e.itemClass = ItemZaphkiel::class.java
             }

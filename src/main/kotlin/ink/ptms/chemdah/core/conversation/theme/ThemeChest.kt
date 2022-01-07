@@ -5,6 +5,7 @@ import ink.ptms.chemdah.core.conversation.ConversationManager
 import ink.ptms.chemdah.core.conversation.PlayerReply
 import ink.ptms.chemdah.core.conversation.Session
 import ink.ptms.chemdah.util.namespace
+import ink.ptms.chemdah.util.replaces
 import ink.ptms.chemdah.util.setIcon
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -87,9 +88,9 @@ object ThemeChest : Theme<ThemeChestSetting>() {
         }
         val build = reply.build(session)
         return modifyMeta<ItemMeta> {
-            setDisplayName(displayName.replace("[index]", index.toString()).replace("[playerSide]", build))
+            setDisplayName(displayName.replaces("index" to index.toString(), "player_side" to build, "playerSide" to build))
             lore = lore?.map { line ->
-                val str = line.replace("[index]", index.toString()).replace("[playerSide]", build)
+                val str = line.replaces("index" to index.toString(), "player_side" to build, "playerSide" to build)
                 KetherFunction.parse(str, sender = adaptPlayer(session.player), namespace = namespace)
             }
         }
@@ -104,8 +105,8 @@ object ThemeChest : Theme<ThemeChestSetting>() {
             setDisplayName(displayName.toTitle(session))
             lore = lore?.flatMap { line ->
                 val str = KetherFunction.parse(line, sender = adaptPlayer(session.player), namespace = namespace)
-                if (str.contains("[npcSide]")) {
-                    message.map { str.replace("[npcSide]", it) }
+                if (str.contains("npc_side") || str.contains("npcSide")) {
+                    message.map { str.replaces("npc_side" to it, "npcSide" to it) }
                 } else {
                     str.toTitle(session).asList()
                 }
@@ -114,7 +115,7 @@ object ThemeChest : Theme<ThemeChestSetting>() {
     }
 
     private fun String.toTitle(session: Session): String {
-        val str = replace("[title]", session.conversation.option.title.replace("[name]", session.source?.name.toString())).colored()
+        val str = replaces("title" to session.conversation.option.title.replaces("name" to session.source.name)).colored()
         return KetherFunction.parse(str, sender = adaptPlayer(session.player), namespace = namespace)
     }
 

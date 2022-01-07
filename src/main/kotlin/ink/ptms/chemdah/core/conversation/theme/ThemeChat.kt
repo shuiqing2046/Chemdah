@@ -9,6 +9,7 @@ import ink.ptms.chemdah.core.quest.QuestDevelopment.hasTransmitMessages
 import ink.ptms.chemdah.core.quest.QuestDevelopment.releaseTransmit
 import ink.ptms.chemdah.util.namespace
 import ink.ptms.chemdah.util.realLength
+import ink.ptms.chemdah.util.replaces
 import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerItemHeldEvent
@@ -238,99 +239,98 @@ object ThemeChat : Theme<ThemeChatSettings>() {
             // 如果是最终效果并且存在对话转发，则不发送白信息
             val json = if (noSpace || (animationStopped && session.player.hasTransmitMessages() && !canReply)) TellrawJson().fixed() else newJson()
             try {
-                // 老版本检测
-                if (settings.format.toString().contains("{npcSide}")) {
-                    json.append("§cYour §4conversation.yml §cfile is out of date, please regenerate!")
-                } else {
-                    settings.format.map {
-                        // 识别内联脚本并继承会话变量
-                        KetherFunction.parse(it, sender = adaptPlayer(session.player), namespace = namespace) { extend(session.variables) }
-                    }.colored().forEach {
-                        when {
-                            it.contains("[title]") -> {
-                                val title = session.variables["title"]?.toString() ?: session.conversation.option.title
-                                json.append(it.replace("[title]", title.replace("[name]", session.source.name.toString()))).newLine()
-                            }
-                            it.contains("[npcSide]") -> {
-                                messages.colored().forEachIndexed { i, fully ->
-                                    when {
-                                        index > i -> json.append(it.replace("[npcSide]", fully)).newLine()
-                                        index == i -> json.append(it.replace("[npcSide]", message)).newLine()
-                                        else -> json.newLine()
-                                    }
+                settings.format.map {
+                    // 识别内联脚本并继承会话变量
+                    KetherFunction.parse(it, sender = adaptPlayer(session.player), namespace = namespace) { extend(session.variables) }.colored()
+                }.forEach {
+                    when {
+                        // 包含标题
+                        it.contains("title") -> {
+                            val title = session.variables["title"]?.toString() ?: session.conversation.option.title
+                            json.append(it.replaces("title" to title.replaces("name" to session.source.name))).newLine()
+                        }
+                        // 包含发言，兼容老版本 npcSide 变量
+                        it.contains("npc_side") || it.contains("npcSide") -> {
+                            messages.colored().forEachIndexed { i, fully ->
+                                when {
+                                    index > i -> json.append(it.replaces("npc_side" to fully, "npcSide" to fully)).newLine()
+                                    index == i -> json.append(it.replaces("npc_side" to message, "npcSide" to message)).newLine()
+                                    else -> json.newLine()
                                 }
                             }
-                            it.contains("[reply]") -> {
-                                session.playerReplyForDisplay.clear()
-                                session.playerReplyForDisplay.addAll(replies)
-                                if (canReply) {
-                                    var len = 0
-                                    replies.forEachIndexed { idx, reply ->
-                                        var newLine = false
-                                        val text = reply.build(session)
-                                        val rep = if (session.playerSide == reply) settings.select else settings.selectOther
-                                        // 在单行中显示回复内容
-                                        if (settings.singleLineEnable) {
-                                            len += text.uncolored().realLength()
-                                            // 自动换行
-                                            if (len >= settings.singleLineAutoSwap) {
-                                                len = 0
-                                                newLine = true
-                                                if (animationStopped) {
-                                                    json.newLine()
-                                                }
-                                            }
-                                            // 主动换行
-                                            if (reply.swapLine) {
-                                                newLine = true
-                                                if (animationStopped) {
-                                                    json.newLine()
-                                                }
-                                            }
+                        }
+                        // 包含回复
+                        it.contains("reply") -> {
+                            session.playerReplyForDisplay.clear()
+                            session.playerReplyForDisplay.addAll(replies)
+                            if (canReply) {
+                                var len = 0
+                                replies.forEachIndexed { idx, reply ->
+                                    var newLine = false
+                                    val text = reply.build(session)
+                                    val rep = if (session.playerSide == reply) settings.select else settings.selectOther
+                                    // 在单行中显示回复内容
+                                    if (settings.singleLineEnable) {
+                                        len += text.uncolored().realLength()
+                                        // 自动换行
+                                        if (len >= settings.singleLineAutoSwap) {
+                                            len = 0
+                                            newLine = true
                                             if (animationStopped) {
-                                                json.append(it.replace("[reply]", rep.replace("[playerSide]", text).replace("[index]", (idx + 1).toString())))
-                                                    .runCommand("/session reply ${reply.uuid}")
-                                                // 是否启用鼠标悬停显示
-                                                if (settings.hoverText) {
-                                                    json.hoverText(text)
-                                                }
-                                                // 分割字符
-                                                if (idx + 1 < replies.size) {
-                                                    json.append(settings.singleLineReplySeparator)
-                                                }
+                                                json.newLine()
+                                            }
+                                        }
+                                        // 主动换行
+                                        if (reply.swapLine) {
+                                            newLine = true
+                                            if (animationStopped) {
+                                                json.newLine()
+                                            }
+                                        }
+                                        if (animationStopped) {
+                                            val replyText = rep.replaces("player_side" to text, "playerSide" to text, "index" to idx + 1)
+                                            json.append(it.replaces("reply" to replyText)).runCommand("/session reply ${reply.uuid}")
+                                            // 是否启用鼠标悬停显示
+                                            if (settings.hoverText) {
+                                                json.hoverText(text)
+                                            }
+                                            // 分割字符
+                                            if (idx + 1 < replies.size) {
+                                                json.append(settings.singleLineReplySeparator)
+                                            }
+                                        }
+                                    } else {
+                                        if (animationStopped) {
+                                            val replyText = rep.replaces("player_side" to text, "playerSide" to text, "index" to idx + 1)
+                                            json.append(it.replaces("reply" to replyText)).runCommand("/session reply ${reply.uuid}")
+                                            // 是否启用鼠标悬停显示
+                                            if (settings.hoverText) {
+                                                json.hoverText(text)
+                                            }
+                                            json.newLine()
+                                            newLine = true
+                                        }
+                                    }
+                                    if (!animationStopped) {
+                                        if (settings.singleLineEnable) {
+                                            if (idx == 0) {
+                                                json.append(settings.talking)
+                                            } else if (newLine) {
+                                                json.newLine()
                                             }
                                         } else {
-                                            if (animationStopped) {
-                                                json.append(it.replace("[reply]", rep.replace("[playerSide]", text).replace("[index]", (idx + 1).toString())))
-                                                    .runCommand("/session reply ${reply.uuid}")
-                                                if (settings.hoverText) {
-                                                    json.hoverText(text)
-                                                }
-                                                json.newLine()
-                                                newLine = true
-                                            }
-                                        }
-                                        if (!animationStopped) {
-                                            if (settings.singleLineEnable) {
-                                                if (idx == 0) {
-                                                    json.append(settings.talking)
-                                                } else if (newLine) {
-                                                    json.newLine()
-                                                }
+                                            if (idx == 0) {
+                                                json.append(settings.talking).newLine()
                                             } else {
-                                                if (idx == 0) {
-                                                    json.append(settings.talking).newLine()
-                                                } else {
-                                                    json.newLine()
-                                                }
+                                                json.newLine()
                                             }
                                         }
                                     }
                                 }
                             }
-                            else -> {
-                                json.append(it).newLine()
-                            }
+                        }
+                        else -> {
+                            json.append(it).newLine()
                         }
                     }
                 }

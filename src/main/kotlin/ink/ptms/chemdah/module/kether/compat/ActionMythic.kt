@@ -48,7 +48,7 @@ class ActionMythic {
     companion object {
 
         private val triggers by lazy {
-            SkillTrigger.values().map { trigger -> trigger.name.toLowerCase() }.toTypedArray()
+            SkillTrigger.values().map { trigger -> trigger.name.lowercase() }.toTypedArray()
         }
 
         /**
@@ -63,7 +63,7 @@ class ActionMythic {
                     val trigger = try {
                         it.mark()
                         it.expects("with", "as", "by")
-                        SkillTrigger.valueOf(it.expects(*triggers).toUpperCase())
+                        SkillTrigger.valueOf(it.expects(*triggers).uppercase())
                     } catch (ex: Throwable) {
                         it.reset()
                         SkillTrigger.DEFAULT

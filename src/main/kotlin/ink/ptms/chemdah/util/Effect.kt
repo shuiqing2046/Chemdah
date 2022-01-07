@@ -14,7 +14,7 @@ import java.awt.Color
 open class Effect(val source: String) {
 
     val demand = Demand(source)
-    val particle = Enums.getIfPresent(ProxyParticle::class.java, demand.namespace.toUpperCase()).or(ProxyParticle.FLAME)!!
+    val particle = Enums.getIfPresent(ProxyParticle::class.java, demand.namespace.uppercase()).or(ProxyParticle.FLAME)!!
     val offsetX = Coerce.toDouble(demand.get(0, "0")!!)
     val offsetY = Coerce.toDouble(demand.get(1, "0")!!)
     val offsetZ = Coerce.toDouble(demand.get(2, "0")!!)

@@ -4,6 +4,7 @@ import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Template
 import ink.ptms.chemdah.core.quest.addon.AddonTrack.Companion.allowTracked
 import ink.ptms.chemdah.core.quest.addon.AddonTrack.Companion.trackQuest
+import ink.ptms.chemdah.util.replaces
 import org.bukkit.Sound
 import taboolib.module.configuration.SecuredFile
 import taboolib.module.ui.openMenu
@@ -20,7 +21,7 @@ import taboolib.platform.util.isAir
 class UIMenu(val ui: UI, val profile: PlayerProfile, val templates: List<UITemplate>) {
 
     fun open(page: Int = 0) {
-        profile.player.openMenu<Linked<UITemplate>>(ui.name.replace("{name}", profile.player.name).replace("{page}", "%p")) {
+        profile.player.openMenu<Linked<UITemplate>>(ui.name.replaces("name" to profile.player.name, "page" to "%p")) {
             page(page)
             rows(ui.menuQuestRows)
             slots(ui.menuQuestSlot)
