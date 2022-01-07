@@ -14,7 +14,6 @@ import taboolib.module.configuration.SecuredFile
 import taboolib.module.kether.KetherShell
 import taboolib.module.kether.printKetherErrorMessage
 import java.util.concurrent.CompletableFuture
-import javax.script.SimpleBindings
 
 /**
  * Chemdah

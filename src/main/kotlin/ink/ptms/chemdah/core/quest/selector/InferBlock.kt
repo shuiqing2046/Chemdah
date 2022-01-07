@@ -1,6 +1,5 @@
 package ink.ptms.chemdah.core.quest.selector
 
-import com.google.common.collect.ImmutableMap
 import ink.ptms.chemdah.core.quest.selector.Flags.Companion.matchType
 import taboolib.common.reflect.Reflex.Companion.getProperty
 import taboolib.common.reflect.Reflex.Companion.invokeMethod

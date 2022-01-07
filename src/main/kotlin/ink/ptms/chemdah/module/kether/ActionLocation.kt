@@ -5,7 +5,6 @@ import taboolib.common5.Coerce
 import taboolib.library.kether.ArgTypes
 import taboolib.library.kether.ParsedAction
 import taboolib.module.kether.*
-import taboolib.platform.util.toBukkitLocation
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -21,9 +20,9 @@ class ActionLocation {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Any> {
             val future = CompletableFuture<Any>()
-            frame.newFrame(location).run<taboolib.common.util.Location>().thenApply {
+            frame.newFrame(location).run<Location>().thenApply {
                 frame.newFrame(value).run<Any>().thenApply { value ->
-                    future.complete(func(it.toBukkitLocation(), value))
+                    future.complete(func(it, value))
                 }
             }
             return future
@@ -38,8 +37,8 @@ class ActionLocation {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Double> {
             val future = CompletableFuture<Double>()
-            frame.newFrame(loc1).run<taboolib.common.util.Location>().thenApply { loc1 ->
-                frame.newFrame(loc2).run<taboolib.common.util.Location>().thenApply { loc2 ->
+            frame.newFrame(loc1).run<Location>().thenApply { loc1 ->
+                frame.newFrame(loc2).run<Location>().thenApply { loc2 ->
                     if (loc1.world == loc2.world) loc1.distance(loc2) else -1
                 }
             }

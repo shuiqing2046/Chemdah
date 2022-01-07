@@ -1,10 +1,8 @@
 package ink.ptms.chemdah.core.quest.objective.brewery
 
 import com.dre.brewery.api.events.barrel.BarrelCreateEvent
-import ink.ptms.chemdah.core.Data
 import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
-import ink.ptms.chemdah.util.Function2
 
 /**
  * Chemdah

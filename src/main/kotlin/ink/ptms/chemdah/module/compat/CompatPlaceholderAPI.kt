@@ -4,7 +4,6 @@ import ink.ptms.chemdah.api.ChemdahAPI.isChemdahProfileLoaded
 import ink.ptms.chemdah.util.namespaceQuest
 import org.bukkit.entity.Player
 import taboolib.common.platform.function.adaptPlayer
-import taboolib.module.kether.KetherFunction
 import taboolib.module.kether.KetherShell
 import taboolib.platform.compat.PlaceholderExpansion
 

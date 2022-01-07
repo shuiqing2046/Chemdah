@@ -50,11 +50,11 @@ class ActionScenes {
     ) : ScriptAction<Void>() {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Void> {
-            return frame.newFrame(location).run<taboolib.common.util.Location>().thenAccept { location ->
+            return frame.newFrame(location).run<Location>().thenAccept { location ->
                 if (falling) {
-                    frame.getPlayer().createScenesFallingBlock(location.toBukkitLocation(), material, data, solid)
+                    frame.getPlayer().createScenesFallingBlock(location, material, data, solid)
                 } else {
-                    frame.getPlayer().createScenesBlock(location.toBukkitLocation(), material, data)
+                    frame.getPlayer().createScenesBlock(location, material, data)
                 }
             }
         }
@@ -72,13 +72,13 @@ class ActionScenes {
     ) : ScriptAction<Void>() {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Void> {
-            return frame.newFrame(location).run<taboolib.common.util.Location>().thenAccept { location ->
-                frame.newFrame(copy).run<taboolib.common.util.Location>().thenAccept { copy ->
-                    val block = copy.toBukkitLocation().block
+            return frame.newFrame(location).run<Location>().thenAccept { location ->
+                frame.newFrame(copy).run<Location>().thenAccept { copy ->
+                    val block = copy.block
                     if (falling) {
-                        frame.getPlayer().createScenesFallingBlock(location.toBukkitLocation(), block.type, block.data, solid)
+                        frame.getPlayer().createScenesFallingBlock(location, block.type, block.data, solid)
                     } else {
-                        frame.getPlayer().createScenesBlock(location.toBukkitLocation(), block.type, block.data)
+                        frame.getPlayer().createScenesBlock(location, block.type, block.data)
                     }
                 }
             }
@@ -169,8 +169,8 @@ class ActionScenes {
                 case("reset") {
                     val loc = it.next(ArgTypes.ACTION)
                     actionNow {
-                        newFrame(loc).run<taboolib.common.util.Location>().thenAccept { loc ->
-                            getPlayer().removeScenesBlock(loc.toBukkitLocation())
+                        newFrame(loc).run<Location>().thenAccept { loc ->
+                            getPlayer().removeScenesBlock(loc)
                         }
                     }
                 }

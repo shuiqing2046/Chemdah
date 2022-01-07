@@ -6,7 +6,6 @@ import org.bukkit.Location
 import taboolib.library.kether.ArgTypes
 import taboolib.library.kether.ParsedAction
 import taboolib.module.kether.*
-import taboolib.platform.util.toBukkitLocation
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -21,11 +20,11 @@ class ActionParticle {
     class ParticleNormal(val effect: Effect, val location: ParsedAction<*>, val self: Boolean = false) : ScriptAction<Void>() {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Void> {
-            return frame.newFrame(location).run<taboolib.common.util.Location>().thenAccept {
+            return frame.newFrame(location).run<Location>().thenAccept {
                 if (self) {
-                    effect.run(it.toBukkitLocation(), frame.getPlayer())
+                    effect.run(it, frame.getPlayer())
                 } else {
-                    effect.run(it.toBukkitLocation())
+                    effect.run(it)
                 }
             }
         }

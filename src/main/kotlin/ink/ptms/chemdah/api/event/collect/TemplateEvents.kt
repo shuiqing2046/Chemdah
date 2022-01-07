@@ -1,6 +1,5 @@
 package ink.ptms.chemdah.api.event.collect
 
-import ink.ptms.chemdah.core.conversation.Option
 import ink.ptms.chemdah.core.quest.Template
 import ink.ptms.chemdah.core.quest.addon.data.Control
 import taboolib.library.configuration.ConfigurationSection
