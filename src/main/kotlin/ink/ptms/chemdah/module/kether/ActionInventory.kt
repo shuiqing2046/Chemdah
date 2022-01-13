@@ -25,6 +25,19 @@ class ActionInventory {
         }
     }
 
+    class InventoryCount(val item: InferItem.Item) : ScriptAction<Int>() {
+
+        override fun run(frame: ScriptFrame): CompletableFuture<Int> {
+            var checkAmount = 0
+            frame.getPlayer().inventory.contents.forEach { itemStack ->
+                if (itemStack.isNotAir() && item.match(itemStack)) {
+                    checkAmount += itemStack.amount
+                }
+            }
+            return CompletableFuture.completedFuture(checkAmount)
+        }
+    }
+
     class InventoryCheck(val item: InferItem.Item, val amount: Int) : ScriptAction<Boolean>() {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Boolean> {
@@ -56,7 +69,7 @@ class ActionInventory {
         }
     }
 
-    class InventoryClose() : ScriptAction<Void>() {
+    class InventoryClose : ScriptAction<Void>() {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Void> {
             frame.getPlayer().closeInventory()
@@ -67,6 +80,7 @@ class ActionInventory {
     companion object {
 
         /**
+         * inventory count "minecraft:stone"
          * inventory close
          * inventory check "minecraft:stone" amount 1
          * inventory take "minecraft:stone" amount 1
@@ -75,24 +89,40 @@ class ActionInventory {
          */
         @KetherParser(["inventory"], shared = true)
         fun parser() = scriptParser {
-            when (it.expects(
-                "has", "have", "check", "take", "remove",
-                "hand", "mainhand", "offhand",
-                "head", "helmet", "chest", "chestplate", "legs", "leggings", "boots", "feet",
-                "slot",
-                "close"
-            )) {
-                "has", "have", "check" -> InventoryCheck(it.nextToken().toInferItem(), matchAmount(it))
-                "take", "remove" -> InventoryTake(it.nextToken().toInferItem(), matchAmount(it))
-                "hand", "mainhand" -> InventoryEquipment(BukkitEquipment.HAND, matchItem(it), matchAmount(it))
-                "offhand" -> InventoryEquipment(BukkitEquipment.OFF_HAND, matchItem(it), matchAmount(it))
-                "head", "helmet" -> InventoryEquipment(BukkitEquipment.HEAD, matchItem(it), matchAmount(it))
-                "chest", "chestplate" -> InventoryEquipment(BukkitEquipment.CHEST, matchItem(it), matchAmount(it))
-                "legs", "leggings" -> InventoryEquipment(BukkitEquipment.LEGS, matchItem(it), matchAmount(it))
-                "boots", "feet" -> InventoryEquipment(BukkitEquipment.FEET, matchItem(it), matchAmount(it))
-                "slot" -> InventorySlot(it.nextInt(), matchItem(it), matchAmount(it))
-                "close" -> InventoryClose()
-                else -> error("out of case")
+            it.switch {
+                case("count", "amount") {
+                    InventoryCount(it.nextToken().toInferItem())
+                }
+                case("has", "have", "check") {
+                    InventoryCheck(it.nextToken().toInferItem(), matchAmount(it))
+                }
+                case("take", "remove") {
+                    InventoryTake(it.nextToken().toInferItem(), matchAmount(it))
+                }
+                case("hand", "mainhand") {
+                    InventoryEquipment(BukkitEquipment.HAND, matchItem(it), matchAmount(it))
+                }
+                case("offhand") {
+                    InventoryEquipment(BukkitEquipment.OFF_HAND, matchItem(it), matchAmount(it))
+                }
+                case("head", "helmet") {
+                    InventoryEquipment(BukkitEquipment.HEAD, matchItem(it), matchAmount(it))
+                }
+                case("chest", "chestplate") {
+                    InventoryEquipment(BukkitEquipment.CHEST, matchItem(it), matchAmount(it))
+                }
+                case("legs", "leggings") {
+                    InventoryEquipment(BukkitEquipment.LEGS, matchItem(it), matchAmount(it))
+                }
+                case("boots", "feet") {
+                    InventoryEquipment(BukkitEquipment.FEET, matchItem(it), matchAmount(it))
+                }
+                case("slot") {
+                    InventorySlot(it.nextInt(), matchItem(it), matchAmount(it))
+                }
+                case("close") {
+                    InventoryClose()
+                }
             }
         }
 
