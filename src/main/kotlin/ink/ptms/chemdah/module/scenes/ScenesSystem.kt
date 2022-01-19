@@ -4,13 +4,14 @@ import ink.ptms.chemdah.module.Module
 import ink.ptms.chemdah.module.Module.Companion.register
 import taboolib.common.platform.Awake
 import taboolib.module.configuration.Config
+import taboolib.module.configuration.Configuration
 import taboolib.module.configuration.SecuredFile
 
 @Awake
 object ScenesSystem : Module {
 
     @Config("module/scenes.yml")
-    lateinit var conf: SecuredFile
+    lateinit var conf: Configuration
         private set
 
     val scenesMap = HashMap<String, ScenesFile>()

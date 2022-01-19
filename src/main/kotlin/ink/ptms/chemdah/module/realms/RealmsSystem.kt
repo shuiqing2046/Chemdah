@@ -9,6 +9,7 @@ import org.bukkit.event.player.PlayerMoveEvent
 import taboolib.common.platform.Awake
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.module.configuration.Config
+import taboolib.module.configuration.Configuration
 import taboolib.module.configuration.SecuredFile
 import taboolib.module.nms.MinecraftVersion
 import taboolib.platform.BukkitPlugin
@@ -17,7 +18,7 @@ import taboolib.platform.BukkitPlugin
 object RealmsSystem : Module {
 
     @Config("module/realms.yml")
-    lateinit var conf: SecuredFile
+    lateinit var conf: Configuration
         private set
 
     val realmsMap = HashMap<String, Realms>()

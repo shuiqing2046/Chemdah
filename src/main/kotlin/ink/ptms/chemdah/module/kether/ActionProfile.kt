@@ -111,10 +111,16 @@ class ActionProfile {
             return frame.newFrame(key).run<Any>().thenApply {
                 val option = LevelSystem.getLevelOption(it.toString())
                 if (option != null) {
-                    if (type == LevelType.LEVEL) {
-                        frame.getProfile().getLevel(option).level
-                    } else {
-                        frame.getProfile().getLevel(option).experience
+                    when (type) {
+                        LevelType.LEVEL -> {
+                            frame.getProfile().getLevel(option).level
+                        }
+                        LevelType.EXP -> {
+                            frame.getProfile().getLevel(option).experience
+                        }
+                        LevelType.EXP_MAX -> {
+                            option.algorithm.getExp(frame.getProfile().getLevel(option).level).join()
+                        }
                     }
                 } else {
                     -1
@@ -125,7 +131,7 @@ class ActionProfile {
 
     enum class LevelType {
 
-        LEVEL, EXP
+        LEVEL, EXP, EXP_MAX
     }
 
     companion object {
@@ -184,18 +190,23 @@ class ActionProfile {
                 }
                 "level" -> {
                     val key = it.next(ArgTypes.ACTION)
-                    val type = when (it.expects("level", "exp")) {
+                    val type = when (it.expects("level", "exp", "exp-max")) {
                         "level" -> LevelType.LEVEL
                         "exp" -> LevelType.EXP
+                        "exp-max" -> LevelType.EXP_MAX
                         else -> error("out of case")
                     }
                     try {
                         it.mark()
-                        when (it.expects("+", "=", "to", "add", "increase")) {
-                            "=", "to" -> ProfileLevelSet(key, type, it.next(ArgTypes.ACTION), PlayerOperator.Method.MODIFY)
-                            "+", "add", "increase" -> ProfileLevelSet(key, type, it.next(ArgTypes.ACTION), PlayerOperator.Method.INCREASE)
+                        val method = when (it.expects("+", "=", "to", "add", "increase")) {
+                            "=", "to" -> PlayerOperator.Method.MODIFY
+                            "+", "add", "increase" -> PlayerOperator.Method.INCREASE
                             else -> error("out of case")
                         }
+                        if (type == LevelType.EXP_MAX) {
+                            error("not modified")
+                        }
+                        ProfileLevelSet(key, type, it.next(ArgTypes.ACTION), method)
                     } catch (ex: Throwable) {
                         it.reset()
                         ProfileLevelGet(key, type)

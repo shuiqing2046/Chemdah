@@ -6,6 +6,7 @@ import ink.ptms.chemdah.module.Module.Companion.register
 import taboolib.common.platform.Awake
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.module.configuration.Config
+import taboolib.module.configuration.Configuration
 import taboolib.module.configuration.SecuredFile
 import java.util.concurrent.ConcurrentHashMap
 
@@ -20,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap
 object UISystem : Module {
 
     @Config("module/ui.yml")
-    lateinit var conf: SecuredFile
+    lateinit var conf: Configuration
         private set
 
     val ui = ConcurrentHashMap<String, UI>()
@@ -37,6 +38,7 @@ object UISystem : Module {
     }
 
     override fun reload() {
+        conf.reload()
         ui.clear()
         ui.putAll(conf.getKeys(false).map { it to UI(conf.getConfigurationSection(it)!!) })
     }

@@ -2,8 +2,16 @@ __option__:
   theme: 'chat'
   title: 'Mr.{name}'
 
+conversation_switch_0:
+  npc id: 'adyeshach test1'
+  when:
+    - if: check player level < 10
+      open: conversation_0
+    - if: true
+      run: tell Oops!
+
 conversation_0:
-  npc id: 'adyeshach test'
+  npc id: 'adyeshach test2'
   npc:
     - 'Hi! {{ sender }}.'
     - 'I''m conversation tester for Chemdah.'

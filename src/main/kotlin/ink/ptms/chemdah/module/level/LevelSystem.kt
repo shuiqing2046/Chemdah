@@ -10,6 +10,7 @@ import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.warning
 import taboolib.common5.Coerce
 import taboolib.module.configuration.Config
+import taboolib.module.configuration.Configuration
 import taboolib.module.configuration.SecuredFile
 import taboolib.module.kether.KetherShell
 import taboolib.module.kether.printKetherErrorMessage
@@ -26,7 +27,7 @@ import java.util.concurrent.CompletableFuture
 object LevelSystem : Module {
 
     @Config("module/level.yml")
-    lateinit var conf: SecuredFile
+    lateinit var conf: Configuration
         private set
 
     val level = HashMap<String, LevelOption>()
@@ -71,6 +72,7 @@ object LevelSystem : Module {
 
     override fun reload() {
         level.clear()
+        conf.reload()
         conf.getKeys(false).forEach { node ->
             val section = conf.getConfigurationSection(node)!!
             val algorithm = when (section.getString("experience.type")) {

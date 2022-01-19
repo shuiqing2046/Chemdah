@@ -18,6 +18,7 @@ import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.reflect.Reflex.Companion.invokeConstructor
 import taboolib.module.configuration.Config
+import taboolib.module.configuration.Configuration
 import taboolib.module.configuration.SecuredFile
 import taboolib.module.nms.nmsClass
 import taboolib.module.nms.sendPacket
@@ -27,7 +28,7 @@ import taboolib.platform.BukkitPlugin
 object Synchronous : Module {
 
     @Config("module/synchronous.yml")
-    lateinit var conf: SecuredFile
+    lateinit var conf: Configuration
         private set
 
     val playerDataToVault: String?
@@ -81,6 +82,7 @@ object Synchronous : Module {
     }
 
     fun sendSyncLevel(player: Player) {
+        conf.reload()
         val option = LevelSystem.getLevelOption(playerLevelToMinecraft!!) ?: return
         val playerLevel = player.chemdahProfile.getLevel(option)
         option.algorithm.getExp(playerLevel.level).thenAccept { exp ->

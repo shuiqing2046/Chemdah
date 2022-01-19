@@ -14,6 +14,7 @@ import org.bukkit.entity.Player
 import taboolib.common.platform.Awake
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.module.configuration.Config
+import taboolib.module.configuration.Configuration
 import taboolib.module.configuration.SecuredFile
 import java.util.concurrent.ConcurrentHashMap
 
@@ -21,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap
 object PartySystem : Module {
 
     @Config("module/party.yml")
-    lateinit var conf: SecuredFile
+    lateinit var conf: Configuration
         private set
 
     private val hooks = ConcurrentHashMap<String, Party>()
@@ -44,6 +45,10 @@ object PartySystem : Module {
 
     init {
         register()
+    }
+
+    override fun reload() {
+        conf.reload()
     }
 
     /**
