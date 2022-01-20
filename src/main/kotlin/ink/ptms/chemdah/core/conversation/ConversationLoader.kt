@@ -52,9 +52,15 @@ object ConversationLoader {
 
     fun load(file: File): List<Conversation> {
         return when {
-            file.isDirectory -> file.listFiles()?.flatMap { load(it) }?.toList() ?: emptyList()
-            file.name.endsWith(".yml") -> load(Configuration.loadFromFile(file))
-            else -> emptyList()
+            file.isDirectory -> {
+                file.listFiles()?.flatMap { load(it) }?.toList() ?: emptyList()
+            }
+            file.extension == "yml" || file.extension == "json" -> {
+                load(Configuration.loadFromFile(file))
+            }
+            else -> {
+                emptyList()
+            }
         }
     }
 
@@ -82,14 +88,14 @@ object ConversationLoader {
                 file,
                 root,
                 trigger,
-                root.getStringList("npc").toMutableList(),
+                root["npc"]?.asList()?.flatMap { it.lines() }?.toMutableList() ?: ArrayList(), // 兼容 Chemdah Lab
                 root.getList("player")?.run {
                     PlayerSide(mapNotNull { it.asMap() }.map {
                         PlayerReply(
                             it.toMutableMap(),
                             it["if"]?.toString(),
                             it["reply"].toString(),
-                            it["then"]?.asList()?.toMutableList() ?: ArrayList()
+                            it["then"]?.asList()?.flatMap { i -> i.lines() }?.toMutableList() ?: ArrayList() // 兼容 Chemdah Lab
                         )
                     }.toMutableList())
                 } ?: PlayerSide(ArrayList()),

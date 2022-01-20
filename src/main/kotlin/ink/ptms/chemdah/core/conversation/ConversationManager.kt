@@ -61,9 +61,9 @@ object ConversationManager {
 
     val cooldown = Baffle.of(500, TimeUnit.MILLISECONDS)
 
-    fun getConversation(player: Player, namespace: String, name: String): Conversation? {
-        val conversation = ChemdahAPI.conversation.values.firstOrNull { it.isNPC(namespace, name) }
-        val event = ConversationEvents.Select(player, namespace, name, conversation)
+    fun getConversation(player: Player, namespace: String, vararg name: String): Conversation? {
+        val conversation = ChemdahAPI.conversation.values.firstOrNull { name.any { name -> it.isNPC(namespace, name) } }
+        val event = ConversationEvents.Select(player, namespace, name.toList(), conversation)
         return if (event.call()) event.conversation else null
     }
 
@@ -189,14 +189,15 @@ object ConversationManager {
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
     internal fun e(e: PlayerInteractAtEntityEvent) {
         if (e.hand == EquipmentSlot.HAND && e.player.conversationSession == null && cooldown.hasNext(e.player.name)) {
-            val name = e.rightClicked.getI18nName(e.player)
-            val conversation = getConversation(e.player, "minecraft", name) ?: return
+            val name = e.rightClicked.getDisplayName()
+            val conversation = getConversation(e.player, "minecraft", *name) ?: return
             e.isCancelled = true
-            conversation.open(e.player, object : Source<Entity>(name, e.rightClicked) {
+            conversation.open(e.player, object : Source<Entity>(name.last(), e.rightClicked) {
 
                 override fun transfer(player: Player, newId: String): Boolean {
-                    val nearby = e.rightClicked.getNearbyEntities(10.0, 10.0, 10.0).firstOrNull { it.getI18nName(e.player) == newId } ?: return false
-                    this.name = nearby.getI18nName()
+                    val entities = e.rightClicked.getNearbyEntities(10.0, 10.0, 10.0)
+                    val nearby = entities.firstOrNull { it.getDisplayName().any { name -> name.equals(newId, true) } } ?: return false
+                    this.name = nearby.getDisplayName().last()
                     entity = nearby
                     return true
                 }
@@ -214,6 +215,14 @@ object ConversationManager {
         if (e.player.conversationSession != null) {
             e.isCancelled = true
         }
+    }
+
+    internal fun Entity.getDisplayName(): Array<String> {
+        val names = arrayListOf(type.name)
+        if (customName != null) {
+            names += customName!!
+        }
+        return names.toTypedArray()
     }
 
     internal object CompatAdyeshach {

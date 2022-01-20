@@ -26,8 +26,4 @@ object Chemdah : Plugin() {
             disablePlugin()
         }
     }
-
-    override fun onEnable() {
-        Kether.isAllowToleranceParser = true
-    }
 }

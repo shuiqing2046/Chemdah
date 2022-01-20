@@ -45,8 +45,11 @@ data class ConversationSwitch(val file: File?, val root: ConfigurationSection, v
 
     data class Case(val condition: String, val root: Map<*, *>) {
 
+        /**
+         * 兼容 Chemdah Lab
+         */
         val run: List<String>?
-            get() = root["run"]?.asList()
+            get() = root["run"]?.asList()?.flatMap { it.lines() }
 
         val open: String?
             get() = root["open"]?.toString()
@@ -61,7 +64,7 @@ data class ConversationSwitch(val file: File?, val root: ConfigurationSection, v
 
         @SubscribeEvent
         internal fun e(e: ConversationEvents.Load) {
-            if (e.root.contains("when")) {
+            if (e.root.contains("when") && e.root.getMapList("when").isNotEmpty()) {
                 e.isCancelled = true
                 val id = e.root["npc id"] ?: return
                 val trigger = Trigger(id.asList().map { it.split(" ") }.filter { it.size == 2 }.map { Trigger.Id(it[0], it[1]) })
@@ -73,7 +76,7 @@ data class ConversationSwitch(val file: File?, val root: ConfigurationSection, v
         internal fun e(e: ConversationEvents.Select) {
             if (e.conversation == null) {
                 try {
-                    val ele = switchMap.values.firstOrNull { it.npcId.id.any { npc -> npc.isNPC(e.namespace, e.id) } } ?: return
+                    val ele = switchMap.values.firstOrNull { it.npcId.id.any { npc -> e.id.any { id -> npc.isNPC(e.namespace, id) } } } ?: return
                     ele.get(e.player).thenAccept { case ->
                         // 运行脚本
                         if (case.run != null) {

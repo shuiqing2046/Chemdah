@@ -27,7 +27,7 @@ class ConversationEvents {
     /**
      * 当玩家选择对话时
      */
-    class Select(val player: Player, val namespace: String, val id: String, var conversation: Conversation?): BukkitProxyEvent()
+    class Select(val player: Player, val namespace: String, val id: List<String>, var conversation: Conversation?): BukkitProxyEvent()
 
     /**
      * 当对话中当脚本代理执行时
