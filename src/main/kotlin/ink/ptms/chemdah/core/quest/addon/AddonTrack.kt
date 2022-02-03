@@ -75,7 +75,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
 
                 override fun getLocation(player: Player): Location? {
                     val loc = cache.get(player.name) {
-                        AdyeshachAPI.getEntityFromId(center.substring("adyeshach".length).trim(), player)?.getLocation() ?: NullLocation
+                        AdyeshachAPI.getEntityFromId(center.substring("adyeshach".length).trim(), player)?.getLocation()?.add(0.0, 1.0, 0.0) ?: NullLocation
                     }
                     if (loc is NullLocation) {
                         return null

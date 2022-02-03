@@ -92,13 +92,6 @@ abstract class Objective<E : Any> {
         this.handler = handle
     }
 
-//    /**
-//     * 内部方法
-//     */
-//    internal fun handler(handle: E.() -> Player?) {
-//        this.handler = Function { handle(it) }
-//    }
-
     /**
      * 当条目继续时
      */
@@ -127,13 +120,6 @@ abstract class Objective<E : Any> {
         conditions[name] = Function3 { _, task, e -> func(task.condition[name]!!, e) }
     }
 
-//    /**
-//     * 内部接口
-//     */
-//    internal fun addSimpleCondition(name: String, func: Data.(E) -> Boolean) {
-//        conditions[name] = { _, task, e -> func(task.condition[name]!!, e) }
-//    }
-
     /**
      * 添加条目继续的条件
      * 完整版本
@@ -141,13 +127,6 @@ abstract class Objective<E : Any> {
     fun addFullCondition(name: String, func: Function3<PlayerProfile, Task, E, Boolean>) {
         conditions[name] = func
     }
-
-//    /**
-//     * 内部接口
-//     */
-//    internal fun addFullCondition(name: String, func: (PlayerProfile, Task, E) -> Boolean) {
-//        conditions[name] = func
-//    }
 
     /**
      * 检查条目继续的所有条件
@@ -167,13 +146,6 @@ abstract class Objective<E : Any> {
     fun addGoal(name: String, func: Function2<PlayerProfile, Task, Boolean>) {
         goals[name] = func
     }
-
-//    /**
-//     * 内部接口
-//     */
-//    internal fun addGoal(name: String, func: (PlayerProfile, Task) -> Boolean) {
-//        goals[name] = func
-//    }
 
     /**
      * 检查条目完成的所有条件
@@ -256,24 +228,10 @@ abstract class Objective<E : Any> {
         conditionVars += Function { Couple(name, func) }
     }
 
-//    /**
-//     * 内部接口
-//     */
-//    internal fun addConditionVariable(name: String, func: (E) -> Any) {
-//        conditionVars += { name to func(it) }
-//    }
-
     /**
      * 增加在条目完成的条件中的额外脚本变量
      */
     fun addGoalVariable(name: String, func: Function2<PlayerProfile, Task, Any>) {
         goalVars += Function2 { profile, task -> Couple(name, func(profile, task)) }
     }
-
-//    /**
-//     * 内部接口
-//     */
-//    internal fun addGoalVariable(name: String, func: (PlayerProfile, Task) -> Any) {
-//        goalVars += { profile, task -> name to func(profile, task) }
-//    }
 }

@@ -154,7 +154,10 @@ object ThemeChat : Theme<ThemeChatSettings>() {
     override fun onReset(session: Session): CompletableFuture<Void> {
         val future = CompletableFuture<Void>()
         session.conversation.playerSide.checked(session).thenApply {
-            session.playerSide = it.getOrNull(session.player.inventory.heldItemSlot.coerceAtMost(it.size - 1))
+            // 只有按键触发才存在默认回复修正
+            if (!settings.useScroll) {
+                session.playerSide = it.getOrNull(session.player.inventory.heldItemSlot.coerceAtMost(it.size - 1))
+            }
             future.complete(null)
         }
         return future

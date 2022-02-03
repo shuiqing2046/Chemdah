@@ -10,7 +10,6 @@ import taboolib.common.platform.Awake
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.module.configuration.Config
 import taboolib.module.configuration.Configuration
-import taboolib.module.configuration.SecuredFile
 import taboolib.module.nms.MinecraftVersion
 import taboolib.platform.BukkitPlugin
 

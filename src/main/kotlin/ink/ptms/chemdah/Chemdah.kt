@@ -5,7 +5,6 @@ import taboolib.common.platform.function.console
 import taboolib.common.platform.function.disablePlugin
 import taboolib.module.configuration.Config
 import taboolib.module.configuration.Configuration
-import taboolib.module.kether.Kether
 import taboolib.module.lang.sendLang
 import taboolib.module.nms.MinecraftVersion
 import taboolib.platform.BukkitPlugin
