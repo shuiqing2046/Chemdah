@@ -100,7 +100,7 @@ class InferItem(val items: List<Item>) {
             val item = if (indexOfType in 0..(type.length - 2)) {
                 val item = when (val namespace = type.substring(0, indexOfType)) {
                     "minecraft" -> Item::class.java
-                    else -> InferItemHookEvent(namespace, Item::class.java).itemClass
+                    else -> InferItemHookEvent(namespace, Item::class.java).apply { call() }.itemClass
                 }
                 type = type.substring(indexOfType + 1)
                 item

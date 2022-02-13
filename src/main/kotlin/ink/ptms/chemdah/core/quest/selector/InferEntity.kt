@@ -111,7 +111,7 @@ class InferEntity(val entities: List<Entity>) {
                     "minecraft" -> Entity::class.java
                     "citizen", "citizens" -> CitizensEntity::class.java
                     "mythicmob", "mythicmobs" -> MythicMobsEntity::class.java
-                    else -> InferEntityHookEvent(namespace, Entity::class.java).itemClass
+                    else -> InferEntityHookEvent(namespace, Entity::class.java).apply { call() }.itemClass
                 }
                 type = type.substring(indexOfType + 1)
                 entity
