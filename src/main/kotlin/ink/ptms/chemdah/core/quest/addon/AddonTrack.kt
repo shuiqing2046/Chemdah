@@ -96,7 +96,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
      * 引导开启的提示消息
      * 使用 $ 指向语言文件节点
      */
-    val message = config["message"]?.asList()?.colored() ?: conf.getString("default-track.message")!!.asList().colored()
+    val message = config["message"]?.asList()?.colored() ?: conf.getString("default-track.message")?.asList()?.colored()
 
     /**
      * 记分板中的显示名称与描述
@@ -111,10 +111,10 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
     /**
      * 各引导效果
      */
-    val beacon = TrackBeacon(config, conf.getConfigurationSection("default-track.beacon")!!)
-    val landmark = TrackLandmark(config, conf.getConfigurationSection("default-track.landmark")!!)
-    val navigation = TrackNavigation(config, conf.getConfigurationSection("default-track.navigation")!!)
-    val scoreboard = TrackScoreboard(config, conf.getConfigurationSection("default-track.scoreboard")!!)
+    val beacon = TrackBeacon(config, conf.getConfigurationSection("default-track.beacon") ?: error("default-track.beacon not found"))
+    val landmark = TrackLandmark(config, conf.getConfigurationSection("default-track.landmark") ?: error("default-track.landmark not found"))
+    val navigation = TrackNavigation(config, conf.getConfigurationSection("default-track.navigation") ?: error("default-track.navigation not found"))
+    val scoreboard = TrackScoreboard(config, conf.getConfigurationSection("default-track.scoreboard") ?: error("default-track.scoreboard not found"))
 
     companion object {
 
