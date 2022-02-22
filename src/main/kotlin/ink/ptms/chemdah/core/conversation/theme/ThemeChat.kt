@@ -10,6 +10,7 @@ import ink.ptms.chemdah.core.quest.QuestDevelopment.releaseTransmit
 import ink.ptms.chemdah.util.namespace
 import ink.ptms.chemdah.util.realLength
 import ink.ptms.chemdah.util.replaces
+import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerItemHeldEvent
@@ -49,7 +50,8 @@ object ThemeChat : Theme<ThemeChatSettings>() {
     @SubscribeEvent
     fun e(e: PacketSendEvent) {
         if (e.packet.name == "PacketPlayOutChat" && e.packet.read<Any>("b").toString() == "GAME_INFO" && e.player.conversationSession != null) {
-            val text = TextComponent.toPlainText(*e.packet.read("components")).uncolored()
+            val components = e.packet.read<Array<BaseComponent>>("components") ?: return
+            val text = TextComponent.toPlainText(*components).uncolored()
             if (text != e.player.asLangText("theme-chat-help").uncolored()) {
                 e.isCancelled = true
             }
