@@ -19,13 +19,11 @@ class ActionLocation {
     class LocationFunc(val location: ParsedAction<*>, val value: ParsedAction<*>, val func: (Location, Any) -> Any) : ScriptAction<Any>() {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Any> {
-            val future = CompletableFuture<Any>()
-            frame.newFrame(location).run<Location>().thenApply {
+            return frame.newFrame(location).run<Location>().thenApply {
                 frame.newFrame(value).run<Any>().thenApply { value ->
-                    future.complete(func(it, value))
-                }
+                    func(it, value)
+                }.join()
             }
-            return future
         }
 
         override fun toString(): String {
@@ -36,13 +34,11 @@ class ActionLocation {
     class LocationDistance(val loc1: ParsedAction<*>, val loc2: ParsedAction<*>) : ScriptAction<Double>() {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Double> {
-            val future = CompletableFuture<Double>()
-            frame.newFrame(loc1).run<Location>().thenApply { loc1 ->
+            return frame.newFrame(loc1).run<Location>().thenApply { loc1 ->
                 frame.newFrame(loc2).run<Location>().thenApply { loc2 ->
-                    if (loc1.world == loc2.world) loc1.distance(loc2) else -1
-                }
+                    if (loc1.world == loc2.world) loc1.distance(loc2) else -1.0
+                }.join()
             }
-            return future
         }
 
         override fun toString(): String {
@@ -190,7 +186,7 @@ class ActionLocation {
         @KetherParser(["distance"], shared = true)
         fun parserDistance() = scriptParser {
             val loc1 = it.next(ArgTypes.ACTION)
-            it.expect("to")
+            it.expects("and", "to")
             val loc2 = it.next(ArgTypes.ACTION)
             LocationDistance(loc1, loc2)
         }
