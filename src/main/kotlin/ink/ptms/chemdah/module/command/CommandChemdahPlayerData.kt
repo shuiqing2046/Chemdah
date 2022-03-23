@@ -68,8 +68,13 @@ object CommandChemdahPlayerData {
             dynamic(commit = "key") {
                 execute<CommandSender> { sender, context, argument ->
                     val playerExact = Bukkit.getPlayerExact(context.argument(-1))!!
-                    playerExact.chemdahProfile.persistentDataContainer.remove(argument)
-                    sender.sendLang("command-variables-change", "$argument §8= §fnull")
+                    if (argument == "*") {
+                        playerExact.chemdahProfile.persistentDataContainer.clear()
+                        sender.sendLang("command-variables-change", "CLEAR")
+                    } else {
+                        playerExact.chemdahProfile.persistentDataContainer.remove(argument)
+                        sender.sendLang("command-variables-change", "$argument §8= §fnull")
+                    }
                 }
             }
         }

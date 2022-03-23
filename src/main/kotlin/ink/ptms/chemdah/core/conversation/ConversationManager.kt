@@ -1,8 +1,10 @@
 package ink.ptms.chemdah.core.conversation
 
 import com.sucy.skill.api.event.PlayerCastSkillEvent
+import ink.ptms.adyeshach.api.AdyeshachAPI
 import ink.ptms.adyeshach.api.event.AdyeshachEntityInteractEvent
 import ink.ptms.adyeshach.common.entity.EntityInstance
+import ink.ptms.adyeshach.common.entity.ai.expand.ControllerLookAtPlayerAlways
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.conversationSession
 import ink.ptms.chemdah.api.event.collect.ConversationEvents
@@ -235,7 +237,15 @@ object ConversationManager {
                 npc.setTag("conversation:${e.session.player.name}", "conversation")
                 // 让 NPC 看向玩家
                 if (e.conversation.hasFlag("LOOK_PLAYER")) {
-                    npc.controllerLook(e.session.player.eyeLocation, smooth = true)
+                    // 检查 NPC 是否记录原始视角
+                    if (!npc.hasTag("conversation-eye-location")) {
+                        npc.setTag("conversation-eye-location", "${npc.getLocation().yaw},${npc.getLocation().pitch}")
+                    }
+                    // 检查 NPC 是否持有 LookAtPlayerAlways 控制器
+                    if (npc.getController(ControllerLookAtPlayerAlways::class.java) == null) {
+                        npc.registerController(ControllerLookAtPlayerAlways(npc))
+                        npc.setTag("conversation-controller", "true")
+                    }
                 }
             }
         }
@@ -247,7 +257,19 @@ object ConversationManager {
                 npc.removeTag("conversation:${e.session.player.name}")
                 // 若没有玩家在与该 NPC 对话
                 if (npc.getTags().none { it.value == "conversation" }) {
+                    // 移除冻结标记
                     npc.removeTag("isFreeze")
+                    // 移除 LookAtPlayerAlways 控制器
+                    if (npc.hasTag("conversation-controller")) {
+                        npc.removeTag("conversation-controller")
+                        npc.unregisterController(ControllerLookAtPlayerAlways::class.java)
+                    }
+                    // 在对话结束时恢复视角
+                    if (e.session.conversation.hasFlag("LOOK_PLAYER") && npc.hasTag("conversation-eye-location")) {
+                        val eye = npc.getTag("conversation-eye-location")!!.split(",")
+                        npc.removeTag("conversation-eye-location")
+                        npc.controllerLook(eye[0].toFloat(), eye[1].toFloat(), smooth = false)
+                    }
                 }
             }
         }

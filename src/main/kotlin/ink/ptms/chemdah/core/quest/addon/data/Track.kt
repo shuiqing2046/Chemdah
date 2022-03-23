@@ -20,6 +20,8 @@ object NullLocation : Location(null, 0.0, 0.0, 0.0)
 
 interface TrackCenter {
 
+    fun identifier(): String
+
     fun getLocation(player: Player): Location?
 }
 

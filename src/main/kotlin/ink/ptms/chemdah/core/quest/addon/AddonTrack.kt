@@ -3,6 +3,8 @@ package ink.ptms.chemdah.core.quest.addon
 import com.google.common.cache.CacheBuilder
 import ink.ptms.adyeshach.api.AdyeshachAPI
 import ink.ptms.adyeshach.api.Hologram
+import ink.ptms.adyeshach.api.event.AdyeshachEntityTeleportEvent
+import ink.ptms.adyeshach.common.entity.EntityInstance
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.api.ChemdahAPI.isChemdahProfileLoaded
@@ -13,6 +15,9 @@ import ink.ptms.chemdah.api.event.collect.QuestEvents
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.*
 import ink.ptms.chemdah.core.quest.addon.AddonDepend.Companion.isQuestDependCompleted
+import ink.ptms.chemdah.core.quest.addon.AddonTrack.Companion.displayTrackLandmark
+import ink.ptms.chemdah.core.quest.addon.AddonTrack.Companion.track
+import ink.ptms.chemdah.core.quest.addon.AddonTrack.Companion.trackQuest
 import ink.ptms.chemdah.core.quest.addon.AddonUI.Companion.ui
 import ink.ptms.chemdah.core.quest.addon.data.*
 import ink.ptms.chemdah.core.quest.meta.MetaName.Companion.displayName
@@ -65,17 +70,26 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
         when {
             center == null || center.isEmpty() -> object : TrackCenter {
 
+                override fun identifier(): String {
+                    return "null"
+                }
+
                 override fun getLocation(player: Player): Location? {
                     return null
                 }
             }
             center.startsWith("adyeshach") -> object : TrackCenter {
 
-                val cache = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.SECONDS).build<String, Location>()
+                val id = center.substringAfter("adyeshach").trim()
+                val cache = CacheBuilder.newBuilder().expireAfterWrite(250, TimeUnit.MILLISECONDS).build<String, Location>()
+
+                override fun identifier(): String {
+                    return center
+                }
 
                 override fun getLocation(player: Player): Location? {
                     val loc = cache.get(player.name) {
-                        AdyeshachAPI.getEntityFromId(center.substring("adyeshach".length).trim(), player)?.getLocation()?.add(0.0, 1.0, 0.0) ?: NullLocation
+                        AdyeshachAPI.getEntityFromId(id, player)?.getLocation()?.add(0.0, 1.0, 0.0) ?: NullLocation
                     }
                     if (loc is NullLocation) {
                         return null
@@ -85,8 +99,12 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
             }
             else -> object : TrackCenter {
 
+                override fun identifier(): String {
+                    return center
+                }
+
                 override fun getLocation(player: Player): Location {
-                    return InferArea.Single(config.getString("center").toString(), false).positions[0].clone()
+                    return InferArea.Single(center, false).positions[0].clone()
                 }
             }
         }
@@ -328,6 +346,40 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
         }
 
         /**
+         * 根据 NPC 创建或更新任务地标
+         */
+        private fun EntityInstance.updateTrackLandmark() {
+            forViewers {
+                if (it.nonChemdahProfileLoaded) {
+                    return@forViewers
+                }
+                val chemdahProfile = it.chemdahProfile
+                val quest = chemdahProfile.trackQuest ?: return@forViewers
+                // 未接受任务则指向任务本体
+                if (chemdahProfile.getQuestById(quest.id) == null) {
+                    val track = quest.track() ?: return@forViewers
+                    val identifier = track.center.identifier()
+                    if (identifier.startsWith("adyeshach") && identifier.substringAfter("adyeshach").trim() == id) {
+                        it.displayTrackLandmark(track, quest.path, true)
+                    }
+                }
+                // 已接受任务则指向任务条目
+                else {
+                    quest.taskMap.forEach { (_, task) ->
+                        // 依赖条目是否完成
+                        if (task.isQuestDependCompleted(it)) {
+                            val track = task.track() ?: return@forViewers
+                            val identifier = track.center.identifier()
+                            if (identifier.startsWith("adyeshach") && identifier.substringAfter("adyeshach").trim() == id) {
+                                it.displayTrackLandmark(track, task.path, !task.isCompleted(chemdahProfile))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /**
          * 删除任务追踪
          */
         private fun Player.cancelTrackScoreboard(quest: Template?) {
@@ -519,6 +571,14 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
             if (e.from.toVector() != e.to!!.toVector()) {
                 e.player.displayTrackLandmark()
             }
+        }
+
+        /**
+         * NPC 移动时刷新 Navigation 导航
+         */
+        @SubscribeEvent
+        internal fun onMove(e: AdyeshachEntityTeleportEvent) {
+            e.entity.updateTrackLandmark()
         }
 
         @SubscribeEvent
