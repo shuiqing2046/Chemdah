@@ -86,7 +86,7 @@ class ControlCoexist(val type: Map<String, Int>) : Control() {
         get() = null
 
     override fun check(profile: PlayerProfile, template: Template): CompletableFuture<ControlResult> {
-        return if (type.any { label -> profile.getQuests().count { label.key in it.template.type() } > label.value }) {
+        return if (type.any { label -> profile.getQuests().count { label.key in it.template.type() } >= label.value }) {
             CompletableFuture.completedFuture(ControlResult(false, "coexist"))
         } else {
             CompletableFuture.completedFuture(ControlResult(true, "coexist"))
