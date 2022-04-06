@@ -90,7 +90,8 @@ class UI(val config: ConfigurationSection) {
                         // 任务可以接受
                         if (cond.type == AcceptResult.Type.SUCCESSFUL) {
                             // 任务允许显示可接受状态
-                            if (ui?.visibleStart == true) {
+                            // 且任务的前置任务已被完成 才显示在UI
+                            if (ui?.visibleStart == true && quest.isQuestDependCompleted(playerProfile.player)) {
                                 collect.add(UITemplate(quest, ItemType.QUEST_CAN_START))
                             }
                         } else {
