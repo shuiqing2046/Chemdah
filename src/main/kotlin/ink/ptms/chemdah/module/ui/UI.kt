@@ -3,6 +3,7 @@ package ink.ptms.chemdah.module.ui
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.AcceptResult
+import ink.ptms.chemdah.core.quest.addon.AddonDepend.Companion.isQuestDependCompleted
 import ink.ptms.chemdah.core.quest.addon.AddonUI.Companion.ui
 import ink.ptms.chemdah.core.quest.meta.MetaType.Companion.type
 import taboolib.library.configuration.ConfigurationSection
