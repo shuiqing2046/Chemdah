@@ -235,9 +235,11 @@ class DatabaseSQLite : Database() {
             value(uuid, getUserId(this@createQuest), quest.id, 1)
             onFinally {
                 cacheQuestId.computeIfAbsent(name) { HashMap() }[quest.id] = uuid
-                tableQuestData.insert(dataSource, "id", "key", "value", "mode") {
-                    quest.persistentDataContainer.forEach { (k, v) ->
-                        value(uuid, k, v.data, 1)
+                if (quest.persistentDataContainer.isNotEmpty()) {
+                    tableQuestData.insert(dataSource, "id", "key", "value", "mode") {
+                        quest.persistentDataContainer.forEach { (k, v) ->
+                            value(uuid, k, v.data, 1)
+                        }
                     }
                 }
                 quest.persistentDataContainer.flush()

@@ -275,9 +275,12 @@ class DatabaseSQL : Database() {
                     Coerce.toLong(getObject(1))
                 }
                 cacheUserId[player.name] = userId
-                tableUserData.insert(dataSource, "user", "key", "value", "mode") {
-                    persistentDataContainer.forEach { (k, v) ->
-                        value(userId, k, v.data, 1)
+                // 存在数据
+                if (persistentDataContainer.isNotEmpty()) {
+                    tableUserData.insert(dataSource, "user", "key", "value", "mode") {
+                        persistentDataContainer.forEach { (k, v) ->
+                            value(userId, k, v.data, 1)
+                        }
                     }
                 }
                 persistentDataContainer.flush()
@@ -297,9 +300,12 @@ class DatabaseSQL : Database() {
                     Coerce.toLong(getObject(1))
                 }
                 cacheQuestId.computeIfAbsent(name) { HashMap() }[quest.id] = questId
-                tableQuestData.insert(dataSource, "quest", "key", "value", "mode") {
-                    quest.persistentDataContainer.forEach { (k, v) ->
-                        value(questId, k, v.data, 1)
+                // 存在数据
+                if (quest.persistentDataContainer.isNotEmpty()) {
+                    tableQuestData.insert(dataSource, "quest", "key", "value", "mode") {
+                        quest.persistentDataContainer.forEach { (k, v) ->
+                            value(questId, k, v.data, 1)
+                        }
                     }
                 }
                 quest.persistentDataContainer.flush()

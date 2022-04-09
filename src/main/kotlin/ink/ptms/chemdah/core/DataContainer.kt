@@ -162,6 +162,14 @@ class DataContainer {
         }
     }.toString()
 
+    fun isEmpty(): Boolean {
+        return map.isEmpty()
+    }
+
+    fun isNotEmpty(): Boolean {
+        return map.isNotEmpty()
+    }
+
     private fun Data.change(): Data {
         if (!locked) {
             changed = true
