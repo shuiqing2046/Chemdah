@@ -1,7 +1,6 @@
 package ink.ptms.chemdah.core.conversation
 
 import com.sucy.skill.api.event.PlayerCastSkillEvent
-import ink.ptms.adyeshach.api.AdyeshachAPI
 import ink.ptms.adyeshach.api.event.AdyeshachEntityInteractEvent
 import ink.ptms.adyeshach.common.entity.EntityInstance
 import ink.ptms.adyeshach.common.entity.ai.expand.ControllerLookAtPlayerAlways
@@ -34,14 +33,12 @@ import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.OptionalEvent
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
-import taboolib.common5.Baffle
 import taboolib.common5.Coerce
 import taboolib.module.ai.controllerLookAt
 import taboolib.module.configuration.Config
+import taboolib.module.configuration.Configuration
 import taboolib.module.configuration.SecuredFile
-import taboolib.module.nms.getI18nName
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.TimeUnit
 
 /**
  * Chemdah
@@ -56,12 +53,10 @@ object ConversationManager {
     private val effectFreeze = mapOf(PotionEffectType.BLINDNESS to 0, PotionEffectType.SLOW to 4)
 
     @Config("core/conversation.yml", migrate = true)
-    lateinit var conf: SecuredFile
+    lateinit var conf: Configuration
         private set
 
     val sessions = ConcurrentHashMap<String, Session>()
-
-    val cooldown = Baffle.of(500, TimeUnit.MILLISECONDS)
 
     fun getConversation(player: Player, namespace: String, vararg name: String): Conversation? {
         val conversation = ChemdahAPI.conversation.values.firstOrNull { name.any { name -> it.isNPC(namespace, name) } }
@@ -102,13 +97,13 @@ object ConversationManager {
 
     @SubscribeEvent
     internal fun e(e: PlayerEvents.Released) {
-        if (e.player.conversationSession?.conversation?.hasFlag("NO_EFFECT") == false) {
-            effectFreeze.forEach { e.player.removePotionEffect(it.key) }
-            effects.remove(e.player.name)?.forEach { e.player.addPotionEffect(it) }
+        val player = e.player
+        if (player.conversationSession?.conversation?.hasFlag("NO_EFFECT") == false) {
+            effectFreeze.forEach { player.removePotionEffect(it.key) }
+            effects.remove(player.name)?.forEach { e.player.addPotionEffect(it) }
         }
-        e.player.conversationSession?.close(refuse = true)
-        sessions.remove(e.player.name)
-        cooldown.reset(e.player.name)
+        player.conversationSession?.close(refuse = true)
+        sessions.remove(player.name)
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -190,7 +185,7 @@ object ConversationManager {
 
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
     internal fun e(e: PlayerInteractAtEntityEvent) {
-        if (e.hand == EquipmentSlot.HAND && e.player.conversationSession == null && cooldown.hasNext(e.player.name)) {
+        if (e.hand == EquipmentSlot.HAND && e.player.conversationSession == null) {
             val name = e.rightClicked.getDisplayName()
             val conversation = getConversation(e.player, "minecraft", *name) ?: return
             e.isCancelled = true
@@ -276,7 +271,7 @@ object ConversationManager {
 
         @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
         fun e(e: AdyeshachEntityInteractEvent) {
-            if (e.isMainHand && e.player.conversationSession == null && cooldown.hasNext(e.player.name)) {
+            if (e.isMainHand && e.player.conversationSession == null) {
                 getConversation(e.player, "adyeshach", e.entity.id)?.run {
                     e.isCancelled = true
                     submit {
@@ -324,7 +319,8 @@ object ConversationManager {
             if (!isCitizensHooked) {
                 return
             }
-            if (e.hand == EquipmentSlot.HAND && e.rightClicked.hasMetadata("NPC") && e.player.conversationSession == null && cooldown.hasNext(e.player.name)) {
+            val player = e.player
+            if (e.hand == EquipmentSlot.HAND && e.rightClicked.hasMetadata("NPC") && player.conversationSession == null) {
                 val npc = CitizensAPI.getNPCRegistry().getNPC(e.rightClicked) ?: return
                 getConversation(e.player, "citizens", npc.id.toString())?.run {
                     e.isCancelled = true
@@ -369,7 +365,7 @@ object ConversationManager {
             if (!isMythicMobsHooked) {
                 return
             }
-            if (e.hand == EquipmentSlot.HAND && e.rightClicked is LivingEntity && e.player.conversationSession == null && cooldown.hasNext(e.player.name)) {
+            if (e.hand == EquipmentSlot.HAND && e.rightClicked is LivingEntity && e.player.conversationSession == null) {
                 val mob = MythicMobs.inst().mobManager.getMythicMobInstance(e.rightClicked) ?: return
                 getConversation(e.player, "mythicmobs", mob.type.internalName)?.run {
                     e.isCancelled = true
