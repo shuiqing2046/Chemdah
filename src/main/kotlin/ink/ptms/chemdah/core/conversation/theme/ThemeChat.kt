@@ -12,6 +12,7 @@ import ink.ptms.chemdah.util.realLength
 import ink.ptms.chemdah.util.replaces
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.TextComponent
+import net.minecraft.server.v1_16_R3.PacketPlayOutHeldItemSlot
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerItemHeldEvent
 import org.bukkit.event.player.PlayerSwapHandItemsEvent
@@ -21,6 +22,8 @@ import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.adaptCommandSender
 import taboolib.common.platform.function.adaptPlayer
 import taboolib.common.platform.function.submit
+import taboolib.common.reflect.Reflex.Companion.setProperty
+import taboolib.common.reflect.Reflex.Companion.unsafeInstance
 import taboolib.common5.Coerce
 import taboolib.common5.util.printed
 import taboolib.module.chat.TellrawJson
@@ -30,6 +33,7 @@ import taboolib.module.kether.KetherFunction
 import taboolib.module.kether.extend
 import taboolib.module.kether.isInt
 import taboolib.module.nms.PacketSendEvent
+import taboolib.module.nms.sendPacket
 import taboolib.platform.util.asLangText
 import taboolib.platform.util.toProxyLocation
 import java.util.concurrent.CompletableFuture
@@ -49,7 +53,9 @@ object ThemeChat : Theme<ThemeChatSettings>() {
      */
     @SubscribeEvent
     fun e(e: PacketSendEvent) {
-        if (e.packet.name == "PacketPlayOutChat" && e.packet.read<Any>("b").toString() == "GAME_INFO" && e.player.conversationSession != null) {
+        if (e.packet.name == "PacketPlayOutChat" && e.packet.read<Any>("b")
+                .toString() == "GAME_INFO" && e.player.conversationSession != null
+        ) {
             val components = e.packet.read<Array<BaseComponent>>("components") ?: return
             val text = TextComponent.toPlainText(*components).uncolored()
             if (text != e.player.asLangText("theme-chat-help").uncolored()) {
@@ -91,13 +97,29 @@ object ThemeChat : Theme<ThemeChatSettings>() {
                             select = replies.size - 1
                         }
                     }
+                    val packet = PacketPlayOutHeldItemSlot::class.java.unsafeInstance()
+                    if (taboolib.module.nms.MinecraftVersion.isUniversal) {
+                        packet.setProperty("slot", e.previousSlot)
+                    } else {
+                        packet.setProperty("a", e.previousSlot)
+                    }
+                    e.player.sendPacket(packet)
+                    e.isCancelled = true
+
                 } else {
                     select = e.newSlot.coerceAtMost(replies.size - 1)
                 }
                 if (select != index) {
                     session.playerSide = replies[select]
                     settings.playSelectSound(session)
-                    CompletableFuture<Void>().npcTalk(session, session.npcSide, "", session.npcSide.size, endMessage = true, canReply = !session.isFarewell)
+                    CompletableFuture<Void>().npcTalk(
+                        session,
+                        session.npcSide,
+                        "",
+                        session.npcSide.size,
+                        endMessage = true,
+                        canReply = !session.isFarewell
+                    )
                 }
             }
         }
@@ -159,6 +181,8 @@ object ThemeChat : Theme<ThemeChatSettings>() {
             // 只有按键触发才存在默认回复修正
             if (!settings.useScroll) {
                 session.playerSide = it.getOrNull(session.player.inventory.heldItemSlot.coerceAtMost(it.size - 1))
+            }else{
+                session.playerSide = it.getOrNull(0)
             }
             future.complete(null)
         }
@@ -166,7 +190,10 @@ object ThemeChat : Theme<ThemeChatSettings>() {
     }
 
     override fun onBegin(session: Session): CompletableFuture<Void> {
-        ProxyParticle.CLOUD.sendTo(adaptPlayer(session.player), session.origin.clone().add(0.0, 0.5, 0.0).toProxyLocation())
+        ProxyParticle.CLOUD.sendTo(
+            adaptPlayer(session.player),
+            session.origin.clone().add(0.0, 0.5, 0.0).toProxyLocation()
+        )
         return super.onBegin(session)
     }
 
@@ -175,40 +202,63 @@ object ThemeChat : Theme<ThemeChatSettings>() {
         var d = 0L
         var cancel = false
         session.npcTalking = true
-        message.colored().map { if (settings.animation) it.printed("_") else listOf(it) }.forEachIndexed { index, messageText ->
-            messageText.forEachIndexed { printIndex, printText ->
-                val endMessage = printIndex + 1 == messageText.size
-                submit(delay = settings.speed * d++) {
-                    if (session.isValid) {
-                        if (session.npcTalking) {
-                            future.npcTalk(session, message, printText, index, endMessage = endMessage, canReply = canReply)
+        message.colored().map { if (settings.animation) it.printed("_") else listOf(it) }
+            .forEachIndexed { index, messageText ->
+                messageText.forEachIndexed { printIndex, printText ->
+                    val endMessage = printIndex + 1 == messageText.size
+                    submit(delay = settings.speed * d++) {
+                        if (session.isValid) {
+                            if (session.npcTalking) {
+                                future.npcTalk(
+                                    session,
+                                    message,
+                                    printText,
+                                    index,
+                                    endMessage = endMessage,
+                                    canReply = canReply
+                                )
+                            }
+                            // 跳过对话
+                            else if (!cancel) {
+                                cancel = true
+                                // 如果是告别则转发信息
+                                if (session.isFarewell) {
+                                    session.player.releaseTransmit()
+                                }
+                                future.npcTalk(
+                                    session,
+                                    session.npcSide,
+                                    "",
+                                    session.npcSide.size,
+                                    endMessage = true,
+                                    canReply = !session.isFarewell
+                                )
+                                future.complete(null)
+                            }
                         }
-                        // 跳过对话
+                        // 对话中断
                         else if (!cancel) {
                             cancel = true
-                            // 如果是告别则转发信息
-                            if (session.isFarewell) {
+                            if (QuestDevelopment.enableMessageTransmit) {
+                                // 清空对话
+                                newJson().sendTo(adaptCommandSender(session.player))
+                                // 转发信息
                                 session.player.releaseTransmit()
                             }
-                            future.npcTalk(session, session.npcSide, "", session.npcSide.size, endMessage = true, canReply = !session.isFarewell)
+                            future.npcTalk(
+                                session,
+                                message,
+                                printText,
+                                index,
+                                endMessage = endMessage,
+                                canReply,
+                                noSpace = true
+                            )
                             future.complete(null)
                         }
                     }
-                    // 对话中断
-                    else if (!cancel) {
-                        cancel = true
-                        if (QuestDevelopment.enableMessageTransmit) {
-                            // 清空对话
-                            newJson().sendTo(adaptCommandSender(session.player))
-                            // 转发信息
-                            session.player.releaseTransmit()
-                        }
-                        future.npcTalk(session, message, printText, index, endMessage = endMessage, canReply, noSpace = true)
-                        future.complete(null)
-                    }
                 }
             }
-        }
         future.thenAccept {
             session.npcTalking = false
         }
@@ -242,11 +292,16 @@ object ThemeChat : Theme<ThemeChatSettings>() {
             // 最终效果
             val animationStopped = index + 1 >= messages.size && endMessage
             // 如果是最终效果并且存在对话转发，则不发送白信息
-            val json = if (noSpace || (animationStopped && session.player.hasTransmitMessages() && !canReply)) TellrawJson().fixed() else newJson()
+            val json =
+                if (noSpace || (animationStopped && session.player.hasTransmitMessages() && !canReply)) TellrawJson().fixed() else newJson()
             try {
                 settings.format.map {
                     // 识别内联脚本并继承会话变量
-                    KetherFunction.parse(it, sender = adaptPlayer(session.player), namespace = namespace) { extend(session.variables) }.colored()
+                    KetherFunction.parse(it, sender = adaptPlayer(session.player), namespace = namespace) {
+                        extend(
+                            session.variables
+                        )
+                    }.colored()
                 }.forEach {
                     when {
                         // 包含标题
@@ -258,8 +313,10 @@ object ThemeChat : Theme<ThemeChatSettings>() {
                         it.contains("npc_side") || it.contains("npcSide") -> {
                             messages.colored().forEachIndexed { i, fully ->
                                 when {
-                                    index > i -> json.append(it.replaces("npc_side" to fully, "npcSide" to fully)).newLine()
-                                    index == i -> json.append(it.replaces("npc_side" to message, "npcSide" to message)).newLine()
+                                    index > i -> json.append(it.replaces("npc_side" to fully, "npcSide" to fully))
+                                        .newLine()
+                                    index == i -> json.append(it.replaces("npc_side" to message, "npcSide" to message))
+                                        .newLine()
                                     else -> json.newLine()
                                 }
                             }
@@ -293,8 +350,13 @@ object ThemeChat : Theme<ThemeChatSettings>() {
                                             }
                                         }
                                         if (animationStopped) {
-                                            val replyText = rep.replaces("player_side" to text, "playerSide" to text, "index" to idx + 1)
-                                            json.append(it.replaces("reply" to replyText)).runCommand("/session reply ${reply.uuid}")
+                                            val replyText = rep.replaces(
+                                                "player_side" to text,
+                                                "playerSide" to text,
+                                                "index" to idx + 1
+                                            )
+                                            json.append(it.replaces("reply" to replyText))
+                                                .runCommand("/session reply ${reply.uuid}")
                                             // 是否启用鼠标悬停显示
                                             if (settings.hoverText) {
                                                 json.hoverText(text)
@@ -306,8 +368,13 @@ object ThemeChat : Theme<ThemeChatSettings>() {
                                         }
                                     } else {
                                         if (animationStopped) {
-                                            val replyText = rep.replaces("player_side" to text, "playerSide" to text, "index" to idx + 1)
-                                            json.append(it.replaces("reply" to replyText)).runCommand("/session reply ${reply.uuid}")
+                                            val replyText = rep.replaces(
+                                                "player_side" to text,
+                                                "playerSide" to text,
+                                                "index" to idx + 1
+                                            )
+                                            json.append(it.replaces("reply" to replyText))
+                                                .runCommand("/session reply ${reply.uuid}")
                                             // 是否启用鼠标悬停显示
                                             if (settings.hoverText) {
                                                 json.hoverText(text)
