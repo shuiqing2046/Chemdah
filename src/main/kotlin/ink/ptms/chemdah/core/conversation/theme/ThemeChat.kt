@@ -12,6 +12,7 @@ import ink.ptms.chemdah.util.realLength
 import ink.ptms.chemdah.util.replaces
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.TextComponent
+import net.minecraft.server.v1_16_R3.PacketPlayOutHeldItemSlot
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerItemHeldEvent
 import org.bukkit.event.player.PlayerSwapHandItemsEvent
@@ -21,6 +22,8 @@ import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.adaptCommandSender
 import taboolib.common.platform.function.adaptPlayer
 import taboolib.common.platform.function.submit
+import taboolib.common.reflect.Reflex.Companion.setProperty
+import taboolib.common.reflect.Reflex.Companion.unsafeInstance
 import taboolib.common5.Coerce
 import taboolib.common5.util.printed
 import taboolib.module.chat.TellrawJson
@@ -30,6 +33,7 @@ import taboolib.module.kether.KetherFunction
 import taboolib.module.kether.extend
 import taboolib.module.kether.isInt
 import taboolib.module.nms.PacketSendEvent
+import taboolib.module.nms.sendPacket
 import taboolib.platform.util.asLangText
 import taboolib.platform.util.toProxyLocation
 import java.util.concurrent.CompletableFuture
@@ -91,6 +95,14 @@ object ThemeChat : Theme<ThemeChatSettings>() {
                             select = replies.size - 1
                         }
                     }
+                    val packet = PacketPlayOutHeldItemSlot::class.java.unsafeInstance()
+                    if (taboolib.module.nms.MinecraftVersion.isUniversal) {
+                        packet.setProperty("slot", e.previousSlot)
+                    } else {
+                        packet.setProperty("a", e.previousSlot)
+                    }
+                    e.player.sendPacket(packet)
+                    e.isCancelled = true
                 } else {
                     select = e.newSlot.coerceAtMost(replies.size - 1)
                 }
@@ -159,6 +171,8 @@ object ThemeChat : Theme<ThemeChatSettings>() {
             // 只有按键触发才存在默认回复修正
             if (!settings.useScroll) {
                 session.playerSide = it.getOrNull(session.player.inventory.heldItemSlot.coerceAtMost(it.size - 1))
+            }else {
+                session.playerSide = it.getOrNull(0)
             }
             future.complete(null)
         }
