@@ -327,6 +327,8 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                     val distance = trackCenter.distance(location)
                     val direction = trackCenter.toVector().subtract(location.toVector()).normalize()
                     val pos = if (distance < trackAddon.landmark.distance) trackCenter else location.add(direction.multiply(trackAddon.landmark.distance))
+                    // 高度修正
+                    pos.y = pos.y.coerceAtLeast(location.y + 0.5)
                     if (hologramMap.containsKey(id)) {
                         hologramMap[id]!!.also { holo ->
                             holo.teleport(pos)

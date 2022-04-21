@@ -62,11 +62,20 @@ class TrackBeacon(val config: ConfigurationSection, val root: ConfigurationSecti
     val period = Baffle.of(config.getInt("beacon-option.period", root.getInt("period")))
 
     /**
+     * 固定位置
+     */
+    val fixed = config.getBoolean("beacon-option.fixed", root.getBoolean("fixed"))
+
+    /**
      * 播放粒子
      */
     fun display(player: Player, center: Location) {
-        val direction = center.toVector().subtract(player.location.toVector()).normalize()
-        val pos = player.location.add(direction.multiply(distance.coerceAtMost(distance)))
+        val pos = if (fixed) {
+            center
+        } else {
+            val direction = center.toVector().subtract(player.location.toVector()).normalize()
+            player.location.add(direction.multiply(distance.coerceAtMost(distance)))
+        }
         type.sendTo(adaptPlayer(player), pos.toProxyLocation(), Vector(size, 128.0, size), count)
     }
 }
