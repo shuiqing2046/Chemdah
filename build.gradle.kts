@@ -42,7 +42,6 @@ taboolib {
 
 repositories {
     maven { url = uri("https://repo.pcgamingfreaks.at/repository/maven-everything") }
-    maven { url = uri("https://nexus.badbones69.com/repository/maven-releases") }
     maven { url = uri("https://jitpack.io") }
     mavenLocal()
     mavenCentral()
