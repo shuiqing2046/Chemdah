@@ -22,11 +22,15 @@ import ink.ptms.chemdah.util.namespace
 import org.bukkit.entity.Player
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
+import taboolib.common.platform.function.adaptPlayer
 import taboolib.common.platform.function.getDataFolder
 import taboolib.common.platform.function.warning
+import taboolib.module.kether.KetherFunction
+import taboolib.module.kether.KetherShell
 import taboolib.module.kether.Workspace
 import taboolib.module.kether.printKetherErrorMessage
 import java.io.File
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.KClass
 
@@ -244,6 +248,15 @@ object ChemdahAPI {
         QuestLoader.loadTemplate()
         QuestLoader.loadTemplateGroup()
         Module.reload()
+    }
+
+    fun invokeKether(source: String, player: Player, vars: Map<String, Any>): CompletableFuture<Any?> {
+        val map = KetherShell.VariableMap(*vars.map { it.key to it.value }.toTypedArray())
+        return KetherShell.eval(source, sender = adaptPlayer(player), namespace = namespace, vars = map)
+    }
+
+    fun parseFunction(source: String, player: Player): String {
+        return KetherFunction.parse(source, sender = adaptPlayer(player), namespace = namespace)
     }
 
     @Awake(LifeCycle.ACTIVE)
