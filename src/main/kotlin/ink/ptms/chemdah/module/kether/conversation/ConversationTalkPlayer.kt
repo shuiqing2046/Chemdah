@@ -31,7 +31,7 @@ class ConversationTalkPlayer(val token: String) : ScriptAction<Void>() {
                 } else {
                     theme.settings.playSound(session)
                     messages.forEachIndexed { index, s ->
-                        AdyeshachAPI.createHolographic(session.player, session.origin.clone().add(0.0, 0.25 + (index * 0.3), 0.0), 40, { it }, "&7$s")
+                        AdyeshachAPI.createHolographic(session.player, session.origin.clone().add(0.0, 0.25 + (index * 0.3), 0.0), 40, { it }, "§7$s")
                     }
                 }
             }
