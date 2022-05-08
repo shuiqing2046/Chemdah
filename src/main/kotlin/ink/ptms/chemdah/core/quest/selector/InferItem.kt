@@ -2,6 +2,7 @@ package ink.ptms.chemdah.core.quest.selector
 
 import ink.ptms.chemdah.api.event.InferItemHookEvent
 import ink.ptms.chemdah.core.quest.selector.Flags.Companion.matchType
+import org.bukkit.Material
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta

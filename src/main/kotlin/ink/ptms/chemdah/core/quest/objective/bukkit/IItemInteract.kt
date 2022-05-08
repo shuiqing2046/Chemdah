@@ -4,6 +4,7 @@ import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
+import taboolib.common.platform.event.EventPriority
 import taboolib.platform.util.isNotAir
 
 /**
@@ -19,6 +20,9 @@ object IItemInteract : ObjectiveCountableI<PlayerInteractEvent>() {
     override val name = "item interact"
     override val event = PlayerInteractEvent::class.java
     override val isAsync = true
+
+    override val priority: EventPriority
+        get() = EventPriority.LOWEST
 
     init {
         handler {
