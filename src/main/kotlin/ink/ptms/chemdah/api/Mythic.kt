@@ -19,6 +19,7 @@ import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.serverct.ersha.dungeon.taboolib.common.reflect.Reflex.Companion.invokeMethod
 import taboolib.common.reflect.Reflex.Companion.getProperty
+import taboolib.common.reflect.Reflex.Companion.invokeConstructor
 import taboolib.module.configuration.Configuration
 import taboolib.module.configuration.Type
 
@@ -173,7 +174,7 @@ object Mythic {
             } else {
                 io.lumine.mythic.bukkit.BukkitAdapter.adapt(entity)
             }
-            return source.execute(SkillMetadataImpl(
+            return source.execute(SkillMetadataImpl::class.java.invokeConstructor(
                 (trigger as SkillTrigger5).source,
                 io.lumine.mythic.api.mobs.GenericCaster(caster),
                 io.lumine.mythic.bukkit.BukkitAdapter.adapt(target),
@@ -196,7 +197,7 @@ object Mythic {
 
     private class SkillTrigger5(obj: Any) : Skill.Trigger {
 
-        val source = obj as io.lumine.mythic.api.skills.SkillTrigger
+        val source = obj // as io.lumine.mythic.api.skills.SkillTrigger
 
         override val name: String
             get() = source.getProperty<String>("name")!!
