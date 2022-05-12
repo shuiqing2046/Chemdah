@@ -6,11 +6,10 @@ import ink.ptms.adyeshach.common.entity.EntityInstance
 import ink.ptms.adyeshach.common.entity.ai.expand.ControllerLookAtPlayerAlways
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.conversationSession
+import ink.ptms.chemdah.api.Mythic
 import ink.ptms.chemdah.api.event.collect.ConversationEvents
 import ink.ptms.chemdah.api.event.collect.PlayerEvents
 import ink.ptms.chemdah.util.hidden
-import io.lumine.xikage.mythicmobs.MythicMobs
-import io.lumine.xikage.mythicmobs.mobs.ActiveMob
 import net.citizensnpcs.api.CitizensAPI
 import net.citizensnpcs.api.npc.NPC
 import org.bukkit.Bukkit
@@ -37,7 +36,6 @@ import taboolib.common5.Coerce
 import taboolib.module.ai.controllerLookAt
 import taboolib.module.configuration.Config
 import taboolib.module.configuration.Configuration
-import taboolib.module.configuration.SecuredFile
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -355,8 +353,8 @@ object ConversationManager {
                 return
             }
             val npc = e.session.source.entity
-            if (npc is ActiveMob && npc.entity.bukkitEntity is LivingEntity && e.conversation.hasFlag("LOOK_PLAYER")) {
-                (npc.entity.bukkitEntity as LivingEntity).controllerLookAt(e.session.player)
+            if (npc is Mythic.Mob && npc.entity is LivingEntity && e.conversation.hasFlag("LOOK_PLAYER")) {
+                (npc.entity as LivingEntity).controllerLookAt(e.session.player)
             }
         }
 
@@ -366,23 +364,23 @@ object ConversationManager {
                 return
             }
             if (e.hand == EquipmentSlot.HAND && e.rightClicked is LivingEntity && e.player.conversationSession == null) {
-                val mob = MythicMobs.inst().mobManager.getMythicMobInstance(e.rightClicked) ?: return
-                getConversation(e.player, "mythicmobs", mob.type.internalName)?.run {
+                val mob = Mythic.getMobInstance(e.rightClicked) ?: return
+                getConversation(e.player, "mythicmobs", mob.internalName)?.run {
                     e.isCancelled = true
                     // 打开对话
-                    open(e.player, object : Source<ActiveMob>(mob.displayName, mob) {
+                    open(e.player, object : Source<Mythic.Mob>(mob.displayName, mob) {
 
                         override fun transfer(player: Player, newId: String): Boolean {
                             val nearby = e.rightClicked.getNearbyEntities(10.0, 10.0, 10.0)
-                                .mapNotNull { MythicMobs.inst().mobManager.getMythicMobInstance(e.rightClicked) }
-                                .firstOrNull { it.type.internalName == newId } ?: return false
+                                .mapNotNull { Mythic.getMobInstance(e.rightClicked) }
+                                .firstOrNull { it.internalName == newId } ?: return false
                             name = nearby.displayName
                             entity = nearby
                             return true
                         }
 
-                        override fun getOriginLocation(entity: ActiveMob): Location {
-                            val be = entity.entity.bukkitEntity
+                        override fun getOriginLocation(entity: Mythic.Mob): Location {
+                            val be = entity.entity
                             return be.location.add(0.0, be.height, 0.0)
                         }
                     })

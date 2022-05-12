@@ -1,14 +1,7 @@
 package ink.ptms.chemdah.module.kether.compat
 
-import com.google.common.collect.Sets
+import ink.ptms.chemdah.api.Mythic
 import ink.ptms.chemdah.util.getPlayer
-import io.lumine.xikage.mythicmobs.MythicMobs
-import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter
-import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitPlayer
-import io.lumine.xikage.mythicmobs.mobs.GenericCaster
-import io.lumine.xikage.mythicmobs.skills.SkillMechanic
-import io.lumine.xikage.mythicmobs.skills.SkillMetadata
-import io.lumine.xikage.mythicmobs.skills.SkillTrigger
 import taboolib.common.platform.function.submit
 import taboolib.module.kether.*
 import java.util.concurrent.CompletableFuture
@@ -23,33 +16,16 @@ import java.util.concurrent.CompletableFuture
  */
 class ActionMythic {
 
-    class MythicMobsCast(val mechanic: SkillMechanic, val trigger: SkillTrigger) : ScriptAction<Void>() {
+    class MythicMobsCast(val mechanic: Mythic.Skill, val trigger: Mythic.Skill.Trigger) : ScriptAction<Void>() {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Void> {
-            submit {
-                val bukkitPlayer = BukkitPlayer(frame.getPlayer())
-                MythicMobs.inst().skillManager.runSecondPass()
-                mechanic.executeSkills(
-                    SkillMetadata(
-                        trigger,
-                        GenericCaster(bukkitPlayer),
-                        bukkitPlayer,
-                        BukkitAdapter.adapt(bukkitPlayer.entityAsPlayer.location),
-                        Sets.newHashSet(),
-                        Sets.newHashSet(),
-                        0f
-                    )
-                )
-            }
+            val player = frame.getPlayer()
+            submit { mechanic.execute(trigger, player, player, emptySet(), emptySet(), 0f) }
             return CompletableFuture.completedFuture(null);
         }
     }
 
     companion object {
-
-        private val triggers by lazy {
-            SkillTrigger.values().map { trigger -> trigger.name.lowercase() }.toTypedArray()
-        }
 
         /**
          * mm cast skill_name
@@ -59,14 +35,15 @@ class ActionMythic {
         fun parser() = scriptParser {
             when (it.expects("cast")) {
                 "cast" -> {
-                    val mechanic = MythicMobs.inst().skillManager.getSkillMechanic(it.nextToken())
+                    val skill = it.nextToken()
+                    val mechanic = Mythic.getSkillMechanic(skill) ?: error("unknown skill $skill")
                     val trigger = try {
                         it.mark()
                         it.expects("with", "as", "by")
-                        SkillTrigger.valueOf(it.expects(*triggers).uppercase())
+                        Mythic.getSkillTrigger(it.nextToken())
                     } catch (ex: Throwable) {
                         it.reset()
-                        SkillTrigger.DEFAULT
+                        Mythic.getSkillTrigger("DEFAULT")
                     }
                     MythicMobsCast(mechanic, trigger)
                 }

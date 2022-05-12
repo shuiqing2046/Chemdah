@@ -84,6 +84,7 @@ dependencies {
     compileOnly("public:Citizens:1.0.0")
     compileOnly("public:MythicLib:1.0.0")
     compileOnly("public:MythicMobs:1.0.1")
+    compileOnly("public:MythicMobs5:5.0.4")
     compileOnly("public:ExecutableItems:1.0.0")
     compileOnly("public:Brewery:1.0.0")
     compileOnly("ink.ptms:Blockdb:1.1.0")
