@@ -2,6 +2,7 @@ package ink.ptms.chemdah.core.quest.objective.mythicmobs
 
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.Mythic
+import ink.ptms.chemdah.core.quest.QuestLoader.register
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
 
@@ -17,9 +18,9 @@ object MMRRegistry {
     @Awake(LifeCycle.ENABLE)
     fun init() {
         if (Mythic.isLegacy) {
-            ChemdahAPI.addQuestObjective("mythicmobs kill", MMythicKillType4)
-        } else {
-            ChemdahAPI.addQuestObjective("mythicmobs kill", MMythicKillType5)
+            MMythicKillType4.register()
+        } else if (Mythic.isLoaded) {
+            MMythicKillType5.register()
         }
     }
 }

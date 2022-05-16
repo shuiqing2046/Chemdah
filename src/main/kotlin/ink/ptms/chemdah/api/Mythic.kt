@@ -13,6 +13,7 @@ import io.lumine.xikage.mythicmobs.skills.SkillMechanic
 import io.lumine.xikage.mythicmobs.skills.SkillMetadata
 import io.lumine.xikage.mythicmobs.skills.SkillTrigger
 import io.lumine.xikage.mythicmobs.utils.config.file.FileConfiguration
+import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
@@ -25,6 +26,7 @@ import taboolib.module.configuration.Type
 
 object Mythic {
 
+    val isLoaded by lazy { Bukkit.getPluginManager().getPlugin("MythicMobs") != null }
     val isLegacy by lazy { kotlin.runCatching { Class.forName("io.lumine.xikage.mythicmobs.MythicMobs") }.getOrNull() != null }
 
     fun getMobInstance(entity: Entity): Mob? {
