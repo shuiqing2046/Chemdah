@@ -18,9 +18,9 @@ import org.bukkit.Location
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
-import org.serverct.ersha.dungeon.taboolib.common.reflect.Reflex.Companion.invokeMethod
 import taboolib.common.reflect.Reflex.Companion.getProperty
 import taboolib.common.reflect.Reflex.Companion.invokeConstructor
+import taboolib.common.reflect.Reflex.Companion.invokeMethod
 import taboolib.module.configuration.Configuration
 import taboolib.module.configuration.Type
 
