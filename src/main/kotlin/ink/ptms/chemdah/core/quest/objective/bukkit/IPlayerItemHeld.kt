@@ -28,7 +28,7 @@ object IPlayerItemHeld : ObjectiveCountableI<PlayerItemHeldEvent>() {
             data.toInt() == e.newSlot
         }
         addSimpleCondition("slot:previous") { data, e ->
-            data.toInt() == e.newSlot
+            data.toInt() == e.previousSlot
         }
     }
 }
