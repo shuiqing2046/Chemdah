@@ -571,7 +571,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
         @SubscribeEvent
         internal fun onMove(e: PlayerMoveEvent) {
             if (e.from.toVector() != e.to!!.toVector()) {
-                e.player.displayTrackLandmark()
+                submit(async = true) { e.player.displayTrackLandmark() }
             }
         }
 
@@ -580,7 +580,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
          */
         @SubscribeEvent
         internal fun onMove(e: AdyeshachEntityTeleportEvent) {
-            e.entity.updateTrackLandmark()
+            submit(async = true) { e.entity.updateTrackLandmark() }
         }
 
         @SubscribeEvent
