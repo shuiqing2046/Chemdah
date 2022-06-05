@@ -80,6 +80,11 @@ abstract class Objective<E : Any> {
     open val isAsync = false
 
     /**
+     * 是否在每秒自动检查
+     */
+    open val isTickable = false
+
+    /**
      * 获取事件中的玩家
      */
     var handler: Function<E, Player?> = Function { null }

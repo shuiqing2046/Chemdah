@@ -30,7 +30,7 @@ abstract class APlayerBucket<T : PlayerBucketEvent> : ObjectiveCountableI<T>() {
             data.toInferBlock().isBlock(it.blockClicked)
         }
         addSimpleCondition("item") { data, it ->
-            data.toInferItem().isItem(it.itemStack ?: AIR)
+            data.toInferItem().isItem(it.itemStack ?: EMPTY_ITEM)
         }
         addSimpleCondition("item:bucket") { data, it ->
             data.toInferItem().isItem(ItemStack(it.bucket))

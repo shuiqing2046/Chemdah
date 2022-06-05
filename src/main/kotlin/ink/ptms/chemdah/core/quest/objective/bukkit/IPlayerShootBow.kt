@@ -29,10 +29,10 @@ object IPlayerShootBow : ObjectiveCountableI<EntityShootBowEvent>() {
             data.toInferEntity().isEntity(e.projectile)
         }
         addSimpleCondition("item") { data, e ->
-            data.toInferItem().isItem(e.bow ?: AIR)
+            data.toInferItem().isItem(e.bow ?: EMPTY_ITEM)
         }
         addSimpleCondition("item:consumable") { data, e ->
-            data.toInferItem().isItem(e.consumable ?: AIR)
+            data.toInferItem().isItem(e.consumable ?: EMPTY_ITEM)
         }
         addSimpleCondition("hand") { data, e ->
             data.asList().any { it.equals(e.hand.name, true) }

@@ -7,9 +7,9 @@ import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
 import org.bukkit.inventory.ItemStack
 
-val AIR = ItemStack(Material.AIR)
+val EMPTY_ITEM = ItemStack(Material.AIR)
 
-val EMPTY = Location(Bukkit.getWorlds()[0], 0.0, 0.0, 0.0)
+val EMPTY_LOCATION = Location(Bukkit.getWorlds()[0], 0.0, 0.0, 0.0)
 
 val EMPTY_EVENT = object : Event() {
 

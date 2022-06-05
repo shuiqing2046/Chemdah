@@ -31,10 +31,10 @@ object IPlayerItemHeld : ObjectiveCountableI<PlayerItemHeldEvent>() {
             data.toInt() == e.previousSlot
         }
         addSimpleCondition("item:new") { data, e ->
-            data.toInferItem().isItem(e.player.inventory.getItem(e.newSlot) ?: AIR)
+            data.toInferItem().isItem(e.player.inventory.getItem(e.newSlot) ?: EMPTY_ITEM)
         }
         addSimpleCondition("item:previous") { data, e ->
-            data.toInferItem().isItem(e.player.inventory.getItem(e.previousSlot) ?: AIR)
+            data.toInferItem().isItem(e.player.inventory.getItem(e.previousSlot) ?: EMPTY_ITEM)
         }
     }
 }

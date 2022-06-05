@@ -24,7 +24,7 @@ object IPlayerDeath : AEntityDeath<PlayerDeathEvent>() {
         }
         addSimpleCondition("weapon") { data, e ->
             val el = e.entity.lastDamageCause as? EntityDamageByEntityEvent ?: return@addSimpleCondition false
-            data.toInferItem().isItem(el.attacker?.equipment?.itemInMainHand ?: AIR)
+            data.toInferItem().isItem(el.attacker?.equipment?.itemInMainHand ?: EMPTY_ITEM)
         }
         addSimpleCondition("attacker") { data, e ->
             val el = e.entity.lastDamageCause as? EntityDamageByEntityEvent ?: return@addSimpleCondition false

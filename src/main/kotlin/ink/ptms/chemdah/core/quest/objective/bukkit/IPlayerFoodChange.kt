@@ -31,7 +31,7 @@ object IPlayerFoodChange : ObjectiveCountableI<FoodLevelChangeEvent>() {
             data.toInt() <= e.foodLevel
         }
         addSimpleCondition("item") { data, e ->
-            data.toInferItem().isItem(e.item ?: AIR)
+            data.toInferItem().isItem(e.item ?: EMPTY_ITEM)
         }
         addConditionVariable("amount") {
             it.foodLevel

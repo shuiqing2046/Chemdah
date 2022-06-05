@@ -12,8 +12,10 @@ import ink.ptms.chemdah.core.quest.meta.MetaType.Companion.type
 import ink.ptms.chemdah.core.quest.objective.Abstract
 import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.Objective
+import ink.ptms.chemdah.core.quest.objective.bukkit.EMPTY_EVENT
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
+import org.bukkit.event.Event
 import taboolib.common.LifeCycle
 import taboolib.common.io.getInstance
 import taboolib.common.io.runningClasses
@@ -54,6 +56,10 @@ object QuestLoader {
                         } else {
                             // 检查条目自动完成
                             quest.tasks.forEach { task ->
+                                // 处理需要自动检查的任务类型
+                                if (task.objective.isTickable) {
+                                    handleTask(profile, task, quest, EMPTY_EVENT)
+                                }
                                 task.objective.checkComplete(profile, task, quest)
                             }
                             // 检查任务自动完成

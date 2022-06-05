@@ -21,6 +21,7 @@ object IPlayerData : ObjectiveCountableI<Event>() {
     override val name = "player data"
     override val event = Event::class.java
     override val isListener = false
+    override val isTickable = true
 
     init {
         addGoal("key,value") { profile, task ->

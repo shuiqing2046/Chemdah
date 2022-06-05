@@ -23,7 +23,7 @@ object IItemAnvil : ObjectiveCountableI<PrepareAnvilEvent>() {
             it.viewers[0] as Player
         }
         addSimpleCondition("position") { data, e ->
-            data.toPosition().inside(e.inventory.location ?: EMPTY)
+            data.toPosition().inside(e.inventory.location ?: EMPTY_LOCATION)
         }
         addSimpleCondition("text") { data, e ->
             data.toString() in e.inventory.renameText.toString()
@@ -32,11 +32,11 @@ object IItemAnvil : ObjectiveCountableI<PrepareAnvilEvent>() {
             data.toInt() <= e.inventory.repairCost
         }
         addSimpleCondition("item") { data, e ->
-            data.toInferItem().isItem(e.inventory.getItem(2) ?: AIR)
+            data.toInferItem().isItem(e.inventory.getItem(2) ?: EMPTY_ITEM)
         }
         addSimpleCondition("item:matrix") { data, e ->
             data.toInferItem().run {
-                isItem(e.inventory.getItem(0) ?: AIR) || isItem(e.inventory.getItem(1) ?: AIR)
+                isItem(e.inventory.getItem(0) ?: EMPTY_ITEM) || isItem(e.inventory.getItem(1) ?: EMPTY_ITEM)
             }
         }
         addConditionVariable("text") {

@@ -30,7 +30,7 @@ object IItemConsume : ObjectiveCountableI<PlayerItemConsumeEvent>() {
             data.toInferItem().isItem(e.item)
         }
         addSimpleCondition("item:replacement") { data, e ->
-            data.toInferItem().isItem(e.invokeMethod<ItemStack>("getReplacement") ?: AIR)
+            data.toInferItem().isItem(e.invokeMethod<ItemStack>("getReplacement") ?: EMPTY_ITEM)
         }
     }
 }

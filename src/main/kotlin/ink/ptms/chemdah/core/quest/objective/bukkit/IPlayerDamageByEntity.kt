@@ -27,7 +27,7 @@ object IPlayerDamageByEntity : AEntityDamage<EntityDamageByEntityEvent>() {
             data.toInferEntity().isEntity(e.attacker)
         }
         addSimpleCondition("weapon") { data, e ->
-            data.toInferItem().isItem(e.attacker!!.equipment?.itemInMainHand ?: AIR)
+            data.toInferItem().isItem(e.attacker!!.equipment?.itemInMainHand ?: EMPTY_ITEM)
         }
     }
 }

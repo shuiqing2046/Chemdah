@@ -26,7 +26,7 @@ object IPlayerTeleport : ObjectiveCountableI<PlayerTeleportEvent>() {
             data.toPosition().inside(e.to!!)
         }
         addSimpleCondition("position:to") { data, e ->
-            data.toPosition().inside(e.to ?: EMPTY)
+            data.toPosition().inside(e.to ?: EMPTY_LOCATION)
         }
         addSimpleCondition("position:from") { data, e ->
             data.toPosition().inside(e.from)

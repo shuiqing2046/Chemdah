@@ -35,7 +35,7 @@ object IPlayerBreed : ObjectiveCountableI<EntityBreedEvent>() {
             data.toInferEntity().isEntity(it.mother)
         }
         addSimpleCondition("item") { data, it ->
-            data.toInferItem().isItem(it.bredWith ?: AIR)
+            data.toInferItem().isItem(it.bredWith ?: EMPTY_ITEM)
         }
         addSimpleCondition("exp") { data, it ->
             data.toInt() <= it.experience
