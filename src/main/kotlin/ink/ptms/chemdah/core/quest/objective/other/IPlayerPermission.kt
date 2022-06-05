@@ -20,7 +20,7 @@ object IPlayerPermission : ObjectiveCountableI<Event>() {
     override val isTickable = true
 
     init {
-        addFullCondition("permission") { profile, task, _ ->
+        addGoal("permission") { profile, task ->
             profile.player.hasPermission(task.condition["permission"].toString())
         }
     }
