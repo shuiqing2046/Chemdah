@@ -20,8 +20,8 @@ object IPlayerInventory : ObjectiveCountableI<Event>() {
     override val isTickable = true
 
     init {
-        addFullCondition("item,amount,consume") { profile, task, _ ->
-            val item = task.condition["item"]?.toInferItem() ?: return@addFullCondition false
+        addFullCondition("item") { profile, task, _ ->
+            val item = task.condition["item"]!!.toInferItem()
             val amount = task.condition["amount"]?.toInt() ?: 1
             val consume = task.condition["consume"]?.toBoolean() ?: false
             val inventory = profile.player.inventory
