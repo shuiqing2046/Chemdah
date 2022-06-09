@@ -37,7 +37,7 @@ object IBlockInteract : ObjectiveCountableI<PlayerInteractEvent>() {
             data.asList().any { it.equals(e.hand?.name, true) }
         }
         addSimpleCondition("item") { data, e ->
-            data.toInferItem().isItem(e.item!!)
+            data.toInferItem().isItem(e.item ?: EMPTY_ITEM)
         }
     }
 }
