@@ -4,7 +4,7 @@ import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import io.lumine.mythic.bukkit.events.MythicMobDeathEvent
 import org.bukkit.entity.Player
 
-object MMythicKillType5 : ObjectiveCountableI<MythicMobDeathEvent>() {
+class MMythicKillType5 : ObjectiveCountableI<MythicMobDeathEvent>() {
 
     override val name = "mythicmobs kill"
     override val event = MythicMobDeathEvent::class.java
