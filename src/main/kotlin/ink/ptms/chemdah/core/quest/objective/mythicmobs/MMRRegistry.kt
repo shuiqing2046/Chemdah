@@ -18,9 +18,9 @@ object MMRRegistry {
     @Awake(LifeCycle.ENABLE)
     fun init() {
         if (Mythic.isLegacy) {
-            MMythicKillType4.register()
+            MMythicKillType4().register()
         } else if (Mythic.isLoaded) {
-            MMythicKillType5.register()
+            MMythicKillType5().register()
         }
     }
 }
