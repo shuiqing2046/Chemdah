@@ -121,7 +121,7 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
             val quest = profile.getQuests(openAPI = true).firstOrNull { it.id == task.template.id }
             if (quest == null) {
                 warning("Quest(${questContainer.node}) not accepted.")
-                future.complete(Progress.empty)
+                future.complete(Progress.ZERO)
                 return future
             }
             val vars = AtomicReference<QuestContext.VarTable>()
@@ -145,7 +145,7 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
         return if (questContainer is Template) {
             val future = CompletableFuture<Progress>()
             val tasks = questContainer.taskMap.values.toList()
-            var p = Progress.empty
+            var p = Progress.ZERO
             fun process(cur: Int) {
                 if (cur < tasks.size) {
                     getProgress(profile, tasks[cur]).thenAccept {
@@ -264,7 +264,7 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
             }
             return when (this) {
                 is Template -> {
-                    var p = Progress.empty
+                    var p = Progress.ZERO
                     taskMap.forEach { (_, task) ->
                         val tp = task.objective.getProgress(profile, task)
                         p = Progress(p.value.increaseAny(tp.value), p.target.increaseAny(tp.target), p.percent + (tp.percent / this.taskMap.size))

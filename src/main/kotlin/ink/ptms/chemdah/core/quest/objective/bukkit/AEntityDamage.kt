@@ -6,7 +6,7 @@ import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.objective.Abstract
 import ink.ptms.chemdah.core.quest.objective.Objective
 import ink.ptms.chemdah.core.quest.objective.Progress
-import ink.ptms.chemdah.core.quest.objective.Progress.Companion.progress
+import ink.ptms.chemdah.core.quest.objective.Progress.Companion.toProgress
 import org.bukkit.event.entity.EntityDamageEvent
 import taboolib.common5.Coerce
 
@@ -64,10 +64,10 @@ abstract class AEntityDamage<E : EntityDamageEvent> : Objective<E>() {
     override fun getProgress(profile: PlayerProfile, task: Task): Progress {
         val target = Coerce.format(task.goal["damage", 1].toDouble())
         return if (hasCompletedSignature(profile, task)) {
-            target.progress(target, 1.0)
+            target.toProgress(target, 1.0)
         } else {
             profile.dataOperator(task) {
-                get("damage", 0).toDouble().let { a -> Coerce.format(a).progress(target, Coerce.format(a / target)) }
+                get("damage", 0).toDouble().let { a -> Coerce.format(a).toProgress(target, Coerce.format(a / target)) }
             }
         }
     }

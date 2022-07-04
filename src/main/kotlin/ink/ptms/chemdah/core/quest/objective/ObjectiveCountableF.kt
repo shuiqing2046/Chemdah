@@ -3,7 +3,7 @@ package ink.ptms.chemdah.core.quest.objective
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.core.quest.Task
-import ink.ptms.chemdah.core.quest.objective.Progress.Companion.progress
+import ink.ptms.chemdah.core.quest.objective.Progress.Companion.toProgress
 import taboolib.common5.Coerce
 
 /**
@@ -37,13 +37,11 @@ abstract class ObjectiveCountableF<E : Any> : Objective<E>() {
     }
 
     override fun getProgress(profile: PlayerProfile, task: Task): Progress {
-        val target = Coerce.format(task.goal["amount", 1].toDouble())
+        val target = task.goal["amount", 1].toDouble()
         return if (hasCompletedSignature(profile, task)) {
-            target.progress(target, 1.0)
+            target.toProgress(target, 1.0)
         } else {
-            profile.dataOperator(task) {
-                get("amount", 0).toDouble().let { a -> Coerce.format(a).progress(target, Coerce.format(a / target)) }
-            }
+            profile.dataOperator(task) { get("amount", 0).toDouble().toProgress(target) }
         }
     }
 

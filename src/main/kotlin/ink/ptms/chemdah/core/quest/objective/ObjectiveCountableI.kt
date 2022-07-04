@@ -3,7 +3,7 @@ package ink.ptms.chemdah.core.quest.objective
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.core.quest.Task
-import ink.ptms.chemdah.core.quest.objective.Progress.Companion.progress
+import ink.ptms.chemdah.core.quest.objective.Progress.Companion.toProgress
 
 /**
  * Chemdah
@@ -38,11 +38,9 @@ abstract class ObjectiveCountableI<E : Any> : Objective<E>() {
     override fun getProgress(profile: PlayerProfile, task: Task): Progress {
         val target = task.goal["amount", 1].toInt()
         return if (hasCompletedSignature(profile, task)) {
-            target.progress(target, 1.0)
+            target.toProgress(target, 1.0)
         } else {
-            profile.dataOperator(task) {
-                get("amount", 0).toInt().let { a -> a.progress(target, a / target.toDouble()) }
-            }
+            profile.dataOperator(task) { get("amount", 0).toInt().toProgress(target) }
         }
     }
 

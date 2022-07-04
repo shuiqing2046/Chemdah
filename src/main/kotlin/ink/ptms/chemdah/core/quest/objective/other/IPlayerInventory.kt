@@ -1,7 +1,12 @@
 package ink.ptms.chemdah.core.quest.objective.other
 
+import ink.ptms.chemdah.core.PlayerProfile
+import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
+import ink.ptms.chemdah.core.quest.objective.Progress
+import ink.ptms.chemdah.core.quest.objective.Progress.Companion.toProgress
 import org.bukkit.event.Event
+import taboolib.platform.util.countItem
 import taboolib.platform.util.hasItem
 import taboolib.platform.util.takeItem
 
@@ -30,6 +35,16 @@ object IPlayerInventory : ObjectiveCountableI<Event>() {
                 inventory.takeItem(amount) { item.isItem(it) }
             }
             hasItem
+        }
+    }
+
+    override fun getProgress(profile: PlayerProfile, task: Task): Progress {
+        val target = task.condition["amount"]?.toInt() ?: 1
+        return if (hasCompletedSignature(profile, task)) {
+            target.toProgress(target, 1.0)
+        } else {
+            val item = task.condition["item"]!!.toInferItem()
+            profile.player.inventory.countItem { item.isItem(it) }.toProgress(target)
         }
     }
 }

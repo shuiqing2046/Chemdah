@@ -1,5 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective
 
+import taboolib.common5.Coerce
+
 /**
  * Chemdah
  * ink.ptms.chemdah.core.quest.Progress
@@ -9,12 +11,15 @@ package ink.ptms.chemdah.core.quest.objective
  */
 open class Progress(val value: Any, val target: Any, percent: Double) {
 
-    val percent = percent.coerceAtMost(1.0).coerceAtLeast(0.0)
+    val percent = Coerce.format(percent.coerceAtMost(1.0).coerceAtLeast(0.0))
 
     companion object {
 
-        val empty = Progress(0, 0, 0.0)
+        @JvmStatic
+        val ZERO = Progress(0, 0, 0.0)
 
-        fun Any.progress(target: Any, percent: Double) = Progress(this, target, percent)
+        fun Any.toProgress(target: Any, percent: Double) = Progress(this, target, percent)
+
+        fun Number.toProgress(target: Number) = Progress(this, target, toDouble() / target.toDouble())
     }
 }

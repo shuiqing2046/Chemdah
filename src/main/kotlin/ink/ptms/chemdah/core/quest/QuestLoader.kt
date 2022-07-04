@@ -40,7 +40,7 @@ import java.io.File
 object QuestLoader {
 
     @Config("core/group.yml")
-    lateinit var groupConf: SecuredFile
+    lateinit var groupConf: Configuration
         private set
 
     @Schedule(period = 20, async = true)

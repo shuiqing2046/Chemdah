@@ -7,6 +7,7 @@ import ink.ptms.chemdah.core.quest.AgentType
 import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.addon.AddonRestart.Companion.canRestart
+import ink.ptms.chemdah.core.quest.objective.Progress.Companion.toProgress
 import ink.ptms.chemdah.util.*
 import org.bukkit.entity.Player
 import taboolib.common.platform.event.EventPriority
@@ -223,7 +224,7 @@ abstract class Objective<E : Any> {
      * 获取条目进度
      */
     open fun getProgress(profile: PlayerProfile, task: Task): Progress {
-        return Progress.empty
+        return Progress.ZERO
     }
 
     /**
