@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     `java-library`
     `maven-publish`
-    id("io.izzel.taboolib") version "1.38"
+    id("io.izzel.taboolib") version "1.40"
     id("org.jetbrains.kotlin.jvm") version "1.5.10"
     id("org.jetbrains.dokka") version "1.6.0"
 }
@@ -39,7 +39,7 @@ taboolib {
     install("platform-bukkit")
     install("expansion-command-helper")
     classifier = null
-    version = "6.0.9-14"
+    version = "6.0.9-17"
 }
 
 repositories {
