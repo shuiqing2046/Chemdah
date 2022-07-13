@@ -20,7 +20,7 @@ class ActionMythic {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Void> {
             val player = frame.getPlayer()
-            submit { mechanic.execute(trigger, player, player, emptySet(), emptySet(), 0f) }
+            submit { mechanic.execute(trigger, player, player, emptySet(), emptySet(), 0f, emptyMap()) }
             return CompletableFuture.completedFuture(null);
         }
     }
