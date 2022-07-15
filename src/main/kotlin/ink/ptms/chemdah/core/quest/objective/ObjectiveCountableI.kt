@@ -30,11 +30,11 @@ abstract class ObjectiveCountableI<E : Any> : Objective<E>() {
 
     @Suppress("UNCHECKED_CAST")
     override fun onContinue(profile: PlayerProfile, task: Task, quest: Quest, event: Any) {
-        if (task.goal["amount", 1].toInt() == 0) {
-            return
-        }
         profile.dataOperator(task) {
-            put("amount", get("amount", 0).toInt() + getCount(profile, task, event as E))
+            val amount = get("amount", 0).toInt()
+            if (amount < task.goal["amount", 1].toInt()) {
+                put("amount", amount + getCount(profile, task, event as E))
+            }
         }
     }
 

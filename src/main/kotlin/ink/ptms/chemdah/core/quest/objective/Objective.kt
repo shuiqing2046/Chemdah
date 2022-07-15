@@ -22,7 +22,6 @@ import java.util.function.Function
  * @author sky
  * @since 2021/3/1 11:52 下午
  */
-@Suppress("UNCHECKED_CAST")
 abstract class Objective<E : Any> {
 
     /**

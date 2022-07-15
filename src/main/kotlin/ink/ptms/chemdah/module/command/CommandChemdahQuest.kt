@@ -7,6 +7,7 @@ import ink.ptms.chemdah.core.quest.addon.AddonTrack.Companion.trackQuest
 import ink.ptms.chemdah.module.ui.UISystem
 import org.apache.commons.lang3.time.DateFormatUtils
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.command.CommandSender
 import taboolib.common.platform.command.CommandBody
 import taboolib.common.platform.command.CommandHeader
@@ -26,6 +27,7 @@ import kotlin.math.ceil
  * @author sky
  * @since 2021/2/11 7:19 下午
  */
+@Suppress("DuplicatedCode")
 @CommandHeader(name = "ChemdahQuest", aliases = ["chq"], permission = "chemdah.command")
 object CommandChemdahQuest {
 
@@ -156,7 +158,11 @@ object CommandChemdahQuest {
             dynamic(commit = "quest", optional = true) {
                 suggestion<CommandSender>(uncheck = true) { _, _ -> ChemdahAPI.questTemplate.keys.toList() }
                 execute<CommandSender> { sender, context, argument ->
-                    commandInfo(sender, context.argument(-1), Coerce.toInteger(argument))
+                    if (Coerce.asInteger(argument).isPresent) {
+                        commandInfo(sender, context.argument(-1), Coerce.toInteger(argument) - 1)
+                    } else {
+                        commandInfo(sender, context.argument(-1), argument)
+                    }
                 }
             }
             execute<CommandSender> { sender, _, argument ->
@@ -209,7 +215,7 @@ object CommandChemdahQuest {
             return
         } else {
             sender.sendLang("command-quest-info-header")
-            subList(quests, page * 5, (page + 1) * 5 - 1).forEach { quest ->
+            subList(quests, page * 5, (page + 1) * 5).forEach { quest ->
                 sender.sendLang("command-quest-info-body", "  §n${quest.id}:§r ${if (!quest.isOwner(playerExact)) "§8(Share)" else ""}")
                 sender.sendLang("command-quest-info-body", "    §7Start in ${DateFormatUtils.format(quest.startTime, "yyyy/MM/dd HH:mm:ss")}")
                 sender.sendLang("command-quest-info-body", "    §7Data:")
@@ -218,6 +224,23 @@ object CommandChemdahQuest {
                 }
             }
             sender.sendLang("command-quest-info-bottom", (page + 1), ceil(quests.size / 5.0).toInt())
+        }
+    }
+
+    internal fun commandInfo(sender: CommandSender, player: String, questName: String) {
+        val playerExact = Bukkit.getPlayerExact(player)!!
+        val quest = playerExact.chemdahProfile.getQuestById(questName, openAPI = true)
+        if (quest == null) {
+            sender.sendLang("command-quest-info-empty")
+            return
+        } else {
+            sender.sendLang("command-quest-info-header")
+            sender.sendLang("command-quest-info-body", "  §n${quest.id}:§r ${if (!quest.isOwner(playerExact)) "§8(Share)" else ""}")
+            sender.sendLang("command-quest-info-body", "    §7Start in ${DateFormatUtils.format(quest.startTime, "yyyy/MM/dd HH:mm:ss")}")
+            sender.sendLang("command-quest-info-body", "    §7Data:")
+            quest.persistentDataContainer.entries().forEach { e ->
+                sender.sendLang("command-quest-info-body", "      §7${e.key.replace(".", "§f.§7")} §8= §f${e.value.data}")
+            }
         }
     }
 }
