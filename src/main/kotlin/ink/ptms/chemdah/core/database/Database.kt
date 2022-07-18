@@ -98,7 +98,7 @@ abstract class Database {
         }
 
         @SubscribeEvent
-        internal fun e(e: PlayerLoginEvent) {
+        internal fun onLogin(e: PlayerLoginEvent) {
             if (INSTANCE is DatabaseError) {
                 e.result = PlayerLoginEvent.Result.KICK_OTHER
                 e.kickMessage = e.player.asLangText("database-error")
@@ -106,7 +106,7 @@ abstract class Database {
         }
 
         @SubscribeEvent
-        internal fun e(e: PlayerJoinEvent) {
+        internal fun onJoin(e: PlayerJoinEvent) {
             submit(delay = Chemdah.conf.getLong("join-select-delay", 20), async = true) {
                 mirrorNow("Database:select") {
                     if (e.player.isOnline) {
@@ -120,17 +120,17 @@ abstract class Database {
         }
 
         @SubscribeEvent
-        internal fun e(e: PlayerQuitEvent) {
+        internal fun onQuit(e: PlayerQuitEvent) {
             PlayerEvents.Released(e.player).call()
         }
 
         @SubscribeEvent
-        internal fun e(e: PlayerKickEvent) {
+        internal fun onKick(e: PlayerKickEvent) {
             PlayerEvents.Released(e.player).call()
         }
 
         @SubscribeEvent
-        internal fun e(e: PlayerEvents.Released) {
+        internal fun onReleased(e: PlayerEvents.Released) {
             val playerProfile = ChemdahAPI.playerProfile.remove(e.player.name)
             if (playerProfile?.isDataChanged == true) {
                 submit(async = true) {

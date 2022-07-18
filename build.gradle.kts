@@ -38,6 +38,7 @@ taboolib {
     install("module-ui")
     install("platform-bukkit")
     install("expansion-command-helper")
+    install("expansion-javascript")
     classifier = null
     version = "6.0.9-33"
 }

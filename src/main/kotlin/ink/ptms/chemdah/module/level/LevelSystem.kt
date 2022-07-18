@@ -9,12 +9,14 @@ import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.warning
 import taboolib.common5.Coerce
+import taboolib.common5.compileJS
 import taboolib.module.configuration.Config
 import taboolib.module.configuration.Configuration
 import taboolib.module.configuration.SecuredFile
 import taboolib.module.kether.KetherShell
 import taboolib.module.kether.printKetherErrorMessage
 import java.util.concurrent.CompletableFuture
+import javax.script.SimpleBindings
 
 /**
  * Chemdah
@@ -62,7 +64,7 @@ object LevelSystem : Module {
     }
 
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    internal fun e(e: PlayerEvents.LevelChange) {
+    internal fun onLevelChange(e: PlayerEvents.LevelChange) {
         if (e.newLevel > e.oldLevel) {
             ((e.oldLevel + 1)..e.newLevel).forEach { level ->
                 e.option.getReward(level)?.eval(e.player, level)
@@ -76,18 +78,18 @@ object LevelSystem : Module {
         conf.getKeys(false).forEach { node ->
             val section = conf.getConfigurationSection(node)!!
             val algorithm = when (section.getString("experience.type")) {
-//                "javascript" -> {
-//                    val script = section.getString("experience.math")!!.compileJS() ?: return@forEach
-//                    object : Level.Algorithm() {
-//
-//                        override val maxLevel: Int
-//                            get() = section.getInt("max")
-//
-//                        override fun getExp(level: Int): CompletableFuture<Int> {
-//                            return CompletableFuture.completedFuture(Coerce.toInteger(script.eval(SimpleBindings(mapOf("level" to level)))))
-//                        }
-//                    }
-//                }
+                "javascript" -> {
+                    val script = section.getString("experience.math")!!.compileJS() ?: return@forEach
+                    object : Level.Algorithm() {
+
+                        override val maxLevel: Int
+                            get() = section.getInt("max")
+
+                        override fun getExp(level: Int): CompletableFuture<Int> {
+                            return CompletableFuture.completedFuture(Coerce.toInteger(script.eval(SimpleBindings(mapOf("level" to level)))))
+                        }
+                    }
+                }
                 "kether" -> {
                     object : Level.Algorithm() {
 

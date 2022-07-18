@@ -63,7 +63,7 @@ data class ConversationSwitch(val file: File?, val root: ConfigurationSection, v
         val switchMap = HashMap<String, ConversationSwitch>()
 
         @SubscribeEvent
-        internal fun e(e: ConversationEvents.Load) {
+        internal fun onLoad(e: ConversationEvents.Load) {
             if (e.root.contains("when") && e.root.getMapList("when").isNotEmpty()) {
                 e.isCancelled = true
                 val id = e.root["npc id"] ?: return
@@ -73,7 +73,7 @@ data class ConversationSwitch(val file: File?, val root: ConfigurationSection, v
         }
 
         @SubscribeEvent
-        internal fun e(e: ConversationEvents.Select) {
+        internal fun onSelect(e: ConversationEvents.Select) {
             if (e.conversation == null) {
                 try {
                     val ele = switchMap.values.firstOrNull { it.npcId.id.any { npc -> e.id.any { id -> npc.isNPC(e.namespace, id) } } } ?: return

@@ -39,6 +39,7 @@ import java.util.concurrent.ConcurrentHashMap
  * @author sky
  * @since 2021/2/10 6:39 下午
  */
+@Suppress("DuplicatedCode")
 class ActionScenes {
 
     class ScenesBlockSet0(
@@ -180,12 +181,12 @@ class ActionScenes {
         private val scenesBlocks = ConcurrentHashMap<String, MutableMap<String, MutableMap<Vector, ScenesBlockData>>>()
 
         @Schedule(period = 40, async = true)
-        fun e() {
+        fun updateScenesBlock40() {
             Bukkit.getOnlinePlayers().forEach { it.updateScenesBlock() }
         }
 
         @SubscribeEvent
-        fun e(e: PacketReceiveEvent) {
+        fun onPacketReceive(e: PacketReceiveEvent) {
             if (e.packet.name == "PacketPlayInUseItem") {
                 val pos = if (MinecraftVersion.isUniversal) {
                     e.packet.read<Any>("a/blockPos")!!
@@ -228,21 +229,21 @@ class ActionScenes {
         }
 
         @SubscribeEvent
-        fun e(e: PlayerTeleportEvent) {
+        fun onTeleport(e: PlayerTeleportEvent) {
             submit(delay = 20) {
                 e.player.updateScenesBlock()
             }
         }
 
         @SubscribeEvent
-        fun e(e: PlayerChangedWorldEvent) {
+        fun onChangeWorld(e: PlayerChangedWorldEvent) {
             submit(delay = 20) {
                 e.player.updateScenesBlock()
             }
         }
 
         @SubscribeEvent
-        fun e(e: PlayerEvents.Released) {
+        fun onReleased(e: PlayerEvents.Released) {
             scenesBlocks.remove(e.player.name)
         }
 
@@ -289,7 +290,7 @@ class ActionScenes {
         }
 
         @SubscribeEvent
-        fun e(e: AdyeshachEntityTickEvent) {
+        fun onTick(e: AdyeshachEntityTickEvent) {
             val entity = e.entity
             val manager = entity.manager ?: return
             if (!manager.isPublic()

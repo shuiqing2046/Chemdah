@@ -23,7 +23,7 @@ import think.rpgitems.item.ItemManager
 internal object InferItemHooks  {
 
     @SubscribeEvent
-    fun e(e: InferItemHookEvent) {
+    fun onItemHook(e: InferItemHookEvent) {
         when (e.id.lowercase()) {
             "zaphkiel" -> {
                 e.itemClass = ItemZaphkiel::class.java

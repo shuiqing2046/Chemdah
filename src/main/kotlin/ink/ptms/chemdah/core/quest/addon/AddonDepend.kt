@@ -58,14 +58,14 @@ class AddonDepend(root: String, questContainer: QuestContainer) : Addon(root, qu
         }
 
         @SubscribeEvent
-        fun e(e: ObjectiveEvents.Continue.Pre) {
+        fun onObjectiveContinuePre(e: ObjectiveEvents.Continue.Pre) {
             if (!e.task.isQuestDependCompleted(e.playerProfile.player)) {
                 e.isCancelled = true
             }
         }
 
         @SubscribeEvent
-        fun e(e: ObjectiveEvents.Complete.Pre) {
+        fun onObjectiveCompletePre(e: ObjectiveEvents.Complete.Pre) {
             if (!e.task.isQuestDependCompleted(e.playerProfile.player)) {
                 e.isCancelled = true
             }

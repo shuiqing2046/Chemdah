@@ -19,7 +19,7 @@ object ActionWorkflows {
     val fetchMap = ConcurrentHashMap<String, MutableList<ScriptContext>>()
 
     @SubscribeEvent
-    fun e(e: PlayerEvents.Selected) {
+    fun onSelected(e: PlayerEvents.Selected) {
         e.playerProfile.persistentDataContainer.forEach { (k, v) ->
             if (k.startsWith("workflows.fetch.")) {
                 e.playerProfile.persistentDataContainer.remove(k)
@@ -31,7 +31,7 @@ object ActionWorkflows {
     }
 
     @SubscribeEvent
-    fun e(e: PlayerEvents.Released) {
+    fun onReleased(e: PlayerEvents.Released) {
         fetchMap.remove(e.player.name)?.forEach { ScriptService.terminateQuest(it) }
     }
 

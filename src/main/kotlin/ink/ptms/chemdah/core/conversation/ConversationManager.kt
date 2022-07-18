@@ -94,7 +94,7 @@ object ConversationManager {
     }
 
     @SubscribeEvent
-    internal fun e(e: PlayerEvents.Released) {
+    internal fun onReleased(e: PlayerEvents.Released) {
         val player = e.player
         if (player.conversationSession?.conversation?.hasFlag("NO_EFFECT") == false) {
             effectFreeze.forEach { player.removePotionEffect(it.key) }
@@ -106,7 +106,7 @@ object ConversationManager {
 
     @Suppress("UNCHECKED_CAST")
     @SubscribeEvent
-    internal fun e(e: ConversationEvents.Begin) {
+    internal fun onBegin(e: ConversationEvents.Begin) {
         if (!e.conversation.hasFlag("NO_EFFECT")) {
             effects[e.session.player.name] = effectFreeze.mapNotNull { e.session.player.getPotionEffect(it.key) }.filter { it.duration in 10..9999 }
             effectFreeze.forEach { e.session.player.addPotionEffect(PotionEffect(it.key, 99999, it.value).hidden()) }
@@ -121,7 +121,7 @@ object ConversationManager {
     }
 
     @SubscribeEvent
-    internal fun e(e: ConversationEvents.Closed) {
+    internal fun onClosed(e: ConversationEvents.Closed) {
         if (!e.session.conversation.hasFlag("NO_EFFECT")) {
             effectFreeze.forEach { e.session.player.removePotionEffect(it.key) }
             effects.remove(e.session.player.name)?.forEach { e.session.player.addPotionEffect(it) }
@@ -133,7 +133,7 @@ object ConversationManager {
     }
 
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    internal fun e(e: EntityDamageEvent) {
+    internal fun onDamgae(e: EntityDamageEvent) {
         if (e.entity is Player) {
             val session = sessions[e.entity.name] ?: return
             if (session.isClosed) {
@@ -149,21 +149,21 @@ object ConversationManager {
     }
 
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    internal fun e(e: PlayerMoveEvent) {
+    internal fun onMove(e: PlayerMoveEvent) {
         if (e.player.conversationSession?.conversation?.hasFlag("NO_MOVE") == true) {
             e.setTo(e.from)
         }
     }
 
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    internal fun e(e: PlayerDropItemEvent) {
+    internal fun onDropItem(e: PlayerDropItemEvent) {
         if (e.player.conversationSession?.conversation?.hasFlag("FORCE_DISPLAY") == true) {
             e.isCancelled = true
         }
     }
 
     @SubscribeEvent
-    internal fun e(e: PlayerCommandPreprocessEvent) {
+    internal fun onCommand(e: PlayerCommandPreprocessEvent) {
         if (e.message.startsWith("/session")) {
             e.isCancelled = true
             val args = e.message.split(" ").toMutableList().also {
@@ -182,7 +182,7 @@ object ConversationManager {
     }
 
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    internal fun e(e: PlayerInteractAtEntityEvent) {
+    internal fun onInteract(e: PlayerInteractAtEntityEvent) {
         if (e.hand == EquipmentSlot.HAND && e.player.conversationSession == null) {
             val name = e.rightClicked.getDisplayName()
             val conversation = getConversation(e.player, "minecraft", *name) ?: return
@@ -223,7 +223,7 @@ object ConversationManager {
     internal object CompatAdyeshach {
 
         @SubscribeEvent
-        fun e(e: ConversationEvents.Begin) {
+        fun onBegin(e: ConversationEvents.Begin) {
             val npc = e.session.source.entity
             if (npc is EntityInstance) {
                 npc.setTag("isFreeze", "true")
@@ -244,7 +244,7 @@ object ConversationManager {
         }
 
         @SubscribeEvent
-        fun e(e: ConversationEvents.Closed) {
+        fun onClosed(e: ConversationEvents.Closed) {
             val npc = e.session.source.entity
             if (npc is EntityInstance) {
                 npc.removeTag("conversation:${e.session.player.name}")
@@ -268,7 +268,7 @@ object ConversationManager {
         }
 
         @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        fun e(e: AdyeshachEntityInteractEvent) {
+        fun onAdyInteract(e: AdyeshachEntityInteractEvent) {
             if (e.isMainHand && e.player.conversationSession == null) {
                 getConversation(e.player, "adyeshach", e.entity.id)?.run {
                     e.isCancelled = true
@@ -302,7 +302,7 @@ object ConversationManager {
         val isCitizensHooked by lazy { Bukkit.getPluginManager().isPluginEnabled("Citizens") }
 
         @SubscribeEvent
-        fun e(e: ConversationEvents.Begin) {
+        fun onBegin(e: ConversationEvents.Begin) {
             if (!isCitizensHooked) {
                 return
             }
@@ -313,7 +313,7 @@ object ConversationManager {
         }
 
         @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        fun e(e: PlayerInteractAtEntityEvent) {
+        fun onInteract(e: PlayerInteractAtEntityEvent) {
             if (!isCitizensHooked) {
                 return
             }
@@ -348,7 +348,7 @@ object ConversationManager {
         val isMythicMobsHooked by lazy { Bukkit.getPluginManager().isPluginEnabled("MythicMobs") }
 
         @SubscribeEvent
-        fun e(e: ConversationEvents.Begin) {
+        fun onBegin(e: ConversationEvents.Begin) {
             if (!isMythicMobsHooked) {
                 return
             }
@@ -359,7 +359,7 @@ object ConversationManager {
         }
 
         @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        fun e(e: PlayerInteractAtEntityEvent) {
+        fun onInteract(e: PlayerInteractAtEntityEvent) {
             if (!isMythicMobsHooked) {
                 return
             }

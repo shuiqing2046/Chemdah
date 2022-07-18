@@ -313,7 +313,7 @@ class DatabaseSQLite : Database() {
         private val cacheQuestId = ConcurrentHashMap<String, MutableMap<String, String>>()
 
         @SubscribeEvent
-        internal fun e(e: PlayerEvents.Released) {
+        internal fun onReleased(e: PlayerEvents.Released) {
             cacheQuestId.remove(e.player.name)
         }
     }
