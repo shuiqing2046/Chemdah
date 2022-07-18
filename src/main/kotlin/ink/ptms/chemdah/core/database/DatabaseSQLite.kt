@@ -23,6 +23,7 @@ import javax.sql.DataSource
  * @author sky
  * @since 2021/3/5 3:51 下午
  */
+@Suppress("DuplicatedCode")
 class DatabaseSQLite : Database() {
 
     val host = File(getDataFolder(), "data.db").getHost()
@@ -164,7 +165,7 @@ class DatabaseSQLite : Database() {
     fun PlayerProfile.update(player: Player) {
         val id = getUserId(player)
         persistentDataContainer.forEach { (key, data) ->
-            if (data.changed) {
+            if (data.changed && !key.startsWith("__")) {
                 if (tableUserData.find(dataSource) { where("user" eq id and ("key" eq key)) }) {
                     tableUserData.update(dataSource) {
                         where("user" eq id and ("key" eq key))
@@ -204,7 +205,7 @@ class DatabaseSQLite : Database() {
                 }
                 // 对任务数据进行更新
                 quest.persistentDataContainer.forEach { (key, data) ->
-                    if (data.changed) {
+                    if (data.changed && !key.startsWith("__")) {
                         if (tableQuestData.find(dataSource) { where("id" eq questId and ("key" eq key)) }) {
                             tableQuestData.update(dataSource) {
                                 where("id" eq questId and ("key" eq key))
@@ -238,7 +239,9 @@ class DatabaseSQLite : Database() {
                 if (quest.persistentDataContainer.isNotEmpty()) {
                     tableQuestData.insert(dataSource, "id", "key", "value", "mode") {
                         quest.persistentDataContainer.forEach { (k, v) ->
-                            value(uuid, k, v.data, 1)
+                            if (!k.startsWith("__")) {
+                                value(uuid, k, v.data, 1)
+                            }
                         }
                     }
                 }

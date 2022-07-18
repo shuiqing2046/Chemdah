@@ -25,6 +25,7 @@ import javax.sql.DataSource
  * @author sky
  * @since 2021/3/5 3:51 下午
  */
+@Suppress("DuplicatedCode")
 class DatabaseSQL : Database() {
 
     val host = Chemdah.conf.getHost("database.source.SQL")
@@ -200,7 +201,8 @@ class DatabaseSQL : Database() {
     fun PlayerProfile.update(player: Player) {
         val id = getUserId(player)
         persistentDataContainer.forEach { (key, data) ->
-            if (data.changed) {
+            // 非临时变量
+            if (data.changed && !key.startsWith("__")) {
                 if (tableUserData.find(dataSource) { where("user" eq id and ("key" eq key)) }) {
                     tableUserData.update(dataSource) {
                         where("user" eq id and ("key" eq key))
@@ -240,7 +242,8 @@ class DatabaseSQL : Database() {
                 }
                 // 对任务数据进行更新
                 quest.persistentDataContainer.forEach { (key, data) ->
-                    if (data.changed) {
+                    // 非临时变量
+                    if (data.changed && !key.startsWith("__")) {
                         if (tableQuestData.find(dataSource) { where("quest" eq questId and ("key" eq key)) }) {
                             tableQuestData.update(dataSource) {
                                 where("quest" eq questId and ("key" eq key))
@@ -279,7 +282,10 @@ class DatabaseSQL : Database() {
                 if (persistentDataContainer.isNotEmpty()) {
                     tableUserData.insert(dataSource, "user", "key", "value", "mode") {
                         persistentDataContainer.forEach { (k, v) ->
-                            value(userId, k, v.data, 1)
+                            // 非临时变量
+                            if (!k.startsWith("__")) {
+                                value(userId, k, v.data, 1)
+                            }
                         }
                     }
                 }
@@ -304,7 +310,10 @@ class DatabaseSQL : Database() {
                 if (quest.persistentDataContainer.isNotEmpty()) {
                     tableQuestData.insert(dataSource, "quest", "key", "value", "mode") {
                         quest.persistentDataContainer.forEach { (k, v) ->
-                            value(questId, k, v.data, 1)
+                            // 非临时变量
+                            if (!k.startsWith("__")) {
+                                value(questId, k, v.data, 1)
+                            }
                         }
                     }
                 }
