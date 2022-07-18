@@ -59,7 +59,26 @@ command-quest-not-accepted: '&c[Chemdah] &7Quest not accepted.'
 command-quest-info-empty: '&c[Chemdah] &7No quest.'
 command-quest-info-header: '&c[Chemdah] &7Player''s Quest:'
 command-quest-info-body: '&c[Chemdah] &f{0}'
-command-quest-info-bottom: '&c[Chemdah] &7Page: {0} / {1}'
+command-quest-info-bottom-0:
+  - ==: json
+    text: '&c\[Chemdah] &8\[preview] &7{0} / {1} [&a\[next]]'
+    args:
+      - hover: 'Click'
+        command: '/chq info {2} {3}'
+command-quest-info-bottom-1:
+  - ==: json
+    text: '&c\[Chemdah] [&a\[preview]] &7{0} / {1} &8\[next]'
+    args:
+      - hover: 'Click'
+        command: '/chq info {2} {3}'
+command-quest-info-bottom-2:
+  - ==: json
+    text: '&c\[Chemdah] [&a\[preview]] &7{0} / {1} [&a\[next]]'
+    args:
+      - hover: 'Click'
+        command: '/chq info {2} {3}'
+      - hover: 'Click'
+        command: '/chq info {2} {4}'
 command-variables-change: '&c[Chemdah] &7{0}'
 command-variables-list-header: '&c[Chemdah] &7Variables: &f{0}'
 command-variables-remove-all-ed: '&c[Chemdah] &7Deleted.'

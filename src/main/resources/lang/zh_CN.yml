@@ -59,7 +59,26 @@ command-quest-not-accepted: '&c[Chemdah] &7任务未接受.'
 command-quest-info-empty: '&c[Chemdah] &7没有任务.'
 command-quest-info-header: '&c[Chemdah] &7玩家的任务:'
 command-quest-info-body: '&c[Chemdah] &f{0}'
-command-quest-info-bottom: '&c[Chemdah] &7页数: {0} / {1}'
+command-quest-info-bottom-0:
+  - ==: json
+    text: '&c\[Chemdah] &8\[上页] &7{0} / {1} [&a\[下页]]'
+    args:
+      - hover: '点击翻页'
+        command: '/chq info {2} {3}'
+command-quest-info-bottom-1:
+  - ==: json
+    text: '&c\[Chemdah] [&a\[上页]] &7{0} / {1} &8\[下页]'
+    args:
+      - hover: '点击翻页'
+        command: '/chq info {2} {3}'
+command-quest-info-bottom-2:
+  - ==: json
+    text: '&c\[Chemdah] [&a\[上页]] &7{0} / {1} [&a\[下页]]'
+    args:
+      - hover: '点击翻页'
+        command: '/chq info {2} {3}'
+      - hover: '点击翻页'
+        command: '/chq info {2} {4}'
 command-variables-change: '&c[Chemdah] &7{0}'
 command-variables-list-header: '&c[Chemdah] &7变量: &f{0}'
 command-variables-remove-all-ed: '&c[Chemdah] &f已删除'

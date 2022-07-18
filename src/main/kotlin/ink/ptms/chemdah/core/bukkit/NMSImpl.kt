@@ -1,5 +1,7 @@
 package ink.ptms.chemdah.core.bukkit
 
+import net.minecraft.world.level.block.state.IBlockData
+import net.minecraft.world.level.block.state.IBlockDataHolder
 import org.bukkit.block.Block
 import taboolib.module.nms.MinecraftVersion
 
@@ -15,7 +17,7 @@ class NMSImpl : NMS() {
     override fun getBlocKData(block: Block): Map<String, Any> {
         return when {
             MinecraftVersion.majorLegacy >= 11800 -> {
-                (block.blockData as CraftBlockData19).state.values.mapKeys { it.key.name }
+                ((block.blockData as CraftBlockData19).state as IBlockDataHolder<NMSBlock, IBlockData>).values.mapKeys { it.key.name }
             }
             MinecraftVersion.majorLegacy >= 11300 -> {
                 (block.blockData as CraftBlockData13).state.stateMap.mapKeys { it.key.a() }
@@ -24,6 +26,8 @@ class NMSImpl : NMS() {
         }
     }
 }
+
+typealias NMSBlock = net.minecraft.world.level.block.Block
 
 typealias CraftBlockData19 = org.bukkit.craftbukkit.v1_19_R1.block.data.CraftBlockData
 

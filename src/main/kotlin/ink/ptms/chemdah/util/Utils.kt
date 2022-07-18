@@ -116,4 +116,3 @@ fun String.replaces(vararg vars: Pair<String, Any>): String {
     vars.forEach { r = r.replace("[\\[{]${it.first}[]}]".toRegex(), it.second.toString()) }
     return r
 }
-

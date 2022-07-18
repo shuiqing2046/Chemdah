@@ -16,7 +16,6 @@ object IBlockInteract : ObjectiveCountableI<PlayerInteractEvent>() {
 
     override val name = "block interact"
     override val event = PlayerInteractEvent::class.java
-    override val isAsync = true
 
     init {
         handler {

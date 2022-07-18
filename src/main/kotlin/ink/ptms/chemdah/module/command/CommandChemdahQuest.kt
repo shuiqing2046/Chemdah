@@ -7,16 +7,17 @@ import ink.ptms.chemdah.core.quest.addon.AddonTrack.Companion.trackQuest
 import ink.ptms.chemdah.module.ui.UISystem
 import org.apache.commons.lang3.time.DateFormatUtils
 import org.bukkit.Bukkit
-import org.bukkit.Material
 import org.bukkit.command.CommandSender
 import taboolib.common.platform.command.CommandBody
 import taboolib.common.platform.command.CommandHeader
 import taboolib.common.platform.command.mainCommand
 import taboolib.common.platform.command.subCommand
+import taboolib.common.platform.function.adaptCommandSender
 import taboolib.common.platform.function.onlinePlayers
 import taboolib.common.util.subList
 import taboolib.common5.Coerce
 import taboolib.expansion.createHelper
+import taboolib.module.chat.TellrawJson
 import taboolib.platform.util.sendLang
 import kotlin.math.ceil
 
@@ -59,12 +60,17 @@ object CommandChemdahQuest {
                 suggestion<CommandSender>(uncheck = true) { _, _ -> ChemdahAPI.questTemplate.keys.toList() }
                 execute<CommandSender> { sender, context, argument ->
                     val playerExact = Bukkit.getPlayerExact(context.argument(-1))!!
-                    val quest = playerExact.chemdahProfile.getQuestById(argument, openAPI = false)
-                    if (quest == null) {
-                        sender.sendLang("command-quest-not-accepted")
-                        return@execute
+                    val profile = playerExact.chemdahProfile
+                    if (argument == "*") {
+                        profile.getQuests(false).forEach { it.failQuest() }
+                    } else {
+                        val quest = profile.getQuestById(argument, openAPI = false)
+                        if (quest == null) {
+                            sender.sendLang("command-quest-not-accepted")
+                            return@execute
+                        }
+                        quest.failQuest()
                     }
-                    quest.failQuest()
                 }
             }
         }
@@ -78,12 +84,17 @@ object CommandChemdahQuest {
                 suggestion<CommandSender>(uncheck = true) { _, _ -> ChemdahAPI.questTemplate.keys.toList() }
                 execute<CommandSender> { sender, context, argument ->
                     val playerExact = Bukkit.getPlayerExact(context.argument(-1))!!
-                    val quest = playerExact.chemdahProfile.getQuestById(argument, openAPI = false)
-                    if (quest == null) {
-                        sender.sendLang("command-quest-not-accepted")
-                        return@execute
+                    val profile = playerExact.chemdahProfile
+                    if (argument == "*") {
+                        profile.getQuests(false).forEach { it.completeQuest() }
+                    } else {
+                        val quest = profile.getQuestById(argument, openAPI = false)
+                        if (quest == null) {
+                            sender.sendLang("command-quest-not-accepted")
+                            return@execute
+                        }
+                        quest.completeQuest()
                     }
-                    quest.completeQuest()
                 }
             }
         }
@@ -97,12 +108,17 @@ object CommandChemdahQuest {
                 suggestion<CommandSender>(uncheck = true) { _, _ -> ChemdahAPI.questTemplate.keys.toList() }
                 execute<CommandSender> { sender, context, argument ->
                     val playerExact = Bukkit.getPlayerExact(context.argument(-1))!!
-                    val quest = playerExact.chemdahProfile.getQuestById(argument, openAPI = false)
-                    if (quest == null) {
-                        sender.sendLang("command-quest-not-accepted")
-                        return@execute
+                    val profile = playerExact.chemdahProfile
+                    if (argument == "*") {
+                        profile.getQuests(false).forEach { it.restartQuest() }
+                    } else {
+                        val quest = profile.getQuestById(argument, openAPI = false)
+                        if (quest == null) {
+                            sender.sendLang("command-quest-not-accepted")
+                            return@execute
+                        }
+                        quest.restartQuest()
                     }
-                    quest.restartQuest()
                 }
             }
         }
@@ -116,12 +132,17 @@ object CommandChemdahQuest {
                 suggestion<CommandSender>(uncheck = true) { _, _ -> ChemdahAPI.questTemplate.keys.toList() }
                 execute<CommandSender> { sender, context, argument ->
                     val playerExact = Bukkit.getPlayerExact(context.argument(-1))!!
-                    val quest = playerExact.chemdahProfile.getQuestById(argument, openAPI = false)
-                    if (quest == null) {
-                        sender.sendLang("command-quest-not-accepted")
-                        return@execute
+                    val profile = playerExact.chemdahProfile
+                    if (argument == "*") {
+                        profile.getQuests(false).forEach { profile.unregisterQuest(it) }
+                    } else {
+                        val quest = profile.getQuestById(argument, openAPI = false)
+                        if (quest == null) {
+                            sender.sendLang("command-quest-not-accepted")
+                            return@execute
+                        }
+                        profile.unregisterQuest(quest)
                     }
-                    playerExact.chemdahProfile.unregisterQuest(quest)
                 }
             }
         }
@@ -214,8 +235,9 @@ object CommandChemdahQuest {
             sender.sendLang("command-quest-info-empty")
             return
         } else {
+            space(sender)
             sender.sendLang("command-quest-info-header")
-            subList(quests, page * 5, (page + 1) * 5).forEach { quest ->
+            subList(quests, page * 3, (page + 1) * 3).forEach { quest ->
                 sender.sendLang("command-quest-info-body", "  §n${quest.id}:§r ${if (!quest.isOwner(playerExact)) "§8(Share)" else ""}")
                 sender.sendLang("command-quest-info-body", "    §7Start in ${DateFormatUtils.format(quest.startTime, "yyyy/MM/dd HH:mm:ss")}")
                 sender.sendLang("command-quest-info-body", "    §7Data:")
@@ -223,7 +245,19 @@ object CommandChemdahQuest {
                     sender.sendLang("command-quest-info-body", "      §7${e.key.replace(".", "§f.§7")} §8= §f${e.value.data}")
                 }
             }
-            sender.sendLang("command-quest-info-bottom", (page + 1), ceil(quests.size / 5.0).toInt())
+            val max = ceil(quests.size / 3.0).toInt()
+            // 左侧不可翻页
+            if (page == 0) {
+                sender.sendLang("command-quest-info-bottom-0", 1, max, player, 2)
+            }
+            // 右侧不可翻页
+            else if (page + 1 == max) {
+                sender.sendLang("command-quest-info-bottom-1", page + 1, max, player, page)
+            }
+            // 正常翻页
+            else {
+                sender.sendLang("command-quest-info-bottom-2", page + 1, max, player, page, page + 2)
+            }
         }
     }
 
@@ -234,6 +268,7 @@ object CommandChemdahQuest {
             sender.sendLang("command-quest-info-empty")
             return
         } else {
+            space(sender)
             sender.sendLang("command-quest-info-header")
             sender.sendLang("command-quest-info-body", "  §n${quest.id}:§r ${if (!quest.isOwner(playerExact)) "§8(Share)" else ""}")
             sender.sendLang("command-quest-info-body", "    §7Start in ${DateFormatUtils.format(quest.startTime, "yyyy/MM/dd HH:mm:ss")}")
@@ -242,5 +277,9 @@ object CommandChemdahQuest {
                 sender.sendLang("command-quest-info-body", "      §7${e.key.replace(".", "§f.§7")} §8= §f${e.value.data}")
             }
         }
+    }
+
+    internal fun space(sender: CommandSender) {
+        TellrawJson().sendTo(adaptCommandSender(sender)) { repeat(30) { newLine() } }
     }
 }
