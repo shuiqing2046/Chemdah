@@ -18,6 +18,7 @@ object IBlockBreak : ObjectiveCountableI<BlockBreakEvent>() {
 
     override val name = "block break"
     override val event = BlockBreakEvent::class.java
+    override val isAsync = true
 
     init {
         handler {

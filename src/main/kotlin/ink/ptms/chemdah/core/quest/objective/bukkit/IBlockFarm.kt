@@ -18,6 +18,7 @@ object IBlockFarm : ObjectiveCountableI<PlayerInteractEvent>() {
 
     override val name = "block farm"
     override val event = PlayerInteractEvent::class.java
+    override val isAsync = true
 
     init {
         handler {

@@ -16,6 +16,7 @@ object IBlockPlace : ObjectiveCountableI<BlockPlaceEvent>() {
 
     override val name = "block place"
     override val event = BlockPlaceEvent::class.java
+    override val isAsync = true
 
     init {
         handler {

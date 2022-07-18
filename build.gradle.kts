@@ -39,7 +39,7 @@ taboolib {
     install("platform-bukkit")
     install("expansion-command-helper")
     classifier = null
-    version = "6.0.9-31"
+    version = "6.0.9-33"
 }
 
 repositories {
@@ -93,7 +93,7 @@ dependencies {
     compileOnly("ink.ptms:Zaphkiel:1.6.0")
     compileOnly("ink.ptms:Adyeshach:1.4.21")
     compileOnly("ink.ptms:Sandalphon:1.3.0")
-    compileOnly("ink.ptms.core:v11800:11800:api")
+    compileOnly("ink.ptms.core:v11900:11900:all-mapped")
     compileOnly("ink.ptms.core:v11400:11400")
     compileOnly("ink.ptms:nms-all:1.0.0")
     implementation(kotlin("stdlib"))

@@ -1,5 +1,6 @@
 package ink.ptms.chemdah.core.quest.selector
 
+import ink.ptms.chemdah.core.bukkit.NMS
 import ink.ptms.chemdah.core.quest.selector.Flags.Companion.matchType
 import taboolib.common.reflect.Reflex.Companion.getProperty
 import taboolib.common.reflect.Reflex.Companion.invokeMethod
@@ -24,16 +25,12 @@ class InferBlock(val mats: List<Block>) {
 
     fun isBlock(block: org.bukkit.block.Block): Boolean {
         val type = block.type.name.lowercase()
-        val data = when {
-            MinecraftVersion.majorLegacy >= 11800 -> {
-                block.blockData.getProperty<Any>("state")!!.invokeMethod<Map<Any, Any>>("getValues")!!.mapKeys { it.key.invokeMethod<String>("getName")!! }
-            }
-            MinecraftVersion.majorLegacy >= 11300 -> {
-                block.blockData.getProperty<Any>("state")!!.invokeMethod<Map<Any, Any>>("getStateMap")!!.mapKeys { it.key.invokeMethod<String>("getName")!! }
-            }
-            else -> emptyMap()
-        }
+        val data = NMS.INSTANCE.getBlocKData(block)
         return mats.any { mat -> mat.matchFlags(type) && mat.matchBlockData(data) }
+    }
+
+    override fun toString(): String {
+        return "InferBlock(mats=$mats)"
     }
 
     data class Block(val material: String, val flags: List<Flags>, val data: Map<String, String>) {
