@@ -40,7 +40,7 @@ taboolib {
     install("expansion-command-helper")
     install("expansion-javascript")
     classifier = null
-    version = "6.0.9-33"
+    version = "6.0.9-35"
 }
 
 repositories {
