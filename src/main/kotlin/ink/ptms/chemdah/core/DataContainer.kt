@@ -4,8 +4,8 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.google.gson.JsonPrimitive
 import io.netty.util.internal.ConcurrentSet
-import taboolib.common.reflect.Reflex.Companion.getProperty
-import taboolib.common.reflect.Reflex.Companion.setProperty
+import taboolib.library.reflex.Reflex.Companion.getProperty
+import taboolib.library.reflex.Reflex.Companion.setProperty
 import taboolib.module.nms.ItemTag
 import taboolib.module.nms.ItemTagData
 import java.util.concurrent.ConcurrentHashMap

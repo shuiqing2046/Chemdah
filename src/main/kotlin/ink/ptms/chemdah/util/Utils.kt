@@ -6,7 +6,7 @@ import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.potion.PotionEffect
-import taboolib.common.reflect.Reflex.Companion.setProperty
+import taboolib.library.reflex.Reflex.Companion.setProperty
 import taboolib.common5.Coerce
 import taboolib.common5.Demand.Companion.toDemand
 import taboolib.library.configuration.ConfigurationSection

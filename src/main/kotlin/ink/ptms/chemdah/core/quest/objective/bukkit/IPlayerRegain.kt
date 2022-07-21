@@ -6,7 +6,7 @@ import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableF
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityRegainHealthEvent
-import taboolib.common.reflect.Reflex.Companion.invokeMethod
+import taboolib.library.reflex.Reflex.Companion.invokeMethod
 
 /**
  * Chemdah

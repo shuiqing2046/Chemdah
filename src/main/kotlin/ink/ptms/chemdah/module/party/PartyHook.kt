@@ -19,7 +19,7 @@ import sky_bai.bukkit.baiteam.BaiTeam
 import su.nightexpress.quantumrpg.api.QuantumAPI
 import su.nightexpress.quantumrpg.modules.list.party.PartyManager
 import taboolib.common.platform.event.SubscribeEvent
-import taboolib.common.reflect.Reflex.Companion.getProperty
+import taboolib.library.reflex.Reflex.Companion.getProperty
 import java.util.*
 
 /**
@@ -71,7 +71,7 @@ object PartyHook  {
     object CustomGoHook : Party {
 
         override fun getParty(player: Player): Party.PartyInfo? {
-            val teams = Fwteam::class.java.getProperty<Set<Fwteam>>("teamlist", fixed = true)!!
+            val teams = Fwteam::class.java.getProperty<Set<Fwteam>>("teamlist", isStatic = true)!!
             val team = teams.firstOrNull { player.uniqueId in it.getProperty<Set<UUID>>("plist")!! || player.uniqueId == it.getProperty<UUID>("leader") } ?: return null
             return object : Party.PartyInfo {
 

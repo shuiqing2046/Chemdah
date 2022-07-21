@@ -18,8 +18,8 @@ import org.bukkit.event.player.PlayerTeleportEvent
 import taboolib.common.platform.Schedule
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
-import taboolib.common.reflect.Reflex.Companion.getProperty
-import taboolib.common.reflect.Reflex.Companion.invokeMethod
+import taboolib.library.reflex.Reflex.Companion.getProperty
+import taboolib.library.reflex.Reflex.Companion.invokeMethod
 import taboolib.common.util.Vector
 import taboolib.common5.Coerce
 import taboolib.library.kether.ArgTypes

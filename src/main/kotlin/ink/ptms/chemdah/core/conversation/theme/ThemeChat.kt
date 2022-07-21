@@ -22,8 +22,8 @@ import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.adaptCommandSender
 import taboolib.common.platform.function.adaptPlayer
 import taboolib.common.platform.function.submit
-import taboolib.common.reflect.Reflex.Companion.setProperty
-import taboolib.common.reflect.Reflex.Companion.unsafeInstance
+import taboolib.library.reflex.Reflex.Companion.setProperty
+import taboolib.library.reflex.Reflex.Companion.unsafeInstance
 import taboolib.common5.Coerce
 import taboolib.common5.util.printed
 import taboolib.module.chat.TellrawJson

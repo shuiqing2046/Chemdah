@@ -5,7 +5,7 @@ import ink.ptms.chemdah.core.quest.selector.Flags.Companion.matchType
 import ink.ptms.um.Mythic
 import net.citizensnpcs.api.CitizensAPI
 import taboolib.common.platform.function.warning
-import taboolib.common.reflect.Reflex.Companion.invokeConstructor
+import taboolib.library.reflex.Reflex.Companion.invokeConstructor
 import taboolib.common5.Coerce
 import taboolib.module.nms.getI18nName
 

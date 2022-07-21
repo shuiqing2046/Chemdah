@@ -6,7 +6,7 @@ import ink.ptms.chemdah.util.getProfile
 import ink.ptms.chemdah.util.namespace
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.adaptPlayer
-import taboolib.common.reflect.Reflex.Companion.getProperty
+import taboolib.library.reflex.Reflex.Companion.getProperty
 import taboolib.library.kether.ArgTypes
 import taboolib.module.configuration.Type
 import taboolib.module.configuration.createLocal

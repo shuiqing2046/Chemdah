@@ -11,7 +11,7 @@ import org.bukkit.event.block.BlockPlaceEvent
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.getDataFolder
-import taboolib.common.reflect.Reflex.Companion.getProperty
+import taboolib.library.reflex.Reflex.Companion.getProperty
 import taboolib.common5.Coerce
 import taboolib.module.configuration.Configuration
 import taboolib.module.nms.MinecraftVersion

@@ -2,8 +2,8 @@ package ink.ptms.chemdah.core.quest.selector
 
 import ink.ptms.chemdah.core.bukkit.NMS
 import ink.ptms.chemdah.core.quest.selector.Flags.Companion.matchType
-import taboolib.common.reflect.Reflex.Companion.getProperty
-import taboolib.common.reflect.Reflex.Companion.invokeMethod
+import taboolib.library.reflex.Reflex.Companion.getProperty
+import taboolib.library.reflex.Reflex.Companion.invokeMethod
 import taboolib.module.nms.MinecraftVersion
 
 /**
