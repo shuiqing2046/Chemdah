@@ -175,25 +175,21 @@ abstract class Objective<E : Any> {
      */
     open fun checkComplete(profile: PlayerProfile, task: Task, quest: Quest) {
         if (!hasCompletedSignature(profile, task)) {
-            mirrorFuture<Int>("Objective:checkComplete") {
-                task.canRestart(profile).thenAccept { r ->
-                    if (r) {
-                        if (ObjectiveEvents.Restart.Pre(this@Objective, task, quest, profile).call()) {
-                            onReset(profile, task, quest)
-                            task.agent(quest.profile, AgentType.TASK_RESTARTED)
-                            ObjectiveEvents.Restart.Post(this@Objective, task, quest, profile).call()
-                        }
-                        finish(0)
-                    } else {
-                        checkGoal(profile, quest, task).thenAccept {
-                            if (it && !hasCompletedSignature(profile, task)) {
-                                if (ObjectiveEvents.Complete.Pre(this@Objective, task, quest, profile).call()) {
-                                    onComplete(profile, task, quest)
-                                    task.agent(quest.profile, AgentType.TASK_COMPLETED)
-                                    ObjectiveEvents.Complete.Post(this@Objective, task, quest, profile).call()
-                                }
+            task.canRestart(profile).thenAccept { r ->
+                if (r) {
+                    if (ObjectiveEvents.Restart.Pre(this@Objective, task, quest, profile).call()) {
+                        onReset(profile, task, quest)
+                        task.agent(quest.profile, AgentType.TASK_RESTARTED)
+                        ObjectiveEvents.Restart.Post(this@Objective, task, quest, profile).call()
+                    }
+                } else {
+                    checkGoal(profile, quest, task).thenAccept {
+                        if (it && !hasCompletedSignature(profile, task)) {
+                            if (ObjectiveEvents.Complete.Pre(this@Objective, task, quest, profile).call()) {
+                                onComplete(profile, task, quest)
+                                task.agent(quest.profile, AgentType.TASK_COMPLETED)
+                                ObjectiveEvents.Complete.Post(this@Objective, task, quest, profile).call()
                             }
-                            finish(0)
                         }
                     }
                 }

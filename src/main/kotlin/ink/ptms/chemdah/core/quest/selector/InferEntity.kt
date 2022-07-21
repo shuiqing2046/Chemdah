@@ -1,8 +1,8 @@
 package ink.ptms.chemdah.core.quest.selector
 
-import ink.ptms.chemdah.api.Mythic
 import ink.ptms.chemdah.api.event.InferEntityHookEvent
 import ink.ptms.chemdah.core.quest.selector.Flags.Companion.matchType
+import ink.ptms.um.Mythic
 import net.citizensnpcs.api.CitizensAPI
 import taboolib.common.platform.function.warning
 import taboolib.common.reflect.Reflex.Companion.invokeConstructor
@@ -16,6 +16,7 @@ import taboolib.module.nms.getI18nName
  * @author sky
  * @since 2021/4/5 9:32 下午
  */
+@Suppress("DuplicatedCode", "SpellCheckingInspection")
 class InferEntity(val entities: List<Entity>) {
 
     fun isEntity(entity: org.bukkit.entity.Entity?) = entity != null && entities.any { it.match(entity) }
@@ -67,7 +68,7 @@ class InferEntity(val entities: List<Entity>) {
     class MythicMobsEntity(material: String, flags: List<Flags>, data: Map<String, String>) : Entity(material, flags, data) {
 
         fun org.bukkit.entity.Entity.mythicMobId(): String {
-            return Mythic.getMobInstance(this)?.internalName ?: "@vanilla"
+            return Mythic.API.getMob(this)?.id ?: "@vanilla"
         }
 
         override fun match(entity: org.bukkit.entity.Entity): Boolean {
@@ -75,7 +76,7 @@ class InferEntity(val entities: List<Entity>) {
         }
 
         override fun matchData(entity: org.bukkit.entity.Entity): Boolean {
-            val mob = Mythic.getMobInstance(entity) ?: return false
+            val mob = Mythic.API.getMob(entity) ?: return false
             return data.all {
                 when (it.key) {
                     "type" -> it.value.equals(mob.entityType.name, true)

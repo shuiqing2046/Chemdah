@@ -1,7 +1,8 @@
 package ink.ptms.chemdah.module.kether.compat
 
-import ink.ptms.chemdah.api.Mythic
 import ink.ptms.chemdah.util.getPlayer
+import ink.ptms.um.Mythic
+import ink.ptms.um.Skill
 import taboolib.common.platform.function.submit
 import taboolib.module.kether.*
 import java.util.concurrent.CompletableFuture
@@ -16,7 +17,7 @@ import java.util.concurrent.CompletableFuture
  */
 class ActionMythic {
 
-    class MythicMobsCast(val mechanic: Mythic.Skill, val trigger: Mythic.Skill.Trigger) : ScriptAction<Void>() {
+    class MythicMobsCast(val mechanic: Skill, val trigger: Skill.Trigger) : ScriptAction<Void>() {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Void> {
             val player = frame.getPlayer()
@@ -36,14 +37,14 @@ class ActionMythic {
             when (it.expects("cast")) {
                 "cast" -> {
                     val skill = it.nextToken()
-                    val mechanic = Mythic.getSkillMechanic(skill) ?: error("unknown skill $skill")
+                    val mechanic = Mythic.API.getSkillMechanic(skill) ?: error("unknown skill $skill")
                     val trigger = try {
                         it.mark()
                         it.expects("with", "as", "by")
-                        Mythic.getSkillTrigger(it.nextToken())
+                        Mythic.API.getSkillTrigger(it.nextToken())
                     } catch (ex: Throwable) {
                         it.reset()
-                        Mythic.getSkillTrigger("DEFAULT")
+                        Mythic.API.getSkillTrigger("DEFAULT")
                     }
                     MythicMobsCast(mechanic, trigger)
                 }

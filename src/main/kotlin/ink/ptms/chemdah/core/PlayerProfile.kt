@@ -1,5 +1,6 @@
 package ink.ptms.chemdah.core
 
+import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.event.collect.QuestEvents
 import ink.ptms.chemdah.core.database.Database
 import ink.ptms.chemdah.core.quest.Quest
@@ -104,7 +105,11 @@ class PlayerProfile(val uniqueId: UUID) {
      * 通过序号获取正在进行中的有效任务
      */
     fun getQuestById(value: String, openAPI: Boolean = true): Quest? {
-        return getQuests(openAPI).firstOrNull { it.id == value }
+        return if (openAPI) {
+            getQuests(true).firstOrNull { it.id == value }
+        } else {
+            questMap[value]?.takeIf { it.isValid }
+        }
     }
 
     /**
@@ -113,11 +118,7 @@ class PlayerProfile(val uniqueId: UUID) {
      */
     fun getQuests(openAPI: Boolean = false): List<Quest> {
         return if (openAPI) {
-            mirrorNow("PlayerProfile:openAPI") {
-                val event = QuestEvents.Collect(questMap.values.filter { it.isValid }.toMutableList(), this)
-                event.call()
-                event.quests
-            }
+            ChemdahAPI.eventFactory.callQuestCollect(this, questMap.values.filter { it.isValid })
         } else {
             questMap.values.filter { it.isValid }
         }

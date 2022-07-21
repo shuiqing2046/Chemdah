@@ -47,20 +47,20 @@ object QuestDevelopment {
     }
 
     @SubscribeEvent
-    fun onReleased(e: PlayerEvents.Released) {
+    private fun onReleased(e: PlayerEvents.Released) {
         playerRelease.remove(e.player.name)
         playerMessageCache.remove(e.player.name)
     }
 
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    fun onBlockPlace(e: BlockPlaceEvent) {
+    private fun onBlockPlace(e: BlockPlaceEvent) {
         if (enableUniqueBlock) {
             (e.block.getDataContainer() ?: e.block.createDataContainer())["placed"] = Data(true)
         }
     }
 
     @SubscribeEvent
-    fun onPacketSend(e: PacketSendEvent) {
+    private fun onPacketSend(e: PacketSendEvent) {
         if (enableMessageTransmit && e.packet.name == "PacketPlayOutChat" && e.packet.read<Any>("b").toString() != "GAME_INFO") {
             var a = e.packet.read<Any>("a").toString()
             if (a == "null") {

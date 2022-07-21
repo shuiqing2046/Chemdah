@@ -248,7 +248,10 @@ object CommandChemdahQuest {
             val max = ceil(quests.size / 3.0).toInt()
             // 左侧不可翻页
             if (page == 0) {
-                sender.sendLang("command-quest-info-bottom-0", 1, max, player, 2)
+                // 右侧可翻页
+                if (max > 1) {
+                    sender.sendLang("command-quest-info-bottom-0", 1, max, player, 2)
+                }
             }
             // 右侧不可翻页
             else if (page + 1 == max) {

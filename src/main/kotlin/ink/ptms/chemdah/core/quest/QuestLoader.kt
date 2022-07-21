@@ -15,7 +15,6 @@ import ink.ptms.chemdah.core.quest.objective.Objective
 import ink.ptms.chemdah.core.quest.objective.bukkit.EMPTY_EVENT
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
-import org.bukkit.event.Event
 import taboolib.common.LifeCycle
 import taboolib.common.io.getInstance
 import taboolib.common.io.runningClasses
@@ -23,10 +22,8 @@ import taboolib.common.platform.Awake
 import taboolib.common.platform.Schedule
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.function.*
-import taboolib.common5.mirrorNow
 import taboolib.module.configuration.Config
 import taboolib.module.configuration.Configuration
-import taboolib.module.configuration.SecuredFile
 import taboolib.module.nms.MinecraftVersion
 import java.io.File
 
@@ -44,28 +41,26 @@ object QuestLoader {
         private set
 
     @Schedule(period = 20, async = true)
-    fun tick() {
-        mirrorNow("QuestHandler:tick") {
-            Bukkit.getOnlinePlayers().filter { it.isChemdahProfileLoaded }.forEach { player ->
-                player.chemdahProfile.also { profile ->
-                    // 检测所有有效任务
-                    profile.getQuests().forEach { quest ->
-                        // 检测超时
-                        if (quest.isTimeout) {
-                            quest.failQuest()
-                        } else {
-                            // 检查条目自动完成
-                            quest.tasks.forEach { task ->
-                                // 处理需要自动检查的任务类型
-                                if (task.objective.isTickable) {
-                                    handleTask(profile, task, quest, EMPTY_EVENT)
-                                }
-                                task.objective.checkComplete(profile, task, quest)
+    fun tick20() {
+        Bukkit.getOnlinePlayers().filter { it.isChemdahProfileLoaded }.forEach { player ->
+            player.chemdahProfile.also { profile ->
+                // 检测所有有效任务
+                profile.getQuests().forEach { quest ->
+                    // 检测超时
+                    if (quest.isTimeout) {
+                        quest.failQuest()
+                    } else {
+                        // 检查条目自动完成
+                        quest.tasks.forEach { task ->
+                            // 处理需要自动检查的任务类型
+                            if (task.objective.isTickable) {
+                                handleTask(profile, task, quest, EMPTY_EVENT)
                             }
-                            // 检查任务自动完成
-                            quest.checkComplete()
+                            task.objective.checkComplete(profile, task, quest)
                         }
-                     }
+                        // 检查任务自动完成
+                        quest.checkComplete()
+                    }
                 }
             }
         }
@@ -102,6 +97,7 @@ object QuestLoader {
                     Meta::class.java.isAssignableFrom(it) -> {
                         ChemdahAPI.questMeta[id] = it as Class<out Meta<*>>
                     }
+
                     Addon::class.java.isAssignableFrom(it) -> {
                         ChemdahAPI.questAddon[id] = it as Class<out Addon>
                     }
@@ -143,12 +139,10 @@ object QuestLoader {
      * @param objective 条目类型
      */
     fun <T : Any> handleEvent(player: Player, event: T, objective: Objective<T>) {
-        mirrorNow("QuestHandler:handleEvent:${objective.name}") {
-            if (player.isChemdahProfileLoaded) {
-                player.chemdahProfile.also { profile ->
-                    // 通过事件获取所有正在进行的任务条目
-                    profile.tasks(event) { (quest, task) -> handleTask(profile, task, quest, event) }
-                }
+        if (player.isChemdahProfileLoaded) {
+            player.chemdahProfile.also { profile ->
+                // 通过事件获取所有正在进行的任务条目
+                profile.tasks(event) { (quest, task) -> handleTask(profile, task, quest, event) }
             }
         }
     }
@@ -215,6 +209,7 @@ object QuestLoader {
             file.isDirectory -> {
                 file.listFiles()?.flatMap { loadTemplate(it) }?.toList() ?: emptyList()
             }
+
             file.extension == "yml" || file.extension == "json" -> {
                 Configuration.loadFromFile(file).run {
                     getKeys(false).mapNotNull {
@@ -227,6 +222,7 @@ object QuestLoader {
                     }
                 }
             }
+
             else -> {
                 emptyList()
             }
@@ -245,6 +241,7 @@ object QuestLoader {
                     it.startsWith("type:") -> {
                         groupList += ChemdahAPI.questTemplate.values.filter { tem -> it.substring("type:".length) in tem.type() }
                     }
+
                     else -> {
                         val template = ChemdahAPI.getQuestTemplate(it)
                         if (template != null) {

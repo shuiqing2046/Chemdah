@@ -32,20 +32,16 @@ class AddonRestart(root: Any?, questContainer: QuestContainer) : Addon(root, que
          */
         fun QuestContainer.canRestart(profile: PlayerProfile): CompletableFuture<Boolean> {
             return CompletableFuture<Boolean>().also { future ->
-                mirrorFuture<Int>("AddonRestart:checkRestart") {
-                    val reset = addon<AddonRestart>("restart")?.restart
-                    if (reset == null || reset.isEmpty()) {
-                        future.complete(false)
-                        finish(0)
-                    } else {
-                        KetherShell.eval(reset, sender = adaptPlayer(profile.player), namespace = namespaceQuest) {
-                            rootFrame().variables().also { vars ->
-                                vars.set("@QuestContainer", this@canRestart)
-                            }
-                        }.thenApply {
-                            future.complete(Coerce.toBoolean(it))
-                            finish(0)
+                val reset = addon<AddonRestart>("restart")?.restart
+                if (reset == null || reset.isEmpty()) {
+                    future.complete(false)
+                } else {
+                    KetherShell.eval(reset, sender = adaptPlayer(profile.player), namespace = namespaceQuest) {
+                        rootFrame().variables().also { vars ->
+                            vars.set("@QuestContainer", this@canRestart)
                         }
+                    }.thenApply {
+                        future.complete(Coerce.toBoolean(it))
                     }
                 }
             }

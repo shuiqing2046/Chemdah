@@ -32,7 +32,7 @@ import java.util.*
 object PartyHook  {
 
     @SubscribeEvent
-    fun onPartyHook(e: PartyHookEvent) {
+    private fun onPartyHook(e: PartyHookEvent) {
         e.party = when (e.plugin) {
             "BaiTeam" -> BaiTeamHook
             "CustomGo" -> CustomGoHook

@@ -51,7 +51,7 @@ object Synchronous : Module {
     }
 
     @SubscribeEvent
-    fun onExpChange(e: PlayerExpChangeEvent) {
+    private fun onExpChange(e: PlayerExpChangeEvent) {
         if (playerLevelToMinecraft != null) {
             e.amount = 0
             sendSyncLevel(e.player)
@@ -59,21 +59,21 @@ object Synchronous : Module {
     }
 
     @SubscribeEvent
-    fun onLevelChange(e: PlayerLevelChangeEvent) {
+    private fun onLevelChange(e: PlayerLevelChangeEvent) {
         if (playerLevelToMinecraft != null) {
             sendSyncLevel(e.player)
         }
     }
 
     @SubscribeEvent
-    fun onPlayerEventsSelected(e: PlayerEvents.Selected) {
+    private fun onPlayerEventsSelected(e: PlayerEvents.Selected) {
         if (playerLevelToMinecraft != null) {
             sendSyncLevel(e.player)
         }
     }
 
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    fun onPlayerEventsLevelChange(e: PlayerEvents.LevelChange) {
+    private fun onPlayerEventsLevelChange(e: PlayerEvents.LevelChange) {
         if (e.option.id == playerLevelToMinecraft) {
             e.option.algorithm.getExp(e.newLevel).thenAccept { exp ->
                 e.player.sendPacket(packet.invokeConstructor(e.newExperience / exp.toFloat(), 0, e.newLevel))

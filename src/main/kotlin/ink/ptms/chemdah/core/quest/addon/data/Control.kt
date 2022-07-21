@@ -138,24 +138,20 @@ class ControlOperator(val template: Template, val control: List<Control>?) {
             future.complete(ControlResult(true))
             return future
         }
-        mirrorFuture<Int>("MetaControl:check") {
-            fun process(cur: Int) {
-                if (cur < control.size) {
-                    control[cur].check(profile, template).thenApply {
-                        if (it.pass) {
-                            process(cur + 1)
-                        } else {
-                            future.complete(it)
-                            finish(0)
-                        }
+        fun process(cur: Int) {
+            if (cur < control.size) {
+                control[cur].check(profile, template).thenApply {
+                    if (it.pass) {
+                        process(cur + 1)
+                    } else {
+                        future.complete(it)
                     }
-                } else {
-                    future.complete(ControlResult(true))
-                    finish(0)
                 }
+            } else {
+                future.complete(ControlResult(true))
             }
-            process(0)
         }
+        process(0)
         return future
     }
 

@@ -186,7 +186,7 @@ class ActionScenes {
         }
 
         @SubscribeEvent
-        fun onPacketReceive(e: PacketReceiveEvent) {
+        private fun onPacketReceive(e: PacketReceiveEvent) {
             if (e.packet.name == "PacketPlayInUseItem") {
                 val pos = if (MinecraftVersion.isUniversal) {
                     e.packet.read<Any>("a/blockPos")!!
@@ -229,21 +229,21 @@ class ActionScenes {
         }
 
         @SubscribeEvent
-        fun onTeleport(e: PlayerTeleportEvent) {
+        private fun onTeleport(e: PlayerTeleportEvent) {
             submit(delay = 20) {
                 e.player.updateScenesBlock()
             }
         }
 
         @SubscribeEvent
-        fun onChangeWorld(e: PlayerChangedWorldEvent) {
+        private fun onChangeWorld(e: PlayerChangedWorldEvent) {
             submit(delay = 20) {
                 e.player.updateScenesBlock()
             }
         }
 
         @SubscribeEvent
-        fun onReleased(e: PlayerEvents.Released) {
+        private fun onReleased(e: PlayerEvents.Released) {
             scenesBlocks.remove(e.player.name)
         }
 
@@ -290,7 +290,7 @@ class ActionScenes {
         }
 
         @SubscribeEvent
-        fun onTick(e: AdyeshachEntityTickEvent) {
+        private fun onTick(e: AdyeshachEntityTickEvent) {
             val entity = e.entity
             val manager = entity.manager ?: return
             if (!manager.isPublic()

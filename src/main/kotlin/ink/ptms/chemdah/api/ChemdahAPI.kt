@@ -49,6 +49,8 @@ object ChemdahAPI {
 
     val playerProfile = ConcurrentHashMap<String, PlayerProfile>()
 
+    var eventFactory = ChemdahEventFactory()
+
     /**
      * 获取已经缓存的玩家数据
      * 如玩家数据不存在则会直接抛出 NullPointerException 异常

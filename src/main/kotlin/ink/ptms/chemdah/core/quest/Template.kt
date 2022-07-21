@@ -74,34 +74,28 @@ class Template(id: String, config: ConfigurationSection) : QuestContainer(id, co
      */
     fun checkAccept(profile: PlayerProfile): CompletableFuture<AcceptResult> {
         val future = CompletableFuture<AcceptResult>()
-        mirrorFuture<Int>("Template:checkAccept") {
-            if (profile.getQuestById(id, openAPI = false) != null) {
-                future.complete(AcceptResult(AcceptResult.Type.ALREADY_EXISTS))
-                finish(0)
-                return@mirrorFuture
-            }
-            val pre = QuestEvents.Accept.Pre(this@Template, profile)
-            pre.call()
-            if (pre.isCancelled) {
-                future.complete(AcceptResult(AcceptResult.Type.CANCELLED_BY_EVENT, pre.reason))
-                finish(0)
-                return@mirrorFuture
-            }
-            val control = control()
-            control.check(profile).thenApply { c ->
-                if (c.pass) {
-                    agent(profile, AgentType.QUEST_ACCEPT).thenAccept { a ->
-                        if (a) {
-                            future.complete(AcceptResult(AcceptResult.Type.SUCCESSFUL))
-                        } else {
-                            future.complete(AcceptResult(AcceptResult.Type.CANCELLED_BY_AGENT))
-                        }
-                        finish(0)
+        if (profile.getQuestById(id, openAPI = false) != null) {
+            future.complete(AcceptResult(AcceptResult.Type.ALREADY_EXISTS))
+            return future
+        }
+        val pre = QuestEvents.Accept.Pre(this@Template, profile)
+        pre.call()
+        if (pre.isCancelled) {
+            future.complete(AcceptResult(AcceptResult.Type.CANCELLED_BY_EVENT, pre.reason))
+            return future
+        }
+        val control = control()
+        control.check(profile).thenApply { c ->
+            if (c.pass) {
+                agent(profile, AgentType.QUEST_ACCEPT).thenAccept { a ->
+                    if (a) {
+                        future.complete(AcceptResult(AcceptResult.Type.SUCCESSFUL))
+                    } else {
+                        future.complete(AcceptResult(AcceptResult.Type.CANCELLED_BY_AGENT))
                     }
-                } else {
-                    future.complete(AcceptResult(AcceptResult.Type.CANCELLED_BY_CONTROL, c.reason))
-                    finish(0)
                 }
+            } else {
+                future.complete(AcceptResult(AcceptResult.Type.CANCELLED_BY_CONTROL, c.reason))
             }
         }
         return future
@@ -110,6 +104,4 @@ class Template(id: String, config: ConfigurationSection) : QuestContainer(id, co
     private fun loadTask(taskId: String, taskNode: String = "task.$taskId") {
         taskMap[taskId] = Task(taskId, config.getConfigurationSection(taskNode)!!, this)
     }
-
-
 }

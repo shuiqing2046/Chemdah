@@ -1,13 +1,15 @@
 package ink.ptms.chemdah.core.quest.objective.mythicmobs
 
+import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
-import io.lumine.mythic.bukkit.events.MythicMobDeathEvent
+import ink.ptms.um.event.MobDeathEvent
 import org.bukkit.entity.Player
 
-class MMythicKillType5 : ObjectiveCountableI<MythicMobDeathEvent>() {
+@Dependency("MythicMobs")
+object MMobDeath : ObjectiveCountableI<MobDeathEvent>() {
 
     override val name = "mythicmobs kill"
-    override val event = MythicMobDeathEvent::class.java
+    override val event = MobDeathEvent::class.java
 
     init {
         handler {
@@ -17,16 +19,16 @@ class MMythicKillType5 : ObjectiveCountableI<MythicMobDeathEvent>() {
             data.toPosition().inside(e.killer.killer!!.location)
         }
         addSimpleCondition("name") { data, e ->
-            data.asList().any { it.equals(e.mobType.internalName, true) }
+            data.asList().any { it.equals(e.mob.id, true) }
         }
         addSimpleCondition("level") { data, e ->
-            data.toDouble() == e.mobLevel
+            data.toDouble() == e.mob.level
         }
         addSimpleCondition("min-level") { data, e ->
-            data.toDouble() <= e.mobLevel
+            data.toDouble() <= e.mob.level
         }
         addConditionVariable("name") {
-            it.mobType.internalName
+            it.mob.id
         }
     }
 }

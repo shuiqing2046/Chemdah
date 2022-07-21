@@ -66,12 +66,9 @@ object CommandChemdah {
     @CommandBody
     val mirror = subCommand {
         execute<CommandSender> { sender, _, _ ->
-            sender.sendLang("command-mirror-header")
-            sender.sendLang("command-mirror-bottom")
-            submit(async = true) {
-                Mirror.report(adaptCommandSender(sender))
-                sender.sendLang("command-mirror-bottom")
-            }
+            sender.sendMessage("§c[Chemdah] §7Mirror system is disabled, please use professional performance monitoring tools.")
+            sender.sendMessage("§c[Chemdah] §7spark: §f§nhttps://spark.lucko.me")
+            sender.sendMessage("§c[Chemdah] §7async-profiler: §f§nhttps://github.com/jvm-profiling-tools/async-profiler")
         }
     }
 

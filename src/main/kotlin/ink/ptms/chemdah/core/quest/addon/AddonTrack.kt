@@ -78,6 +78,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                     return null
                 }
             }
+
             center.startsWith("adyeshach") -> object : TrackCenter {
 
                 val id = center.substringAfter("adyeshach").trim()
@@ -97,6 +98,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                     return loc
                 }
             }
+
             else -> object : TrackCenter {
 
                 override fun identifier(): String {
@@ -269,6 +271,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                             nav.displayPoint(this, center)
                         }
                     }
+
                     "ARROW" -> {
                         if (nav.arrowPeriod.hasNext(name)) {
                             saveBaffle("${trackAddon.questContainer.path}.navigation.arrow", nav.arrowPeriod)
@@ -322,25 +325,23 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
             val hologramMap = trackLandmarkHologramMap.computeIfAbsent(name) { ConcurrentHashMap() }
             // 启用 Landmark 并在相同世界
             if (trackAddon.landmark.enable && trackCenter.world?.name == world.name && allow) {
-                mirrorNow("AddonTrack:refreshTrackingLandmark") {
-                    val name = trackAddon.name ?: trackAddon.questContainer.displayName()
-                    val distance = trackCenter.distance(location)
-                    val direction = trackCenter.toVector().subtract(location.toVector()).normalize()
-                    val pos = if (distance < trackAddon.landmark.distance) trackCenter else location.add(direction.multiply(trackAddon.landmark.distance))
-                    // 高度修正
-                    pos.y = pos.y.coerceAtLeast(location.y + 0.5)
-                    if (hologramMap.containsKey(id)) {
-                        hologramMap[id]!!.also { holo ->
-                            holo.teleport(pos)
-                            holo.update(trackAddon.landmark.content.map {
-                                it.replaces("name" to name, "distance" to Coerce.format(distance))
-                            })
-                        }
-                    } else {
-                        hologramMap[id] = AdyeshachAPI.createHologram(this, pos, trackAddon.landmark.content.map {
+                val name = trackAddon.name ?: trackAddon.questContainer.displayName()
+                val distance = trackCenter.distance(location)
+                val direction = trackCenter.toVector().subtract(location.toVector()).normalize()
+                val pos = if (distance < trackAddon.landmark.distance) trackCenter else location.add(direction.multiply(trackAddon.landmark.distance))
+                // 高度修正
+                pos.y = pos.y.coerceAtLeast(location.y + 0.5)
+                if (hologramMap.containsKey(id)) {
+                    hologramMap[id]!!.also { holo ->
+                        holo.teleport(pos)
+                        holo.update(trackAddon.landmark.content.map {
                             it.replaces("name" to name, "distance" to Coerce.format(distance))
                         })
                     }
+                } else {
+                    hologramMap[id] = AdyeshachAPI.createHologram(this, pos, trackAddon.landmark.content.map {
+                        it.replaces("name" to name, "distance" to Coerce.format(distance))
+                    })
                 }
             } else {
                 hologramMap.remove(id)?.delete()
@@ -401,63 +402,63 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
             if (nonChemdahProfileLoaded) {
                 return
             }
-            mirrorNow("AddonTrack:refreshTrackingScoreboard") {
-                val quest = chemdahProfile.trackQuest ?: return@mirrorNow
-                if (quest.track()?.scoreboard?.enable == true) {
-                    // 尚未接受任务，显示任务总信息
-                    val content = if (chemdahProfile.getQuestById(quest.id) == null) {
-                        val track = quest.track() ?: return@mirrorNow
-                        track.scoreboard.content.flatMap {
-                            if (it.isQuestFormat) {
-                                it.content.flatMap { contentLine ->
-                                    if (contentLine.contains("description")) {
-                                        val description = KetherFunction.parse(track.description ?: quest.ui()?.description ?: emptyList(),
-                                            namespace = namespaceQuestUI,
-                                            sender = adaptCommandSender(this),
-                                            vars = KetherShell.VariableMap("@QuestSelected" to quest.node)
-                                        )
-                                        description.split(track.scoreboard.length).map { desc -> contentLine.replaces("description" to desc) }
-                                    } else {
-                                        contentLine.replaces("name" to (track.name ?: quest.displayName())).asList()
-                                    }
+            val quest = chemdahProfile.trackQuest ?: return
+            if (quest.track()?.scoreboard?.enable == true) {
+                // 尚未接受任务，显示任务总信息
+                val content = if (chemdahProfile.getQuestById(quest.id) == null) {
+                    val track = quest.track() ?: return
+                    track.scoreboard.content.flatMap {
+                        if (it.isQuestFormat) {
+                            it.content.flatMap { contentLine ->
+                                if (contentLine.contains("description")) {
+                                    val description = KetherFunction.parse(
+                                        track.description ?: quest.ui()?.description ?: emptyList(),
+                                        namespace = namespaceQuestUI,
+                                        sender = adaptCommandSender(this),
+                                        vars = KetherShell.VariableMap("@QuestSelected" to quest.node)
+                                    )
+                                    description.split(track.scoreboard.length).map { desc -> contentLine.replaces("description" to desc) }
+                                } else {
+                                    contentLine.replaces("name" to (track.name ?: quest.displayName())).asList()
                                 }
-                            } else {
-                                it.content
                             }
+                        } else {
+                            it.content
                         }
-                    } else {
-                        (quest.track()?.scoreboard?.content ?: defaultContent).flatMap {
-                            if (it.isQuestFormat) {
-                                quest.taskMap.flatMap { (_, task) ->
-                                    val taskTrack = task.track()
-                                    if (taskTrack != null && !task.isCompleted(chemdahProfile) && task.isQuestDependCompleted(this)) {
-                                        it.content.flatMap { contentLine ->
-                                            if (contentLine.contains("description")) {
-                                                val description = KetherFunction.parse(taskTrack.description ?: quest.ui()?.description ?: emptyList(),
-                                                    namespace = namespaceQuestUI,
-                                                    sender = adaptCommandSender(this),
-                                                    vars = KetherShell.VariableMap("@QuestSelected" to quest.node)
-                                                )
-                                                val size = quest.track()?.scoreboard?.length ?: defaultLength
-                                                description.split(size).map { d -> contentLine.replaces("description" to d) }
-                                            } else {
-                                                contentLine.replaces("name" to (taskTrack.name ?: task.displayName())).asList()
-                                            }
+                    }
+                } else {
+                    (quest.track()?.scoreboard?.content ?: defaultContent).flatMap {
+                        if (it.isQuestFormat) {
+                            quest.taskMap.flatMap { (_, task) ->
+                                val taskTrack = task.track()
+                                if (taskTrack != null && !task.isCompleted(chemdahProfile) && task.isQuestDependCompleted(this)) {
+                                    it.content.flatMap { contentLine ->
+                                        if (contentLine.contains("description")) {
+                                            val description = KetherFunction.parse(
+                                                taskTrack.description ?: quest.ui()?.description ?: emptyList(),
+                                                namespace = namespaceQuestUI,
+                                                sender = adaptCommandSender(this),
+                                                vars = KetherShell.VariableMap("@QuestSelected" to quest.node)
+                                            )
+                                            val size = quest.track()?.scoreboard?.length ?: defaultLength
+                                            description.split(size).map { d -> contentLine.replaces("description" to d) }
+                                        } else {
+                                            contentLine.replaces("name" to (taskTrack.name ?: task.displayName())).asList()
                                         }
-                                    } else {
-                                        emptyList()
                                     }
+                                } else {
+                                    emptyList()
                                 }
-                            } else {
-                                it.content
                             }
+                        } else {
+                            it.content
                         }
                     }
-                    if (content.size > 2) {
-                        sendScoreboard(*content.colored().mapIndexed { index, s -> "§${chars[index]}$s" }.toTypedArray())
-                    } else {
-                        cancelTrackScoreboard(quest)
-                    }
+                }
+                if (content.size > 2) {
+                    sendScoreboard(*content.colored().mapIndexed { index, s -> "§${chars[index]}$s" }.toTypedArray())
+                } else {
+                    cancelTrackScoreboard(quest)
                 }
             }
         }

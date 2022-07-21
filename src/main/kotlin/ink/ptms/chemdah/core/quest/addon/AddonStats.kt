@@ -234,21 +234,18 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
                 future.complete(null)
                 return future
             }
-            mirrorFuture<Int>("AddonStats:statsDisplay") {
-                getProgress(profile).thenApply { progress ->
-                    val bossBar = Bukkit.createBossBar("", stats.color, stats.style)
-                    if (stats.darkenSky) {
-                        bossBar.addFlag(BarFlag.DARKEN_SKY)
-                    }
-                    if (stats.bossMusic) {
-                        bossBar.addFlag(BarFlag.PLAY_BOSS_MUSIC)
-                    }
-                    bossBar.progress = progress.percent
-                    bossBar.setTitle(stats.getTitle(this@statsDisplay, progress))
-                    bossBar.addPlayer(profile.player)
-                    future.complete(bossBar)
-                    finish(0)
+            getProgress(profile).thenApply { progress ->
+                val bossBar = Bukkit.createBossBar("", stats.color, stats.style)
+                if (stats.darkenSky) {
+                    bossBar.addFlag(BarFlag.DARKEN_SKY)
                 }
+                if (stats.bossMusic) {
+                    bossBar.addFlag(BarFlag.PLAY_BOSS_MUSIC)
+                }
+                bossBar.progress = progress.percent
+                bossBar.setTitle(stats.getTitle(this@statsDisplay, progress))
+                bossBar.addPlayer(profile.player)
+                future.complete(bossBar)
             }
             return future
         }
@@ -271,9 +268,11 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
                     }
                     CompletableFuture.completedFuture(p)
                 }
+
                 is Task -> {
                     CompletableFuture.completedFuture(objective.getProgress(profile, this))
                 }
+
                 else -> error("out of case")
             }
         }
@@ -333,41 +332,35 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
         fun QuestContainer.refreshStats(profile: PlayerProfile) {
             val stats = stats() ?: return
             val statsMap = statsMap.computeIfAbsent(profile.player.name) { StatsMap() }
-            mirrorFuture<Int>("AddonStats:onContinue") {
-                when {
-                    stats.visibleAlways -> {
-                        val bossBar = statsMap.bossBarAlways[path]
-                        if (bossBar == null) {
-                            statsDisplay(profile).thenApply { bar ->
-                                if (bar != null) {
-                                    statsMap.bossBarAlways.put(path, bar)?.removeAll()
-                                }
-                                finish(0)
-                            }
-                        } else {
-                            getProgress(profile).thenApply { progress ->
-                                bossBar.progress = progress.percent
-                                bossBar.setTitle(stats.getTitle(this@refreshStats, progress))
-                                finish(0)
+            when {
+                stats.visibleAlways -> {
+                    val bossBar = statsMap.bossBarAlways[path]
+                    if (bossBar == null) {
+                        statsDisplay(profile).thenApply { bar ->
+                            if (bar != null) {
+                                statsMap.bossBarAlways.put(path, bar)?.removeAll()
                             }
                         }
+                    } else {
+                        getProgress(profile).thenApply { progress ->
+                            bossBar.progress = progress.percent
+                            bossBar.setTitle(stats.getTitle(this@refreshStats, progress))
+                        }
                     }
-                    stats.visible -> {
-                        val bossBar = statsMap.bossBar[path]
-                        if (bossBar == null) {
-                            statsDisplay(profile).thenApply { bar ->
-                                if (bar != null) {
-                                    statsMap.bossBar.put(path, Couple(bar, System.currentTimeMillis() + (stats.stay * 50L)))?.key?.removeAll()
-                                }
-                                finish(0)
+                }
+                stats.visible -> {
+                    val bossBar = statsMap.bossBar[path]
+                    if (bossBar == null) {
+                        statsDisplay(profile).thenApply { bar ->
+                            if (bar != null) {
+                                statsMap.bossBar.put(path, Couple(bar, System.currentTimeMillis() + (stats.stay * 50L)))?.key?.removeAll()
                             }
-                        } else {
-                            getProgress(profile).thenApply { progress ->
-                                bossBar.key.progress = progress.percent
-                                bossBar.key.setTitle(stats.getTitle(this@refreshStats, progress))
-                                bossBar.value = System.currentTimeMillis() + (stats.stay * 50L)
-                                finish(0)
-                            }
+                        }
+                    } else {
+                        getProgress(profile).thenApply { progress ->
+                            bossBar.key.progress = progress.percent
+                            bossBar.key.setTitle(stats.getTitle(this@refreshStats, progress))
+                            bossBar.value = System.currentTimeMillis() + (stats.stay * 50L)
                         }
                     }
                 }

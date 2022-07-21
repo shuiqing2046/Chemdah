@@ -39,7 +39,7 @@ object RealmsSystem : Module {
     }
 
     @SubscribeEvent
-    fun onJoin(e: PlayerJoinEvent) {
+    private fun onJoin(e: PlayerJoinEvent) {
         if (e.player.location.getRealms() != null) {
             Bukkit.getOnlinePlayers().forEach { player ->
                 if (player.name != e.player.name) {
@@ -54,7 +54,7 @@ object RealmsSystem : Module {
     }
 
     @SubscribeEvent
-    fun onMove(e: PlayerMoveEvent) {
+    private fun onMove(e: PlayerMoveEvent) {
         if (e.from.block != e.to!!.block) {
             val realms = e.to!!.getRealms()
             if (realms != null) {

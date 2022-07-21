@@ -108,12 +108,10 @@ abstract class Database {
         @SubscribeEvent
         internal fun onJoin(e: PlayerJoinEvent) {
             submit(delay = Chemdah.conf.getLong("join-select-delay", 20), async = true) {
-                mirrorNow("Database:select") {
-                    if (e.player.isOnline) {
-                        INSTANCE.select(e.player).also {
-                            ChemdahAPI.playerProfile[e.player.name] = it
-                            PlayerEvents.Selected(e.player, it).call()
-                        }
+                if (e.player.isOnline) {
+                    INSTANCE.select(e.player).also {
+                        ChemdahAPI.playerProfile[e.player.name] = it
+                        PlayerEvents.Selected(e.player, it).call()
                     }
                 }
             }
@@ -134,10 +132,8 @@ abstract class Database {
             val playerProfile = ChemdahAPI.playerProfile.remove(e.player.name)
             if (playerProfile?.isDataChanged == true) {
                 submit(async = true) {
-                    mirrorNow("Database:update") {
-                        INSTANCE.update(e.player, playerProfile)
-                        PlayerEvents.Updated(e.player, playerProfile).call()
-                    }
+                    INSTANCE.update(e.player, playerProfile)
+                    PlayerEvents.Updated(e.player, playerProfile).call()
                 }
             }
         }
@@ -147,10 +143,8 @@ abstract class Database {
             Bukkit.getOnlinePlayers().filter { it.isChemdahProfileLoaded }.forEach {
                 val playerProfile = it.chemdahProfile
                 if (playerProfile.isDataChanged) {
-                    mirrorNow("Database:update") {
-                        INSTANCE.update(it, playerProfile)
-                        PlayerEvents.Updated(it, playerProfile).call()
-                    }
+                    INSTANCE.update(it, playerProfile)
+                    PlayerEvents.Updated(it, playerProfile).call()
                 }
             }
         }

@@ -36,6 +36,7 @@ class AddonAutomation(source: ConfigurationSection, questContainer: QuestContain
                 RealTime.Type.HOUR,
                 Coerce.toInteger(args[1]),
             )
+
             "day", "daily" -> PlanTypeDaily(
                 method,
                 RealTime.Type.DAY,
@@ -43,6 +44,7 @@ class AddonAutomation(source: ConfigurationSection, questContainer: QuestContain
                 Coerce.toInteger(args.getOrNull(2) ?: 6),
                 Coerce.toInteger(args.getOrNull(3) ?: 0)
             )
+
             "week", "weekly" -> PlanTypeWeekly(
                 method,
                 RealTime.Type.WEEK,
@@ -51,6 +53,7 @@ class AddonAutomation(source: ConfigurationSection, questContainer: QuestContain
                 Coerce.toInteger(args.getOrNull(3) ?: 6),
                 Coerce.toInteger(args.getOrNull(4) ?: 0)
             )
+
             else -> null
         }
         if (type != null) {
@@ -72,8 +75,8 @@ class AddonAutomation(source: ConfigurationSection, questContainer: QuestContain
 
         fun Template.planGroup() = addon<AddonAutomation>("automation")?.planGroup
 
-        @Schedule(period = 20, async = true)
-        fun automation() {
+        @Schedule(period = 40, async = true)
+        fun automation40() {
             if (Bukkit.getOnlinePlayers().isEmpty()) {
                 return
             }
@@ -104,37 +107,34 @@ class AddonAutomation(source: ConfigurationSection, questContainer: QuestContain
             if (groups.isEmpty() && autoAccept.isEmpty()) {
                 return
             }
-            mirrorFuture<Int>("MetaAutomation") {
-                Bukkit.getOnlinePlayers().filter { it.isChemdahProfileLoaded }.forEach { player ->
-                    val profile = player.chemdahProfile
-                    // 自动接受的任务
-                    autoAccept.forEach {
-                        if (profile.getQuestById(it.id, openAPI = false) == null) {
-                            it.acceptTo(profile)
-                        }
-                    }
-                    // 定时计划
-                    groups.forEach { (id, group) ->
-                        val nextTime = profile.persistentDataContainer["quest.automation.$id.next", 0L].toLong()
-                        if (nextTime < System.currentTimeMillis()) {
-                            profile.persistentDataContainer["quest.automation.$id.next"] = group.plan.nextTime
-                            val pool = group.quests.toMutableList()
-                            var i = group.plan.count
-                            fun process() {
-                                if (i > 0 && pool.isNotEmpty()) {
-                                    pool.removeAt(Random.nextInt(pool.size)).acceptTo(profile).thenAccept {
-                                        if (it.type == AcceptResult.Type.SUCCESSFUL) {
-                                            i--
-                                        }
-                                        process()
-                                    }
-                                }
-                            }
-                            process()
-                        }
+            Bukkit.getOnlinePlayers().filter { it.isChemdahProfileLoaded }.forEach { player ->
+                val profile = player.chemdahProfile
+                // 自动接受的任务
+                autoAccept.forEach {
+                    if (profile.getQuestById(it.id, openAPI = false) == null) {
+                        it.acceptTo(profile)
                     }
                 }
-                finish(0)
+                // 定时计划
+                groups.forEach { (id, group) ->
+                    val nextTime = profile.persistentDataContainer["quest.automation.$id.next", 0L].toLong()
+                    if (nextTime < System.currentTimeMillis()) {
+                        profile.persistentDataContainer["quest.automation.$id.next"] = group.plan.nextTime
+                        val pool = group.quests.toMutableList()
+                        var i = group.plan.count
+                        fun process() {
+                            if (i > 0 && pool.isNotEmpty()) {
+                                pool.removeAt(Random.nextInt(pool.size)).acceptTo(profile).thenAccept {
+                                    if (it.type == AcceptResult.Type.SUCCESSFUL) {
+                                        i--
+                                    }
+                                    process()
+                                }
+                            }
+                        }
+                        process()
+                    }
+                }
             }
         }
     }

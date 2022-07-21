@@ -40,17 +40,18 @@ taboolib {
     install("expansion-command-helper")
     install("expansion-javascript")
     classifier = null
-    version = "6.0.9-35"
+    version = "6.0.9-39"
+    relocate("ink.ptms.um", "ink.ptms.chemdah.um")
 }
 
 repositories {
     maven { url = uri("https://repo.pcgamingfreaks.at/repository/maven-everything") }
     maven { url = uri("https://jitpack.io") }
-    mavenLocal()
     mavenCentral()
 }
 
 dependencies {
+    taboo("ink.ptms:um:1.0.0-beta-4")
     compileOnly("net.milkbowl.vault:Vault:1")
     compileOnly("org.serverct.ersha.dungeon:DungeonPlus:1.1.3")
     compileOnly("com.github.angeschossen:LandsAPI:5.13.0")

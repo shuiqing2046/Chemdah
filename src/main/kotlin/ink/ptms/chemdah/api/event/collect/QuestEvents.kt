@@ -21,15 +21,8 @@ class QuestEvents {
      */
     class Agent(val questContainer: QuestContainer, val playerProfile: PlayerProfile, val agentType: AgentType, val restrict: String): BukkitProxyEvent()
 
-    /**
-     * 当玩家的任务列表被获取时
-     * 通过修改这个属性来动态编辑玩家的任务列表
-     */
-    class Collect(val quests: MutableList<Quest>, val playerProfile: PlayerProfile) : BukkitProxyEvent() {
-
-        override val allowCancelled: Boolean
-            get() = false
-    }
+    @Deprecated("请使用 ChemdahAPI.eventFactory")
+    class Collect(val quests: MutableList<Quest>, val playerProfile: PlayerProfile): BukkitProxyEvent()
 
     /**
      * 当任务接受时

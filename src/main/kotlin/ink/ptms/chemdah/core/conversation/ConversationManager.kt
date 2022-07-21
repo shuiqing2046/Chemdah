@@ -6,10 +6,11 @@ import ink.ptms.adyeshach.common.entity.EntityInstance
 import ink.ptms.adyeshach.common.entity.ai.expand.ControllerLookAtPlayerAlways
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.conversationSession
-import ink.ptms.chemdah.api.Mythic
 import ink.ptms.chemdah.api.event.collect.ConversationEvents
 import ink.ptms.chemdah.api.event.collect.PlayerEvents
 import ink.ptms.chemdah.util.hidden
+import ink.ptms.um.Mob
+import ink.ptms.um.Mythic
 import net.citizensnpcs.api.CitizensAPI
 import net.citizensnpcs.api.npc.NPC
 import org.bukkit.Bukkit
@@ -223,7 +224,7 @@ object ConversationManager {
     internal object CompatAdyeshach {
 
         @SubscribeEvent
-        fun onBegin(e: ConversationEvents.Begin) {
+        private fun onBegin(e: ConversationEvents.Begin) {
             val npc = e.session.source.entity
             if (npc is EntityInstance) {
                 npc.setTag("isFreeze", "true")
@@ -244,7 +245,7 @@ object ConversationManager {
         }
 
         @SubscribeEvent
-        fun onClosed(e: ConversationEvents.Closed) {
+        private fun onClosed(e: ConversationEvents.Closed) {
             val npc = e.session.source.entity
             if (npc is EntityInstance) {
                 npc.removeTag("conversation:${e.session.player.name}")
@@ -268,7 +269,7 @@ object ConversationManager {
         }
 
         @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        fun onAdyInteract(e: AdyeshachEntityInteractEvent) {
+        private fun onAdyInteract(e: AdyeshachEntityInteractEvent) {
             if (e.isMainHand && e.player.conversationSession == null) {
                 getConversation(e.player, "adyeshach", e.entity.id)?.run {
                     e.isCancelled = true
@@ -302,7 +303,7 @@ object ConversationManager {
         val isCitizensHooked by lazy { Bukkit.getPluginManager().isPluginEnabled("Citizens") }
 
         @SubscribeEvent
-        fun onBegin(e: ConversationEvents.Begin) {
+        private fun onBegin(e: ConversationEvents.Begin) {
             if (!isCitizensHooked) {
                 return
             }
@@ -313,7 +314,7 @@ object ConversationManager {
         }
 
         @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        fun onInteract(e: PlayerInteractAtEntityEvent) {
+        private fun onInteract(e: PlayerInteractAtEntityEvent) {
             if (!isCitizensHooked) {
                 return
             }
@@ -348,38 +349,38 @@ object ConversationManager {
         val isMythicMobsHooked by lazy { Bukkit.getPluginManager().isPluginEnabled("MythicMobs") }
 
         @SubscribeEvent
-        fun onBegin(e: ConversationEvents.Begin) {
+        private fun onBegin(e: ConversationEvents.Begin) {
             if (!isMythicMobsHooked) {
                 return
             }
             val npc = e.session.source.entity
-            if (npc is Mythic.Mob && npc.entity is LivingEntity && e.conversation.hasFlag("LOOK_PLAYER")) {
+            if (npc is Mob && npc.entity is LivingEntity && e.conversation.hasFlag("LOOK_PLAYER")) {
                 (npc.entity as LivingEntity).controllerLookAt(e.session.player)
             }
         }
 
         @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        fun onInteract(e: PlayerInteractAtEntityEvent) {
+        private fun onInteract(e: PlayerInteractAtEntityEvent) {
             if (!isMythicMobsHooked) {
                 return
             }
             if (e.hand == EquipmentSlot.HAND && e.rightClicked is LivingEntity && e.player.conversationSession == null) {
-                val mob = Mythic.getMobInstance(e.rightClicked) ?: return
-                getConversation(e.player, "mythicmobs", mob.internalName)?.run {
+                val mob = Mythic.API.getMob(e.rightClicked) ?: return
+                getConversation(e.player, "mythicmobs", mob.id)?.run {
                     e.isCancelled = true
                     // 打开对话
-                    open(e.player, object : Source<Mythic.Mob>(mob.displayName, mob) {
+                    open(e.player, object : Source<Mob>(mob.displayName, mob) {
 
                         override fun transfer(player: Player, newId: String): Boolean {
                             val nearby = e.rightClicked.getNearbyEntities(10.0, 10.0, 10.0)
-                                .mapNotNull { Mythic.getMobInstance(e.rightClicked) }
-                                .firstOrNull { it.internalName == newId } ?: return false
+                                .mapNotNull { Mythic.API.getMob(e.rightClicked) }
+                                .firstOrNull { it.id == newId } ?: return false
                             name = nearby.displayName
                             entity = nearby
                             return true
                         }
 
-                        override fun getOriginLocation(entity: Mythic.Mob): Location {
+                        override fun getOriginLocation(entity: Mob): Location {
                             val be = entity.entity
                             return be.location.add(0.0, be.height, 0.0)
                         }

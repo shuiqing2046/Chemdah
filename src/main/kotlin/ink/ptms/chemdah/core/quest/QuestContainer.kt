@@ -112,39 +112,36 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
      */
     fun agent(profile: PlayerProfile, agentType: AgentType, restrict: String = "self", reason: String? = null): CompletableFuture<Boolean> {
         val future = CompletableFuture<Boolean>()
-        mirrorFuture<Int>("QuestContainer:agent") {
-            if (!QuestEvents.Agent(this@QuestContainer, profile, agentType, restrict).call()) {
-                future.complete(false)
-                finish(0)
-            }
-            val agent = getAgentList(agentType, restrict)
-            fun process(cur: Int) {
-                if (cur < agent.size) {
-                    try {
-                        KetherShell.eval(agent[cur].action, sender = adaptPlayer(profile.player), namespace = agentType.namespaceAll()) {
-                            rootFrame().variables().also { vars ->
-                                vars.set("reason", reason)
-                                vars.set("@QuestSelected", node)
-                                vars.set("@QuestContainer", this@QuestContainer)
-                            }
-                        }.thenApply {
-                            if (it is Boolean && !it) {
-                                future.complete(false)
-                            } else {
-                                process(cur + 1)
-                            }
-                        }
-                    } catch (e: Throwable) {
-                        warning("path: $path, agentType: $agentType, source: ${agent[cur].action}")
-                        e.printKetherErrorMessage()
-                    }
-                } else {
-                    future.complete(true)
-                }
-            }
-            process(0)
-            finish(0)
+        if (!QuestEvents.Agent(this@QuestContainer, profile, agentType, restrict).call()) {
+            future.complete(false)
+            return future
         }
+        val agent = getAgentList(agentType, restrict)
+        fun process(cur: Int) {
+            if (cur < agent.size) {
+                try {
+                    KetherShell.eval(agent[cur].action, sender = adaptPlayer(profile.player), namespace = agentType.namespaceAll()) {
+                        rootFrame().variables().also { vars ->
+                            vars.set("reason", reason)
+                            vars.set("@QuestSelected", node)
+                            vars.set("@QuestContainer", this@QuestContainer)
+                        }
+                    }.thenApply {
+                        if (it is Boolean && !it) {
+                            future.complete(false)
+                        } else {
+                            process(cur + 1)
+                        }
+                    }
+                } catch (e: Throwable) {
+                    warning("path: $path, agentType: $agentType, source: ${agent[cur].action}")
+                    e.printKetherErrorMessage()
+                }
+            } else {
+                future.complete(true)
+            }
+        }
+        process(0)
         return future
     }
 

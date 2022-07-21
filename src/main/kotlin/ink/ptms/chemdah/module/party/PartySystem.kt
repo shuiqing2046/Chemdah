@@ -1,16 +1,21 @@
 package ink.ptms.chemdah.module.party
 
+import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.api.ChemdahAPI.isChemdahProfileLoaded
 import ink.ptms.chemdah.api.event.PartyHookEvent
 import ink.ptms.chemdah.api.event.collect.ObjectiveEvents
 import ink.ptms.chemdah.api.event.collect.QuestEvents
+import ink.ptms.chemdah.api.event.plugin.CollectEvent
+import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.AgentType
 import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.core.quest.addon.AddonParty.Companion.party
 import ink.ptms.chemdah.module.Module
 import ink.ptms.chemdah.module.Module.Companion.register
+import ink.ptms.chemdah.module.party.PartySystem.getMembers
 import org.bukkit.entity.Player
+import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.module.configuration.Config
@@ -26,17 +31,19 @@ object PartySystem : Module {
         private set
 
     private val hooks = ConcurrentHashMap<String, Party>()
+    private var retry = 0
 
     val hook: Party? = null
         get() {
-            if (field != null) {
+            if (field != null || retry > 10) {
                 return field
             }
+            retry++
             val id = conf.getString("default.plugin", "")!!
             if (hooks.containsKey(id)) {
                 return hooks[id]
             }
-            val party = PartyHookEvent(conf.getString("default.plugin", "")!!).run {
+            val party = PartyHookEvent(id).run {
                 call()
                 party
             }
@@ -115,71 +122,76 @@ object PartySystem : Module {
         }
     }
 
-    @SubscribeEvent
-    fun onQuestEventsCollect(e: QuestEvents.Collect) {
-        val team = e.playerProfile.player.getParty() ?: return
-        val leader = team.getLeader()
-        if (leader != null) {
-            shareQuests(e.quests, leader, leader = true)
-        }
-        team.getMembers().forEach { member ->
-            if (member.uniqueId != e.playerProfile.uniqueId) {
-                shareQuests(e.quests, member)
+    @Awake(LifeCycle.ENABLE)
+    private fun onEnable() {
+        ChemdahAPI.eventFactory.prepareQuestCollect(object : CollectEvent {
+
+            override fun invoke(playerProfile: PlayerProfile, quests: MutableList<Quest>) {
+                val team = playerProfile.player.getParty() ?: return
+                val leader = team.getLeader()
+                if (leader != null) {
+                    shareQuests(quests, leader, leader = true)
+                }
+                team.getMembers().forEach { member ->
+                    if (member.uniqueId != playerProfile.uniqueId) {
+                        shareQuests(quests, member)
+                    }
+                }
             }
-        }
+        })
     }
 
     @SubscribeEvent
-    fun onQuestEventsFailPost(e: QuestEvents.Fail.Post) {
+    private fun onQuestEventsFailPost(e: QuestEvents.Fail.Post) {
         e.quest.profile.player.getPartyMembers().forEach { member ->
             e.quest.template.agent(member.chemdahProfile, AgentType.QUEST_FAILED, "party")
         }
     }
 
     @SubscribeEvent
-    fun onQuestEventsRestartPost(e: QuestEvents.Restart.Post) {
+    private fun onQuestEventsRestartPost(e: QuestEvents.Restart.Post) {
         e.quest.profile.player.getPartyMembers().forEach { member ->
             e.quest.template.agent(member.chemdahProfile, AgentType.QUEST_RESTART, "party")
         }
     }
 
     @SubscribeEvent
-    fun onQuestEventsAcceptPost(e: QuestEvents.Accept.Post) {
+    private fun onQuestEventsAcceptPost(e: QuestEvents.Accept.Post) {
         e.quest.profile.player.getPartyMembers().forEach { member ->
             e.quest.template.agent(member.chemdahProfile, AgentType.QUEST_ACCEPTED, "party")
         }
     }
 
     @SubscribeEvent
-    fun onQuestEventsCompilePost(e: QuestEvents.Complete.Post) {
+    private fun onQuestEventsCompilePost(e: QuestEvents.Complete.Post) {
         e.quest.profile.player.getPartyMembers().forEach { member ->
             e.quest.template.agent(member.chemdahProfile, AgentType.QUEST_COMPLETED, "party")
         }
     }
 
     @SubscribeEvent
-    fun onObjectiveEventsRestartPost(e: ObjectiveEvents.Restart.Post) {
+    private fun onObjectiveEventsRestartPost(e: ObjectiveEvents.Restart.Post) {
         e.quest.profile.player.getPartyMembers().forEach { member ->
             e.task.agent(member.chemdahProfile, AgentType.TASK_RESTARTED, "party")
         }
     }
 
     @SubscribeEvent
-    fun onObjectiveEventsContinuePost(e: ObjectiveEvents.Continue.Post) {
+    private fun onObjectiveEventsContinuePost(e: ObjectiveEvents.Continue.Post) {
         e.quest.profile.player.getPartyMembers().forEach { member ->
             e.task.agent(member.chemdahProfile, AgentType.TASK_CONTINUED, "party")
         }
     }
 
     @SubscribeEvent
-    fun onObjectEventsCompilePost(e: ObjectiveEvents.Complete.Post) {
+    private fun onObjectEventsCompilePost(e: ObjectiveEvents.Complete.Post) {
         e.quest.profile.player.getPartyMembers().forEach { member ->
             e.task.agent(member.chemdahProfile, AgentType.TASK_COMPLETED, "party")
         }
     }
 
     @SubscribeEvent
-    fun onObjectiveEventsContinuePre(e: ObjectiveEvents.Continue.Pre) {
+    private fun onObjectiveEventsContinuePre(e: ObjectiveEvents.Continue.Pre) {
         if (!e.quest.isOwner(e.playerProfile.player) && (e.quest.template.party()?.canContinue == false || e.task.party()?.canContinue == false)) {
             e.isCancelled = true
         }
@@ -190,7 +202,7 @@ object PartySystem : Module {
     }
 
     @SubscribeEvent
-    fun onObjectiveEventsCompilePre(e: ObjectiveEvents.Complete.Pre) {
+    private fun onObjectiveEventsCompilePre(e: ObjectiveEvents.Complete.Pre) {
         val requireMembers = e.task.party()?.requireMembers ?: e.quest.template.party()?.requireMembers ?: 0
         if (requireMembers > 0 && requireMembers < e.playerProfile.player.getPartyMembers().size) {
             e.isCancelled = true

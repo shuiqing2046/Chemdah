@@ -52,7 +52,7 @@ object ThemeChat : Theme<ThemeChatSettings>() {
      * 例如 SkillAPI
      */
     @SubscribeEvent
-    fun onPacketSend(e: PacketSendEvent) {
+    private fun onPacketSend(e: PacketSendEvent) {
         if (e.packet.name == "PacketPlayOutChat" && e.packet.read<Any>("b").toString() == "GAME_INFO" && e.player.conversationSession != null) {
             val components = e.packet.read<Array<BaseComponent>>("components") ?: return
             val text = TextComponent.toPlainText(*components).uncolored()
@@ -67,7 +67,7 @@ object ThemeChat : Theme<ThemeChatSettings>() {
      * 以及无法 mc 无法重复切换相同物品栏
      */
     @SubscribeEvent(EventPriority.HIGHEST, ignoreCancelled = true)
-    fun onItemHeld(e: PlayerItemHeldEvent) {
+    private fun onItemHeld(e: PlayerItemHeldEvent) {
         val session = e.player.conversationSession ?: return
         if (session.conversation.option.theme == "chat") {
             if (session.npcTalking) {
@@ -116,7 +116,7 @@ object ThemeChat : Theme<ThemeChatSettings>() {
     }
 
     @SubscribeEvent
-    fun onSwap(e: PlayerSwapHandItemsEvent) {
+    private fun onSwap(e: PlayerSwapHandItemsEvent) {
         val session = e.player.conversationSession ?: return
         if (session.conversation.option.theme == "chat") {
             e.isCancelled = true
@@ -139,7 +139,7 @@ object ThemeChat : Theme<ThemeChatSettings>() {
     }
 
     @SubscribeEvent
-    fun onChat(e: AsyncPlayerChatEvent) {
+    private fun onChat(e: AsyncPlayerChatEvent) {
         val session = e.player.conversationSession ?: return
         if (session.conversation.option.theme == "chat" && !session.npcTalking && e.message.isInt()) {
             e.isCancelled = true
@@ -154,7 +154,7 @@ object ThemeChat : Theme<ThemeChatSettings>() {
     }
 
     @SubscribeEvent
-    fun onClosed(e: ConversationEvents.Closed) {
+    private fun onClosed(e: ConversationEvents.Closed) {
         if (e.refuse && !e.session.npcTalking && QuestDevelopment.enableMessageTransmit) {
             newJson().sendTo(adaptCommandSender(e.session.player))
             e.session.player.releaseTransmit()

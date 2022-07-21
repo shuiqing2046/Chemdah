@@ -82,25 +82,19 @@ class Quest(val id: String, val profile: PlayerProfile, val persistentDataContai
      * 当所有条目均已完成时任务完成
      */
     fun checkComplete() {
-        mirrorFuture<Int>("Quest:checkComplete") {
-            template.canRestart(profile).thenAccept { reset ->
-                if (reset) {
-                    restartQuest()
-                    finish(0)
-                } else {
-                    if (tasks.all { it.objective.hasCompletedSignature(profile, it) } && QuestEvents.Complete.Pre(this@Quest, profile).call()) {
-                        template.agent(profile, AgentType.QUEST_COMPLETE).thenAccept {
-                            if (it) {
-                                profile.persistentDataContainer["quest.complete.$id"] = System.currentTimeMillis()
-                                profile.unregisterQuest(this@Quest)
-                                template.control().signature(profile, ControlTrigger.COMPLETE)
-                                template.agent(profile, AgentType.QUEST_COMPLETED)
-                                QuestEvents.Complete.Post(this@Quest, profile).call()
-                            }
-                            finish(0)
+        template.canRestart(profile).thenAccept { reset ->
+            if (reset) {
+                restartQuest()
+            } else {
+                if (tasks.all { it.objective.hasCompletedSignature(profile, it) } && QuestEvents.Complete.Pre(this@Quest, profile).call()) {
+                    template.agent(profile, AgentType.QUEST_COMPLETE).thenAccept {
+                        if (it) {
+                            profile.persistentDataContainer["quest.complete.$id"] = System.currentTimeMillis()
+                            profile.unregisterQuest(this@Quest)
+                            template.control().signature(profile, ControlTrigger.COMPLETE)
+                            template.agent(profile, AgentType.QUEST_COMPLETED)
+                            QuestEvents.Complete.Post(this@Quest, profile).call()
                         }
-                    } else {
-                        finish(0)
                     }
                 }
             }
@@ -119,19 +113,14 @@ class Quest(val id: String, val profile: PlayerProfile, val persistentDataContai
      * 放弃任务
      */
     fun failQuest() {
-        mirrorFuture<Int>("Quest:fail") {
-            if (QuestEvents.Fail.Pre(this@Quest, profile).call()) {
-                template.agent(profile, AgentType.QUEST_FAIL).thenAccept {
-                    if (it) {
-                        profile.unregisterQuest(this@Quest)
-                        template.control().signature(profile, ControlTrigger.FAIL)
-                        template.agent(profile, AgentType.QUEST_FAILED)
-                        QuestEvents.Fail.Post(this@Quest, profile).call()
-                    }
-                    finish(0)
+        if (QuestEvents.Fail.Pre(this@Quest, profile).call()) {
+            template.agent(profile, AgentType.QUEST_FAIL).thenAccept {
+                if (it) {
+                    profile.unregisterQuest(this@Quest)
+                    template.control().signature(profile, ControlTrigger.FAIL)
+                    template.agent(profile, AgentType.QUEST_FAILED)
+                    QuestEvents.Fail.Post(this@Quest, profile).call()
                 }
-            } else {
-                finish(0)
             }
         }
     }
@@ -140,25 +129,20 @@ class Quest(val id: String, val profile: PlayerProfile, val persistentDataContai
      * 重置任务
      */
     fun restartQuest() {
-        mirrorFuture<Int>("Quest:restart") {
-            if (QuestEvents.Restart.Pre(this@Quest, profile).call()) {
-                template.agent(profile, AgentType.QUEST_RESTART).thenAccept {
-                    if (it) {
-                        tasks.forEach { task ->
-                            if (ObjectiveEvents.Restart.Pre(task.objective, task, this@Quest, profile).call()) {
-                                task.objective.onReset(profile, task, this@Quest)
-                                task.agent(profile, AgentType.TASK_RESTARTED)
-                                ObjectiveEvents.Restart.Post(task.objective, task, this@Quest, profile).call()
-                            }
+        if (QuestEvents.Restart.Pre(this@Quest, profile).call()) {
+            template.agent(profile, AgentType.QUEST_RESTART).thenAccept {
+                if (it) {
+                    tasks.forEach { task ->
+                        if (ObjectiveEvents.Restart.Pre(task.objective, task, this@Quest, profile).call()) {
+                            task.objective.onReset(profile, task, this@Quest)
+                            task.agent(profile, AgentType.TASK_RESTARTED)
+                            ObjectiveEvents.Restart.Post(task.objective, task, this@Quest, profile).call()
                         }
-                        persistentDataContainer.clear()
-                        template.agent(profile, AgentType.QUEST_RESTARTED)
-                        QuestEvents.Restart.Post(this@Quest, profile).call()
                     }
-                    finish(0)
+                    persistentDataContainer.clear()
+                    template.agent(profile, AgentType.QUEST_RESTARTED)
+                    QuestEvents.Restart.Post(this@Quest, profile).call()
                 }
-            } else {
-                finish(0)
             }
         }
     }

@@ -161,22 +161,20 @@ class TrackNavigation(val config: ConfigurationSection, val root: ConfigurationS
      */
     fun displayPoint(player: Player, center: Location) {
         submit(async = !sync) {
-            mirrorNow("AddonTrack:trackTickNavigation:${if (sync) "sync" else "async"}") {
-                // 创建寻路任务
-                val pathFinder = createPathfinder(NodeEntity(player.location, 2.0, 1.0, canOpenDoors = true, canPassDoors = true))
-                val path = pathFinder.findPath(center, distance)
-                val nodes = path?.nodes ?: return@mirrorNow
-                // 播放特效
-                nodes.forEachIndexed { index, node ->
-                    // 速度
-                    submit(delay = index * pointSpeed) {
-                        pointType.sendTo(
-                            player = adaptPlayer(player),
-                            location = node.asBlockPos().toLocation(center.world!!).add(0.5, pointY, 0.5).toProxyLocation(),
-                            offset = Vector(pointSizeX, pointSizeY, pointSizeX),
-                            count = pointCount
-                        )
-                    }
+            // 创建寻路任务
+            val pathFinder = createPathfinder(NodeEntity(player.location, 2.0, 1.0, canOpenDoors = true, canPassDoors = true))
+            val path = pathFinder.findPath(center, distance)
+            val nodes = path?.nodes ?: return@submit
+            // 播放特效
+            nodes.forEachIndexed { index, node ->
+                // 速度
+                submit(delay = index * pointSpeed) {
+                    pointType.sendTo(
+                        player = adaptPlayer(player),
+                        location = node.asBlockPos().toLocation(center.world!!).add(0.5, pointY, 0.5).toProxyLocation(),
+                        offset = Vector(pointSizeX, pointSizeY, pointSizeX),
+                        count = pointCount
+                    )
                 }
             }
         }
@@ -187,21 +185,19 @@ class TrackNavigation(val config: ConfigurationSection, val root: ConfigurationS
      */
     fun displayArrow(player: Player, center: Location) {
         submit(async = !sync) {
-            mirrorNow("AddonTrack:trackTickNavigation:${if (sync) "sync" else "async"}") {
-                val pathFinder = createPathfinder(NodeEntity(player.location, 2.0, 1.0, canOpenDoors = true, canPassDoors = true))
-                val path = pathFinder.findPath(center, distance)
-                val nodes = path?.nodes ?: return@mirrorNow
-                // 播放特效
-                (0 until (nodes.size - 1) step 2).forEach {
-                    submit(delay = it * arrowSpeed) {
-                        // 起始坐标
-                        val start = nodes[it].asBlockPos().toLocation(center.world!!).add(0.5, arrowY, 0.5).toProxyLocation()
-                        // 结束坐标
-                        val target = nodes[it + 1].asBlockPos().toLocation(center.world!!).add(0.5, arrowY, 0.5).toProxyLocation()
-                        // 绘制特效
-                        Effects.drawArrow(start, target, arrowDensity, arrowLen, arrowAngle).forEach { pos ->
-                            arrowType.sendTo(adaptPlayer(player), pos, Vector(0, 0, 0))
-                        }
+            val pathFinder = createPathfinder(NodeEntity(player.location, 2.0, 1.0, canOpenDoors = true, canPassDoors = true))
+            val path = pathFinder.findPath(center, distance)
+            val nodes = path?.nodes ?: return@submit
+            // 播放特效
+            (0 until (nodes.size - 1) step 2).forEach {
+                submit(delay = it * arrowSpeed) {
+                    // 起始坐标
+                    val start = nodes[it].asBlockPos().toLocation(center.world!!).add(0.5, arrowY, 0.5).toProxyLocation()
+                    // 结束坐标
+                    val target = nodes[it + 1].asBlockPos().toLocation(center.world!!).add(0.5, arrowY, 0.5).toProxyLocation()
+                    // 绘制特效
+                    Effects.drawArrow(start, target, arrowDensity, arrowLen, arrowAngle).forEach { pos ->
+                        arrowType.sendTo(adaptPlayer(player), pos, Vector(0, 0, 0))
                     }
                 }
             }
