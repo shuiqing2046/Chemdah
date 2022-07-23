@@ -97,6 +97,11 @@ abstract class Database {
             }
         }
 
+        @Awake(LifeCycle.ENABLE)
+        internal fun onEnable() {
+            INSTANCE
+        }
+
         @SubscribeEvent
         internal fun onLogin(e: PlayerLoginEvent) {
             if (INSTANCE is DatabaseError) {
