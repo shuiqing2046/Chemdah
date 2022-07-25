@@ -16,7 +16,7 @@ object MMobDeath : ObjectiveCountableI<MobDeathEvent>() {
             it.killer as? Player
         }
         addSimpleCondition("position") { data, e ->
-            data.toPosition().inside(e.killer.killer!!.location)
+            data.toPosition().inside(e.killer!!.location)
         }
         addSimpleCondition("name") { data, e ->
             data.asList().any { it.equals(e.mob.id, true) }
