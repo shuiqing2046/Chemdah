@@ -139,7 +139,7 @@ abstract class Objective<E : Any> {
      */
     open fun checkCondition(profile: PlayerProfile, task: Task, quest: Quest, event: E): CompletableFuture<Boolean> {
         return if (conditions.all { (name, cond) -> !task.condition.containsKey(name) || cond(profile, task, event) }) {
-            profile.checkAgent(task.condition["$"]?.data, quest, conditionVars.mapNotNull { safely { it.apply(event) } }.toMap())
+            profile.checkAgent(task.condition["$"]?.data, quest, conditionVars.mapNotNull { safely { it.apply(event).toPair() } }.toMap())
         } else {
             CompletableFuture.completedFuture(false)
         }
@@ -226,7 +226,7 @@ abstract class Objective<E : Any> {
      * 增加在条目继续的条件中的额外脚本变量
      */
     fun addConditionVariable(name: String, func: Function<E, Any>) {
-        conditionVars += Function { Couple(name, func) }
+        conditionVars += Function { Couple(name, func.apply(it)) }
     }
 
     /**

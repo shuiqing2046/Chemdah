@@ -52,7 +52,7 @@ repositories {
 }
 
 dependencies {
-    taboo("ink.ptms:um:1.0.0-beta9")
+    taboo("ink.ptms:um:1.0.0-beta-12")
     compileOnly("net.milkbowl.vault:Vault:1")
     compileOnly("org.serverct.ersha.dungeon:DungeonPlus:1.1.3")
     compileOnly("com.github.angeschossen:LandsAPI:5.13.0")
