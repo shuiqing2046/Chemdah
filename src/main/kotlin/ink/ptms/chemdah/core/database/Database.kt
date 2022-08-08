@@ -8,6 +8,8 @@ import ink.ptms.chemdah.api.ChemdahAPI.isChemdahProfileLoaded
 import ink.ptms.chemdah.api.event.collect.PlayerEvents
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Quest
+import ink.ptms.error_reporter.ErrorAction
+import ink.ptms.error_reporter.ErrorReportHandler
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerJoinEvent
@@ -18,6 +20,7 @@ import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
 import taboolib.common.platform.Schedule
 import taboolib.common.platform.event.SubscribeEvent
+import taboolib.common.platform.function.pluginId
 import taboolib.common.platform.function.submit
 import taboolib.common5.mirrorNow
 import taboolib.platform.util.asLangText
@@ -99,7 +102,9 @@ abstract class Database {
 
         @Awake(LifeCycle.ENABLE)
         internal fun onEnable() {
-            INSTANCE
+            if (INSTANCE is DatabaseError && ErrorReportHandler.isRegistered()) {
+                ink.ptms.error_reporter.error(pluginId, IllegalStateException("Database Error"), ErrorAction.SHUTDOWN)
+            }
         }
 
         @SubscribeEvent

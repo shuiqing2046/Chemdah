@@ -40,7 +40,7 @@ taboolib {
     install("expansion-command-helper")
     install("expansion-javascript")
     classifier = null
-    version = "6.0.9-40"
+    version = "6.0.9-55"
     relocate("ink.ptms.um", "ink.ptms.chemdah.um")
 }
 
@@ -53,6 +53,7 @@ repositories {
 
 dependencies {
     taboo("ink.ptms:um:1.0.0-beta-12")
+    compileOnly("ink.ptms:error_reporter:1.0.0")
     compileOnly("net.milkbowl.vault:Vault:1")
     compileOnly("org.serverct.ersha.dungeon:DungeonPlus:1.1.3")
     compileOnly("com.github.angeschossen:LandsAPI:5.13.0")
