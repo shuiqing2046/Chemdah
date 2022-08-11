@@ -17,7 +17,11 @@ import ink.ptms.chemdah.module.party.PartySystem.getMembers
 import org.bukkit.entity.Player
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
+import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
+import taboolib.common.platform.function.info
+import taboolib.common.platform.function.warning
+import taboolib.common5.Baffle
 import taboolib.module.configuration.Config
 import taboolib.module.configuration.Configuration
 import taboolib.module.configuration.SecuredFile
@@ -33,7 +37,7 @@ object PartySystem : Module {
     private val hooks = ConcurrentHashMap<String, Party>()
     private var retry = 0
 
-    val hook: Party? = null
+    var hook: Party? = null
         get() {
             if (field != null || retry > 10) {
                 return field
@@ -41,6 +45,7 @@ object PartySystem : Module {
             retry++
             val id = conf.getString("default.plugin", "")!!
             if (hooks.containsKey(id)) {
+                field = hooks[id]
                 return hooks[id]
             }
             val party = PartyHookEvent(id).run {
@@ -48,6 +53,7 @@ object PartySystem : Module {
                 party
             }
             if (party != null) {
+                field = party
                 hooks[id] = party
             }
             return party
@@ -143,68 +149,68 @@ object PartySystem : Module {
 
     @SubscribeEvent
     private fun onQuestEventsFailPost(e: QuestEvents.Fail.Post) {
-        e.quest.profile.player.getPartyMembers().forEach { member ->
+        e.quest.getMembers().forEach { member ->
             e.quest.template.agent(member.chemdahProfile, AgentType.QUEST_FAILED, "party")
         }
     }
 
     @SubscribeEvent
     private fun onQuestEventsRestartPost(e: QuestEvents.Restart.Post) {
-        e.quest.profile.player.getPartyMembers().forEach { member ->
+        e.quest.getMembers().forEach { member ->
             e.quest.template.agent(member.chemdahProfile, AgentType.QUEST_RESTART, "party")
         }
     }
 
     @SubscribeEvent
     private fun onQuestEventsAcceptPost(e: QuestEvents.Accept.Post) {
-        e.quest.profile.player.getPartyMembers().forEach { member ->
+        e.quest.getMembers().forEach { member ->
             e.quest.template.agent(member.chemdahProfile, AgentType.QUEST_ACCEPTED, "party")
         }
     }
 
     @SubscribeEvent
     private fun onQuestEventsCompilePost(e: QuestEvents.Complete.Post) {
-        e.quest.profile.player.getPartyMembers().forEach { member ->
+        e.quest.getMembers().forEach { member ->
             e.quest.template.agent(member.chemdahProfile, AgentType.QUEST_COMPLETED, "party")
         }
     }
 
     @SubscribeEvent
     private fun onObjectiveEventsRestartPost(e: ObjectiveEvents.Restart.Post) {
-        e.quest.profile.player.getPartyMembers().forEach { member ->
+        e.quest.getMembers().forEach { member ->
             e.task.agent(member.chemdahProfile, AgentType.TASK_RESTARTED, "party")
         }
     }
 
     @SubscribeEvent
     private fun onObjectiveEventsContinuePost(e: ObjectiveEvents.Continue.Post) {
-        e.quest.profile.player.getPartyMembers().forEach { member ->
+        e.quest.getMembers().forEach { member ->
             e.task.agent(member.chemdahProfile, AgentType.TASK_CONTINUED, "party")
         }
     }
 
     @SubscribeEvent
     private fun onObjectEventsCompilePost(e: ObjectiveEvents.Complete.Post) {
-        e.quest.profile.player.getPartyMembers().forEach { member ->
+        e.quest.getMembers().forEach { member ->
             e.task.agent(member.chemdahProfile, AgentType.TASK_COMPLETED, "party")
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(EventPriority.LOWEST)
     private fun onObjectiveEventsContinuePre(e: ObjectiveEvents.Continue.Pre) {
         if (!e.quest.isOwner(e.playerProfile.player) && (e.quest.template.party()?.canContinue == false || e.task.party()?.canContinue == false)) {
             e.isCancelled = true
         }
         val requireMembers = e.task.party()?.requireMembers ?: e.quest.template.party()?.requireMembers ?: 0
-        if (requireMembers > 0 && requireMembers < e.playerProfile.player.getPartyMembers().size) {
+        if (requireMembers > 0 && requireMembers < e.quest.getMembers().size) {
             e.isCancelled = true
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(EventPriority.LOWEST)
     private fun onObjectiveEventsCompilePre(e: ObjectiveEvents.Complete.Pre) {
         val requireMembers = e.task.party()?.requireMembers ?: e.quest.template.party()?.requireMembers ?: 0
-        if (requireMembers > 0 && requireMembers < e.playerProfile.player.getPartyMembers().size) {
+        if (requireMembers > 0 && requireMembers < e.quest.getMembers().size) {
             e.isCancelled = true
         }
     }

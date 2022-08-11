@@ -2,6 +2,9 @@ package ink.ptms.chemdah.module.command
 
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
+import ink.ptms.chemdah.module.party.PartySystem
+import ink.ptms.chemdah.module.party.PartySystem.getParty
+import ink.ptms.chemdah.module.party.PartySystem.getPartyMembers
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import taboolib.common.platform.command.CommandBody
@@ -59,6 +62,15 @@ object CommandChemdah {
                 val quests = playerExact.chemdahProfile.getQuests(openAPI = true)
                 sender.sendLang("command-info-body", "  §7Quests: §f${quests.filter { it.isOwner(playerExact) }.map { it.id }.toList()}")
                 sender.sendLang("command-info-body", "  §7Quests (Share): §f${quests.filter { !it.isOwner(playerExact) }.map { it.id }.toList()}")
+                val partyHook = PartySystem.hook?.javaClass?.name
+                if (partyHook != null) {
+                    sender.sendLang("command-info-body", "  §7Party: §f$partyHook")
+                    val party = playerExact.getParty()
+                    if (party != null) {
+                        sender.sendLang("command-info-body", "  §7 = Leader: §f${party.isLeader(playerExact)}")
+                        sender.sendLang("command-info-body", "  §7 = Member: §f${playerExact.getPartyMembers(true).map { it.name }}")
+                    }
+                }
             }
         }
     }
