@@ -138,7 +138,7 @@ object PartySystem : Module {
                 if (leader != null) {
                     shareQuests(quests, leader, leader = true)
                 }
-                team.getMembers().forEach { member ->
+                team.getMembers().filter { it.name != leader?.name }.forEach { member ->
                     if (member.uniqueId != playerProfile.uniqueId) {
                         shareQuests(quests, member)
                     }
