@@ -40,7 +40,7 @@ taboolib {
     install("expansion-command-helper")
     install("expansion-javascript")
     classifier = null
-    version = "6.0.9-local"
+    version = "6.0.9-59"
     relocate("ink.ptms.um", "ink.ptms.chemdah.um")
 }
 
