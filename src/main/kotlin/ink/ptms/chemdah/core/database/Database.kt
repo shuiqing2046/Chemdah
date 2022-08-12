@@ -105,7 +105,7 @@ abstract class Database {
             if (INSTANCE is DatabaseError && Bukkit.getPluginManager().isPluginEnabled("ErrorReporter")) {
                 // 汇报异常并关服
                 if (ErrorReportHandler.isRegistered()) {
-                    ink.ptms.error_reporter.error(pluginId, IllegalStateException("Database Error"), ErrorAction.SHUTDOWN)
+                    ink.ptms.error_reporter.error(pluginId, IllegalStateException("Database Error", (INSTANCE as DatabaseError).cause), ErrorAction.SHUTDOWN)
                 }
             }
         }

@@ -198,8 +198,9 @@ object PartySystem : Module {
 
     @SubscribeEvent(EventPriority.LOWEST)
     private fun onObjectiveEventsContinuePre(e: ObjectiveEvents.Continue.Pre) {
-        if (!e.quest.isOwner(e.playerProfile.player) && (e.quest.template.party()?.canContinue == false || e.task.party()?.canContinue == false)) {
+        if (!e.quest.isOwner(e.playerProfile.player) && e.quest.template.party()?.canContinue == false && e.task.party()?.canContinue == false) {
             e.isCancelled = true
+            return
         }
         val requireMembers = e.task.party()?.requireMembers ?: e.quest.template.party()?.requireMembers ?: 0
         if (requireMembers > 0 && requireMembers < e.quest.getMembers().size) {

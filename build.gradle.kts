@@ -25,7 +25,7 @@ taboolib {
     install("common-5")
     install("module-effect")
     install("module-database")
-    install("module-database-mongodb")
+//    install("module-database-mongodb")
     install("module-configuration")
     install("module-kether")
     install("module-chat")
@@ -40,7 +40,7 @@ taboolib {
     install("expansion-command-helper")
     install("expansion-javascript")
     classifier = null
-    version = "6.0.9-55"
+    version = "6.0.9-local"
     relocate("ink.ptms.um", "ink.ptms.chemdah.um")
 }
 
@@ -52,7 +52,7 @@ repositories {
 }
 
 dependencies {
-    taboo("ink.ptms:um:1.0.0-beta-14")
+    taboo("ink.ptms:um:1.0.0-beta-15")
     compileOnly("ink.ptms:error_reporter:1.0.0")
     compileOnly("net.milkbowl.vault:Vault:1")
     compileOnly("org.serverct.ersha.dungeon:DungeonPlus:1.1.3")
