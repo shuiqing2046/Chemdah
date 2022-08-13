@@ -40,7 +40,7 @@ object QuestLoader {
     lateinit var groupConf: Configuration
         private set
 
-    // @Schedule(period = 20, async = true)
+    @Schedule(period = 20, async = true)
     fun tick20() {
         Bukkit.getOnlinePlayers().filter { it.isChemdahProfileLoaded }.forEach { player ->
             player.chemdahProfile.also { profile ->
