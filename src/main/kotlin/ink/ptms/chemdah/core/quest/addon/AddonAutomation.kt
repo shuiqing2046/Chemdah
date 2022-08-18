@@ -8,10 +8,11 @@ import ink.ptms.chemdah.core.quest.*
 import ink.ptms.chemdah.core.quest.addon.data.*
 import org.bukkit.Bukkit
 import taboolib.common.platform.Schedule
+import taboolib.common.platform.function.warning
 import taboolib.common5.Coerce
 import taboolib.common5.RealTime
-import taboolib.common5.mirrorFuture
 import taboolib.library.configuration.ConfigurationSection
+import java.util.Date
 import kotlin.random.Random
 
 /**
@@ -36,7 +37,6 @@ class AddonAutomation(source: ConfigurationSection, questContainer: QuestContain
                 RealTime.Type.HOUR,
                 Coerce.toInteger(args[1]),
             )
-
             "day", "daily" -> PlanTypeDaily(
                 method,
                 RealTime.Type.DAY,
@@ -44,7 +44,6 @@ class AddonAutomation(source: ConfigurationSection, questContainer: QuestContain
                 Coerce.toInteger(args.getOrNull(2) ?: 6),
                 Coerce.toInteger(args.getOrNull(3) ?: 0)
             )
-
             "week", "weekly" -> PlanTypeWeekly(
                 method,
                 RealTime.Type.WEEK,
@@ -53,10 +52,17 @@ class AddonAutomation(source: ConfigurationSection, questContainer: QuestContain
                 Coerce.toInteger(args.getOrNull(3) ?: 6),
                 Coerce.toInteger(args.getOrNull(4) ?: 0)
             )
-
             else -> null
         }
         if (type != null) {
+            if (type.value == 0) {
+                type.value = 1
+                warning("[Automation] 任务 ${questContainer.id} 中的计划周期为 0，已自动修正。")
+                warning("[Automation] 配置:")
+                source.toString().lines().forEach {
+                    warning("[Automation]  | $it")
+                }
+            }
             Plan(type, source.getInt("plan.count", 1), source.getString("plan.group"))
         } else {
             null
@@ -116,10 +122,17 @@ class AddonAutomation(source: ConfigurationSection, questContainer: QuestContain
                     }
                 }
                 // 定时计划
-                groups.forEach { (id, group) ->
+                groups.forEach self@{ (id, group) ->
                     val nextTime = profile.persistentDataContainer["quest.automation.$id.next", 0L].toLong()
                     if (nextTime < System.currentTimeMillis()) {
-                        profile.persistentDataContainer["quest.automation.$id.next"] = group.plan.nextTime
+                        val newTime = group.plan.nextTime
+                        if (newTime < System.currentTimeMillis()) {
+                            val now = Date(System.currentTimeMillis())
+                            warning("[Automation] $id 的计划时间已过期, 无法分发任务: ${Date(newTime)}, 当前时间: $now")
+                            warning("[Automation] 调试: ${group.plan.debug}")
+                            return@self
+                        }
+                        profile.persistentDataContainer["quest.automation.$id.next"] = newTime
                         val pool = group.quests.toMutableList()
                         var i = group.plan.count
                         fun process() {

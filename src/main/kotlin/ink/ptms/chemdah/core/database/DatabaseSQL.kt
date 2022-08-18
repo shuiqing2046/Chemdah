@@ -123,7 +123,7 @@ class DatabaseSQL : Database() {
     }
 
     val dataSource: DataSource by lazy {
-        host.createDataSource()
+        host.createDataSource(withoutConfig = true)
     }
 
     init {
