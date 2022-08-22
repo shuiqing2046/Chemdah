@@ -22,7 +22,7 @@ class ActionVariables {
             return frame.newFrame(key).run<Any>().thenApply {
                 frame.newFrame(default).run<Any>().thenApply { def ->
                     ChemdahAPI.getVariable(it.toString()) ?: def
-                }
+                }.join()
             }
         }
     }
