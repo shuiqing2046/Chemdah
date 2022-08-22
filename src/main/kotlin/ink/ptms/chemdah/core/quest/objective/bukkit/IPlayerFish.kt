@@ -2,6 +2,7 @@ package ink.ptms.chemdah.core.quest.objective.bukkit
 
 import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
+import org.bukkit.entity.Item
 import org.bukkit.event.player.PlayerFishEvent
 
 /**
@@ -29,6 +30,9 @@ object IPlayerFish : ObjectiveCountableI<PlayerFishEvent>() {
         }
         addSimpleCondition("entity:hook") { data, e ->
             data.toInferEntity().isEntity(e.hook)
+        }
+        addSimpleCondition("item") { data, e ->
+            data.toInferItem().isItem((e.caught as? Item)?.itemStack ?: return@addSimpleCondition false)
         }
         addSimpleCondition("state") { data, e ->
             data.asList().any { it.equals(e.state.name, true) }
