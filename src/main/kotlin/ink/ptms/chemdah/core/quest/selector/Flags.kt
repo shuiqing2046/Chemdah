@@ -35,11 +35,11 @@ enum class Flags(val match: (String, String) -> Boolean) {
             var result = this
             if (result == "*") {
                 flags.add(ALL)
-            } else if (result.startsWith('%') && result.startsWith('%')) {
+            } else if (result.startsWith('%') && result.endsWith('%')) {
                 result = result.substring(1, result.length - 1)
                 flags.add(TAG)
             } else {
-                if (result.startsWith('(') && result.startsWith(')')) {
+                if (result.startsWith('(') && result.endsWith(')')) {
                     result = result.substring(1, result.length - 1)
                     flags.add(CONTAINS)
                 }
