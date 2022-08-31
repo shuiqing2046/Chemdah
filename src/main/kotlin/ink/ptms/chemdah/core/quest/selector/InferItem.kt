@@ -2,14 +2,13 @@ package ink.ptms.chemdah.core.quest.selector
 
 import ink.ptms.chemdah.api.event.InferItemHookEvent
 import ink.ptms.chemdah.core.quest.selector.Flags.Companion.matchType
-import org.bukkit.Material
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.inventory.meta.PotionMeta
 import taboolib.common.platform.function.warning
-import taboolib.library.reflex.Reflex.Companion.invokeConstructor
 import taboolib.common5.Coerce
+import taboolib.library.reflex.Reflex.Companion.invokeConstructor
 import taboolib.module.nms.getItemTag
 import taboolib.module.nms.getName
 import taboolib.platform.util.hasItem
@@ -85,6 +84,7 @@ class InferItem(val items: List<Item>) {
 
         fun List<String>.toInferItem() = InferItem(map { it.toInferItem() })
 
+        @Suppress("DuplicatedCode")
         fun String.toInferItem(): Item {
             var type: String
             val data = HashMap<String, String>()

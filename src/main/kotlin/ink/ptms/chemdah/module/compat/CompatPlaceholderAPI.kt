@@ -6,7 +6,6 @@ import org.bukkit.entity.Player
 import taboolib.common.platform.function.adaptPlayer
 import taboolib.module.kether.KetherShell
 import taboolib.module.kether.printKetherErrorMessage
-import taboolib.module.kether.runKether
 import taboolib.platform.compat.PlaceholderExpansion
 
 /**

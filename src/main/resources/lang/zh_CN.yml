@@ -90,3 +90,17 @@ command-script-reload-all:
   - '&c[Chemdah] &7重载完成.'
 database-error: '&4&l错误! &r插件 &4&lChemdah&r 的数据库未完成初始化.'
 database-error-username: '&4&l警告! &r插件 &4&lChemdah&r 阻止改用户名进入服务器.'
+
+console-quest-locked:
+  - '&6[Checker] {0} 的任务 ({1}) 在被锁定状态下超过 1 秒.'
+  - '&6[Checker] 请检查脚本 (complete, failure, restart) 中是否存在延迟 (delay) 语句.'
+console-automation-plan-error:
+  - '&6[Automation] 任务 {0} 中的计划周期为 0，已自动修正。'
+  - '&6[Automation] 配置:'
+  - '&6{1}'
+console-automation-plan-out-of-date:
+  - '&6[Automation] {0} 的计划时间已过期, 无法分发任务: {1}, 当前时间: {2}'
+  - '&6[Automation] 调试:'
+  - '&6{3}'
+console-message-transmit-not-support: '&6[Developer] 1.19+ 不支持 "enable-message-transmit" 模式'
+console-infer-block-not-support: '&6方块材质不支持使用命名空间, 请使用 {0}'

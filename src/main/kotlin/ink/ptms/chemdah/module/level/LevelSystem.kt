@@ -12,7 +12,6 @@ import taboolib.common5.Coerce
 import taboolib.common5.compileJS
 import taboolib.module.configuration.Config
 import taboolib.module.configuration.Configuration
-import taboolib.module.configuration.SecuredFile
 import taboolib.module.kether.KetherShell
 import taboolib.module.kether.printKetherErrorMessage
 import java.util.concurrent.CompletableFuture

@@ -6,10 +6,12 @@ import ink.ptms.chemdah.core.quest.Option
 import ink.ptms.chemdah.core.quest.QuestContainer
 import ink.ptms.chemdah.util.namespaceQuest
 import taboolib.common.platform.function.adaptPlayer
+import taboolib.common.platform.function.warning
 import taboolib.common.util.asList
 import taboolib.common5.Coerce
-import taboolib.common5.mirrorFuture
 import taboolib.module.kether.KetherShell
+import taboolib.module.kether.printKetherErrorMessage
+import taboolib.module.kether.runKether
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -33,15 +35,21 @@ class AddonRestart(root: Any?, questContainer: QuestContainer) : Addon(root, que
         fun QuestContainer.canRestart(profile: PlayerProfile): CompletableFuture<Boolean> {
             return CompletableFuture<Boolean>().also { future ->
                 val reset = addon<AddonRestart>("restart")?.restart
-                if (reset == null || reset.isEmpty()) {
+                if (reset.isNullOrEmpty()) {
                     future.complete(false)
                 } else {
-                    KetherShell.eval(reset, sender = adaptPlayer(profile.player), namespace = namespaceQuest) {
-                        rootFrame().variables().also { vars ->
-                            vars.set("@QuestContainer", this@canRestart)
+                    try {
+                        KetherShell.eval(reset, sender = adaptPlayer(profile.player), namespace = namespaceQuest) {
+                            rootFrame().variables().also { vars ->
+                                vars.set("@QuestContainer", this@canRestart)
+                            }
+                        }.thenApply {
+                            future.complete(Coerce.toBoolean(it))
                         }
-                    }.thenApply {
-                        future.complete(Coerce.toBoolean(it))
+                    } catch (e: Throwable) {
+                        warning("path: $path, addon: restart, source: $reset")
+                        e.printKetherErrorMessage()
+                        future.complete(false)
                     }
                 }
             }

@@ -40,32 +40,6 @@ object QuestLoader {
     lateinit var groupConf: Configuration
         private set
 
-    @Schedule(period = 20, async = true)
-    fun tick20() {
-        Bukkit.getOnlinePlayers().filter { it.isChemdahProfileLoaded }.forEach { player ->
-            player.chemdahProfile.also { profile ->
-                // 检测所有有效任务
-                profile.getQuests().forEach { quest ->
-                    // 检测超时
-                    if (quest.isTimeout) {
-                        quest.failQuest()
-                    } else {
-                        // 检查条目自动完成
-                        quest.tasks.forEach { task ->
-                            // 处理需要自动检查的任务类型
-                            if (task.objective.isTickable) {
-                                handleTask(profile, task, quest, EMPTY_EVENT)
-                            }
-                            task.objective.checkComplete(profile, task, quest)
-                        }
-                        // 检查任务自动完成
-                        quest.checkComplete()
-                    }
-                }
-            }
-        }
-    }
-
     @Suppress("UNCHECKED_CAST")
     @Awake(LifeCycle.ENABLE)
     fun registerAll() {
@@ -97,7 +71,6 @@ object QuestLoader {
                     Meta::class.java.isAssignableFrom(it) -> {
                         ChemdahAPI.questMeta[id] = it as Class<out Meta<*>>
                     }
-
                     Addon::class.java.isAssignableFrom(it) -> {
                         ChemdahAPI.questAddon[id] = it as Class<out Addon>
                     }
@@ -120,9 +93,9 @@ object QuestLoader {
                     // 获取该监听器中的玩家对象
                     handler.apply(e)?.run {
                         if (isAsync) {
-                            submit(async = true) { handleEvent(this@run, e, this@register) }
+                            submitAsync { handleEvent(this@run, e) }
                         } else {
-                            handleEvent(this, e, this@register)
+                            handleEvent(this, e)
                         }
                     }
                 }
@@ -136,9 +109,8 @@ object QuestLoader {
      *
      * @param player 玩家
      * @param event 事件
-     * @param objective 条目类型
      */
-    fun <T : Any> handleEvent(player: Player, event: T, objective: Objective<T>) {
+    fun <T : Any> handleEvent(player: Player, event: T) {
         if (player.isChemdahProfileLoaded) {
             player.chemdahProfile.also { profile ->
                 // 通过事件获取所有正在进行的任务条目
@@ -160,8 +132,11 @@ object QuestLoader {
                 objective.onContinue(profile, task, quest, event)
                 task.agent(quest.profile, AgentType.TASK_CONTINUED)
                 ObjectiveEvents.Continue.Post(objective, task, quest, profile).call()
-                objective.checkComplete(profile, task, quest)
-                quest.checkComplete()
+                // 检查条目
+                objective.checkComplete(profile, task, quest).thenAccept {
+                    // 检查任务
+                    quest.checkCompleteFuture()
+                }
             }
         }
     }
@@ -206,10 +181,7 @@ object QuestLoader {
      */
     fun loadTemplate(file: File): List<Template> {
         return when {
-            file.isDirectory -> {
-                file.listFiles()?.flatMap { loadTemplate(it) }?.toList() ?: emptyList()
-            }
-
+            file.isDirectory -> file.listFiles()?.flatMap { loadTemplate(it) }?.toList() ?: emptyList()
             file.extension == "yml" || file.extension == "json" -> {
                 Configuration.loadFromFile(file).run {
                     getKeys(false).mapNotNull {
@@ -222,10 +194,7 @@ object QuestLoader {
                     }
                 }
             }
-
-            else -> {
-                emptyList()
-            }
+            else -> emptyList()
         }
     }
 
@@ -239,9 +208,8 @@ object QuestLoader {
             groupConf.getStringList("group.$group").forEach {
                 when {
                     it.startsWith("type:") -> {
-                        groupList += ChemdahAPI.questTemplate.values.filter { tem -> it.substring("type:".length) in tem.type() }
+                        groupList += ChemdahAPI.questTemplate.values.filter { tem -> it.substringAfter("type:") in tem.type() }
                     }
-
                     else -> {
                         val template = ChemdahAPI.getQuestTemplate(it)
                         if (template != null) {

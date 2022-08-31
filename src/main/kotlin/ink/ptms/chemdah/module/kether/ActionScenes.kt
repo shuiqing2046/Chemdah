@@ -18,12 +18,12 @@ import org.bukkit.event.player.PlayerTeleportEvent
 import taboolib.common.platform.Schedule
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
-import taboolib.library.reflex.Reflex.Companion.getProperty
-import taboolib.library.reflex.Reflex.Companion.invokeMethod
 import taboolib.common.util.Vector
 import taboolib.common5.Coerce
 import taboolib.library.kether.ArgTypes
 import taboolib.library.kether.ParsedAction
+import taboolib.library.reflex.Reflex.Companion.getProperty
+import taboolib.library.reflex.Reflex.Companion.invokeMethod
 import taboolib.library.xseries.parseToMaterial
 import taboolib.module.kether.*
 import taboolib.module.nms.MinecraftVersion

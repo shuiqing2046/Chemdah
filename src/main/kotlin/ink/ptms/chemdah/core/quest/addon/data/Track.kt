@@ -9,7 +9,6 @@ import taboolib.common.platform.function.submit
 import taboolib.common.util.Vector
 import taboolib.common.util.asList
 import taboolib.common5.Baffle
-import taboolib.common5.mirrorNow
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.module.chat.colored
 import taboolib.module.navigation.NodeEntity

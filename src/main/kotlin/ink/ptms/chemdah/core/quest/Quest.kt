@@ -10,7 +10,8 @@ import ink.ptms.chemdah.core.quest.addon.AddonRestart.Companion.canRestart
 import ink.ptms.chemdah.core.quest.addon.AddonTimeout.Companion.isTimeout
 import ink.ptms.chemdah.core.quest.addon.data.ControlTrigger
 import org.bukkit.entity.Player
-import taboolib.common5.mirrorFuture
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.CopyOnWriteArraySet
 
 /**
  * Chemdah
@@ -62,6 +63,11 @@ class Quest(val id: String, val profile: PlayerProfile, val persistentDataContai
      */
     var newQuest = false
 
+    /**
+     * 启用时任务将被锁定
+     */
+    var lock = false
+
     init {
         persistentDataContainer["start"] = System.currentTimeMillis()
         profile.persistentDataContainer.remove("quest.complete.$id")
@@ -78,14 +84,29 @@ class Quest(val id: String, val profile: PlayerProfile, val persistentDataContai
     fun getTask(id: String) = tasks.firstOrNull { it.id == id }
 
     /**
+     * 强制完成任务
+     */
+    fun completeQuest() {
+        tasks.forEach { it.objective.setCompletedSignature(profile, it, true) }
+        checkCompleteFuture()
+    }
+
+    /**
      * 检查任务的所有条目
      * 当所有条目均已完成时任务完成
      */
+    @Deprecated("Use checkCompleteFuture", ReplaceWith("checkCompleteFuture()"))
     fun checkComplete() {
+        checkCompleteFuture()
+    }
+
+    fun checkCompleteFuture(): CompletableFuture<Boolean> {
+        val future = CompletableFuture<Boolean>()
         template.canRestart(profile).thenAccept { reset ->
             if (reset) {
-                restartQuest()
+                restartQuestFuture().thenAccept { future.complete(false) }
             } else {
+                // 所有条目均已完成且通过事件检查
                 if (tasks.all { it.objective.hasCompletedSignature(profile, it) } && QuestEvents.Complete.Pre(this@Quest, profile).call()) {
                     template.agent(profile, AgentType.QUEST_COMPLETE).thenAccept {
                         if (it) {
@@ -95,24 +116,26 @@ class Quest(val id: String, val profile: PlayerProfile, val persistentDataContai
                             template.agent(profile, AgentType.QUEST_COMPLETED)
                             QuestEvents.Complete.Post(this@Quest, profile).call()
                         }
+                        future.complete(it)
                     }
+                } else {
+                    future.complete(false)
                 }
             }
         }
-    }
-
-    /**
-     * 完成任务
-     */
-    fun completeQuest() {
-        tasks.forEach { it.objective.setCompletedSignature(profile, it, true) }
-        checkComplete()
+        return future
     }
 
     /**
      * 放弃任务
      */
+    @Deprecated("Use failQuestFuture", ReplaceWith("failQuestFuture()"))
     fun failQuest() {
+        failQuestFuture()
+    }
+
+    fun failQuestFuture(): CompletableFuture<Boolean> {
+        val future = CompletableFuture<Boolean>()
         if (QuestEvents.Fail.Pre(this@Quest, profile).call()) {
             template.agent(profile, AgentType.QUEST_FAIL).thenAccept {
                 if (it) {
@@ -121,14 +144,24 @@ class Quest(val id: String, val profile: PlayerProfile, val persistentDataContai
                     template.agent(profile, AgentType.QUEST_FAILED)
                     QuestEvents.Fail.Post(this@Quest, profile).call()
                 }
+                future.complete(it)
             }
+        } else {
+            future.complete(false)
         }
+        return future
     }
 
     /**
      * 重置任务
      */
+    @Deprecated("Use restartQuestFuture", ReplaceWith("restartQuestFuture()"))
     fun restartQuest() {
+        restartQuestFuture()
+    }
+
+    fun restartQuestFuture(): CompletableFuture<Boolean> {
+        val future = CompletableFuture<Boolean>()
         if (QuestEvents.Restart.Pre(this@Quest, profile).call()) {
             template.agent(profile, AgentType.QUEST_RESTART).thenAccept {
                 if (it) {
@@ -143,7 +176,11 @@ class Quest(val id: String, val profile: PlayerProfile, val persistentDataContai
                     template.agent(profile, AgentType.QUEST_RESTARTED)
                     QuestEvents.Restart.Post(this@Quest, profile).call()
                 }
+                future.complete(it)
             }
+        } else {
+            future.complete(false)
         }
+        return future
     }
 }

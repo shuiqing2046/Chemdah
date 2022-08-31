@@ -12,11 +12,10 @@ import ink.ptms.chemdah.util.namespaceQuest
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import taboolib.common.platform.function.adaptCommandSender
-import taboolib.common.platform.function.info
 import taboolib.common.platform.function.submit
+import taboolib.common.platform.function.submitAsync
 import taboolib.common.util.asList
 import taboolib.common5.Coerce
-import taboolib.common5.mirrorNow
 import taboolib.module.kether.KetherShell
 import taboolib.module.kether.printKetherErrorMessage
 import java.util.*
@@ -84,9 +83,7 @@ class PlayerProfile(val uniqueId: UUID) {
         questMap.remove(quest.id)
         // 释放数据
         if (release) {
-            submit(async = true) {
-                Database.INSTANCE.releaseQuest(player, this@PlayerProfile, quest)
-            }
+            submitAsync { Database.INSTANCE.releaseQuest(player, this@PlayerProfile, quest) }
         }
         QuestEvents.Unregistered(quest, this).call()
     }

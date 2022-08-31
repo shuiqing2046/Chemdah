@@ -7,7 +7,6 @@ import ink.ptms.chemdah.core.quest.addon.AddonControl.Companion.control
 import ink.ptms.chemdah.core.quest.addon.data.ControlTrigger
 import ink.ptms.chemdah.core.quest.meta.Meta
 import taboolib.common.util.asList
-import taboolib.common5.mirrorFuture
 import taboolib.library.configuration.ConfigurationSection
 import java.util.concurrent.CompletableFuture
 

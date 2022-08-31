@@ -25,7 +25,7 @@ object IPlayerCommand : ObjectiveCountableI<PlayerCommandPreprocessEvent>() {
             data.toPosition().inside(e.player.location)
         }
         addSimpleCondition("command") { data, e ->
-            e.message.startsWith(toString(), true)
+            e.message.startsWith(data.toString(), true)
         }
         addConditionVariable("command") {
             it.message

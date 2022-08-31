@@ -8,6 +8,7 @@ import ink.ptms.chemdah.core.quest.Quest
 import org.bukkit.entity.Player
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
+import taboolib.common.platform.function.submitAsync
 import taboolib.common5.Coerce
 import taboolib.module.database.ColumnOptionSQL
 import taboolib.module.database.ColumnTypeSQL
@@ -328,7 +329,7 @@ class DatabaseSQL : Database() {
         if (user == -1L) {
             return playerProfile
         }
-        submit(async = true) { updateUserTime(user) }
+        submitAsync { updateUserTime(user) }
         return playerProfile.init()
     }
 

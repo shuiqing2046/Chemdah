@@ -3,6 +3,7 @@ package ink.ptms.chemdah.core.quest.objective.bukkit
 import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import org.bukkit.event.player.AsyncPlayerChatEvent
+import taboolib.common.platform.event.EventPriority
 
 /**
  * Chemdah
@@ -16,6 +17,7 @@ object IPlayerChat : ObjectiveCountableI<AsyncPlayerChatEvent>() {
 
     override val name = "player chat"
     override val event = AsyncPlayerChatEvent::class.java
+    override val priority = EventPriority.LOWEST
 
     init {
         handler {

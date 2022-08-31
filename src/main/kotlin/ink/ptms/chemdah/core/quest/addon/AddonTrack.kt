@@ -15,9 +15,6 @@ import ink.ptms.chemdah.api.event.collect.QuestEvents
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.*
 import ink.ptms.chemdah.core.quest.addon.AddonDepend.Companion.isQuestDependCompleted
-import ink.ptms.chemdah.core.quest.addon.AddonTrack.Companion.displayTrackLandmark
-import ink.ptms.chemdah.core.quest.addon.AddonTrack.Companion.track
-import ink.ptms.chemdah.core.quest.addon.AddonTrack.Companion.trackQuest
 import ink.ptms.chemdah.core.quest.addon.AddonUI.Companion.ui
 import ink.ptms.chemdah.core.quest.addon.data.*
 import ink.ptms.chemdah.core.quest.meta.MetaName.Companion.displayName
@@ -36,11 +33,11 @@ import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.adaptCommandSender
 import taboolib.common.platform.function.submit
+import taboolib.common.platform.function.submitAsync
 import taboolib.common.platform.function.warning
 import taboolib.common.util.asList
 import taboolib.common5.Baffle
 import taboolib.common5.Coerce
-import taboolib.common5.mirrorNow
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.module.chat.TellrawJson
 import taboolib.module.chat.colored
@@ -68,7 +65,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
     val center by lazy {
         val center = config.getString("center")
         when {
-            center == null || center.isEmpty() -> object : TrackCenter {
+            center.isNullOrEmpty() -> object : TrackCenter {
 
                 override fun identifier(): String {
                     return "null"
@@ -572,7 +569,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
         @SubscribeEvent
         internal fun onMove(e: PlayerMoveEvent) {
             if (e.from.toVector() != e.to!!.toVector()) {
-                submit(async = true) { e.player.displayTrackLandmark() }
+                submitAsync { e.player.displayTrackLandmark() }
             }
         }
 
@@ -581,7 +578,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
          */
         @SubscribeEvent
         internal fun onMove(e: AdyeshachEntityTeleportEvent) {
-            submit(async = true) { e.entity.updateTrackLandmark() }
+            submitAsync { e.entity.updateTrackLandmark() }
         }
 
         @SubscribeEvent

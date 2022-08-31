@@ -90,3 +90,17 @@ command-script-reload-all:
   - '&c[Chemdah] &7Scripts has been reloaded.'
 database-error: '&4&lERROR! &rThe &4&lChemdah&r database failed to initialize.'
 database-error-username: '&4&lWARNING! &rThe &4&lChemdah&r blocked this username.'
+
+console-quest-locked:
+  - '&6[Checker] {0}''s quest ({1}) is locked for more than 1 second.'
+  - '&6[Checker] Please check the script (complete, failure, restart) for the presence of delay statements.'
+console-automation-plan-error:
+  - '&6[Automation] The schedule period in the quest {0} is 0 and has been automatically corrected'
+  - '&6[Automation] Config:'
+  - '&6{1}'
+console-automation-plan-out-of-date:
+  - '&6[Automation] The scheduled time for {0} has expired, Unable to distribute quest: {1}, Current time: {2}'
+  - '&6[Automation] Debug:'
+  - '&6{3}'
+console-message-transmit-not-support: '&6[Developer] 1.19+ does not support the "enable-message-transmit" mode'
+console-infer-block-not-support: '&6Block materials do not support namespace, please use {0}'

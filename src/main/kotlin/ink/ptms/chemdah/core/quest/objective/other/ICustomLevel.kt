@@ -9,7 +9,6 @@ import ink.ptms.chemdah.core.quest.objective.Progress
 import ink.ptms.chemdah.core.quest.objective.Progress.Companion.toProgress
 import ink.ptms.chemdah.module.level.LevelSystem
 import ink.ptms.chemdah.module.level.LevelSystem.getLevel
-import taboolib.platform.util.countItem
 
 /**
  * Chemdah

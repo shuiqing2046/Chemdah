@@ -4,7 +4,6 @@ import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.objective.Progress.Companion.toProgress
-import taboolib.common5.Coerce
 
 /**
  * Chemdah

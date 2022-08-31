@@ -1,14 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective.other
 
-import ink.ptms.chemdah.core.PlayerProfile
-import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
-import ink.ptms.chemdah.core.quest.objective.Progress
-import ink.ptms.chemdah.core.quest.objective.Progress.Companion.toProgress
 import org.bukkit.event.Event
-import taboolib.common.platform.function.info
-import taboolib.common5.Coerce
-import taboolib.platform.util.countItem
 import taboolib.platform.util.hasItem
 import taboolib.platform.util.takeItem
 

@@ -2,8 +2,6 @@ package ink.ptms.chemdah.core.quest.objective.other
 
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import org.bukkit.event.Event
-import taboolib.platform.util.hasItem
-import taboolib.platform.util.takeItem
 
 /**
  * Chemdah

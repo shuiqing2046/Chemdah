@@ -252,13 +252,14 @@ object ChemdahAPI {
         Module.reload()
     }
 
-    fun invokeKether(source: String, player: Player, vars: Map<String, Any>): CompletableFuture<Any?> {
+    fun invokeKether(source: String, player: Player? = null, vars: Map<String, Any> = emptyMap()): CompletableFuture<Any?> {
         val map = KetherShell.VariableMap(*vars.map { it.key to it.value }.toTypedArray())
-        return KetherShell.eval(source, sender = adaptPlayer(player), namespace = namespace, vars = map)
+        return KetherShell.eval(source, sender = if (player != null) adaptPlayer(player) else null, namespace = namespace, vars = map)
     }
 
-    fun parseFunction(source: String, player: Player): String {
-        return KetherFunction.parse(source, sender = adaptPlayer(player), namespace = namespace)
+    fun parseFunction(source: String, player: Player? = null, vars: Map<String, Any> = emptyMap()): String {
+        val map = KetherShell.VariableMap(*vars.map { it.key to it.value }.toTypedArray())
+        return KetherFunction.parse(source, sender = if (player != null) adaptPlayer(player) else null, namespace = namespace, vars = map)
     }
 
     @Awake(LifeCycle.ACTIVE)

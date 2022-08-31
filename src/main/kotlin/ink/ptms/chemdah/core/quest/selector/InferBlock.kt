@@ -2,8 +2,9 @@ package ink.ptms.chemdah.core.quest.selector
 
 import ink.ptms.chemdah.core.bukkit.NMS
 import ink.ptms.chemdah.core.quest.selector.Flags.Companion.matchType
-import taboolib.library.reflex.Reflex.Companion.getProperty
-import taboolib.library.reflex.Reflex.Companion.invokeMethod
+import taboolib.common.platform.function.console
+import taboolib.common.platform.function.warning
+import taboolib.module.lang.sendLang
 import taboolib.module.nms.MinecraftVersion
 
 /**
@@ -46,10 +47,11 @@ class InferBlock(val mats: List<Block>) {
 
     companion object {
 
-        fun List<String>.toInferBlock() = InferBlock(map { it.toBlock() })
+        fun List<String>.toInferBlock() = InferBlock(map { it.toInferBlock() })
 
-        private fun String.toBlock(): Block {
-            val type: String
+        @Suppress("DuplicatedCode")
+        fun String.toInferBlock(): Block {
+            var type: String
             val data = HashMap<String, String>()
             val flag = ArrayList<Flags>()
             if (indexOf('[') > -1 && endsWith(']')) {
@@ -62,6 +64,11 @@ class InferBlock(val mats: List<Block>) {
                 }
             } else {
                 type = this
+            }
+            // 方块材质不支持命名空间
+            if (contains("minecraft:")) {
+                type = substringAfter("minecraft:")
+                console().sendLang("console-infer-block-not-support", type)
             }
             return Block(type.matchType(flag), flag, data)
         }

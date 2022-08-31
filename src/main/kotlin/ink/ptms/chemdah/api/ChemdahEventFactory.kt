@@ -3,7 +3,6 @@ package ink.ptms.chemdah.api
 import ink.ptms.chemdah.api.event.plugin.CollectEvent
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Quest
-import taboolib.common.platform.function.info
 
 /**
  * Chemdah

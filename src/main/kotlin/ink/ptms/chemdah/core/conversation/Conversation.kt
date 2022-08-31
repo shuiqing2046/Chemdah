@@ -6,7 +6,6 @@ import ink.ptms.chemdah.util.namespaceConversationNPC
 import org.bukkit.entity.Player
 import taboolib.common.platform.function.warning
 import taboolib.common5.Coerce
-import taboolib.common5.mirrorFuture
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.module.kether.KetherFunction
 import taboolib.module.kether.KetherShell

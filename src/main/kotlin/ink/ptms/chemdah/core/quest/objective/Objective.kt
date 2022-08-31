@@ -7,11 +7,12 @@ import ink.ptms.chemdah.core.quest.AgentType
 import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.addon.AddonRestart.Companion.canRestart
-import ink.ptms.chemdah.core.quest.objective.Progress.Companion.toProgress
-import ink.ptms.chemdah.util.*
+import ink.ptms.chemdah.util.Couple
+import ink.ptms.chemdah.util.Function2
+import ink.ptms.chemdah.util.Function3
+import ink.ptms.chemdah.util.safely
 import org.bukkit.entity.Player
 import taboolib.common.platform.event.EventPriority
-import taboolib.common5.mirrorFuture
 import java.util.concurrent.CompletableFuture
 import java.util.function.Function
 
@@ -173,28 +174,35 @@ abstract class Objective<E : Any> {
      * 优先检测重置条件
      * 满足时则不会完成条目
      */
-    open fun checkComplete(profile: PlayerProfile, task: Task, quest: Quest) {
-        if (!hasCompletedSignature(profile, task)) {
-            task.canRestart(profile).thenAccept { r ->
-                if (r) {
-                    if (ObjectiveEvents.Restart.Pre(this@Objective, task, quest, profile).call()) {
-                        onReset(profile, task, quest)
-                        task.agent(quest.profile, AgentType.TASK_RESTARTED)
-                        ObjectiveEvents.Restart.Post(this@Objective, task, quest, profile).call()
-                    }
-                } else {
-                    checkGoal(profile, quest, task).thenAccept {
-                        if (it && !hasCompletedSignature(profile, task)) {
-                            if (ObjectiveEvents.Complete.Pre(this@Objective, task, quest, profile).call()) {
-                                onComplete(profile, task, quest)
-                                task.agent(quest.profile, AgentType.TASK_COMPLETED)
-                                ObjectiveEvents.Complete.Post(this@Objective, task, quest, profile).call()
-                            }
-                        }
+    open fun checkComplete(profile: PlayerProfile, task: Task, quest: Quest): CompletableFuture<Boolean> {
+        if (hasCompletedSignature(profile, task)) {
+            return CompletableFuture.completedFuture(true)
+        }
+        val future = CompletableFuture<Boolean>()
+        task.canRestart(profile).thenAccept { r ->
+            // 是否重启任务
+            if (r) {
+                if (ObjectiveEvents.Restart.Pre(this@Objective, task, quest, profile).call()) {
+                    onReset(profile, task, quest)
+                    task.agent(quest.profile, AgentType.TASK_RESTARTED)
+                    ObjectiveEvents.Restart.Post(this@Objective, task, quest, profile).call()
+                }
+                future.complete(false)
+            } else {
+                checkGoal(profile, quest, task).thenAccept {
+                    // 目标达成 && 任务未完成 && 事件通过
+                    if (it && !hasCompletedSignature(profile, task) && ObjectiveEvents.Complete.Pre(this@Objective, task, quest, profile).call()) {
+                        onComplete(profile, task, quest)
+                        task.agent(quest.profile, AgentType.TASK_COMPLETED)
+                        ObjectiveEvents.Complete.Post(this@Objective, task, quest, profile).call()
+                        future.complete(true)
+                    } else {
+                        future.complete(false)
                     }
                 }
             }
         }
+        return future
     }
 
     /**

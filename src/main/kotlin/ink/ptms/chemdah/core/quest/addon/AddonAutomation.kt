@@ -8,11 +8,13 @@ import ink.ptms.chemdah.core.quest.*
 import ink.ptms.chemdah.core.quest.addon.data.*
 import org.bukkit.Bukkit
 import taboolib.common.platform.Schedule
+import taboolib.common.platform.function.console
 import taboolib.common.platform.function.warning
 import taboolib.common5.Coerce
 import taboolib.common5.RealTime
 import taboolib.library.configuration.ConfigurationSection
-import java.util.Date
+import taboolib.module.lang.sendLang
+import java.util.*
 import kotlin.random.Random
 
 /**
@@ -57,11 +59,7 @@ class AddonAutomation(source: ConfigurationSection, questContainer: QuestContain
         if (type != null) {
             if (type.value == 0) {
                 type.value = 1
-                warning("[Automation] 任务 ${questContainer.id} 中的计划周期为 0，已自动修正。")
-                warning("[Automation] 配置:")
-                source.toString().lines().forEach {
-                    warning("[Automation]  | $it")
-                }
+                console().sendLang("console-automation-plan-error", questContainer.id, source)
             }
             Plan(type, source.getInt("plan.count", 1), source.getString("plan.group"))
         } else {
@@ -128,8 +126,7 @@ class AddonAutomation(source: ConfigurationSection, questContainer: QuestContain
                         val newTime = group.plan.nextTime
                         if (newTime < System.currentTimeMillis()) {
                             val now = Date(System.currentTimeMillis())
-                            warning("[Automation] $id 的计划时间已过期, 无法分发任务: ${Date(newTime)}, 当前时间: $now")
-                            warning("[Automation] 调试: ${group.plan.debug}")
+                            console().sendLang("console-automation-plan-out-of-date", id, Date(newTime), now, group.plan.debug)
                             return@self
                         }
                         profile.persistentDataContainer["quest.automation.$id.next"] = newTime

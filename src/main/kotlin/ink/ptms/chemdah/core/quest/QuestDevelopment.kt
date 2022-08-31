@@ -10,10 +10,13 @@ import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockPlaceEvent
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
+import taboolib.common.platform.function.console
 import taboolib.common.platform.function.getDataFolder
-import taboolib.library.reflex.Reflex.Companion.getProperty
+import taboolib.common.platform.function.warning
 import taboolib.common5.Coerce
+import taboolib.library.reflex.Reflex.Companion.getProperty
 import taboolib.module.configuration.Configuration
+import taboolib.module.lang.sendLang
 import taboolib.module.nms.MinecraftVersion
 import taboolib.module.nms.PacketSendEvent
 import taboolib.module.nms.sendPacket
@@ -31,7 +34,6 @@ import java.util.concurrent.CopyOnWriteArrayList
 object QuestDevelopment {
 
     private val playerRelease = ConcurrentHashMap<String, MutableList<String>>()
-
     private val playerMessageCache = ConcurrentHashMap<String, MutableList<Any>>()
 
     var enableUniqueBlock = false
@@ -43,6 +45,12 @@ object QuestDevelopment {
             val conf = Configuration.loadFromFile(file)
             enableUniqueBlock = conf.getBoolean("enable-unique-block")
             enableMessageTransmit = conf.getBoolean("enable-message-transmit")
+
+            // 1.19 版本下该功能暂时停用
+            if (MinecraftVersion.majorLegacy >= 11900) {
+                enableMessageTransmit = false
+                console().sendLang("console-message-transmit-not-support")
+            }
         }
     }
 

@@ -22,7 +22,7 @@ import taboolib.common.platform.Schedule
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.pluginId
 import taboolib.common.platform.function.submit
-import taboolib.common5.mirrorNow
+import taboolib.common.platform.function.submitAsync
 import taboolib.platform.util.asLangText
 
 /**
@@ -144,7 +144,7 @@ abstract class Database {
         internal fun onReleased(e: PlayerEvents.Released) {
             val playerProfile = ChemdahAPI.playerProfile.remove(e.player.name)
             if (playerProfile?.isDataChanged == true) {
-                submit(async = true) {
+                submitAsync {
                     INSTANCE.update(e.player, playerProfile)
                     PlayerEvents.Updated(e.player, playerProfile).call()
                 }

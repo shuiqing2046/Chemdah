@@ -5,8 +5,8 @@ import ink.ptms.chemdah.core.quest.selector.Flags.Companion.matchType
 import ink.ptms.um.Mythic
 import net.citizensnpcs.api.CitizensAPI
 import taboolib.common.platform.function.warning
-import taboolib.library.reflex.Reflex.Companion.invokeConstructor
 import taboolib.common5.Coerce
+import taboolib.library.reflex.Reflex.Companion.invokeConstructor
 import taboolib.module.nms.getI18nName
 
 /**
@@ -94,6 +94,7 @@ class InferEntity(val entities: List<Entity>) {
 
         fun List<String>.toInferEntity() = InferEntity(map { it.toInferEntity() })
 
+        @Suppress("DuplicatedCode")
         fun String.toInferEntity(): Entity {
             var type: String
             val data = HashMap<String, String>()

@@ -2,6 +2,7 @@ package ink.ptms.chemdah.module.kether
 
 import ink.ptms.chemdah.api.ChemdahAPI
 import taboolib.common.platform.function.submit
+import taboolib.common.platform.function.submitAsync
 import taboolib.library.kether.ArgTypes
 import taboolib.library.kether.ParsedAction
 import taboolib.module.kether.*
@@ -38,11 +39,11 @@ class ActionVariables {
             return frame.newFrame(key).run<Any>().thenAccept { key ->
                 frame.newFrame(value).run<Any>().thenAccept { value ->
                     frame.newFrame(default).run<Any>().thenAccept { def ->
-                        submit(async = true) {
+                        submitAsync {
                             ChemdahAPI.setVariable(key.toString(), value?.toString(), symbol == PlayerOperator.Method.INCREASE, default = def?.toString())
                         }
-                    }
-                }
+                    }.join()
+                }.join()
             }
         }
     }

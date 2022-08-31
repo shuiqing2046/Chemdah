@@ -5,7 +5,6 @@ import ink.ptms.chemdah.module.Module.Companion.register
 import taboolib.common.platform.Awake
 import taboolib.module.configuration.Config
 import taboolib.module.configuration.Configuration
-import taboolib.module.configuration.SecuredFile
 
 @Awake
 object ScenesSystem : Module {

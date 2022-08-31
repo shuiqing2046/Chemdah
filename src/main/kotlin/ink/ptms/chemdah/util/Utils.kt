@@ -6,10 +6,10 @@ import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.potion.PotionEffect
-import taboolib.library.reflex.Reflex.Companion.setProperty
 import taboolib.common5.Coerce
 import taboolib.common5.Demand.Companion.toDemand
 import taboolib.library.configuration.ConfigurationSection
+import taboolib.library.reflex.Reflex.Companion.setProperty
 import taboolib.library.xseries.XBlock
 import taboolib.library.xseries.XMaterial
 import taboolib.module.configuration.Configuration

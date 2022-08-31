@@ -9,7 +9,6 @@ import taboolib.common.platform.function.adaptPlayer
 import taboolib.common.util.asList
 import taboolib.common5.Coerce
 import taboolib.library.configuration.ConfigurationSection
-import taboolib.module.kether.Kether
 import taboolib.module.kether.KetherShell
 import taboolib.module.kether.printKetherErrorMessage
 import java.io.File
