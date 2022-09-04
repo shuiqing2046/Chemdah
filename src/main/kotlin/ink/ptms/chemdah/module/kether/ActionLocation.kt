@@ -14,6 +14,7 @@ import java.util.concurrent.CompletableFuture
  * @author sky
  * @since 2021/2/10 6:39 下午
  */
+@Suppress("DuplicatedCode")
 class ActionLocation {
 
     class LocationFunc(val location: ParsedAction<*>, val value: ParsedAction<*>, val func: (Location, Any) -> Any) : ScriptAction<Any>() {

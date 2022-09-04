@@ -1,6 +1,7 @@
 package ink.ptms.chemdah.module.kether
 
 import ink.ptms.chemdah.api.ChemdahAPI.callTrigger
+import ink.ptms.chemdah.util.getBukkitPlayer
 import org.bukkit.entity.Player
 import taboolib.module.kether.*
 import java.util.concurrent.CompletableFuture
@@ -12,22 +13,14 @@ import java.util.concurrent.CompletableFuture
  * @author sky
  * @since 2021/2/10 6:39 下午
  */
-class ActionTrigger(val trigger: String) : ScriptAction<Void>() {
+internal object ActionTrigger {
 
-    override fun run(frame: ScriptFrame): CompletableFuture<Void> {
-        val player = frame.script().sender?.castSafely<Player>() ?: error("No player selected.")
-        player.callTrigger(trigger)
-        return CompletableFuture.completedFuture(null)
-    }
-
-    companion object {
-
-        /**
-         * trigger def
-         */
-        @KetherParser(["trigger"], shared = true)
-        fun parser() = scriptParser {
-            ActionTrigger(it.nextToken())
-        }
+    /**
+     * trigger def
+     */
+    @KetherParser(["trigger"], shared = true)
+    fun parser() = scriptParser {
+        val trigger = it.nextParsedAction()
+        actionTake { run(trigger).str { t -> getBukkitPlayer().callTrigger(t) } }
     }
 }

@@ -8,7 +8,7 @@ import ink.ptms.adyeshach.common.entity.type.AdyFallingBlock
 import ink.ptms.chemdah.api.event.collect.PlayerEvents
 import ink.ptms.chemdah.module.scenes.ScenesBlockData
 import ink.ptms.chemdah.module.scenes.ScenesSystem
-import ink.ptms.chemdah.util.getPlayer
+import ink.ptms.chemdah.util.getBukkitPlayer
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -53,9 +53,9 @@ class ActionScenes {
         override fun run(frame: ScriptFrame): CompletableFuture<Void> {
             return frame.newFrame(location).run<Location>().thenAccept { location ->
                 if (falling) {
-                    frame.getPlayer().createScenesFallingBlock(location, material, data, solid)
+                    frame.getBukkitPlayer().createScenesFallingBlock(location, material, data, solid)
                 } else {
-                    frame.getPlayer().createScenesBlock(location, material, data)
+                    frame.getBukkitPlayer().createScenesBlock(location, material, data)
                 }
             }
         }
@@ -77,9 +77,9 @@ class ActionScenes {
                 frame.newFrame(copy).run<Location>().thenAccept { copy ->
                     val block = copy.block
                     if (falling) {
-                        frame.getPlayer().createScenesFallingBlock(location, block.type, block.data, solid)
+                        frame.getBukkitPlayer().createScenesFallingBlock(location, block.type, block.data, solid)
                     } else {
-                        frame.getPlayer().createScenesBlock(location, block.type, block.data)
+                        frame.getBukkitPlayer().createScenesBlock(location, block.type, block.data)
                     }
                 }
             }
@@ -155,13 +155,13 @@ class ActionScenes {
                         "state" -> {
                             val state = it.nextInt()
                             actionNow {
-                                ScenesSystem.scenesMap[file]?.state?.firstOrNull { s -> s.index == state }?.send(getPlayer())
+                                ScenesSystem.scenesMap[file]?.state?.firstOrNull { s -> s.index == state }?.send(getBukkitPlayer())
                             }
                         }
                         "cancel" -> {
                             val state = it.nextInt()
                             actionNow {
-                                ScenesSystem.scenesMap[file]?.state?.firstOrNull { s -> s.index == state }?.cancel(getPlayer())
+                                ScenesSystem.scenesMap[file]?.state?.firstOrNull { s -> s.index == state }?.cancel(getBukkitPlayer())
                             }
                         }
                         else -> error("out of case")
@@ -171,7 +171,7 @@ class ActionScenes {
                     val loc = it.next(ArgTypes.ACTION)
                     actionNow {
                         newFrame(loc).run<Location>().thenAccept { loc ->
-                            getPlayer().removeScenesBlock(loc)
+                            getBukkitPlayer().removeScenesBlock(loc)
                         }
                     }
                 }

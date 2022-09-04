@@ -1,10 +1,11 @@
 package ink.ptms.chemdah.module.kether
 
-import ink.ptms.chemdah.core.quest.selector.InferArea
 import ink.ptms.chemdah.core.quest.selector.InferArea.Companion.toInferArea
-import ink.ptms.chemdah.util.getPlayer
-import taboolib.module.kether.*
-import java.util.concurrent.CompletableFuture
+import ink.ptms.chemdah.util.getBukkitPlayer
+import taboolib.module.kether.KetherParser
+import taboolib.module.kether.actionNow
+import taboolib.module.kether.expects
+import taboolib.module.kether.scriptParser
 
 /**
  * Chemdah
@@ -13,21 +14,15 @@ import java.util.concurrent.CompletableFuture
  * @author sky
  * @since 2021/2/10 6:39 下午
  */
-class ActionPosition(val area: InferArea) : ScriptAction<Boolean>() {
+object ActionPosition {
 
-    override fun run(frame: ScriptFrame): CompletableFuture<Boolean> {
-        return CompletableFuture.completedFuture(area.inside(frame.getPlayer().location))
-    }
-
-    companion object {
-
-        /**
-         * position inside "world 0 0 0 > 10 10 10"
-         */
-        @KetherParser(["position"], shared = true)
-        fun parser() = scriptParser {
-            it.expects("is", "in", "inside")
-            ActionPosition(it.nextToken().toInferArea())
-        }
+    /**
+     * position inside "world 0 0 0 > 10 10 10"
+     */
+    @KetherParser(["position"], shared = true)
+    fun parser() = scriptParser {
+        it.expects("is", "in", "inside")
+        val area = it.nextToken().toInferArea()
+        actionNow { area.inside(getBukkitPlayer().location) }
     }
 }

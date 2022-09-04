@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.module.kether
 
 import ink.ptms.chemdah.util.Effect
-import ink.ptms.chemdah.util.getPlayer
+import ink.ptms.chemdah.util.getBukkitPlayer
 import org.bukkit.Location
 import taboolib.library.kether.ArgTypes
 import taboolib.library.kether.ParsedAction
@@ -22,7 +22,7 @@ class ActionParticle {
         override fun run(frame: ScriptFrame): CompletableFuture<Void> {
             return frame.newFrame(location).run<Location>().thenAccept {
                 if (self) {
-                    effect.run(it, frame.getPlayer())
+                    effect.run(it, frame.getBukkitPlayer())
                 } else {
                     effect.run(it)
                 }

@@ -2,7 +2,8 @@ package ink.ptms.chemdah.module.kether
 
 import ink.ptms.chemdah.core.quest.selector.InferItem
 import ink.ptms.chemdah.core.quest.selector.InferItem.Companion.toInferItem
-import ink.ptms.chemdah.util.getPlayer
+import ink.ptms.chemdah.util.getBukkitPlayer
+import taboolib.library.kether.ParsedAction
 import taboolib.library.kether.QuestReader
 import taboolib.module.kether.*
 import taboolib.platform.util.isNotAir
@@ -18,10 +19,10 @@ import java.util.concurrent.CompletableFuture
  */
 class ActionInventory {
 
-    class InventoryTake(val item: InferItem.Item, val amount: Int) : ScriptAction<Boolean>() {
+    class InventoryTake(val item: InferItem.Item, val amount: ParsedAction<*>) : ScriptAction<Any?>() {
 
-        override fun run(frame: ScriptFrame): CompletableFuture<Boolean> {
-            return CompletableFuture.completedFuture(item.take(frame.getPlayer().inventory, amount))
+        override fun run(frame: ScriptFrame): CompletableFuture<Any?> {
+            return frame.run(amount).int { a -> item.take(frame.getBukkitPlayer().inventory, a) }
         }
     }
 
@@ -29,7 +30,7 @@ class ActionInventory {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Int> {
             var checkAmount = 0
-            frame.getPlayer().inventory.contents.forEach { itemStack ->
+            frame.getBukkitPlayer().inventory.contents.forEach { itemStack ->
                 if (itemStack.isNotAir() && item.match(itemStack)) {
                     checkAmount += itemStack.amount
                 }
@@ -38,42 +39,40 @@ class ActionInventory {
         }
     }
 
-    class InventoryCheck(val item: InferItem.Item, val amount: Int) : ScriptAction<Boolean>() {
+    class InventoryCheck(val item: InferItem.Item, val amount: ParsedAction<*>) : ScriptAction<Any?>() {
 
-        override fun run(frame: ScriptFrame): CompletableFuture<Boolean> {
-            return CompletableFuture.completedFuture(item.check(frame.getPlayer().inventory, amount))
+        override fun run(frame: ScriptFrame): CompletableFuture<Any?> {
+            return frame.run(amount).int { a -> item.check(frame.getBukkitPlayer().inventory, a) }
         }
     }
 
-    class InventorySlot(val slot: Int, val item: InferItem.Item, val amount: Int) : ScriptAction<Boolean>() {
+    class InventorySlot(val slot: ParsedAction<*>, val item: InferItem.Item, val amount: ParsedAction<*>) : ScriptAction<Any?>() {
 
-        override fun run(frame: ScriptFrame): CompletableFuture<Boolean> {
-            val equipment = frame.getPlayer().inventory.getItem(slot)
-            return if (equipment.isNotAir() && item.match(equipment!!)) {
-                CompletableFuture.completedFuture(equipment.amount >= amount)
-            } else {
-                CompletableFuture.completedFuture(false)
+        override fun run(frame: ScriptFrame): CompletableFuture<Any?> {
+            return frame.run(slot).int { slot ->
+                frame.run(amount).int { amount ->
+                    val equipment = frame.getBukkitPlayer().inventory.getItem(slot)
+                    if (equipment.isNotAir() && item.match(equipment!!)) {
+                        equipment.amount >= amount
+                    } else {
+                        false
+                    }
+                }.join()
             }
         }
     }
 
-    class InventoryEquipment(val equipment: BukkitEquipment, val item: InferItem.Item, val amount: Int) : ScriptAction<Boolean>() {
+    class InventoryEquipment(val equipment: BukkitEquipment, val item: InferItem.Item, val amount: ParsedAction<*>) : ScriptAction<Any?>() {
 
-        override fun run(frame: ScriptFrame): CompletableFuture<Boolean> {
-            val equipment = equipment.getItem(frame.getPlayer())
-            return if (equipment.isNotAir() && item.match(equipment!!)) {
-                CompletableFuture.completedFuture(equipment.amount >= amount)
-            } else {
-                CompletableFuture.completedFuture(false)
+        override fun run(frame: ScriptFrame): CompletableFuture<Any?> {
+            return frame.run(amount).int { amount ->
+                val equipment = equipment.getItem(frame.getBukkitPlayer())
+                if (equipment.isNotAir() && item.match(equipment!!)) {
+                    equipment.amount >= amount
+                } else {
+                    false
+                }
             }
-        }
-    }
-
-    class InventoryClose : ScriptAction<Void>() {
-
-        override fun run(frame: ScriptFrame): CompletableFuture<Void> {
-            frame.getPlayer().closeInventory()
-            return CompletableFuture.completedFuture(null)
         }
     }
 
@@ -89,55 +88,43 @@ class ActionInventory {
          */
         @KetherParser(["inventory"], shared = true)
         fun parser() = scriptParser {
-            it.switch {
-                case("count", "amount") {
-                    InventoryCount(it.nextToken().toInferItem())
+            when (val token = it.nextToken()) {
+                "close" -> actionNow { getBukkitPlayer().closeInventory() }
+                "count", "amount" -> InventoryCount(it.nextToken().toInferItem())
+                "has", "have", "check" -> InventoryCheck(it.nextToken().toInferItem(), matchAmount(it))
+                "take", "remove" -> InventoryTake(it.nextToken().toInferItem(), matchAmount(it))
+                "slot" -> {
+                    it.mark()
+                    try {
+                        it.expects("is", "match")
+                        InventorySlot(it.nextParsedAction(), it.nextToken().toInferItem(), matchAmount(it))
+                    } catch (ex: Exception) {
+                        it.reset()
+                        val slot = it.nextParsedAction()
+                        actionTake { run(slot).int { s -> getBukkitPlayer().inventory.getItem(s) } }
+                    }
                 }
-                case("has", "have", "check") {
-                    InventoryCheck(it.nextToken().toInferItem(), matchAmount(it))
-                }
-                case("take", "remove") {
-                    InventoryTake(it.nextToken().toInferItem(), matchAmount(it))
-                }
-                case("hand", "mainhand") {
-                    InventoryEquipment(BukkitEquipment.HAND, matchItem(it), matchAmount(it))
-                }
-                case("offhand") {
-                    InventoryEquipment(BukkitEquipment.OFF_HAND, matchItem(it), matchAmount(it))
-                }
-                case("head", "helmet") {
-                    InventoryEquipment(BukkitEquipment.HEAD, matchItem(it), matchAmount(it))
-                }
-                case("chest", "chestplate") {
-                    InventoryEquipment(BukkitEquipment.CHEST, matchItem(it), matchAmount(it))
-                }
-                case("legs", "leggings") {
-                    InventoryEquipment(BukkitEquipment.LEGS, matchItem(it), matchAmount(it))
-                }
-                case("boots", "feet") {
-                    InventoryEquipment(BukkitEquipment.FEET, matchItem(it), matchAmount(it))
-                }
-                case("slot") {
-                    InventorySlot(it.nextInt(), matchItem(it), matchAmount(it))
-                }
-                case("close") {
-                    InventoryClose()
+                else -> {
+                    val equip = BukkitEquipment.fromString(token) ?: error("Unknown inventory equipment: $token")
+                    it.mark()
+                    try {
+                        it.expects("is", "match")
+                        InventoryEquipment(equip, it.nextToken().toInferItem(), matchAmount(it))
+                    } catch (ex: Exception) {
+                        it.reset()
+                        actionNow { equip.getItem(getBukkitPlayer()) }
+                    }
                 }
             }
-        }
-
-        private fun matchItem(it: QuestReader) = it.run {
-            it.expect("is")
-            it.nextToken().toInferItem()
         }
 
         private fun matchAmount(it: QuestReader) = try {
             it.mark()
             it.expect("amount")
-            it.nextInt()
+            it.nextParsedAction()
         } catch (ex: Throwable) {
             it.reset()
-            1
+            literalAction(1)
         }
     }
 }

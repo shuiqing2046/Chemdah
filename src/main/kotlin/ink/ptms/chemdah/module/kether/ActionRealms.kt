@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.module.kether
 
 import ink.ptms.chemdah.module.realms.RealmsSystem.getRealms
-import ink.ptms.chemdah.util.getPlayer
+import ink.ptms.chemdah.util.getBukkitPlayer
 import taboolib.module.kether.KetherParser
 import taboolib.module.kether.actionNow
 import taboolib.module.kether.scriptParser
@@ -13,15 +13,10 @@ import taboolib.module.kether.scriptParser
  * @author sky
  * @since 2021/6/14 2:59 下午
  */
-class ActionRealms {
+internal object ActionRealms {
 
-    companion object {
-
-        @KetherParser(["realms"], namespace = "chemdah", shared = true)
-        fun max() = scriptParser {
-            actionNow {
-                getPlayer().location.getRealms()?.id.toString()
-            }
-        }
+    @KetherParser(["realms"], namespace = "chemdah", shared = true)
+    fun realms() = scriptParser {
+        actionNow { getBukkitPlayer().location.getRealms()?.id.toString() }
     }
 }

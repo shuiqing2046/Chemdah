@@ -17,6 +17,7 @@ import java.util.concurrent.CompletableFuture
  * @author sky
  * @since 2021/2/10 6:39 下午
  */
+@Suppress("DuplicatedCode")
 class UI {
 
     class UIBar(val plan: String, val include: List<String>, val exclude: List<String>) : ScriptAction<String>() {

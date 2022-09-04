@@ -40,7 +40,7 @@ taboolib {
     install("expansion-command-helper")
     install("expansion-javascript")
     classifier = null
-    version = "6.0.9-74"
+    version = "6.0.9-79"
     relocate("ink.ptms.um", "ink.ptms.chemdah.um")
 }
 
@@ -52,7 +52,7 @@ repositories {
 }
 
 dependencies {
-    taboo("ink.ptms:um:1.0.0-beta-15")
+    taboo("ink.ptms:um:1.0.0-beta-23")
     compileOnly("ink.ptms:error_reporter:1.0.0")
     compileOnly("net.milkbowl.vault:Vault:1")
     compileOnly("org.serverct.ersha.dungeon:DungeonPlus:1.1.3")

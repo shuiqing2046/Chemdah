@@ -66,14 +66,14 @@ fun ScriptFrame.getTask(): Task {
 }
 
 fun ScriptFrame.getSession(): Session {
-    return getPlayer().conversationSession ?: error("No session selected.")
+    return getBukkitPlayer().conversationSession ?: error("No session selected.")
 }
 
 fun ScriptFrame.getProfile(): PlayerProfile {
-    return getPlayer().chemdahProfile
+    return getBukkitPlayer().chemdahProfile
 }
 
-fun ScriptFrame.getPlayer(): Player {
+fun ScriptFrame.getBukkitPlayer(): Player {
     return script().sender?.castSafely<Player>() ?: error("No player selected.")
 }
 

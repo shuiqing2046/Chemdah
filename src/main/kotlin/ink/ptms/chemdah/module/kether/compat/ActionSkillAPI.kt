@@ -2,7 +2,7 @@ package ink.ptms.chemdah.module.kether.compat
 
 import com.sucy.skill.SkillAPI
 import com.sucy.skill.api.player.PlayerData
-import ink.ptms.chemdah.util.getPlayer
+import ink.ptms.chemdah.util.getBukkitPlayer
 import taboolib.module.kether.*
 import java.util.concurrent.CompletableFuture
 import java.util.function.Function
@@ -19,7 +19,7 @@ class ActionSkillAPI {
     class Base(val action: Function<PlayerData, Any>) : ScriptAction<Any>() {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Any> {
-            return CompletableFuture.completedFuture(action.apply(SkillAPI.getPlayerData(frame.getPlayer())))
+            return CompletableFuture.completedFuture(action.apply(SkillAPI.getPlayerData(frame.getBukkitPlayer())))
         }
     }
 

@@ -1,7 +1,7 @@
 package ink.ptms.chemdah.module.kether
 
 import ink.ptms.chemdah.api.event.collect.PlayerEvents
-import ink.ptms.chemdah.util.getPlayer
+import ink.ptms.chemdah.util.getBukkitPlayer
 import ink.ptms.chemdah.util.getProfile
 import ink.ptms.chemdah.util.namespace
 import taboolib.common.platform.event.SubscribeEvent
@@ -50,7 +50,7 @@ object ActionWorkflows {
                 content = content.lines().joinToString(" ") { i -> i.trim() }
                 data.set(id, content)
                 actionNow {
-                    fetchMap.computeIfAbsent(getPlayer().name) { ArrayList() } += script()
+                    fetchMap.computeIfAbsent(getBukkitPlayer().name) { ArrayList() } += script()
                     getProfile().persistentDataContainer.set("workflows.fetch.$id", true)
                 }
             }

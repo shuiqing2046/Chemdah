@@ -1,6 +1,6 @@
 package ink.ptms.chemdah.module.kether.compat
 
-import ink.ptms.chemdah.util.getPlayer
+import ink.ptms.chemdah.util.getBukkitPlayer
 import ink.ptms.um.Mythic
 import ink.ptms.um.Skill
 import taboolib.common.platform.function.submit
@@ -20,7 +20,7 @@ class ActionMythic {
     class MythicMobsCast(val mechanic: Skill, val trigger: Skill.Trigger) : ScriptAction<Void>() {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Void> {
-            val player = frame.getPlayer()
+            val player = frame.getBukkitPlayer()
             submit { mechanic.execute(trigger, player, player, emptySet(), emptySet(), 0f, emptyMap()) }
             return CompletableFuture.completedFuture(null);
         }

@@ -2,7 +2,7 @@ package ink.ptms.chemdah.module.kether
 
 import com.google.common.collect.ImmutableList
 import ink.ptms.chemdah.api.ChemdahAPI
-import ink.ptms.chemdah.util.getPlayer
+import ink.ptms.chemdah.util.getBukkitPlayer
 import taboolib.common.platform.function.adaptPlayer
 import taboolib.library.kether.ArgTypes
 import taboolib.library.kether.ParsedAction
@@ -33,11 +33,9 @@ class ActionScript {
                     val script = ChemdahAPI.workspace.scripts[name]
                     if (script != null) {
                         try {
-                            ChemdahAPI.workspace.runScript(if (self) "$name@${frame.getPlayer().name}" else name, ScriptContext.create(script) {
-                                sender = adaptPlayer(frame.getPlayer())
-                                args.forEachIndexed { index, any ->
-                                    rootFrame().variables().set("arg$index", any)
-                                }
+                            ChemdahAPI.workspace.runScript(if (self) "$name@${frame.getBukkitPlayer().name}" else name, ScriptContext.create(script) {
+                                sender = adaptPlayer(frame.getBukkitPlayer())
+                                args.forEachIndexed { index, any -> rootFrame().variables().set("arg$index", any) }
                             })
                         } catch (t: Throwable) {
                             t.printKetherErrorMessage()
@@ -54,7 +52,7 @@ class ActionScript {
     class ScriptStop(val name: String, val self: Boolean) : ScriptAction<Void>() {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Void> {
-            val namespace = if (self) "$name@${frame.getPlayer().name}" else name
+            val namespace = if (self) "$name@${frame.getBukkitPlayer().name}" else name
             val script = ImmutableList.copyOf(ChemdahAPI.workspace.getRunningScript()).firstOrNull { it.quest.id == namespace }
             if (script != null) {
                 ChemdahAPI.workspace.terminateScript(script)

@@ -17,14 +17,10 @@ import java.util.concurrent.CompletableFuture
  */
 class ActionVariables {
 
-    class VariablesGet(val key: ParsedAction<*>, val default: ParsedAction<*> = ParsedAction.noop<Any>()) : ScriptAction<Any>() {
+    class VariablesGet(val key: ParsedAction<*>, val default: ParsedAction<*> = ParsedAction.noop<Any>()) : ScriptAction<Any?>() {
 
-        override fun run(frame: ScriptFrame): CompletableFuture<Any> {
-            return frame.newFrame(key).run<Any>().thenApply {
-                frame.newFrame(default).run<Any>().thenApply { def ->
-                    ChemdahAPI.getVariable(it.toString()) ?: def
-                }.join()
-            }
+        override fun run(frame: ScriptFrame): CompletableFuture<Any?> {
+            return frame.run(key).str { key -> frame.run(default).str { def -> ChemdahAPI.getVariable(key) ?: def }.join() }
         }
     }
 
@@ -36,15 +32,14 @@ class ActionVariables {
     ) : ScriptAction<Void>() {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Void> {
-            return frame.newFrame(key).run<Any>().thenAccept { key ->
-                frame.newFrame(value).run<Any>().thenAccept { value ->
-                    frame.newFrame(default).run<Any>().thenAccept { def ->
-                        submitAsync {
-                            ChemdahAPI.setVariable(key.toString(), value?.toString(), symbol == PlayerOperator.Method.INCREASE, default = def?.toString())
-                        }
-                    }.join()
-                }.join()
+            frame.run(key).str { key ->
+                frame.run(value).str { value ->
+                    frame.run(default).str { def ->
+                        submitAsync { ChemdahAPI.setVariable(key, value, symbol == PlayerOperator.Method.INCREASE, def) }
+                    }
+                }
             }
+            return CompletableFuture.completedFuture(null)
         }
     }
 

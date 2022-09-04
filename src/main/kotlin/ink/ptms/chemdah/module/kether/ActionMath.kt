@@ -2,9 +2,8 @@ package ink.ptms.chemdah.module.kether
 
 import taboolib.common5.Coerce
 import taboolib.library.kether.ArgTypes
-import taboolib.module.kether.KetherParser
-import taboolib.module.kether.actionFuture
-import taboolib.module.kether.scriptParser
+import taboolib.module.kether.*
+import kotlin.run
 
 /**
  * Chemdah
@@ -13,31 +12,31 @@ import taboolib.module.kether.scriptParser
  * @author sky
  * @since 2021/6/14 2:59 下午
  */
-class ActionMath {
+internal object ActionMath {
 
-    companion object {
+    @KetherParser(["max"], namespace = "chemdah", shared = true)
+    fun max() = scriptParser {
+        val n1 = it.nextParsedAction()
+        val n2 = it.nextParsedAction()
+        actionTake { run(n1).double { n1 -> run(n2).double { n2 -> kotlin.math.max(n1, n2) }.join() } }
+    }
 
-        @KetherParser(["max"], namespace = "chemdah", shared = true)
-        fun max() = scriptParser {
-            val n1 = it.next(ArgTypes.ACTION)
-            val n2 = it.next(ArgTypes.ACTION)
-            actionFuture {
-                newFrame(n1).run<Any>().thenAccept { n1 ->
-                    newFrame(n2).run<Any>().thenAccept { n2 ->
-                        it.complete(kotlin.math.max(Coerce.toDouble(n1), Coerce.toDouble(n2)))
-                    }
-                }
-            }
-        }
+    @KetherParser(["min"], namespace = "chemdah", shared = true)
+    fun min() = scriptParser {
+        val n1 = it.nextParsedAction()
+        val n2 = it.nextParsedAction()
+        actionTake { run(n1).double { n1 -> run(n2).double { n2 -> kotlin.math.min(n1, n2) }.join() } }
+    }
 
-        @KetherParser(["ceil"], namespace = "chemdah", shared = true)
-        fun ceil() = scriptParser {
-            val n1 = it.next(ArgTypes.ACTION)
-            actionFuture {
-                newFrame(n1).run<Any>().thenAccept { n1 ->
-                    it.complete(kotlin.math.ceil(Coerce.toDouble(n1)))
-                }
-            }
-        }
+    @KetherParser(["ceil"], namespace = "chemdah", shared = true)
+    fun ceil() = scriptParser {
+        val n1 = it.nextParsedAction()
+        actionTake { run(n1).double { n1 -> kotlin.math.ceil(n1) } }
+    }
+
+    @KetherParser(["floor"], namespace = "chemdah", shared = true)
+    fun floor() = scriptParser {
+        val n1 = it.nextParsedAction()
+        actionTake { run(n1).double { n1 -> kotlin.math.floor(n1) } }
     }
 }

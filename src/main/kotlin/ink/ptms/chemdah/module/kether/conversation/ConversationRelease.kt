@@ -3,7 +3,7 @@ package ink.ptms.chemdah.module.kether.conversation
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.conversation.theme.ThemeChatSettings
 import ink.ptms.chemdah.core.quest.QuestDevelopment.releaseTransmit
-import ink.ptms.chemdah.util.getPlayer
+import ink.ptms.chemdah.util.getBukkitPlayer
 import taboolib.common.platform.function.adaptCommandSender
 import taboolib.module.chat.TellrawJson
 import taboolib.module.kether.KetherParser
@@ -30,8 +30,8 @@ class ConversationRelease() : ScriptAction<Void>() {
     }
 
     override fun run(frame: ScriptFrame): CompletableFuture<Void> {
-        newJson().sendTo(adaptCommandSender(frame.getPlayer()))
-        frame.getPlayer().releaseTransmit()
+        newJson().sendTo(adaptCommandSender(frame.getBukkitPlayer()))
+        frame.getBukkitPlayer().releaseTransmit()
         return CompletableFuture.completedFuture(null)
     }
 

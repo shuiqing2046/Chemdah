@@ -1,6 +1,6 @@
 package ink.ptms.chemdah.module.kether.compat
 
-import ink.ptms.chemdah.util.getPlayer
+import ink.ptms.chemdah.util.getBukkitPlayer
 import net.Indyuce.mmocore.MMOCore
 import net.Indyuce.mmocore.api.player.PlayerData
 import taboolib.module.kether.*
@@ -19,7 +19,7 @@ class ActionCore {
     class Base(val action: Function<PlayerData, Any>) : ScriptAction<Any>() {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Any> {
-            return CompletableFuture.completedFuture(action.apply(MMOCore.plugin.dataProvider.dataManager.get(frame.getPlayer())))
+            return CompletableFuture.completedFuture(action.apply(MMOCore.plugin.dataProvider.dataManager.get(frame.getBukkitPlayer())))
         }
     }
 
