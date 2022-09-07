@@ -4,10 +4,7 @@ import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.util.increaseAny
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
-import taboolib.common.platform.command.CommandBody
-import taboolib.common.platform.command.CommandHeader
-import taboolib.common.platform.command.mainCommand
-import taboolib.common.platform.command.subCommand
+import taboolib.common.platform.command.*
 import taboolib.common.platform.function.onlinePlayers
 import taboolib.expansion.createHelper
 import taboolib.platform.util.sendLang
@@ -30,7 +27,7 @@ object CommandChemdahPlayerData {
     @CommandBody
     val set = subCommand {
         dynamic(commit = "player") {
-            suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
+            suggestPlayers()
             dynamic(commit = "key") {
                 dynamic(commit = "value") {
                     execute<CommandSender> { sender, context, argument ->
@@ -46,7 +43,7 @@ object CommandChemdahPlayerData {
     @CommandBody
     val add = subCommand {
         dynamic(commit = "player") {
-            suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
+            suggestPlayers()
             dynamic(commit = "key") {
                 dynamic(commit = "value") {
                     execute<CommandSender> { sender, context, argument ->
@@ -64,7 +61,7 @@ object CommandChemdahPlayerData {
     @CommandBody
     val remove = subCommand {
         dynamic(commit = "player") {
-            suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
+            suggestPlayers()
             dynamic(commit = "key") {
                 execute<CommandSender> { sender, context, argument ->
                     val playerExact = Bukkit.getPlayerExact(context.argument(-1))!!
@@ -83,7 +80,7 @@ object CommandChemdahPlayerData {
     @CommandBody
     val clear = subCommand {
         dynamic(commit = "player") {
-            suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
+            suggestPlayers()
             execute<CommandSender> { sender, _, argument ->
                 val playerExact = Bukkit.getPlayerExact(argument)!!
                 playerExact.chemdahProfile.persistentDataContainer.clear()

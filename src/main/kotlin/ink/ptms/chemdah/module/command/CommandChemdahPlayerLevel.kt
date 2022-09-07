@@ -7,10 +7,7 @@ import ink.ptms.chemdah.module.level.LevelSystem.getLevelOption
 import ink.ptms.chemdah.module.level.LevelSystem.setLevel
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
-import taboolib.common.platform.command.CommandBody
-import taboolib.common.platform.command.CommandHeader
-import taboolib.common.platform.command.mainCommand
-import taboolib.common.platform.command.subCommand
+import taboolib.common.platform.command.*
 import taboolib.common.platform.function.onlinePlayers
 import taboolib.common5.Coerce
 import taboolib.expansion.createHelper
@@ -23,6 +20,7 @@ import taboolib.platform.util.sendLang
  * @author sky
  * @since 2021/2/11 7:19 下午
  */
+@Suppress("SpellCheckingInspection")
 @CommandHeader(name = "ChemdahPlayerLevel", aliases = ["chpl"], permission = "chemdah.command")
 object CommandChemdahPlayerLevel {
 
@@ -34,7 +32,7 @@ object CommandChemdahPlayerLevel {
     @CommandBody
     val addlevel = subCommand { 
         dynamic(commit = "player") {
-            suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
+            suggestPlayers()
             // level
             dynamic(commit = "level") {
                 suggestion<CommandSender> { _, _ -> LevelSystem.level.keys.toList() }
@@ -60,7 +58,7 @@ object CommandChemdahPlayerLevel {
     @CommandBody
     val setlevel = subCommand {
         dynamic(commit = "player") {
-            suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
+            suggestPlayers()
             // level
             dynamic(commit = "level") {
                 suggestion<CommandSender> { _, _ -> LevelSystem.level.keys.toList() }
@@ -86,7 +84,7 @@ object CommandChemdahPlayerLevel {
     @CommandBody
     val addexp = subCommand {
         dynamic(commit = "player") {
-            suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
+            suggestPlayers()
             // level
             dynamic(commit = "level") {
                 suggestion<CommandSender> { _, _ -> LevelSystem.level.keys.toList() }
@@ -112,7 +110,7 @@ object CommandChemdahPlayerLevel {
     @CommandBody
     val setexp = subCommand {
         dynamic(commit = "player") {
-            suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
+            suggestPlayers()
             // level
             dynamic(commit = "level") {
                 suggestion<CommandSender> { _, _ -> LevelSystem.level.keys.toList() }

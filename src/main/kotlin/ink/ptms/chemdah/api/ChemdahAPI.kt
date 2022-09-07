@@ -29,6 +29,7 @@ import taboolib.module.kether.KetherFunction
 import taboolib.module.kether.KetherShell
 import taboolib.module.kether.Workspace
 import taboolib.module.kether.printKetherErrorMessage
+import taboolib.module.lang.Language
 import java.io.File
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
@@ -244,6 +245,7 @@ object ChemdahAPI {
      * 6 重载模块
      */
     fun reloadAll() {
+        Language.reload()
         Chemdah.conf.reload()
         ConversationManager.conf.reload()
         ConversationLoader.loadAll()

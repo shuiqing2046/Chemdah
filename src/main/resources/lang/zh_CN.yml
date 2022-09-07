@@ -4,6 +4,41 @@ track-cancel: '&7追踪已取消.'
 command-reload: '重载配置'
 command-info: '查看玩家信息'
 command-info-header: '&c[Chemdah] &7玩家信息:'
+command-info-empty: '&c[Chemdah] &7无'
+command-info-data: '&c[Chemdah] &7  数据:'
+command-info-quest:
+  ==: JSON
+  text: '&c\[Chemdah] &7  任务: &f[共 {0} 项]'
+  args:
+    - hover: '{1}'
+command-info-quest-share:
+  ==: JSON
+  text: '&c\[Chemdah] &7  任务 (共享): &f[共 {0} 项]'
+  args:
+    - hover: '{1}'
+command-info-bottom-0:
+  - ==: json
+    text: '&c\[Chemdah] &8\[上页] &7{0} / {1} [&a[下页]&a]'
+    args:
+      - hover: '点击翻页'
+        command: '/ch info {2} {3}'
+command-info-bottom-1:
+  - ==: json
+    text: '&c\[Chemdah] [&a[上页]&a] &7{0} / {1} &8\[下页]'
+    args:
+      - hover: '点击翻页'
+        command: '/ch info {2} {3}'
+command-info-bottom-2:
+  - ==: json
+    text: '&c\[Chemdah] [&a[上页]&a] &7{0} / {1} [&a[下页]&a]'
+    args:
+      - hover: '点击翻页'
+        command: '/ch info {2} {3}'
+      - hover: '点击翻页'
+        command: '/ch info {2} {4}'
+command-info-party: '&c[Chemdah] &7  队伍: &f'
+command-info-party-leader: '&c[Chemdah] &7   = 队长: &f'
+command-info-party-member: '&c[Chemdah] &7   = 队员: &f'
 command-info-body: '&c[Chemdah] &f{0}'
 command-quest-accept: '使玩家接受任务'
 command-quest-failure: '使玩家放弃任务'
@@ -53,22 +88,26 @@ command-scenes-file-not-found: '&c[Chemdah] &7演出文件不存在.'
 command-quest-not-accepted: '&c[Chemdah] &7任务未接受.'
 command-quest-info-empty: '&c[Chemdah] &7没有任务.'
 command-quest-info-header: '&c[Chemdah] &7玩家的任务:'
+command-quest-info-name: '&c[Chemdah] &7  &f&n{0}:'
+command-quest-info-name-share: '&c[Chemdah] &7  &f&n{0}: &8(共享)'
+command-quest-info-data: '&c[Chemdah] &7    数据:'
+command-quest-info-start-at: '&c[Chemdah] &7    任务开始于:'
 command-quest-info-body: '&c[Chemdah] &f{0}'
 command-quest-info-bottom-0:
   - ==: json
-    text: '&c\[Chemdah] &8\[上页] &7{0} / {1} [&a\[下页]]'
+    text: '&c\[Chemdah] &8\[上页] &7{0} / {1} [&a[下页]&a]'
     args:
       - hover: '点击翻页'
         command: '/chq info {2} {3}'
 command-quest-info-bottom-1:
   - ==: json
-    text: '&c\[Chemdah] [&a\[上页]] &7{0} / {1} &8\[下页]'
+    text: '&c\[Chemdah] [&a[上页]&a] &7{0} / {1} &8\[下页]'
     args:
       - hover: '点击翻页'
         command: '/chq info {2} {3}'
 command-quest-info-bottom-2:
   - ==: json
-    text: '&c\[Chemdah] [&a\[上页]] &7{0} / {1} [&a\[下页]]'
+    text: '&c\[Chemdah] [&a[上页]&a] &7{0} / {1} [&a[下页]&a]'
     args:
       - hover: '点击翻页'
         command: '/chq info {2} {3}'

@@ -8,10 +8,8 @@ import ink.ptms.chemdah.module.ui.UISystem
 import org.apache.commons.lang3.time.DateFormatUtils
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
-import taboolib.common.platform.command.CommandBody
-import taboolib.common.platform.command.CommandHeader
-import taboolib.common.platform.command.mainCommand
-import taboolib.common.platform.command.subCommand
+import org.bukkit.entity.Player
+import taboolib.common.platform.command.*
 import taboolib.common.platform.function.adaptCommandSender
 import taboolib.common.platform.function.onlinePlayers
 import taboolib.common.util.subList
@@ -40,7 +38,7 @@ object CommandChemdahQuest {
     @CommandBody
     val accept = subCommand {
         dynamic(commit = "player") {
-            suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
+            suggestPlayers()
             dynamic(commit = "quest") {
                 suggestion<CommandSender> { _, _ -> ChemdahAPI.questTemplate.keys.toList() }
                 execute<CommandSender> { _, context, argument ->
@@ -55,7 +53,7 @@ object CommandChemdahQuest {
     @CommandBody
     val failure = subCommand {
         dynamic(commit = "player") {
-            suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
+            suggestPlayers()
             dynamic(commit = "quest") {
                 suggestion<CommandSender>(uncheck = true) { _, _ -> ChemdahAPI.questTemplate.keys.toList() }
                 execute<CommandSender> { sender, context, argument ->
@@ -69,7 +67,7 @@ object CommandChemdahQuest {
                             sender.sendLang("command-quest-not-accepted")
                             return@execute
                         }
-                        quest.failQuest()
+                        quest.failQuestFuture()
                     }
                 }
             }
@@ -79,7 +77,7 @@ object CommandChemdahQuest {
     @CommandBody
     val complete = subCommand {
         dynamic(commit = "player") {
-            suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
+            suggestPlayers()
             dynamic(commit = "quest") {
                 suggestion<CommandSender>(uncheck = true) { _, _ -> ChemdahAPI.questTemplate.keys.toList() }
                 execute<CommandSender> { sender, context, argument ->
@@ -103,7 +101,7 @@ object CommandChemdahQuest {
     @CommandBody
     val restart = subCommand {
         dynamic(commit = "player") {
-            suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
+            suggestPlayers()
             dynamic(commit = "quest") {
                 suggestion<CommandSender>(uncheck = true) { _, _ -> ChemdahAPI.questTemplate.keys.toList() }
                 execute<CommandSender> { sender, context, argument ->
@@ -117,7 +115,7 @@ object CommandChemdahQuest {
                             sender.sendLang("command-quest-not-accepted")
                             return@execute
                         }
-                        quest.restartQuest()
+                        quest.restartQuestFuture()
                     }
                 }
             }
@@ -127,7 +125,7 @@ object CommandChemdahQuest {
     @CommandBody
     val stop = subCommand {
         dynamic(commit = "player") {
-            suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
+            suggestPlayers()
             dynamic(commit = "quest") {
                 suggestion<CommandSender>(uncheck = true) { _, _ -> ChemdahAPI.questTemplate.keys.toList() }
                 execute<CommandSender> { sender, context, argument ->
@@ -151,11 +149,10 @@ object CommandChemdahQuest {
     @CommandBody
     val trigger = subCommand {
         dynamic(commit = "player") {
-            suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
+            suggestPlayers()
             dynamic(commit = "value") {
                 execute<CommandSender> { _, context, argument ->
-                    val playerExact = Bukkit.getPlayerExact(context.argument(-1))!!
-                    playerExact.callTrigger(argument)
+                    context.player(-1).cast<Player>().callTrigger(argument)
                 }
             }
         }
@@ -165,9 +162,7 @@ object CommandChemdahQuest {
     val triggerAll = subCommand {
         dynamic(commit = "value") {
             execute<CommandSender> { _, _, argument ->
-                Bukkit.getOnlinePlayers().forEach {
-                    it.callTrigger(argument)
-                }
+                Bukkit.getOnlinePlayers().forEach { it.callTrigger(argument) }
             }
         }
     }
@@ -175,7 +170,7 @@ object CommandChemdahQuest {
     @CommandBody
     val info = subCommand {
         dynamic(commit = "player") {
-            suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
+            suggestPlayers()
             dynamic(commit = "quest", optional = true) {
                 suggestion<CommandSender>(uncheck = true) { _, _ -> ChemdahAPI.questTemplate.keys.toList() }
                 execute<CommandSender> { sender, context, argument ->
@@ -195,7 +190,7 @@ object CommandChemdahQuest {
     @CommandBody
     val ui = subCommand {
         dynamic(commit = "player") {
-            suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
+            suggestPlayers()
             dynamic(commit = "ui") {
                 suggestion<CommandSender> { _, _ -> UISystem.ui.keys.toList() }
                 execute<CommandSender> { _, context, argument ->
@@ -210,7 +205,7 @@ object CommandChemdahQuest {
     @CommandBody
     val track = subCommand {
         dynamic(commit = "player") {
-            suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
+            suggestPlayers()
             literal("cancel") {
                 execute<CommandSender> { _, context, _ ->
                     val playerExact = Bukkit.getPlayerExact(context.argument(-1))!!
@@ -238,9 +233,16 @@ object CommandChemdahQuest {
             space(sender)
             sender.sendLang("command-quest-info-header")
             subList(quests, page * 3, (page + 1) * 3).forEach { quest ->
-                sender.sendLang("command-quest-info-body", "  §n${quest.id}:§r ${if (!quest.isOwner(playerExact)) "§8(Share)" else ""}")
-                sender.sendLang("command-quest-info-body", "    §7Start in ${DateFormatUtils.format(quest.startTime, "yyyy/MM/dd HH:mm:ss")}")
-                sender.sendLang("command-quest-info-body", "    §7Data:")
+                // 任务名称
+                if (quest.isOwner(playerExact)) {
+                    sender.sendLang("command-quest-info-name", quest.id)
+                } else {
+                    sender.sendLang("command-quest-info-name-share", quest.id)
+                }
+                // 开始时间
+                sender.sendLang("command-quest-info-start-at", DateFormatUtils.format(quest.startTime, "yyyy/MM/dd HH:mm:ss"))
+                // 任务数据
+                sender.sendLang("command-quest-info-data")
                 quest.persistentDataContainer.entries().forEach { e ->
                     sender.sendLang("command-quest-info-body", "      §7${e.key.replace(".", "§f.§7")} §8= §f${e.value.data}")
                 }
@@ -273,16 +275,19 @@ object CommandChemdahQuest {
         } else {
             space(sender)
             sender.sendLang("command-quest-info-header")
-            sender.sendLang("command-quest-info-body", "  §n${quest.id}:§r ${if (!quest.isOwner(playerExact)) "§8(Share)" else ""}")
-            sender.sendLang("command-quest-info-body", "    §7Start in ${DateFormatUtils.format(quest.startTime, "yyyy/MM/dd HH:mm:ss")}")
-            sender.sendLang("command-quest-info-body", "    §7Data:")
+            // 任务名称
+            if (quest.isOwner(playerExact)) {
+                sender.sendLang("command-quest-info-name", quest.id)
+            } else {
+                sender.sendLang("command-quest-info-name-share", quest.id)
+            }
+            // 开始时间
+            sender.sendLang("command-quest-info-start-at", DateFormatUtils.format(quest.startTime, "yyyy/MM/dd HH:mm:ss"))
+            // 任务数据
+            sender.sendLang("command-quest-info-data")
             quest.persistentDataContainer.entries().forEach { e ->
                 sender.sendLang("command-quest-info-body", "      §7${e.key.replace(".", "§f.§7")} §8= §f${e.value.data}")
             }
         }
-    }
-
-    internal fun space(sender: CommandSender) {
-        TellrawJson().sendTo(adaptCommandSender(sender)) { repeat(30) { newLine() } }
     }
 }

@@ -6,10 +6,7 @@ import ink.ptms.chemdah.module.scenes.ScenesSystem
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import taboolib.common.io.newFile
-import taboolib.common.platform.command.CommandBody
-import taboolib.common.platform.command.CommandHeader
-import taboolib.common.platform.command.mainCommand
-import taboolib.common.platform.command.subCommand
+import taboolib.common.platform.command.*
 import taboolib.common.platform.function.getDataFolder
 import taboolib.common.platform.function.onlinePlayers
 import taboolib.common5.Coerce
@@ -25,6 +22,7 @@ import taboolib.platform.util.sendLang
  * @author sky
  * @since 2021/2/11 7:19 下午
  */
+@Suppress("SpellCheckingInspection")
 @CommandHeader(name = "ChemdahAPI", aliases = ["chapi"], permission = "chemdah.command")
 object CommandChemdahAPI {
 
@@ -36,7 +34,7 @@ object CommandChemdahAPI {
     @CommandBody
     val createscenes = subCommand {
         dynamic(commit = "player") {
-            suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
+            suggestPlayers()
             dynamic(commit = "scenes") {
                 suggestion<CommandSender> { _, _ -> ScenesSystem.scenesMap.keys.toMutableList() }
                 dynamic(commit = "index") {
@@ -57,7 +55,7 @@ object CommandChemdahAPI {
     @CommandBody
     val cancelscenes = subCommand {
         dynamic(commit = "player") {
-            suggestion<CommandSender> { _, _ -> onlinePlayers().map { it.name } }
+            suggestPlayers()
             dynamic(commit = "scenes") {
                 suggestion<CommandSender> { _, _ -> ScenesSystem.scenesMap.keys.toMutableList() }
                 dynamic(commit = "index") {
