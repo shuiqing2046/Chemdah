@@ -315,7 +315,7 @@ object ConversationManager {
             }
             val npc = e.session.source.entity
             if (npc is NPC && e.conversation.hasFlag("LOOK_PLAYER")) {
-                npc.faceLocation(e.session.player.eyeLocation)
+                npc.faceLocation(e.session.player.location)
             }
         }
 
