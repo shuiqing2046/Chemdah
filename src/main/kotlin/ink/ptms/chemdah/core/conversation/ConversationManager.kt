@@ -110,7 +110,13 @@ object ConversationManager {
     internal fun onBegin(e: ConversationEvents.Begin) {
         if (!e.conversation.hasFlag("NO_EFFECT")) {
             effects[e.session.player.name] = effectFreeze.mapNotNull { e.session.player.getPotionEffect(it.key) }.filter { it.duration in 10..9999 }
-            effectFreeze.forEach { e.session.player.addPotionEffect(PotionEffect(it.key, 99999, it.value).hidden()) }
+            effectFreeze.forEach {
+                // 取消特定效果
+                if (e.conversation.hasFlag("NO_EFFECT:${it.key}")) {
+                    return@forEach
+                }
+                e.session.player.addPotionEffect(PotionEffect(it.key, 99999, it.value).hidden())
+            }
         }
         if (e.conversation.hasFlag("FORCE_LOOK")) {
             val source = e.session.source as Source<Any>
