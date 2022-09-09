@@ -24,10 +24,10 @@ annotation class Option(val type: Type) {
                     SECTION -> config.getConfigurationSection(node)
                     TEXT -> config.getString(node)
                     NUMBER -> config.getDouble(node)
-                    ANY -> config.get(node)
+                    ANY -> config[node]
                 }
             } catch (e: Throwable) {
-                warning("${config.get(node)} (${config.get(node)?.javaClass?.simpleName}) cannot cast to $this ($node)")
+                warning("${config[node]} (${config[node]?.javaClass?.simpleName}) cannot cast to $this ($node)")
             }
             return null
         }

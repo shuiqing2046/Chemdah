@@ -20,7 +20,9 @@ class ActionVariables {
     class VariablesGet(val key: ParsedAction<*>, val default: ParsedAction<*> = ParsedAction.noop<Any>()) : ScriptAction<Any?>() {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Any?> {
-            return frame.run(key).str { key -> frame.run(default).str { def -> ChemdahAPI.getVariable(key) ?: def }.join() }
+            val future = CompletableFuture<Any?>()
+            frame.run(key).str { key -> frame.run(default).str { def -> future.complete(ChemdahAPI.getVariable(key) ?: def) } }
+            return future
         }
     }
 
@@ -28,7 +30,7 @@ class ActionVariables {
         val key: ParsedAction<*>,
         val value: ParsedAction<*>,
         val symbol: PlayerOperator.Method,
-        val default: ParsedAction<*> = ParsedAction.noop<Any>()
+        val default: ParsedAction<*> = ParsedAction.noop<Any>(),
     ) : ScriptAction<Void>() {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Void> {
@@ -76,6 +78,7 @@ class ActionVariables {
                                 VariablesSet(key, value, PlayerOperator.Method.INCREASE)
                             }
                         }
+
                         else -> error("out of case")
                     }
                 } catch (ex: Throwable) {

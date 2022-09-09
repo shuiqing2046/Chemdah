@@ -49,9 +49,11 @@ class ActionProfile {
                             value == null -> {
                                 persistentDataContainer.remove(key.toString())
                             }
+
                             symbol == PlayerOperator.Method.INCREASE -> {
                                 persistentDataContainer[key.toString()] = (persistentDataContainer[key.toString()] ?: def).increaseAny(value)
                             }
+
                             else -> {
                                 persistentDataContainer[key.toString()] = value
                             }
@@ -108,24 +110,26 @@ class ActionProfile {
     class ProfileLevelGet(val key: ParsedAction<*>, val type: LevelType) : ScriptAction<Int>() {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Int> {
-            return frame.newFrame(key).run<Any>().thenApply {
+            val future = CompletableFuture<Int>()
+            frame.newFrame(key).run<Any>().thenApply {
                 val option = LevelSystem.getLevelOption(it.toString())
                 if (option != null) {
                     when (type) {
                         LevelType.LEVEL -> {
-                            frame.getProfile().getLevel(option).level
+                            future.complete(frame.getProfile().getLevel(option).level)
                         }
                         LevelType.EXP -> {
-                            frame.getProfile().getLevel(option).experience
+                            future.complete(frame.getProfile().getLevel(option).experience)
                         }
                         LevelType.EXP_MAX -> {
-                            option.algorithm.getExp(frame.getProfile().getLevel(option).level).join()
+                            option.algorithm.getExp(frame.getProfile().getLevel(option).level).thenAccept { exp -> future.complete(exp) }
                         }
                     }
                 } else {
-                    -1
+                    future.complete(-1)
                 }
             }
+            return future
         }
     }
 
@@ -173,6 +177,7 @@ class ActionProfile {
                                         ProfileDataSet(key, value, PlayerOperator.Method.INCREASE)
                                     }
                                 }
+
                                 else -> error("out of case")
                             }
                         } catch (ex: Throwable) {
@@ -188,6 +193,7 @@ class ActionProfile {
                         }
                     }
                 }
+
                 "level" -> {
                     val key = it.next(ArgTypes.ACTION)
                     val type = when (it.expects("level", "exp", "exp-max")) {
@@ -212,6 +218,7 @@ class ActionProfile {
                         ProfileLevelGet(key, type)
                     }
                 }
+
                 else -> error("out of case")
             }
         }

@@ -49,16 +49,19 @@ class ActionInventory {
     class InventorySlot(val slot: ParsedAction<*>, val item: InferItem.Item, val amount: ParsedAction<*>) : ScriptAction<Any?>() {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Any?> {
-            return frame.run(slot).int { slot ->
+            val future = CompletableFuture<Any?>()
+            frame.run(slot).int { slot ->
                 frame.run(amount).int { amount ->
                     val equipment = frame.getBukkitPlayer().inventory.getItem(slot)
-                    if (equipment.isNotAir() && item.match(equipment!!)) {
+                    val value = if (equipment.isNotAir() && item.match(equipment!!)) {
                         equipment.amount >= amount
                     } else {
                         false
                     }
-                }.join()
+                    future.complete(value)
+                }
             }
+            return future
         }
     }
 

@@ -20,11 +20,13 @@ class ActionLocation {
     class LocationFunc(val location: ParsedAction<*>, val value: ParsedAction<*>, val func: (Location, Any) -> Any) : ScriptAction<Any>() {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Any> {
-            return frame.newFrame(location).run<Location>().thenApply {
+            val future = CompletableFuture<Any>()
+            frame.newFrame(location).run<Location>().thenApply {
                 frame.newFrame(value).run<Any>().thenApply { value ->
-                    func(it, value)
-                }.join()
+                    future.complete(func(it, value))
+                }
             }
+            return future
         }
 
         override fun toString(): String {
@@ -35,11 +37,13 @@ class ActionLocation {
     class LocationDistance(val loc1: ParsedAction<*>, val loc2: ParsedAction<*>) : ScriptAction<Double>() {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Double> {
-            return frame.newFrame(loc1).run<Location>().thenApply { loc1 ->
+            val future = CompletableFuture<Double>()
+            frame.newFrame(loc1).run<Location>().thenApply { loc1 ->
                 frame.newFrame(loc2).run<Location>().thenApply { loc2 ->
-                    if (loc1.world == loc2.world) loc1.distance(loc2) else -1.0
-                }.join()
+                    future.complete(if (loc1.world == loc2.world) loc1.distance(loc2) else -1.0)
+                }
             }
+            return future
         }
 
         override fun toString(): String {
