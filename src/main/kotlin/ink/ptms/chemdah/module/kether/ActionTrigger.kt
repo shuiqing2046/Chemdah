@@ -13,7 +13,7 @@ import java.util.concurrent.CompletableFuture
  * @author sky
  * @since 2021/2/10 6:39 下午
  */
-internal object ActionTrigger {
+object ActionTrigger {
 
     /**
      * trigger def

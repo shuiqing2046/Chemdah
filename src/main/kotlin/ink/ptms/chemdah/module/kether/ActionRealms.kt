@@ -13,7 +13,7 @@ import taboolib.module.kether.scriptParser
  * @author sky
  * @since 2021/6/14 2:59 下午
  */
-internal object ActionRealms {
+object ActionRealms {
 
     @KetherParser(["realms"], namespace = "chemdah", shared = true)
     fun realms() = scriptParser {
