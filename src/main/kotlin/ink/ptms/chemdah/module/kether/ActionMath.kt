@@ -12,7 +12,7 @@ import kotlin.run
  * @author sky
  * @since 2021/6/14 2:59 下午
  */
-internal object ActionMath {
+object ActionMath {
 
     @KetherParser(["max"], namespace = "chemdah", shared = true)
     fun max() = scriptParser {
