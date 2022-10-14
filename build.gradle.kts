@@ -80,7 +80,7 @@ dependencies {
     compileOnly("public:SkillAPI:s1.98")
     compileOnly("public:mcMMO:1.0.0")
     compileOnly("public:MMOLib:1.0.0")
-    compileOnly("public:MMOCore:1.0.0")
+    compileOnly("public:MMOCore:1.10.2")
     compileOnly("public:MMOItems:1.0.0")
     compileOnly("public:Parties:1.0.0")
     compileOnly("public:NexEngine:1.0.0")

@@ -19,6 +19,8 @@ import sky_bai.bukkit.baiteam.BaiTeam
 import su.nightexpress.quantumrpg.api.QuantumAPI
 import su.nightexpress.quantumrpg.modules.list.party.PartyManager
 import taboolib.common.platform.event.SubscribeEvent
+import taboolib.common.platform.function.severe
+import taboolib.common.platform.function.warning
 import taboolib.library.reflex.Reflex.Companion.getProperty
 import java.util.*
 
@@ -29,7 +31,7 @@ import java.util.*
  * @author sky
  * @since 2021/4/24 5:30 下午
  */
-object PartyHook  {
+object PartyHook {
 
     @SubscribeEvent
     private fun onPartyHook(e: PartyHookEvent) {
@@ -72,7 +74,8 @@ object PartyHook  {
 
         override fun getParty(player: Player): Party.PartyInfo? {
             val teams = Fwteam::class.java.getProperty<Set<Fwteam>>("teamlist", isStatic = true)!!
-            val team = teams.firstOrNull { player.uniqueId in it.getProperty<Set<UUID>>("plist")!! || player.uniqueId == it.getProperty<UUID>("leader") } ?: return null
+            val team = teams.firstOrNull { player.uniqueId in it.getProperty<Set<UUID>>("plist")!! || player.uniqueId == it.getProperty<UUID>("leader") }
+                ?: return null
             return object : Party.PartyInfo {
 
                 override fun getLeader(): Player? {
@@ -267,19 +270,37 @@ object PartyHook  {
     object MMOCoreHook : Party {
 
         override fun getParty(player: Player): Party.PartyInfo? {
-            val teams = MMOCore.plugin.partyManager.getProperty<Set<net.Indyuce.mmocore.api.player.social.Party>>("parties")!!
-            val team = teams.firstOrNull { team -> team.members.getProperty<List<PlayerData>>("members")!!.any { it.uniqueId == player.uniqueId } } ?: return null
-            val members = team.getProperty<List<PlayerData>>("members")!!
+            // 版本过低 (1.10.X)
+            if (kotlin.runCatching { MMOCore.plugin.dataProvider }.isFailure) {
+                severe("Outdated MMOCore (required: >1.10.X)")
+                return null
+            }
+            val data = MMOCore.plugin.dataProvider.dataManager.get(player) ?: return null
+            val party = MMOCore.plugin.partyModule.getParty(data) as? net.Indyuce.mmocore.party.provided.Party ?: return null
             return object : Party.PartyInfo {
 
                 override fun getLeader(): Player? {
-                    return team.owner.player
+                    return party.owner.player
                 }
 
                 override fun getMembers(): List<Player> {
-                    return members.filter { it.uniqueId != team.owner.uniqueId }.map { it.player }
+                    return party.members.filter { it.uniqueId != party.owner.uniqueId }.map { it.player }
                 }
             }
+            // 老版本
+//            val teams = MMOCore.plugin.partyManager.getProperty<Set<net.Indyuce.mmocore.api.player.social.Party>>("parties")!!
+//            val team = teams.firstOrNull { team -> team.members.getProperty<List<PlayerData>>("members")!!.any { it.uniqueId == player.uniqueId } } ?: return null
+//            val members = team.getProperty<List<PlayerData>>("members")!!
+//            return object : Party.PartyInfo {
+//
+//                override fun getLeader(): Player? {
+//                    return team.owner.player
+//                }
+//
+//                override fun getMembers(): List<Player> {
+//                    return members.filter { it.uniqueId != team.owner.uniqueId }.map { it.player }
+//                }
+//            }
         }
     }
 }
