@@ -12,7 +12,6 @@ import ink.ptms.chemdah.util.realLength
 import ink.ptms.chemdah.util.replaces
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.TextComponent
-import net.minecraft.server.v1_16_R3.PacketPlayOutHeldItemSlot
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerItemHeldEvent
 import org.bukkit.event.player.PlayerSwapHandItemsEvent
@@ -24,8 +23,7 @@ import taboolib.common.platform.function.adaptPlayer
 import taboolib.common.platform.function.submit
 import taboolib.common5.Coerce
 import taboolib.common5.util.printed
-import taboolib.library.reflex.Reflex.Companion.setProperty
-import taboolib.library.reflex.Reflex.Companion.unsafeInstance
+import taboolib.library.reflex.Reflex.Companion.invokeConstructor
 import taboolib.module.chat.TellrawJson
 import taboolib.module.chat.colored
 import taboolib.module.chat.uncolored
@@ -33,6 +31,7 @@ import taboolib.module.kether.KetherFunction
 import taboolib.module.kether.extend
 import taboolib.module.kether.isInt
 import taboolib.module.nms.PacketSendEvent
+import taboolib.module.nms.nmsClass
 import taboolib.module.nms.sendPacket
 import taboolib.platform.util.asLangText
 import taboolib.platform.util.toProxyLocation
@@ -66,6 +65,7 @@ object ThemeChat : Theme<ThemeChatSettings>() {
      * 取消这个行为会出现客户端显示不同步的错误
      * 以及无法 mc 无法重复切换相同物品栏
      */
+    @Suppress("SpellCheckingInspection")
     @SubscribeEvent(EventPriority.HIGHEST, ignoreCancelled = true)
     private fun onItemHeld(e: PlayerItemHeldEvent) {
         val session = e.player.conversationSession ?: return
@@ -95,13 +95,14 @@ object ThemeChat : Theme<ThemeChatSettings>() {
                             select = replies.size - 1
                         }
                     }
-                    val packet = PacketPlayOutHeldItemSlot::class.java.unsafeInstance()
-                    if (taboolib.module.nms.MinecraftVersion.isUniversal) {
-                        packet.setProperty("slot", e.previousSlot)
-                    } else {
-                        packet.setProperty("a", e.previousSlot)
+                    // start linghaner
+                    // fix use-scroll
+                    // 1.16.5 之前的版本使用滚轮会出现客户端显示不同步的错误
+                    try {
+                        e.player.sendPacket(nmsClass("PacketPlayOutHeldItemSlot").invokeConstructor(e.previousSlot))
+                    } catch (ignored: Throwable) {
                     }
-                    e.player.sendPacket(packet)
+                    // end
                     e.isCancelled = true
                 } else {
                     select = e.newSlot.coerceAtMost(replies.size - 1)
@@ -243,6 +244,7 @@ object ThemeChat : Theme<ThemeChatSettings>() {
      * @param canReply 是否允许回复
      * @param noSpace 没有隔离空行
      */
+    @Suppress("DuplicatedCode")
     fun CompletableFuture<Void>.npcTalk(
         session: Session,
         messages: List<String>,
