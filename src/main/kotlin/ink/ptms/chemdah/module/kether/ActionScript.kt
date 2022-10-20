@@ -18,10 +18,10 @@ import java.util.concurrent.CompletableFuture
  */
 class ActionScript {
 
-    class ScriptRun(val name: String, val self: Boolean, val using: List<ParsedAction<*>>) : ScriptAction<Void>() {
+    class ScriptRun(val name: String, val self: Boolean, val using: List<ParsedAction<*>>) : ScriptAction<Any>() {
 
-        override fun run(frame: ScriptFrame): CompletableFuture<Void> {
-            val future = CompletableFuture<Void>()
+        override fun run(frame: ScriptFrame): CompletableFuture<Any> {
+            val future = CompletableFuture<Any>()
             val args = ArrayList<Any>()
             fun process(cur: Int) {
                 if (cur < using.size) {
@@ -32,20 +32,27 @@ class ActionScript {
                 } else {
                     val script = ChemdahAPI.workspace.scripts[name]
                     if (script != null) {
-                        try {
-                            ChemdahAPI.workspace.runScript(if (self) "$name@${frame.getBukkitPlayer().name}" else name, ScriptContext.create(script) {
+                        runKether {
+                            val scriptId = if (self) "$name@${frame.getBukkitPlayer().name}" else name
+                            val scriptContext = ScriptContext.create(script) {
                                 sender = adaptPlayer(frame.getBukkitPlayer())
                                 args.forEachIndexed { index, any -> rootFrame().variables().set("arg$index", any) }
-                            })
-                        } catch (t: Throwable) {
-                            t.printKetherErrorMessage()
+                            }
+                            ChemdahAPI.workspace.run(scriptId, scriptContext).thenAccept { future.complete(it) }
                         }
+                    } else {
+                        future.complete(null)
                     }
-                    future.complete(null)
                 }
             }
             process(0)
             return future
+        }
+
+        private fun Workspace.run(id: String, context: ScriptContext): CompletableFuture<Any> {
+            context.id = id
+            runningScripts.put(id, context)
+            return context.runActions().also { it.thenRun{ runningScripts.remove(id, context) } }
         }
     }
 
