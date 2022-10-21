@@ -179,12 +179,12 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
         }
 
         @SubscribeEvent
-        internal fun onReleased(e: PlayerEvents.Released) {
+        private fun onReleased(e: PlayerEvents.Released) {
             statsMap.remove(e.player.name)
         }
 
         @SubscribeEvent
-        internal fun onSelected(e: PlayerEvents.Selected) {
+        private fun onSelected(e: PlayerEvents.Selected) {
             e.playerProfile.getQuests().forEach { quest ->
                 quest.getMembers(self = true).forEach {
                     quest.refreshStatusAlwaysType(it.chemdahProfile)
@@ -193,28 +193,28 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
         }
 
         @SubscribeEvent
-        internal fun onRegistered(e: QuestEvents.Registered) {
+        private fun onRegistered(e: QuestEvents.Registered) {
             e.quest.getMembers(self = true).forEach {
                 e.quest.refreshStatusAlwaysType(it.chemdahProfile)
             }
         }
 
         @SubscribeEvent
-        internal fun onUnregistered(e: QuestEvents.Unregistered) {
+        private fun onUnregistered(e: QuestEvents.Unregistered) {
             e.quest.getMembers(self = true).forEach {
                 e.quest.hiddenStats(it.chemdahProfile)
             }
         }
 
         @SubscribeEvent
-        internal fun onCompletePost(e: ObjectiveEvents.Complete.Post) {
+        private fun onCompletePost(e: ObjectiveEvents.Complete.Post) {
             e.quest.getMembers(self = true).forEach {
                 e.task.hiddenStats(it.chemdahProfile)
             }
         }
 
         @SubscribeEvent
-        internal fun onContinuePost(e: ObjectiveEvents.Continue.Post) {
+        private fun onContinuePost(e: ObjectiveEvents.Continue.Post) {
             e.quest.getMembers(self = true).forEach {
                 e.task.refreshStats(it.chemdahProfile)
                 e.quest.template.refreshStats(it.chemdahProfile)

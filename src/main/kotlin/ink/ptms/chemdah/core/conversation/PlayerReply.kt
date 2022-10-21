@@ -38,21 +38,34 @@ data class PlayerReply(
     }
 
     fun check(session: Session): CompletableFuture<Boolean> {
-        return if (condition == null) {
-            CompletableFuture.completedFuture(true)
-        } else {
-            try {
-                KetherShell.eval(condition!!, namespace = namespaceConversationPlayer) { extend(session.variables) }.thenApply {
-                    Coerce.toBoolean(it)
-                }
-            } catch (e: Throwable) {
-                e.printKetherErrorMessage()
+        return when {
+            // 已选择
+            session.isSelected -> {
                 CompletableFuture.completedFuture(false)
+            }
+            // 无条件
+            condition == null -> {
+                CompletableFuture.completedFuture(true)
+            }
+            else -> {
+                try {
+                    KetherShell.eval(condition!!, namespace = namespaceConversationPlayer) { extend(session.variables) }.thenApply {
+                        Coerce.toBoolean(it)
+                    }
+                } catch (e: Throwable) {
+                    e.printKetherErrorMessage()
+                    CompletableFuture.completedFuture(false)
+                }
             }
         }
     }
 
     fun select(session: Session): CompletableFuture<Void> {
+        // 已选择
+        if (session.isSelected) {
+            return CompletableFuture.completedFuture(null)
+        }
+        session.isSelected = true
         return try {
             KetherShell.eval(action, namespace = namespaceConversationPlayer) { extend(session.variables) }.thenAccept {
                 if (session.isNext) {

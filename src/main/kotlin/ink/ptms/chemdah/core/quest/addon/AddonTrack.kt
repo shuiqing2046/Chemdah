@@ -465,7 +465,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
          * 不知道原因
          */
         @SubscribeEvent
-        internal fun onSelect(e: PlayerEvents.Selected) {
+        private fun onSelect(e: PlayerEvents.Selected) {
             submit(delay = 40) {
                 if (e.playerProfile.trackQuest != null) {
                     e.player.cancelTrackLandmark()
@@ -481,7 +481,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
          * 已完成的条目不再显示于记分板中
          */
         @SubscribeEvent
-        internal fun onContinue(e: ObjectiveEvents.Continue.Post) {
+        private fun onContinue(e: ObjectiveEvents.Continue.Post) {
             e.quest.getMembers(self = true).forEach {
                 if (it.chemdahProfile.trackQuest == e.task.template) {
                     it.displayTrackScoreboard()
@@ -494,7 +494,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
          * 已完成的条目不再显示于记分板中
          */
         @SubscribeEvent
-        internal fun onComplete(e: ObjectiveEvents.Complete.Post) {
+        private fun onComplete(e: ObjectiveEvents.Complete.Post) {
             e.quest.getMembers(self = true).forEach {
                 if (it.chemdahProfile.trackQuest == e.task.template) {
                     it.displayTrackLandmark()
@@ -507,7 +507,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
          * 任务注销时取消任务追踪
          */
         @SubscribeEvent
-        internal fun onUnregistered(e: QuestEvents.Unregistered) {
+        private fun onUnregistered(e: QuestEvents.Unregistered) {
             // 如果我在追踪这个任务
             if (e.playerProfile.trackQuest == e.quest.template) {
                 // 我和我的队友都会取消这个任务的追踪
@@ -524,7 +524,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
          * 总内容替换为子内容显示
          */
         @SubscribeEvent
-        internal fun onRegistered(e: QuestEvents.Registered) {
+        private fun onRegistered(e: QuestEvents.Registered) {
             if (e.playerProfile.trackQuest == e.quest.template) {
                 e.playerProfile.player.displayTrackLandmark()
                 e.playerProfile.player.displayTrackScoreboard()
@@ -536,7 +536,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
          * 并给予相关提示
          */
         @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        internal fun onTrack(e: PlayerEvents.Track) {
+        private fun onTrack(e: PlayerEvents.Track) {
             if (e.cancel) {
                 e.player.cancelTrackLandmark()
                 e.player.cancelTrackScoreboard(e.trackingQuest)
@@ -567,7 +567,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
          * 玩家移动时刷新 Navigation 导航
          */
         @SubscribeEvent
-        internal fun onMove(e: PlayerMoveEvent) {
+        private fun onMove(e: PlayerMoveEvent) {
             if (e.from.toVector() != e.to!!.toVector()) {
                 submitAsync { e.player.displayTrackLandmark() }
             }
@@ -577,12 +577,12 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
          * NPC 移动时刷新 Navigation 导航
          */
         @SubscribeEvent
-        internal fun onMove(e: AdyeshachEntityTeleportEvent) {
+        private fun onMove(e: AdyeshachEntityTeleportEvent) {
             submitAsync { e.entity.updateTrackLandmark() }
         }
 
         @SubscribeEvent
-        internal fun onQuit(e: PlayerEvents.Released) {
+        private fun onQuit(e: PlayerEvents.Released) {
             trackLandmarkHologramMap.remove(e.player.name)
             acceptedQuestsMap.remove(e.player.name)
             scoreboardBaffle.reset(e.player.name)
@@ -594,7 +594,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
         }
 
         @SubscribeEvent
-        internal fun onCommand(e: PlayerCommandPreprocessEvent) {
+        private fun onCommand(e: PlayerCommandPreprocessEvent) {
             if (e.message.equals("/ChemdahTrackCancel", true)) {
                 e.isCancelled = true
                 e.player.chemdahProfile.trackQuest = null

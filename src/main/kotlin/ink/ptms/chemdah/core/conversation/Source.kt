@@ -15,4 +15,9 @@ abstract class Source<T>(var name: String, var entity: T) {
     abstract fun transfer(player: Player, newId: String): Boolean
 
     abstract fun getOriginLocation(entity: T): Location
+
+    fun update(name: String, entity: T) {
+        this.name = name
+        this.entity = entity
+    }
 }

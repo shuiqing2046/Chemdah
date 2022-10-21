@@ -15,8 +15,15 @@ import taboolib.module.chat.colored
 class ThemeChatSettings(root: ConfigurationSection) : ThemeSettings(root) {
 
     val format = root.getStringList("format")
+
+    /** 可以选择的回复 **/
     val select = root.getString("select.reply.1", "")!!.colored()
     val selectOther = root.getString("select.reply.0", "")!!.colored()
+
+    /** 曾被选过的回复 **/
+    val selected = root.getString("select.reply-selected.1", select)!!.colored()
+    val selectedOther = root.getString("select.reply-selected.0", selectOther)!!.colored()
+
     val talking = root.getString("talking", "")!!.colored()
     val animation = root.getBoolean("animation", true)
     val speed = root.getLong("speed", 1)

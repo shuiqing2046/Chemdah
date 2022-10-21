@@ -101,7 +101,7 @@ abstract class Database {
         }
 
         @Awake(LifeCycle.ENABLE)
-        internal fun onEnable() {
+        private fun onEnable() {
             if (INSTANCE is DatabaseError && Bukkit.getPluginManager().isPluginEnabled("ErrorReporter")) {
                 // 汇报异常并关服
                 if (ErrorReportHandler.isRegistered()) {
@@ -111,7 +111,7 @@ abstract class Database {
         }
 
         @SubscribeEvent
-        internal fun onLogin(e: PlayerLoginEvent) {
+        private fun onLogin(e: PlayerLoginEvent) {
             if (INSTANCE is DatabaseError) {
                 e.result = PlayerLoginEvent.Result.KICK_OTHER
                 e.kickMessage = e.player.asLangText("database-error")
@@ -119,7 +119,7 @@ abstract class Database {
         }
 
         @SubscribeEvent
-        internal fun onJoin(e: PlayerJoinEvent) {
+        private fun onJoin(e: PlayerJoinEvent) {
             submit(delay = Chemdah.conf.getLong("join-select-delay", 20), async = true) {
                 if (e.player.isOnline) {
                     INSTANCE.select(e.player).also {
@@ -131,17 +131,17 @@ abstract class Database {
         }
 
         @SubscribeEvent
-        internal fun onQuit(e: PlayerQuitEvent) {
+        private fun onQuit(e: PlayerQuitEvent) {
             PlayerEvents.Released(e.player).call()
         }
 
         @SubscribeEvent
-        internal fun onKick(e: PlayerKickEvent) {
+        private fun onKick(e: PlayerKickEvent) {
             PlayerEvents.Released(e.player).call()
         }
 
         @SubscribeEvent
-        internal fun onReleased(e: PlayerEvents.Released) {
+        private fun onReleased(e: PlayerEvents.Released) {
             val playerProfile = ChemdahAPI.playerProfile.remove(e.player.name)
             if (playerProfile?.isDataChanged == true) {
                 submitAsync {

@@ -24,6 +24,7 @@ class Session(
     /**
      * 会话是否有效
      */
+    @Suppress("KotlinConstantConditions")
     val isValid: Boolean
         get(): Boolean {
             val session = ConversationManager.sessions[player.name]
@@ -36,16 +37,27 @@ class Session(
     val distance: Double
         get() = origin.distance(player.location) - origin.distance(location)
 
+    /** NPC 部分 **/
     val npcSide = ArrayList<String>()
     var npcTalking = false
 
+    /** 玩家部分 **/
     var playerSide: PlayerReply? = null
     var playerReplyForDisplay = ArrayList<PlayerReply>()
 
+    /** 是否跳转 **/
     var isNext = false
+
+    /** 是否关闭 **/
     var isClosed = false
+
+    /** 是否告别 **/
     var isFarewell = false
 
+    /** 是否选择 **/
+    var isSelected = false
+
+    /** 开始时间 **/
     val beginTime = System.currentTimeMillis()
 
     init {

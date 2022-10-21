@@ -63,7 +63,7 @@ object LevelSystem : Module {
     }
 
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    internal fun onLevelChange(e: PlayerEvents.LevelChange) {
+    private fun onLevelChange(e: PlayerEvents.LevelChange) {
         if (e.newLevel > e.oldLevel) {
             ((e.oldLevel + 1)..e.newLevel).forEach { level ->
                 e.option.getReward(level)?.eval(e.player, level)

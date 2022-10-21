@@ -16,6 +16,9 @@ theme-chat:
     reply:
       1: '&7▶ &f&n{player_side}&r &8(&6&lF&8)'
       0: '&8▶ &7{player_side}&r   &r'
+    reply-selected:
+      1: '&7▶ &7&n{player_side}&r &8(&6&lF&8)'
+      0: '&8▶ &8{player_side}&r   &r'
     sound:
       name: ENTITY_EXPERIENCE_ORB_PICKUP
       p: 2
@@ -50,7 +53,8 @@ theme-chat:
 theme-chest:
   ui:
     title: 'Talking with {title}...'
-    rows: 'max ceil math add [ math div [ &size 5 ] 2 ] 3'
+    rows: |-
+      max ceil calc "size / 5 + 2" 3
   npc-side:
     item:
       material: book
@@ -64,6 +68,9 @@ theme-chest:
     item:
       material: paper
       name: '&7{index}. &f{player_side}'
+    item-selected:
+      material: paper
+      name: '&8{index}. &7{player_side}'
     slot:
       - 12
       - 13

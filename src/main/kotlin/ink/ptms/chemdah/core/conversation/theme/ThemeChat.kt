@@ -195,6 +195,7 @@ object ThemeChat : Theme<ThemeChatSettings>() {
                 val endMessage = printIndex + 1 == messageText.size
                 submit(delay = settings.speed * d++) {
                     if (session.isValid) {
+                        // 如果 NPC 正在发言，则向玩家发送消息
                         if (session.npcTalking) {
                             future.npcTalk(session, message, printText, index, endMessage = endMessage, canReply = canReply)
                         }

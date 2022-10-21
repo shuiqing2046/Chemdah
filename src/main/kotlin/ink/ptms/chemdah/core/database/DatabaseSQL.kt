@@ -403,7 +403,7 @@ class DatabaseSQL : Database() {
         private val cacheQuestId = ConcurrentHashMap<String, MutableMap<String, Long>>()
 
         @SubscribeEvent
-        internal fun onReleased(e: PlayerEvents.Released) {
+        private fun onReleased(e: PlayerEvents.Released) {
             cacheUserId.remove(e.player.name)
             cacheQuestId.remove(e.player.name)
         }

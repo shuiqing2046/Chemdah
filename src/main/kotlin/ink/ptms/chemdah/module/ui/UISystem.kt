@@ -32,7 +32,7 @@ object UISystem : Module {
     fun getUI(name: String) = ui[name]
 
     @SubscribeEvent
-    internal fun onReleased(e: PlayerEvents.Released) {
+    private fun onReleased(e: PlayerEvents.Released) {
         ui.values.forEach { it.playerFilters.remove(e.player.uniqueId) }
     }
 
