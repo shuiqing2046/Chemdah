@@ -85,6 +85,7 @@ class Session(
     fun reload() {
         npcSide.clear()
         variables["@Sender"] = player
+        isSelected = false
     }
 
     /**
