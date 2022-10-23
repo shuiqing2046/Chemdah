@@ -158,9 +158,7 @@ object ConversationManager {
     private fun onCommand(e: PlayerCommandPreprocessEvent) {
         if (e.message.startsWith("/session")) {
             e.isCancelled = true
-            val args = e.message.split(" ").toMutableList().also {
-                it.removeFirst()
-            }
+            val args = e.message.split(" ").toMutableList().also { it.removeFirst() }
             if (args.size == 2 && args[0] == "reply") {
                 val session = e.player.conversationSession ?: return
                 val reply = session.conversation.playerSide.reply.firstOrNull { it.uuid.toString() == args[1] } ?: return

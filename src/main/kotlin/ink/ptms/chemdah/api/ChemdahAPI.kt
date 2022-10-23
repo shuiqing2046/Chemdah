@@ -37,19 +37,29 @@ import kotlin.reflect.KClass
 
 object ChemdahAPI {
 
+    /** 脚本工作空间 **/
     val workspace = Workspace(File(getDataFolder(), "module/script"), namespace = namespace)
 
+    /** 已注册对话 **/
     val conversation = HashMap<String, Conversation>()
+    /** 已注册主题 **/
     val conversationTheme = HashMap<String, Theme<*>>()
 
+    /** 已注册任务元数据 **/
     val questMeta = HashMap<String, Class<out Meta<*>>>()
+    /** 已注册任务组件 **/
     val questAddon = HashMap<String, Class<out Addon>>()
+    /** 已注册任务模板 **/
     val questTemplate = HashMap<String, Template>()
+    /** 已注册任务模板分组 **/
     val questTemplateGroup = HashMap<String, TemplateGroup>()
+    /** 已注册任务目标 **/
     val questObjective = HashMap<String, Objective<*>>()
 
+    /** 玩家数据 **/
     val playerProfile = ConcurrentHashMap<String, PlayerProfile>()
 
+    /** 事件工厂 **/
     var eventFactory = ChemdahEventFactory()
 
     /**
