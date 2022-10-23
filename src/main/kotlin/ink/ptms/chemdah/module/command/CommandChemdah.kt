@@ -47,12 +47,12 @@ object CommandChemdah {
 
     @CommandBody
     val info = subCommand {
-        dynamic(commit = "player") {
+        dynamic(comment ="player") {
             suggestPlayers()
             execute<CommandSender> { sender, _, argument ->
                 commandInfo(sender, Bukkit.getPlayerExact(argument)!!)
             }
-            dynamic(commit = "page", optional = true) {
+            dynamic(comment ="page", optional = true) {
                 execute<CommandSender> { sender, ctx, argument ->
                     commandInfo(sender, ctx.player(-1).cast(), Coerce.toInteger(argument) - 1)
                 }

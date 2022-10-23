@@ -2,13 +2,14 @@ package ink.ptms.chemdah.module.command
 
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.module.level.LevelSystem
-import ink.ptms.chemdah.module.level.LevelSystem.getLevel
 import ink.ptms.chemdah.module.level.LevelSystem.getLevelOption
+import ink.ptms.chemdah.module.level.LevelSystem.giveExperience
+import ink.ptms.chemdah.module.level.LevelSystem.giveLevel
+import ink.ptms.chemdah.module.level.LevelSystem.setExperience
 import ink.ptms.chemdah.module.level.LevelSystem.setLevel
-import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
 import taboolib.common.platform.command.*
-import taboolib.common.platform.function.onlinePlayers
 import taboolib.common5.Coerce
 import taboolib.expansion.createHelper
 import taboolib.platform.util.sendLang
@@ -30,24 +31,19 @@ object CommandChemdahPlayerLevel {
     }
 
     @CommandBody
-    val addlevel = subCommand { 
-        dynamic(commit = "player") {
+    val addlevel = subCommand {
+        dynamic(comment = "player") {
             suggestPlayers()
             // level
-            dynamic(commit = "level") {
+            dynamic(comment = "level") {
                 suggestion<CommandSender> { _, _ -> LevelSystem.level.keys.toList() }
                 // value
-                dynamic(commit = "value") {
-                    execute<CommandSender> { sender, context, argument ->
-                        val playerExact = Bukkit.getPlayerExact(context.argument(-2))!!
-                        val option = getLevelOption(context.argument(-1))!!
-                        val profile = playerExact.chemdahProfile
-                        val level = option.toLevel(profile.getLevel(option))
-                        level.addLevel(Coerce.toInteger(argument)).thenAccept {
-                            profile.setLevel(option, level.toPlayerLevel())
-                            profile.getLevel(option).also {
-                                sender.sendLang("command-level-change", "§7${option.id} (LEVEL) §8+= §f${argument} §7(Lv.${it.level}, ${it.experience})")
-                            }
+                dynamic(comment = "value") {
+                    execute<CommandSender> { sender, ctx, argument ->
+                        val option = getLevelOption(ctx.argument(-1))!!
+                        val profile = ctx.player(-2).cast<Player>().chemdahProfile
+                        profile.giveLevel(option, Coerce.toInteger(argument)).thenAccept {
+                            sender.sendLang("command-level-change", "§7${option.id} (LEVEL) §8+= §f${argument} §7(Lv.${it.level}, ${it.experience})")
                         }
                     }
                 }
@@ -57,23 +53,18 @@ object CommandChemdahPlayerLevel {
 
     @CommandBody
     val setlevel = subCommand {
-        dynamic(commit = "player") {
+        dynamic(comment = "player") {
             suggestPlayers()
             // level
-            dynamic(commit = "level") {
+            dynamic(comment = "level") {
                 suggestion<CommandSender> { _, _ -> LevelSystem.level.keys.toList() }
                 // value
-                dynamic(commit = "value") {
-                    execute<CommandSender> { sender, context, argument ->
-                        val playerExact = Bukkit.getPlayerExact(context.argument(-2))!!
-                        val option = getLevelOption(context.argument(-1))!!
-                        val profile = playerExact.chemdahProfile
-                        val level = option.toLevel(profile.getLevel(option))
-                        level.setLevel(Coerce.toInteger(argument)).thenAccept {
-                            profile.setLevel(option, level.toPlayerLevel())
-                            profile.getLevel(option).also {
-                                sender.sendLang("command-level-change", "§7${option.id} (LEVEL) §8= §f${argument} §7(Lv.${it.level}, ${it.experience})")
-                            }
+                dynamic(comment = "value") {
+                    execute<CommandSender> { sender, ctx, argument ->
+                        val option = getLevelOption(ctx.argument(-1))!!
+                        val profile = ctx.player(-2).cast<Player>().chemdahProfile
+                        profile.setLevel(option, Coerce.toInteger(argument)).thenAccept {
+                            sender.sendLang("command-level-change", "§7${option.id} (LEVEL) §8= §f${argument} §7(Lv.${it.level}, ${it.experience})")
                         }
                     }
                 }
@@ -83,23 +74,18 @@ object CommandChemdahPlayerLevel {
 
     @CommandBody
     val addexp = subCommand {
-        dynamic(commit = "player") {
+        dynamic(comment = "player") {
             suggestPlayers()
             // level
-            dynamic(commit = "level") {
+            dynamic(comment = "level") {
                 suggestion<CommandSender> { _, _ -> LevelSystem.level.keys.toList() }
                 // value
-                dynamic(commit = "value") {
-                    execute<CommandSender> { sender, context, argument ->
-                        val playerExact = Bukkit.getPlayerExact(context.argument(-2))!!
-                        val option = getLevelOption(context.argument(-1))!!
-                        val profile = playerExact.chemdahProfile
-                        val level = option.toLevel(profile.getLevel(option))
-                        level.addExperience(Coerce.toInteger(argument)).thenAccept {
-                            profile.setLevel(option, level.toPlayerLevel())
-                            profile.getLevel(option).also {
-                                sender.sendLang("command-level-change", "§7${option.id} (EXP) §8+= §f${argument} §7(Lv.${it.level}, ${it.experience})")
-                            }
+                dynamic(comment = "value") {
+                    execute<CommandSender> { sender, ctx, argument ->
+                        val option = getLevelOption(ctx.argument(-1))!!
+                        val profile = ctx.player(-2).cast<Player>().chemdahProfile
+                        profile.giveExperience(option, Coerce.toInteger(argument)).thenAccept {
+                            sender.sendLang("command-level-change", "§7${option.id} (EXP) §8+= §f${argument} §7(Lv.${it.level}, ${it.experience})")
                         }
                     }
                 }
@@ -109,23 +95,18 @@ object CommandChemdahPlayerLevel {
 
     @CommandBody
     val setexp = subCommand {
-        dynamic(commit = "player") {
+        dynamic(comment = "player") {
             suggestPlayers()
             // level
-            dynamic(commit = "level") {
+            dynamic(comment = "level") {
                 suggestion<CommandSender> { _, _ -> LevelSystem.level.keys.toList() }
                 // value
-                dynamic(commit = "value") {
-                    execute<CommandSender> { sender, context, argument ->
-                        val playerExact = Bukkit.getPlayerExact(context.argument(-2))!!
-                        val option = getLevelOption(context.argument(-1))!!
-                        val profile = playerExact.chemdahProfile
-                        val level = option.toLevel(profile.getLevel(option))
-                        level.setExperience(Coerce.toInteger(argument)).thenAccept {
-                            profile.setLevel(option, level.toPlayerLevel())
-                            profile.getLevel(option).also {
-                                sender.sendLang("command-level-change", "§7${option.id} (EXP) §8= §f${argument} §7(Lv.${it.level}, ${it.experience})")
-                            }
+                dynamic(comment = "value") {
+                    execute<CommandSender> { sender, ctx, argument ->
+                        val option = getLevelOption(ctx.argument(-1))!!
+                        val profile = ctx.player(-2).cast<Player>().chemdahProfile
+                        profile.setExperience(option, Coerce.toInteger(argument)).thenAccept {
+                            sender.sendLang("command-level-change", "§7${option.id} (EXP) §8= §f${argument} §7(Lv.${it.level}, ${it.experience})")
                         }
                     }
                 }

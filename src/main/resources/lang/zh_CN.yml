@@ -127,6 +127,8 @@ command-script-list-all:
   - '&c[Chemdah] &7运行脚本: &f{1}'
 command-script-reload-all:
   - '&c[Chemdah] &7重载完成.'
+command-conversation-not-found: '&c[Chemdah] &7对话不存在.'
+command-adyeshach-not-found: '&c[Chemdah] &7Adyeshach 单位不存在.'
 database-error: '&4&l错误! &r插件 &4&lChemdah&r 的数据库未完成初始化.'
 database-error-username: '&4&l警告! &r插件 &4&lChemdah&r 阻止改用户名进入服务器.'
 

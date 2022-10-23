@@ -4,7 +4,16 @@
 
 
 database:
+  # Data loading delay
+  # How soon after the player joins the game does the data load
+  join-select-delay: 20
+  # Index of the data
+  # Player data indexed in a way that cannot be changed once in production
+  user-index: UUID
+  # Database type
+  # Available: LOCAL, SQL
   use: LOCAL
+  # Database settings
   source:
     SQL:
       host: localhost
@@ -13,56 +22,102 @@ database:
       password: root
       database: test
       table: chemdah
-  join-select-delay: 20
-  user-index: UUID
 
+# Default state configuration
 default-stats:
+  # Staying time, how long to remove
   stay: 100
+  # BossBar style
+  # Available: SOLID, SEGMENTED_6, SEGMENTED_10, SEGMENTED_12, SEGMENTED_20
   style: SOLID
+  # BossBar color
+  # Available: PINK, BLUE, RED, GREEN, YELLOW, PURPLE, WHITE
   color: WHITE
+  # BossBar text
   content: '&3[{name}] &7{value}/{target} &f[{percent}%]'
 
+# Default tracking configuration
 default-track:
+  # Message sent when the player starts tracking
   message: '&7Tracking &3[{name}]&7... Click to cancel.'
+  # Beacon, particle pillar
   beacon:
+    # Whether to enable
     value: true
+    # Particle type
     type: CLOUD
+    # Particle width
     size: 0.05
+    # Particle density
     count: 500
+    # Nearest visual distance
+    # Particle effects are only displayed from this distance
     distance: 32
+    # Update interval
     period: 2
+    # Fixed position
+    # If true, the particle pillar will be fixed at the destination
     fixed: false
+  # Landmark, hologram in front of the player
   landmark:
+    # Whether to enable
     value: true
+    # Hologram text
     content:
       - '&a{name}'
       - '&f({distance}m)'
+    # Display distance
     distance: 3
+  # Navigation, pathfinding to the destination
   navigation:
+    # Whether to enable
     value: true
+    # Whether to calculate in the main thread
+    # Fast response but with performance loss
     sync: true
+    # Display type
     type: POINT
+    # Longest search distance
     distance: 64
+    # Display type of POINT
     point:
+      # Particle type
       type: CRIT
+      # Height above ground
       y: 0
+      # Particle size
       size:
         x: 0.2
         y: 0.2
+      # Particle density
       count: 20
+      # Particle speed
       speed: 1
+      # Update interval
       period: 60
+    # Display type of ARROW
     arrow:
+      # Particle type
       type: DRIP_LAVA
+      # Height above ground
       y: 0.2
+      # Arrow density
       density: 12
+      # Arrow length
       len: 0.5
+      # Arrow angle
       angle: 45
+      # Particle speed
       speed: 1
+      # Update interval
       period: 100
+  # Scoreboard, display information about the quest
   scoreboard:
+    # Whether to enable
     value: true
+    # Automatic line break length
     length: 64
+    # Display text
     content:
       - '&6&lTRACKING'
       - - ''

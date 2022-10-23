@@ -39,7 +39,7 @@ class UI(val config: ConfigurationSection) {
         config.getConfigurationSection("include")?.getKeys(false)?.forEach {
             val active = config.getConfigurationSection("include.$it.active") ?: return@forEach
             val normal = config.getConfigurationSection("include.$it.normal") ?: return@forEach
-            include.add(Include(it, XItemStack.deserialize(active)!!, XItemStack.deserialize(normal)!!))
+            include.add(Include(it, XItemStack.deserialize(active), XItemStack.deserialize(normal)))
         }
         items[ItemType.INFO] = Item(config.getConfigurationSection("item.info")!!)
         items[ItemType.FILTER] = ItemFilter(config.getConfigurationSection("item.filter")!!)

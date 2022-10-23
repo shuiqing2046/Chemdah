@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     `java-library`
     `maven-publish`
-    id("io.izzel.taboolib") version "1.42"
+    id("io.izzel.taboolib") version "1.50"
     id("org.jetbrains.kotlin.jvm") version "1.5.31"
     id("org.jetbrains.dokka") version "1.6.0"
 }
@@ -40,7 +40,7 @@ taboolib {
     install("expansion-command-helper")
     install("expansion-javascript")
     classifier = null
-    version = "6.0.9-124"
+    version = "6.0.10-6"
     relocate("ink.ptms.um", "ink.ptms.chemdah.um")
 }
 
@@ -95,7 +95,7 @@ dependencies {
     compileOnly("public:Brewery:1.0.0")
     compileOnly("ink.ptms:Blockdb:1.1.0")
     compileOnly("ink.ptms:Zaphkiel:1.6.0")
-    compileOnly("ink.ptms:Adyeshach:1.4.21")
+    compileOnly("ink.ptms:Adyeshach:1.5.13-op16")
     compileOnly("ink.ptms:Sandalphon:1.3.0")
     compileOnly("ink.ptms.core:v11900:11900:all-mapped")
     compileOnly("ink.ptms.core:v11400:11400")

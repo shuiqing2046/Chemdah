@@ -44,6 +44,7 @@ import taboolib.module.chat.colored
 import taboolib.module.kether.KetherFunction
 import taboolib.module.kether.KetherShell
 import taboolib.module.nms.sendScoreboard
+import taboolib.platform.util.isMovement
 import taboolib.platform.util.sendLang
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
@@ -568,7 +569,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
          */
         @SubscribeEvent
         private fun onMove(e: PlayerMoveEvent) {
-            if (e.from.toVector() != e.to!!.toVector()) {
+            if (e.isMovement()) {
                 submitAsync { e.player.displayTrackLandmark() }
             }
         }

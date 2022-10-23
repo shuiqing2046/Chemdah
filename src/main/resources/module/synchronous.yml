@@ -4,5 +4,9 @@
 
 
 synchronous:
+  # Whether to use player data to take over the economy
+  # Write the key
   player-data-to-vault: ~
+  # Whether to map player data to experience values
+  # Write the key
   player-level-to-minecraft: ~

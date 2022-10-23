@@ -280,13 +280,13 @@ class ActionQuest {
                     }
                 }
                 case("fail", "failure") {
-                    actionNow {
-                        getProfile().getQuestById(getQuestSelected())?.failQuest()
+                    actionTake {
+                        getProfile().getQuestById(getQuestSelected())?.failQuestFuture() ?: CompletableFuture.completedFuture(null)
                     }
                 }
                 case("reset", "restart") {
-                    actionNow {
-                        getProfile().getQuestById(getQuestSelected())?.restartQuest()
+                    actionTake {
+                        getProfile().getQuestById(getQuestSelected())?.restartQuestFuture() ?: CompletableFuture.completedFuture(null)
                     }
                 }
                 case("stop", "cancel") {

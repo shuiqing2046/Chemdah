@@ -180,7 +180,7 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
             } else {
                 Option.Type.ANY
             }
-            metaMap[metaId] = meta.invokeConstructor(option[config, metaNode], this) as Meta<*>
+            metaMap[metaId] = meta.invokeConstructor(option[config, metaNode], this)
         } else {
             warning("$metaId meta not supported.")
         }

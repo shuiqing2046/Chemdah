@@ -4,20 +4,29 @@
 
 
 example:
+  # Scene world name
   in: world
+  # Scene state
   state:
     0:
+      # Relative position
       relative: 0 80 0
+      # Method
       set:
         - 1 1 1 > stone
         - 0 0 0 ~ 2 0 2 > stone
       auto-next: 20
       $: ~
     1:
+      # Relative position
       relative: 0 80 0
+      # Method
       copy:
+        # Copy from world name
         from-world: ~
+        # Copy from position
         from: 0 0 0 ~ 10 10 10
+        # Copy to position
         to: 0 0 0
       auto-next: ~
       $: ~

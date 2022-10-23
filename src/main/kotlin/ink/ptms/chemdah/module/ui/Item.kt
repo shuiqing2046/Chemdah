@@ -22,7 +22,7 @@ import taboolib.platform.util.modifyMeta
  */
 open class Item(val config: ConfigurationSection) {
 
-    val itemStackBase = XItemStack.deserialize(config)!!
+    val itemStackBase = XItemStack.deserialize(config)
 
     open fun getItemStack(player: PlayerProfile, ui: UI, template: Template): ItemStack {
         return itemStackBase.clone().also { item ->

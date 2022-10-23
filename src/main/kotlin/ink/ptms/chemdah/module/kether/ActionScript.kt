@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableList
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.util.getBukkitPlayer
 import taboolib.common.platform.function.adaptPlayer
+import taboolib.common.platform.function.info
+import taboolib.common.platform.function.warning
 import taboolib.library.kether.ArgTypes
 import taboolib.library.kether.ParsedAction
 import taboolib.module.kether.*
@@ -38,21 +40,16 @@ class ActionScript {
                                 sender = adaptPlayer(frame.getBukkitPlayer())
                                 args.forEachIndexed { index, any -> rootFrame().variables().set("arg$index", any) }
                             }
-                            ChemdahAPI.workspace.run(scriptId, scriptContext).thenAccept { future.complete(it) }
+                            ChemdahAPI.workspace.runScript(scriptId, scriptContext).thenAccept { future.complete(it) }
                         }
                     } else {
+                        warning("Script $name not found.")
                         future.complete(null)
                     }
                 }
             }
             process(0)
             return future
-        }
-
-        private fun Workspace.run(id: String, context: ScriptContext): CompletableFuture<Any> {
-            context.id = id
-            runningScripts.put(id, context)
-            return context.runActions().also { it.thenRun{ runningScripts.remove(id, context) } }
         }
     }
 

@@ -1,0 +1,17 @@
+
+
+#         Powered by TabooLib 6.0         #
+
+
+example_0:
+  # Wizard world name
+  in: world
+  # Path nodes
+  # If the distance to the destination is long,
+  # it needs to be split into multiple nodes for movement
+  # From top to bottom, from start to finish
+  nodes:
+    - 50 80 0
+    - 100 80 0
+  # Stops moving when the player is too far away from the Wizard NPC
+  waiting-distance: 5

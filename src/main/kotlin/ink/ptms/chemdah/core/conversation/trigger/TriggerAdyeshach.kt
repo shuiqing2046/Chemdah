@@ -5,13 +5,16 @@ import ink.ptms.adyeshach.common.entity.EntityInstance
 import ink.ptms.adyeshach.common.entity.ai.expand.ControllerLookAtPlayerAlways
 import ink.ptms.chemdah.api.ChemdahAPI.conversationSession
 import ink.ptms.chemdah.api.event.collect.ConversationEvents
+import ink.ptms.chemdah.core.conversation.Conversation
 import ink.ptms.chemdah.core.conversation.ConversationManager
+import ink.ptms.chemdah.core.conversation.Session
 import ink.ptms.chemdah.core.conversation.Source
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
+import java.util.concurrent.CompletableFuture
 
 /**
  * Chemdah
@@ -74,32 +77,46 @@ internal object TriggerAdyeshach {
             if (conversation != null) {
                 e.isCancelled = true
                 // 同步打开对话
-                submit {
-                    // 创建对话源
-                    val source = object : Source<EntityInstance>(e.entity.getDisplayName(), e.entity) {
-
-                        override fun transfer(player: Player, newId: String): Boolean {
-                            val entities = e.entity.manager?.getEntities()
-                            val nearby = entities?.filter { it.isValidDistance(player) }?.firstOrNull { it.id == newId } ?: return false
-                            update(nearby.getDisplayName(), nearby)
-                            return true
-                        }
-
-                        override fun getOriginLocation(entity: EntityInstance): Location {
-                            return entity.getLocation().add(0.0, entity.entityType.entitySize.height, 0.0)
-                        }
-                    }
-                    // 打开对话
-                    conversation.open(e.player, source) {
-                        it.variables["@manager"] = e.entity.manager
-                        it.variables["@entities"] = listOf(e.entity)
-                    }
-                }
+                submit { conversation.openByAdyeshach(e.player, e.entity) }
             }
         }
     }
 
     fun EntityInstance.isValidDistance(player: Player): Boolean {
         return player.world == getWorld() && player.location.distance(getLocation()) < 10.0
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun EntityInstance.openConversation(player: Player): CompletableFuture<Session>? {
+        return ConversationManager.getConversation(player, "adyeshach", this.id)?.openByAdyeshach(player, this)
+    }
+
+    fun Conversation.openByAdyeshach(player: Player, entityInstance: EntityInstance, look: Boolean = true): CompletableFuture<Session> {
+        // 创建对话源
+        val source = object : Source<EntityInstance>(entityInstance.getDisplayName(), entityInstance) {
+
+            override fun transfer(player: Player, newId: String): Boolean {
+                val entities = entityInstance.manager?.getEntities()
+                val nearby = entities?.filter { it.isValidDistance(player) }?.firstOrNull { it.id == newId } ?: return false
+                update(nearby.getDisplayName(), nearby)
+                return true
+            }
+
+            override fun getOriginLocation(entity: EntityInstance): Location {
+                return entity.getLocation().add(0.0, entity.entityType.entitySize.height, 0.0)
+            }
+        }
+        // 锁定视角
+        if (look) {
+            val direction = source.getOriginLocation(source.entity).subtract(player.eyeLocation).toVector().normalize()
+            val temp = player.location.clone()
+            temp.direction = direction
+            player.teleport(temp)
+        }
+        // 打开对话
+        return open(player, source) {
+            it.variables["@manager"] = entityInstance.manager
+            it.variables["@entities"] = listOf(entityInstance)
+        }
     }
 }
