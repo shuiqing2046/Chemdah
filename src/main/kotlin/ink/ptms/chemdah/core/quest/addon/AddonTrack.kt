@@ -31,11 +31,9 @@ import org.bukkit.event.player.PlayerMoveEvent
 import taboolib.common.platform.Schedule
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
-import taboolib.common.platform.function.adaptCommandSender
-import taboolib.common.platform.function.submit
-import taboolib.common.platform.function.submitAsync
-import taboolib.common.platform.function.warning
+import taboolib.common.platform.function.*
 import taboolib.common.util.asList
+import taboolib.common.util.resettableLazy
 import taboolib.common5.Baffle
 import taboolib.common5.Coerce
 import taboolib.library.configuration.ConfigurationSection
@@ -66,6 +64,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
     val center by lazy {
         val center = config.getString("center")
         when {
+            // 无追踪
             center.isNullOrEmpty() -> object : TrackCenter {
 
                 override fun identifier(): String {
@@ -77,6 +76,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                 }
             }
 
+            // 追踪 Adyeshach 单位
             center.startsWith("adyeshach") -> object : TrackCenter {
 
                 val id = center.substringAfter("adyeshach").trim()
@@ -97,6 +97,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                 }
             }
 
+            // 追踪坐标
             else -> object : TrackCenter {
 
                 override fun identifier(): String {
@@ -148,15 +149,15 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
 
         private val chars = (1..50).map { '黑' + it }
 
-        private val defaultContent by lazy {
+        private val defaultContent by resettableLazy {
             conf.getList("default-track.scoreboard.content")!!.filterNotNull().map { TrackScoreboard.Line(it.asList().colored()) }
         }
 
-        private val defaultMessage by lazy {
+        private val defaultMessage by resettableLazy {
             conf["default-track.message"]?.asList()?.colored() ?: emptyList()
         }
 
-        private val defaultLength by lazy {
+        private val defaultLength by resettableLazy {
             conf.getInt("default-track.scoreboard.length")
         }
 
@@ -337,9 +338,9 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                         })
                     }
                 } else {
-                    hologramMap[id] = AdyeshachAPI.createHologram(this, pos, trackAddon.landmark.content.map {
+                    hologramMap.put(id, AdyeshachAPI.createHologram(this, pos, trackAddon.landmark.content.map {
                         it.replaces("name" to name, "distance" to Coerce.format(distance))
-                    })
+                    }))?.delete()
                 }
             } else {
                 hologramMap.remove(id)?.delete()

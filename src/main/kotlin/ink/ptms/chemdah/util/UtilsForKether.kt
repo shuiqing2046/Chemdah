@@ -13,37 +13,15 @@ import taboolib.library.kether.QuestContext
 import taboolib.module.kether.ScriptFrame
 import taboolib.module.kether.script
 
-val namespace = listOf(
-    "adyeshach",
-    "chemdah",
-)
+val namespace = listOf("adyeshach", "chemdah")
 
-val namespaceQuest = listOf(
-    "adyeshach",
-    "chemdah",
-    "chemdah-quest"
-)
+val namespaceQuest = listOf(*namespace.toTypedArray(), "chemdah-quest")
 
-val namespaceQuestUI = listOf(
-    "adyeshach",
-    "chemdah",
-    "chemdah-quest",
-    "chemdah-quest-ui"
-)
+val namespaceQuestUI = listOf(*namespaceQuest.toTypedArray(), "chemdah-quest-ui")
 
-val namespaceConversationNPC = listOf(
-    "adyeshach",
-    "chemdah",
-    "chemdah-conversation",
-    "chemdah-conversation-npc"
-)
+val namespaceConversationNPC = listOf(*namespace.toTypedArray(), "chemdah-conversation", "chemdah-conversation-npc")
 
-val namespaceConversationPlayer = listOf(
-    "adyeshach",
-    "chemdah",
-    "chemdah-conversation",
-    "chemdah-conversation-player"
-)
+val namespaceConversationPlayer = listOf(*namespace.toTypedArray(), "chemdah-conversation", "chemdah-conversation-player")
 
 fun ScriptFrame.getQuestSelected(): String {
     return variables().get<Any?>("@QuestSelected").orElse(null)?.toString() ?: error("No quest selected.")

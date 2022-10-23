@@ -295,10 +295,18 @@ class ActionQuest {
                     }
                 }
                 case("track") {
-                    actionNow {
-                        val template = ChemdahAPI.getQuestTemplate(getQuestSelected())
-                        if (template != null) {
-                            getProfile().trackQuest = template
+                    it.mark()
+                    try {
+                        it.expect("cancel")
+                        actionNow {
+                            getProfile().trackQuest = null
+                            null
+                        }
+                    } catch (ignored: Exception) {
+                        it.reset()
+                        actionNow {
+                            getProfile().trackQuest = ChemdahAPI.getQuestTemplate(getQuestSelected())
+                            null
                         }
                     }
                 }

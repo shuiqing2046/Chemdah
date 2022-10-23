@@ -25,6 +25,7 @@ import taboolib.common.platform.Awake
 import taboolib.common.platform.function.adaptPlayer
 import taboolib.common.platform.function.getDataFolder
 import taboolib.common.platform.function.warning
+import taboolib.common.util.ResettableLazy
 import taboolib.module.kether.KetherFunction
 import taboolib.module.kether.KetherShell
 import taboolib.module.kether.Workspace
@@ -262,6 +263,7 @@ object ChemdahAPI {
         QuestLoader.loadTemplate()
         QuestLoader.loadTemplateGroup()
         Module.reload()
+        ResettableLazy.reset()
     }
 
     fun invokeKether(source: String, player: Player? = null, vars: Map<String, Any> = emptyMap()): CompletableFuture<Any?> {
