@@ -90,6 +90,7 @@ command-script-reload-all:
   - '&c[Chemdah] &7Scripts has been reloaded.'
 command-conversation-not-found: '&c[Chemdah] &7Conversation not found.'
 command-adyeshach-not-found: '&c[Chemdah] &7Adyeshach not found.'
+command-name-generated: '&c[Chemdah] &7Name generated:'
 database-error: '&4&lERROR! &rThe &4&lChemdah&r database failed to initialize.'
 database-error-username: '&4&lWARNING! &rThe &4&lChemdah&r blocked this username.'
 

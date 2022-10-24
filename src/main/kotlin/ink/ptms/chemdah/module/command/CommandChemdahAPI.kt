@@ -2,14 +2,16 @@ package ink.ptms.chemdah.module.command
 
 import ink.ptms.adyeshach.api.AdyeshachAPI
 import ink.ptms.chemdah.api.ChemdahAPI
-import ink.ptms.chemdah.core.conversation.Source
 import ink.ptms.chemdah.core.conversation.trigger.TriggerAdyeshach.openConversation
+import ink.ptms.chemdah.module.generator.NameGenerator
 import ink.ptms.chemdah.module.scenes.ScenesSystem
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import taboolib.common.platform.command.*
+import taboolib.common.platform.function.adaptCommandSender
 import taboolib.common5.Coerce
 import taboolib.expansion.createHelper
+import taboolib.module.chat.TellrawJson
 import taboolib.module.chat.colored
 import taboolib.platform.util.sendLang
 
@@ -105,6 +107,36 @@ object CommandChemdahAPI {
                             conversation.openSelf(ctx.player(-2).cast(), argument.colored())
                         }
                     }
+                }
+            }
+        }
+    }
+
+    @CommandBody
+    val generate = subCommand {
+        dynamic(comment = "name") {
+            suggest { NameGenerator.generatorNames() }
+            dynamic(comment = "amount", optional = true) {
+                restrictInt()
+                execute<CommandSender> { sender, ctx, _ ->
+                    val names = NameGenerator.generate(ctx.argument(-1), ctx.int(0))
+                    sender.sendLang("command-name-generated")
+                    TellrawJson().sendTo(adaptCommandSender(sender)) {
+                        names.forEach { name ->
+                            append("&c[Chemdah] &8- ".colored())
+                            append("&f$name".colored()).copyToClipboard(name).hoverText("&7Click to copy".colored())
+                            newLine()
+                        }
+                    }
+                }
+            }
+            execute<CommandSender> { sender, ctx, _ ->
+                val name = NameGenerator.generate(ctx.argument(0)).firstOrNull() ?: "null"
+                sender.sendLang("command-name-generated")
+                TellrawJson().sendTo(adaptCommandSender(sender)) {
+                    append("&c[Chemdah] &8- ".colored())
+                    append("&f$name".colored()).copyToClipboard(name).hoverText("&7Click to copy".colored())
+                    newLine()
                 }
             }
         }
