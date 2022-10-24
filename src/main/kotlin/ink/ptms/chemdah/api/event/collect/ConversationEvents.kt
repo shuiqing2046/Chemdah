@@ -1,9 +1,6 @@
 package ink.ptms.chemdah.api.event.collect
 
-import ink.ptms.chemdah.core.conversation.AgentType
-import ink.ptms.chemdah.core.conversation.Conversation
-import ink.ptms.chemdah.core.conversation.Option
-import ink.ptms.chemdah.core.conversation.Session
+import ink.ptms.chemdah.core.conversation.*
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import taboolib.library.configuration.ConfigurationSection
@@ -25,9 +22,14 @@ class ConversationEvents {
     class Load(val file: File?, val option: Option, val root: ConfigurationSection): BukkitProxyEvent()
 
     /**
-     * 当玩家选择对话时
+     * 当玩家选择对话时（对话开始之前）
      */
     class Select(val player: Player, val namespace: String, val id: List<String>, var conversation: Conversation?): BukkitProxyEvent()
+
+    /**
+     * 当玩家选择对话回复时
+     */
+    class SelectReply(val player: Player, val session: Session, val reply: PlayerReply): BukkitProxyEvent()
 
     /**
      * 当对话中当脚本代理执行时

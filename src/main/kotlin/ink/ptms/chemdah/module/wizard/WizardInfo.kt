@@ -16,6 +16,9 @@ import taboolib.library.configuration.ConfigurationSection
  */
 class WizardInfo(val root: ConfigurationSection) {
 
+    /** 序号 **/
+    val id = root.name
+
     /** 世界名 **/
     val world = Bukkit.getWorld(root.getString("in").toString())
 
