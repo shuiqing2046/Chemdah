@@ -15,3 +15,6 @@ example_0:
     - 100 80 0
   # Stops moving when the player is too far away from the Wizard NPC
   waiting-distance: 5
+  # The faster the movements speed the greater the value
+  # Generally not changed, unless your Wizard NPC has no way to move between nodes
+  effective-distance-corrections: 1.5

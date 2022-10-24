@@ -18,7 +18,10 @@ import java.io.File
 @Awake
 object NameGenerator : Module {
 
+    /** 命名空间 **/
     val namespace = listOf("adyeshach", "chemdah", "chemdah_name_generator")
+
+    /** 默认文件 **/
     val def = listOf("city", "dragon_1", "dragon_2", "dragon_3", "dwarf_1", "dwarf_2", "elf_1", "elf_2", "elf_3", "human", "item", "kingdom", "town")
 
     init {
