@@ -26,7 +26,7 @@ object CommandChemdahVariables {
 
     @CommandBody
     val get = subCommand {
-        dynamic(commit = "key") {
+        dynamic(comment ="key") {
             suggestion<CommandSender> { _, _ -> ChemdahAPI.getVariables() }
             execute<CommandSender> { sender, _, argument ->
                 val time = System.currentTimeMillis()
@@ -37,13 +37,13 @@ object CommandChemdahVariables {
 
     @CommandBody
     val set = subCommand {
-        dynamic(commit = "key") {
+        dynamic(comment ="key") {
             suggestion<CommandSender>(uncheck = true) { _, _ -> ChemdahAPI.getVariables() }
-            dynamic(commit = "value") {
-                execute<CommandSender> { sender, context, argument ->
+            dynamic(comment ="value") {
+                execute<CommandSender> { sender, ctx, argument ->
                     val time = System.currentTimeMillis()
-                    ChemdahAPI.setVariable(context.argument(-1), argument)
-                    sender.sendLang("command-variables-change", "${context.argument(-1)} §8= §f$argument §7(${System.currentTimeMillis() - time}ms)")
+                    ChemdahAPI.setVariable(ctx.argument(-1), argument)
+                    sender.sendLang("command-variables-change", "${ctx.argument(-1)} §8= §f$argument §7(${System.currentTimeMillis() - time}ms)")
                 }
             }
         }
@@ -51,13 +51,13 @@ object CommandChemdahVariables {
 
     @CommandBody
     val add = subCommand {
-        dynamic(commit = "key") {
+        dynamic(comment ="key") {
             suggestion<CommandSender>(uncheck = true) { _, _ -> ChemdahAPI.getVariables() }
-            dynamic(commit = "value") {
-                execute<CommandSender> { sender, context, argument ->
+            dynamic(comment ="value") {
+                execute<CommandSender> { sender, ctx, argument ->
                     val time = System.currentTimeMillis()
-                    ChemdahAPI.setVariable(context.argument(-1), argument, true)
-                    sender.sendLang("command-variables-change", "${context.argument(-1)} §8+= §f$argument §7(${System.currentTimeMillis() - time}ms)")
+                    ChemdahAPI.setVariable(ctx.argument(-1), argument, true)
+                    sender.sendLang("command-variables-change", "${ctx.argument(-1)} §8+= §f$argument §7(${System.currentTimeMillis() - time}ms)")
                 }
             }
         }
@@ -65,7 +65,7 @@ object CommandChemdahVariables {
 
     @CommandBody
     val remove = subCommand {
-        dynamic(commit = "key") {
+        dynamic(comment ="key") {
             suggestion<CommandSender> { _, _ -> ChemdahAPI.getVariables() }
             execute<CommandSender> { sender, _, argument ->
                 val time = System.currentTimeMillis()

@@ -1,4 +1,4 @@
-package ink.ptms.chemdah.module.compat
+package ink.ptms.chemdah.module
 
 import ink.ptms.chemdah.api.ChemdahAPI.isChemdahProfileLoaded
 import ink.ptms.chemdah.util.namespaceQuest
@@ -10,12 +10,12 @@ import taboolib.platform.compat.PlaceholderExpansion
 
 /**
  * Chemdah
- * ink.ptms.chemdah.compat.CompatPlaceholderAPI
+ * ink.ptms.chemdah.module.PlaceholderHok
  *
  * @author sky
  * @since 2021/3/8 11:07 下午
  */
-object CompatPlaceholderAPI : PlaceholderExpansion {
+object PlaceholderHok : PlaceholderExpansion {
 
     override val identifier: String
         get() = "chemdah"

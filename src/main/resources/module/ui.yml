@@ -4,22 +4,32 @@
 
 
 default:
+  # UI title
   name: '{name}''s Quests [Pg. {page}]'
+  # UI settings
   menu:
+    # UI settings of the quest list
     quest:
+      # Size
       rows: 6
+      # Quest slots
       slot: [
           12, 13, 14, 15, 16,
           21, 22, 23, 24, 25,
           30, 31, 32, 33, 34,
           39, 40, 41, 42, 43
       ]
+      # Function slots
       methods:
         info: 19
         filter: 28
+    # UI settings of the quest filter
     filter:
+      # Size
       rows: 3
+      # Filter slots
       slot: [ 10, 11, 12, 13, 14, 15, 16 ]
+  # UI settings of the quest item
   item:
     info:
       material: totem
@@ -103,7 +113,7 @@ default:
           - '&8UNTRACKED'
       unavailable:
         material: gray_stained_glass_pane
-        name: '&8Unavailable'
+  # Quest included
   include:
     L1:
       active:
@@ -142,5 +152,6 @@ default:
         name: '&fL3 quests'
         lore:
           - '&7INCLUDE'
+  # Quest excluded
   exclude:
     - S1

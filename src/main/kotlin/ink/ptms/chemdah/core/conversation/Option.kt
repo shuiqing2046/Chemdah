@@ -4,7 +4,7 @@ import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.core.conversation.theme.Theme
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.module.chat.colored
-import taboolib.module.configuration.SecuredFile
+import taboolib.module.configuration.Configuration
 
 /**
  * Chemdah
@@ -26,6 +26,6 @@ data class Option(
 
     companion object {
 
-        val default = Option(SecuredFile().createSection("__option__"))
+        val default = Option(Configuration.empty().createSection("__option__"))
     }
 }

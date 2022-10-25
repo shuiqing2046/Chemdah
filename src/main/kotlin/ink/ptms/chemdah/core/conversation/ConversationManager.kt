@@ -36,7 +36,7 @@ import java.util.concurrent.ConcurrentHashMap
 object ConversationManager {
 
     private val effects = ConcurrentHashMap<String, List<PotionEffect>>()
-    private val effectFreeze = mapOf(PotionEffectType.BLINDNESS to 0, PotionEffectType.SLOW to 4)
+    private val effectFreeze = mapOf(PotionEffectType.BLINDNESS to 0, PotionEffectType.SLOW to 2)
 
     @Config("core/conversation.yml", migrate = true)
     lateinit var conf: Configuration
@@ -97,7 +97,7 @@ object ConversationManager {
             effects[e.session.player.name] = effectFreeze.mapNotNull { e.session.player.getPotionEffect(it.key) }.filter { it.duration in 10..9999 }
             effectFreeze.forEach {
                 // 取消特定效果
-                if (e.conversation.hasFlag("NO_EFFECT:${it.key}")) {
+                if (e.conversation.hasFlag("NO_EFFECT:${it.key.name.uppercase()}")) {
                     return@forEach
                 }
                 e.session.player.addPotionEffect(PotionEffect(it.key, 99999, it.value).hidden())
@@ -158,9 +158,7 @@ object ConversationManager {
     private fun onCommand(e: PlayerCommandPreprocessEvent) {
         if (e.message.startsWith("/session")) {
             e.isCancelled = true
-            val args = e.message.split(" ").toMutableList().also {
-                it.removeFirst()
-            }
+            val args = e.message.split(" ").toMutableList().also { it.removeFirst() }
             if (args.size == 2 && args[0] == "reply") {
                 val session = e.player.conversationSession ?: return
                 val reply = session.conversation.playerSide.reply.firstOrNull { it.uuid.toString() == args[1] } ?: return

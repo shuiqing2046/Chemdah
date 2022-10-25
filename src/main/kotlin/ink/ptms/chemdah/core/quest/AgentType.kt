@@ -82,11 +82,7 @@ enum class AgentType(val namespace: String) {
     /**
      * 获取所有 Kether 命名空间
      */
-    fun namespaceAll() = listOf(
-        "chemdah",
-        "chemdah-quest",
-        "chemdah-quest-${namespace}"
-    )
+    fun namespaceAll() = listOf("chemdah", "chemdah-quest", "chemdah-quest-${namespace}")
 
     companion object {
 

@@ -289,8 +289,14 @@ object ThemeChat : Theme<ThemeChatSettings>() {
                                 var len = 0
                                 replies.forEachIndexed { idx, reply ->
                                     var newLine = false
+                                    // 回复内容
                                     val text = reply.build(session)
-                                    val rep = if (session.playerSide == reply) settings.select else settings.selectOther
+                                    // 回复结构
+                                    val rep = if (session.playerSide == reply) {
+                                        if (reply.isPlayerSelected(session.player)) settings.selected else settings.select
+                                    } else {
+                                        if (reply.isPlayerSelected(session.player)) settings.selectedOther else settings.selectOther
+                                    }
                                     // 在单行中显示回复内容
                                     if (settings.singleLineEnable) {
                                         len += text.uncolored().realLength()
@@ -309,6 +315,7 @@ object ThemeChat : Theme<ThemeChatSettings>() {
                                                 json.newLine()
                                             }
                                         }
+                                        // 当动画结束时，显示回复内容
                                         if (animationStopped) {
                                             val replyText = rep.replaces("player_side" to text, "playerSide" to text, "index" to idx + 1)
                                             json.append(it.replaces("reply" to replyText)).runCommand("/session reply ${reply.uuid}")
@@ -322,6 +329,7 @@ object ThemeChat : Theme<ThemeChatSettings>() {
                                             }
                                         }
                                     } else {
+                                        // 当动画结束时，显示回复内容
                                         if (animationStopped) {
                                             val replyText = rep.replaces("player_side" to text, "playerSide" to text, "index" to idx + 1)
                                             json.append(it.replaces("reply" to replyText)).runCommand("/session reply ${reply.uuid}")

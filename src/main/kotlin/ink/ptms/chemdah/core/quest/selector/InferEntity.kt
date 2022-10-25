@@ -120,7 +120,7 @@ class InferEntity(val entities: List<Entity>) {
             } else {
                 Entity::class.java
             }
-            return entity.invokeConstructor(type.matchType(flag), flag, data) as Entity
+            return entity.invokeConstructor(type.matchType(flag), flag, data)
         }
     }
 }

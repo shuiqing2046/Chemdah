@@ -41,25 +41,115 @@ object LevelSystem : Module {
         return level[name]
     }
 
-    fun PlayerProfile.setLevel(node: LevelOption, playerLevel: PlayerLevel) {
-        setLevel(node, playerLevel.level, playerLevel.experience)
+    /**
+     * 设置玩家等级数据
+     *
+     * @param option 经验配置
+     * @param playerLevel 玩家经验数据
+     */
+    fun PlayerProfile.setLevel(option: LevelOption, playerLevel: PlayerLevel) {
+        setLevel(option, playerLevel.level, playerLevel.experience)
     }
 
-    fun PlayerProfile.setLevel(node: LevelOption, level: Int, experience: Int) {
-        val p = getLevel(node)
-        val event = PlayerEvents.LevelChange(player, node, p.level, p.experience, level, experience)
-        event.call()
-        if (!event.isCancelled) {
-            persistentDataContainer["module.level.${node.id}.level"] = event.newLevel
-            persistentDataContainer["module.level.${node.id}.experience"] = event.newExperience
+    /**
+     * 设置玩家等级数据
+     *
+     * @param option 经验配置
+     * @param level 等级
+     * @param experience 经验
+     */
+    fun PlayerProfile.setLevel(option: LevelOption, level: Int, experience: Int) {
+        val p = getLevel(option)
+        val event = PlayerEvents.LevelChange(player, option, p.level, p.experience, level, experience)
+        if (event.call()) {
+            persistentDataContainer["module.level.${option.id}.level"] = event.newLevel
+            persistentDataContainer["module.level.${option.id}.experience"] = event.newExperience
         }
     }
 
-    fun PlayerProfile.getLevel(node: LevelOption): PlayerLevel {
+    /**
+     * 获取玩家等级数据
+     *
+     * @param option 经验配置
+     * @return [PlayerLevel]
+     */
+    fun PlayerProfile.getLevel(option: LevelOption): PlayerLevel {
         return PlayerLevel(
-            persistentDataContainer["module.level.${node.id}.level", 0].toInt(),
-            persistentDataContainer["module.level.${node.id}.experience", 0].toInt()
+            persistentDataContainer["module.level.${option.id}.level", 0].toInt(),
+            persistentDataContainer["module.level.${option.id}.experience", 0].toInt()
         )
+    }
+
+    /**
+     * 设置玩家等级
+     *
+     * @param option 经验配置
+     * @param value 经验值
+     * @return [CompletableFuture<PlayerLevel>]
+     */
+    fun PlayerProfile.setLevel(option: LevelOption, value: Int): CompletableFuture<PlayerLevel> {
+        return CompletableFuture<PlayerLevel>().also { future ->
+            val level = option.toLevel(getLevel(option))
+            level.setLevel(value).thenAccept {
+                val playerLevel = level.toPlayerLevel()
+                setLevel(option, playerLevel)
+                future.complete(playerLevel)
+            }
+        }
+    }
+
+    /**
+     * 给予玩家等级
+     *
+     * @param option 经验配置
+     * @param value 经验值
+     * @return [CompletableFuture<PlayerLevel>]
+     */
+    fun PlayerProfile.giveLevel(option: LevelOption, value: Int): CompletableFuture<PlayerLevel> {
+        return CompletableFuture<PlayerLevel>().also { future ->
+            val level = option.toLevel(getLevel(option))
+            level.addLevel(value).thenAccept {
+                val playerLevel = level.toPlayerLevel()
+                setLevel(option, playerLevel)
+                future.complete(playerLevel)
+            }
+        }
+    }
+
+    /**
+     * 设置玩家经验值
+     *
+     * @param option 经验配置
+     * @param value 经验值
+     * @return [CompletableFuture<PlayerLevel>]
+     */
+    fun PlayerProfile.setExperience(option: LevelOption, value: Int): CompletableFuture<PlayerLevel> {
+        return CompletableFuture<PlayerLevel>().also { future ->
+            val level = option.toLevel(getLevel(option))
+            level.setExperience(value).thenAccept {
+                val playerLevel = level.toPlayerLevel()
+                setLevel(option, playerLevel)
+                future.complete(playerLevel)
+            }
+        }
+    }
+
+    /**
+     * 给予玩家经验值
+     *
+     * @param option 经验配置
+     * @param value 经验值
+     * @return [CompletableFuture<PlayerLevel>]
+     */
+    fun PlayerProfile.giveExperience(option: LevelOption, value: Int): CompletableFuture<PlayerLevel> {
+        return CompletableFuture<PlayerLevel>().also { future ->
+            val level = option.toLevel(getLevel(option))
+            level.addExperience(value).thenAccept {
+                val playerLevel = level.toPlayerLevel()
+                setLevel(option, playerLevel)
+                future.complete(playerLevel)
+            }
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -89,6 +179,7 @@ object LevelSystem : Module {
                         }
                     }
                 }
+
                 "kether" -> {
                     object : Level.Algorithm() {
 
@@ -109,6 +200,7 @@ object LevelSystem : Module {
                         }
                     }
                 }
+
                 else -> {
                     warning("${section.getString("experience.type")} experience not supported.")
                     return@forEach

@@ -29,23 +29,23 @@ object CommandChemdahScript {
     @CommandBody
     val run = subCommand {
         // script
-        dynamic(commit = "file") {
+        dynamic(comment ="file") {
             suggestion<CommandSender> { _, _ ->
                 workspace.scripts.map { it.value.id }
             }
             // viewer
-            dynamic(commit = "viewer", optional = true) {
+            dynamic(comment ="viewer", optional = true) {
                 suggestion<CommandSender> { _, _ ->
                     Bukkit.getOnlinePlayers().map { it.name }
                 }
                 // ver
-                dynamic(commit = "args", optional = true) {
-                    execute<CommandSender> { sender, context, argument ->
-                        commandRun(sender, context.argument(-2), context.argument(-1), argument.split(" ").toTypedArray())
+                dynamic(comment ="args", optional = true) {
+                    execute<CommandSender> { sender, ctx, argument ->
+                        commandRun(sender, ctx.argument(-2), ctx.argument(-1), argument.split(" ").toTypedArray())
                     }
                 }
-                execute<CommandSender> { sender, context, argument ->
-                    commandRun(sender, context.argument(-1), argument)
+                execute<CommandSender> { sender, ctx, argument ->
+                    commandRun(sender, ctx.argument(-1), argument)
                 }
             }
             execute<CommandSender> { sender, _, argument ->
@@ -56,7 +56,7 @@ object CommandChemdahScript {
 
     @CommandBody
     val stop = subCommand {
-        dynamic(commit = "file", optional = true) {
+        dynamic(comment ="file", optional = true) {
             suggestion<CommandSender> { _, _ ->
                 workspace.scripts.map { it.value.id }
             }
@@ -105,7 +105,7 @@ object CommandChemdahScript {
 
     @CommandBody
     val invoke = subCommand {
-        dynamic(commit = "script") {
+        dynamic(comment ="script") {
             execute<CommandSender> { sender, _, argument ->
                 try {
                     KetherShell.eval(argument, namespace = namespace, sender = adaptCommandSender(sender)).thenApply { v ->
@@ -121,7 +121,7 @@ object CommandChemdahScript {
     internal fun commandRun(sender: CommandSender, file: String, viewer: String? = null, args: Array<String> = emptyArray()) {
         val script = workspace.scripts[file]
         if (script != null) {
-            val context = ScriptContext.create(script) {
+            val ctx = ScriptContext.create(script) {
                 if (viewer != null) {
                     val player = Bukkit.getPlayerExact(viewer)
                     if (player != null) {
@@ -135,7 +135,7 @@ object CommandChemdahScript {
                 }
             }
             try {
-                workspace.runScript(file, context)
+                workspace.runScript(file, ctx)
             } catch (t: Throwable) {
                 sender.sendLang("command-script-error", t.localizedMessage)
                 t.printKetherErrorMessage()

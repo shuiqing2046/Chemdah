@@ -46,9 +46,10 @@ object ThemeChest : Theme<ThemeChestSetting>() {
                 session.player.openMenu<Basic>(settings.title.toTitle(session)) {
                     rows(rows)
                     onBuild(async = true) { _, inventory ->
-                        replies.forEachIndexed { index, playerReply ->
+                        replies.forEachIndexed { index, reply ->
                             if (index < settings.playerSlot.size) {
-                                inventory.setItem(settings.playerSlot[index], settings.playerItem.buildItem(session, playerReply, index + 1))
+                                val rep = if (reply.isPlayerSelected(session.player)) settings.playerItem else settings.playerItemSelected
+                                inventory.setItem(settings.playerSlot[index], rep.buildItem(session, reply, index + 1))
                             }
                         }
                         inventory.setItem(settings.npcSlot, settings.npcItem.buildItem(session, message))

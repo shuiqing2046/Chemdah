@@ -3,10 +3,12 @@ package ink.ptms.chemdah.core.conversation
 import ink.ptms.chemdah.api.event.collect.ConversationEvents
 import ink.ptms.chemdah.core.conversation.ConversationManager.sessions
 import ink.ptms.chemdah.util.namespaceConversationNPC
+import org.bukkit.Location
 import org.bukkit.entity.Player
 import taboolib.common.platform.function.warning
 import taboolib.common5.Coerce
 import taboolib.library.configuration.ConfigurationSection
+import taboolib.module.chat.colored
 import taboolib.module.kether.KetherFunction
 import taboolib.module.kether.KetherShell
 import taboolib.module.kether.extend
@@ -56,12 +58,31 @@ data class Conversation(
     }
 
     /**
+     * 唤起不需要单位的对话
+     *
+     * @param player 玩家
+     * @param name 对话名称
+     */
+    fun openSelf(player: Player, name: String): CompletableFuture<Session> {
+        return open(player, object : Source<Any>(name, player) {
+
+            override fun transfer(player: Player, newId: String): Boolean {
+                return true
+            }
+
+            override fun getOriginLocation(entity: Any): Location {
+                return player.eyeLocation
+            }
+        })
+    }
+
+    /**
      * 唤起对话
      * 脚本代理的执行在添加对话内容之前
      * 所有脚本包括嵌入式在内都会继承会话中的所有变量
      *
      * @param player 玩家
-     * @param origin 原点（对话实体的头顶坐标）
+     * @param source 来源
      * @param sessionTop 上层会话（继承关系）
      */
     fun <T> open(

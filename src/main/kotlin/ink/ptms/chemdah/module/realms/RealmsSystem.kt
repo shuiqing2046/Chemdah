@@ -12,6 +12,7 @@ import taboolib.module.configuration.Config
 import taboolib.module.configuration.Configuration
 import taboolib.module.nms.MinecraftVersion
 import taboolib.platform.BukkitPlugin
+import taboolib.platform.util.isBlockMovement
 
 @Awake
 object RealmsSystem : Module {
@@ -55,7 +56,7 @@ object RealmsSystem : Module {
 
     @SubscribeEvent
     private fun onMove(e: PlayerMoveEvent) {
-        if (e.from.block != e.to!!.block) {
+        if (e.isBlockMovement()) {
             val realms = e.to!!.getRealms()
             if (realms != null) {
                 Bukkit.getOnlinePlayers().forEach { player ->

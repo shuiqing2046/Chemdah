@@ -19,24 +19,52 @@ import taboolib.platform.util.modifyMeta
 val conf: Configuration
     get() = Chemdah.conf
 
+/**
+ * 将任意 [Map] 或 [Configuration] 转换为 [Map<String, Any?>]
+ *
+ * @return [Map<String, Any?>]
+ */
 fun Any?.asMap(): Map<String, Any?> = when (this) {
     is Map<*, *> -> entries.associate { it.key.toString() to it.value }
     is ConfigurationSection -> getValues(false)
     else -> emptyMap()
 }
 
+/**
+ * 将对象转换为整型
+ *
+ * @param def 默认值
+ * @return [Int]
+ */
 fun Any?.asInt(def: Int = 0): Int {
     return Coerce.toInteger(this ?: def)
 }
 
+/**
+ * 将对象转换为浮点型
+ *
+ * @param def 默认值
+ * @return [Double]
+ */
 fun Any?.asDouble(def: Double = 0.0): Double {
     return Coerce.toDouble(this ?: def)
 }
 
+/**
+ * 判定材质是否为方块
+ *
+ * @param block 材质
+ * @return [Boolean]
+ */
 fun XMaterial.isBlock(block: Block): Boolean {
     return XBlock.isSimilar(block, this) && (MinecraftVersion.majorLegacy >= 11300 || block.data == data)
 }
 
+/**
+ * 根据给出的 icon 表达式对 [ItemStack] 进行修改
+ *
+ * @param value icon 表达式
+ */
 fun ItemStack.setIcon(value: String) {
     val demand = value.toDemand()
     type = XMaterial.matchXMaterial(demand.namespace).orElse(XMaterial.STONE).parseMaterial()!!
@@ -50,6 +78,14 @@ fun ItemStack.setIcon(value: String) {
     }
 }
 
+/**
+ * 安全调用
+ *
+ * @param T 返回值类型
+ * @param func 调用函数
+ * @receiver [Any]
+ * @return [T]
+ */
 fun <T> safely(func: () -> T): T? {
     try {
         return func()
@@ -62,6 +98,11 @@ fun <T> safely(func: () -> T): T? {
     return null
 }
 
+/**
+ * 隐藏 [PotionEffect] 的效果
+ *
+ * @return [PotionEffect]
+ */
 fun PotionEffect.hidden(): PotionEffect {
     if (MinecraftVersion.majorLegacy >= 11300) {
         try {
@@ -73,6 +114,11 @@ fun PotionEffect.hidden(): PotionEffect {
     return this
 }
 
+/**
+ * 获取坐标中心点
+ *
+ * @return [Location]
+ */
 fun Location.toCenter(): Location {
     val loc = clone()
     loc.x = blockX + 0.5
@@ -81,9 +127,26 @@ fun Location.toCenter(): Location {
     return loc
 }
 
+/**
+ * 获取字符串的真实长度（对中文进行处理）
+ *
+ * @return [Int]
+ */
 fun String.realLength(): Int {
     val regex = "[\u3091-\uFFe5]".toRegex()
     return sumBy { if (it.toString().matches(regex)) 2 else 1 }
+}
+
+/**
+ * 替换字符串中的变量
+ *
+ * @param vars 变量
+ * @return [String]
+ */
+fun String.replaces(vararg vars: Pair<String, Any>): String {
+    var r = this
+    vars.forEach { r = r.replace("[\\[{]${it.first}[]}]".toRegex(), it.second.toString()) }
+    return r
 }
 
 fun <K, V, M : MutableMap<in K, in V>> Iterable<Couple<K, V>>.toMap(destination: M): M {
@@ -109,10 +172,4 @@ fun <K, V> MutableMap<in K, in V>.putAll(couples: Iterable<Couple<K, V>>) {
 
 fun <K, V> mapOf(couple: Couple<K, V>): Map<K, V> {
     return java.util.Collections.singletonMap(couple.key, couple.value)
-}
-
-fun String.replaces(vararg vars: Pair<String, Any>): String {
-    var r = this
-    vars.forEach { r = r.replace("[\\[{]${it.first}[]}]".toRegex(), it.second.toString()) }
-    return r
 }

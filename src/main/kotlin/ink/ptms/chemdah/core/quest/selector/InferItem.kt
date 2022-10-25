@@ -108,7 +108,7 @@ class InferItem(val items: List<Item>) {
             } else {
                 Item::class.java
             }
-            return item.invokeConstructor(type.matchType(flag), flag, data) as Item
+            return item.invokeConstructor(type.matchType(flag), flag, data)
         }
     }
 }

@@ -20,7 +20,7 @@ object ActionWorkflows {
 
     @SubscribeEvent
     private fun onSelected(e: PlayerEvents.Selected) {
-        e.playerProfile.persistentDataContainer.forEach { (k, v) ->
+        e.playerProfile.persistentDataContainer.forEach { (k, _) ->
             if (k.startsWith("workflows.fetch.")) {
                 e.playerProfile.persistentDataContainer.remove(k)
                 val id = k.substring("workflows.fetch.".length)

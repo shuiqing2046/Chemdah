@@ -4,18 +4,23 @@
 
 
 default_0:
+  # Beginning value
   min: 0
+  # Maximum value
   max: 100
+  # Experience value algorithm
   experience:
+    # Algorithm type
+    # Available: kether, javascript
     type: kether
+    # Algorithm content
     math: |
-      if check &level <= 15 then {
-          math &level * 2 + 7
-      } else if check &level <= 30 then {
-          math &level * 5 - 38
-      } else {
-          math &level * 9 - 158
-      }
+      case &level [
+        when <= 15 -> calc "level * 2 + 7"
+        when <= 30 -> calc "level * 5 - 38"
+        else calc "level * 9 - 158"
+      ]
+  # Leveling up rewards
   reward:
     5: tell colored inline *"&aLevel up! &f{{ &level }}!"
     10-20: tell colored inline *"&eLevel up! &f{{ &level }}!"

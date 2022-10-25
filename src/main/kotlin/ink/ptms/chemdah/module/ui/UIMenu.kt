@@ -6,7 +6,7 @@ import ink.ptms.chemdah.core.quest.addon.AddonTrack.Companion.allowTracked
 import ink.ptms.chemdah.core.quest.addon.AddonTrack.Companion.trackQuest
 import ink.ptms.chemdah.util.replaces
 import org.bukkit.Sound
-import taboolib.module.configuration.SecuredFile
+import taboolib.module.configuration.Configuration
 import taboolib.module.ui.openMenu
 import taboolib.module.ui.type.Linked
 import taboolib.platform.util.isAir
@@ -18,6 +18,7 @@ import taboolib.platform.util.isAir
  * @author sky
  * @since 2021/3/25 7:18 下午
  */
+@Suppress("DuplicatedCode")
 class UIMenu(val ui: UI, val profile: PlayerProfile, val templates: List<UITemplate>) {
 
     fun open(page: Int = 0) {
@@ -80,6 +81,6 @@ class UIMenu(val ui: UI, val profile: PlayerProfile, val templates: List<UITempl
 
     companion object {
 
-        private val unavailable = Template("__unavailable__", SecuredFile())
+        private val unavailable = Template("__unavailable__", Configuration.empty())
     }
 }

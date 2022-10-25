@@ -280,13 +280,13 @@ class ActionQuest {
                     }
                 }
                 case("fail", "failure") {
-                    actionNow {
-                        getProfile().getQuestById(getQuestSelected())?.failQuest()
+                    actionTake {
+                        getProfile().getQuestById(getQuestSelected())?.failQuestFuture() ?: CompletableFuture.completedFuture(null)
                     }
                 }
                 case("reset", "restart") {
-                    actionNow {
-                        getProfile().getQuestById(getQuestSelected())?.restartQuest()
+                    actionTake {
+                        getProfile().getQuestById(getQuestSelected())?.restartQuestFuture() ?: CompletableFuture.completedFuture(null)
                     }
                 }
                 case("stop", "cancel") {
@@ -295,10 +295,18 @@ class ActionQuest {
                     }
                 }
                 case("track") {
-                    actionNow {
-                        val template = ChemdahAPI.getQuestTemplate(getQuestSelected())
-                        if (template != null) {
-                            getProfile().trackQuest = template
+                    it.mark()
+                    try {
+                        it.expect("cancel")
+                        actionNow {
+                            getProfile().trackQuest = null
+                            null
+                        }
+                    } catch (ignored: Exception) {
+                        it.reset()
+                        actionNow {
+                            getProfile().trackQuest = ChemdahAPI.getQuestTemplate(getQuestSelected())
+                            null
                         }
                     }
                 }
