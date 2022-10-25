@@ -31,7 +31,7 @@ data class PlayerReply(
 
     val swapLine = Coerce.toBoolean(root["swap"])
 
-    val uniqueId = root["uniqueId"]?.toString()
+    val uniqueId = root["unique"]?.toString()
 
     /**
      * 玩家是否选择过该回复

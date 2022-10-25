@@ -26,3 +26,5 @@ example_0:
       tell "I'm waiting for you"
     continue: |-
       tell "Quickly come to me"
+  # Script triggered cooldown
+  event-cooldown: 5s

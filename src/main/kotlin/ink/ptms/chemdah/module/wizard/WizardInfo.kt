@@ -5,6 +5,7 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import taboolib.common.platform.function.warning
+import taboolib.common5.util.parseMillis
 import taboolib.library.configuration.ConfigurationSection
 import java.util.concurrent.CompletableFuture
 
@@ -41,6 +42,9 @@ class WizardInfo(val root: ConfigurationSection) {
     /** 当 NPC 继续时触发脚本 **/
     val eventOnContinue = root.getString("event.continue")
 
+    /** 事件冷却 **/
+    val eventCooldown = root.getString("event-cooldown")?.parseMillis() ?: 0
+
     /**
      * Apply
      *
@@ -50,7 +54,7 @@ class WizardInfo(val root: ConfigurationSection) {
     fun apply(player: Player, entityInstance: EntityInstance): CompletableFuture<Boolean> {
         val action = WizardAction(player, entityInstance, this).check()
         WizardSystem.actions[entityInstance.uniqueId] = action
-        return action.finishFuture
+        return action.onFinish
     }
 
     /**
