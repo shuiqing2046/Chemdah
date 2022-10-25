@@ -3,8 +3,10 @@ package ink.ptms.chemdah.module.wizard
 import ink.ptms.adyeshach.common.entity.EntityInstance
 import ink.ptms.chemdah.module.Module
 import ink.ptms.chemdah.module.Module.Companion.register
+import org.bukkit.event.player.PlayerQuitEvent
 import taboolib.common.platform.Awake
 import taboolib.common.platform.Schedule
+import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.getDataFolder
 import taboolib.common.platform.function.releaseResourceFile
 import taboolib.common.platform.function.submit
@@ -57,8 +59,16 @@ object WizardSystem : Module {
         actions.remove(entityInstance.uniqueId)
     }
 
-    @Schedule(period = 20)
+    @Schedule(period = 10)
     private fun onTick() {
         actions.values.forEach { it.check() }
+    }
+
+    @SubscribeEvent
+    private fun onQuit(e: PlayerQuitEvent) {
+        actions.values.filter { it.player.name == e.player.name }.forEach {
+            it.cancel()
+            actions.remove(it.entityInstance.uniqueId)
+        }
     }
 }

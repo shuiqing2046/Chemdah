@@ -38,12 +38,7 @@ data class PlayerReply(
      */
     fun isPlayerSelected(player: Player): Boolean {
         if (uniqueId != null && player.isChemdahProfileLoaded) {
-            val container = player.chemdahProfile.persistentDataContainer
-            if (container.containsKey("conversation.unique.$uniqueId")) {
-                return true
-            }
-            container["conversation.unique.$uniqueId"] = true
-            return false
+            return player.chemdahProfile.persistentDataContainer.containsKey("conversation.unique.$uniqueId")
         }
         return false
     }
@@ -97,6 +92,10 @@ data class PlayerReply(
         // 事件
         if (!ConversationEvents.SelectReply(session.player, session, this).call()) {
             return CompletableFuture.completedFuture(null)
+        }
+        // 记录选择
+        if (uniqueId != null && session.player.isChemdahProfileLoaded) {
+            session.player.chemdahProfile.persistentDataContainer["conversation.unique.$uniqueId"] = true
         }
         session.isSelected = true
         return try {

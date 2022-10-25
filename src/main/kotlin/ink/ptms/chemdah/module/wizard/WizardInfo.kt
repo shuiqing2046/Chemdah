@@ -6,6 +6,7 @@ import org.bukkit.Location
 import org.bukkit.entity.Player
 import taboolib.common.platform.function.warning
 import taboolib.library.configuration.ConfigurationSection
+import java.util.concurrent.CompletableFuture
 
 /**
  * Chemdah
@@ -25,11 +26,20 @@ class WizardInfo(val root: ConfigurationSection) {
     /** 节点 **/
     val nodes = root.getStringList("nodes").map { Location(world, it.split(" ")[0].toDouble(), it.split(" ")[1].toDouble(), it.split(" ")[2].toDouble()) }
 
+    /** 结束距离 **/
+    val finishDistance = root.getDouble("finish-distance", 2.0)
+
     /** 等待距离 **/
     val waitingDistance = root.getDouble("waiting-distance")
 
     /** 有效距离修正 **/
-    val effectiveDistanceCorrections = root.getDouble("effective-distance-corrections")
+    val effectiveDistanceCorrections = root.getDouble("effective-distance-corrections", 2.0)
+
+    /** 当 NPC 暂停时触发脚本 **/
+    val eventOnWaiting = root.getString("event.waiting")
+
+    /** 当 NPC 继续时触发脚本 **/
+    val eventOnContinue = root.getString("event.continue")
 
     /**
      * Apply
@@ -37,8 +47,10 @@ class WizardInfo(val root: ConfigurationSection) {
      * @param player 玩家
      * @param entityInstance 单位实例
      */
-    fun apply(player: Player, entityInstance: EntityInstance) {
-        WizardSystem.actions[entityInstance.uniqueId] = WizardAction(player, entityInstance, this).check()
+    fun apply(player: Player, entityInstance: EntityInstance): CompletableFuture<Boolean> {
+        val action = WizardAction(player, entityInstance, this).check()
+        WizardSystem.actions[entityInstance.uniqueId] = action
+        return action.finishFuture
     }
 
     /**
@@ -49,7 +61,7 @@ class WizardInfo(val root: ConfigurationSection) {
      */
     fun getNearestNode(location: Location): Location? {
         if (nodes.isEmpty()) {
-            warning("Wizard nodes is empty.")
+            warning("[$id] Wizard nodes is empty.")
             return null
         }
         // 获取目的地
@@ -60,7 +72,7 @@ class WizardInfo(val root: ConfigurationSection) {
         // 获取最远移动节点
         val next = nodes.filter { it.distance(destination) < valid }.filter { it.distance(location) < 32 }.maxByOrNull { it.distance(location) }
         if (next == null) {
-            warning("No nearest node found.")
+            warning("[$id] No nearest node found.")
             return null
         }
         return next

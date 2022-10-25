@@ -13,8 +13,16 @@ example_0:
   nodes:
     - 50 80 0
     - 100 80 0
+  # Stops moving when the Wizard NPC is within this distance
+  finish-distance: 2.0
   # Stops moving when the player is too far away from the Wizard NPC
   waiting-distance: 5
   # The faster the movements speed the greater the value
   # Generally not changed, unless your Wizard NPC has no way to move between nodes
-  effective-distance-corrections: 1.5
+  effective-distance-corrections: 2.0
+  # Script triggered when an NPC changes state
+  event:
+    waiting: |-
+      tell "I'm waiting for you"
+    continue: |-
+      tell "Quickly come to me"

@@ -77,7 +77,7 @@ internal object TriggerAdyeshach {
             if (conversation != null) {
                 e.isCancelled = true
                 // 同步打开对话
-                submit { conversation.openByAdyeshach(e.player, e.entity) }
+                submit { conversation.openByAdyeshach(e.player, e.entity, look = false) }
             }
         }
     }
