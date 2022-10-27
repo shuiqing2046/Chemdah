@@ -54,6 +54,8 @@ class InferItem(val items: List<Item>) {
                     "name" -> it.check(item.getName())
                     // 描述
                     "lore" -> meta?.lore?.any { line -> it.check(line) } ?: false
+                    // 附加值
+                    "damage", "durability" -> it.check(item.durability.toInt())
                     // CMD
                     "custom-model-data" -> it.check(meta?.customModelData ?: 0)
                     // 附魔
