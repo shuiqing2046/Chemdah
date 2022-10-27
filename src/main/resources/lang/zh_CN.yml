@@ -130,6 +130,9 @@ command-script-reload-all:
 command-conversation-not-found: '&c[Chemdah] &7对话不存在.'
 command-adyeshach-not-found: '&c[Chemdah] &7Adyeshach 单位不存在.'
 command-name-generated: '&c[Chemdah] &7名称已生成:'
+command-block-info-is-air: '&c[Chemdah] &7方块为空气.'
+command-block-info-header: '&c[Chemdah] &7方块信息:'
+command-position-header: '&c[Chemdah] &7位置信息:'
 database-error: '&4&l错误! &r插件 &4&lChemdah&r 的数据库未完成初始化.'
 database-error-username: '&4&l警告! &r插件 &4&lChemdah&r 阻止改用户名进入服务器.'
 

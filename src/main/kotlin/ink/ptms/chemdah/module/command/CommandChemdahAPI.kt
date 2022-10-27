@@ -2,9 +2,11 @@ package ink.ptms.chemdah.module.command
 
 import ink.ptms.adyeshach.api.AdyeshachAPI
 import ink.ptms.chemdah.api.ChemdahAPI
+import ink.ptms.chemdah.core.bukkit.NMS
 import ink.ptms.chemdah.core.conversation.trigger.TriggerAdyeshach.openConversation
 import ink.ptms.chemdah.module.generator.NameGenerator
 import ink.ptms.chemdah.module.scenes.ScenesSystem
+import org.bukkit.Material
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import taboolib.common.platform.command.*
@@ -23,7 +25,7 @@ import taboolib.platform.util.sendLang
  * @since 2021/2/11 7:19 下午
  */
 @Suppress("SpellCheckingInspection")
-@CommandHeader(name = "ChemdahAPI", aliases = ["chapi"], permission = "chemdah.command")
+@CommandHeader(name = "ChemdahAPI", aliases = ["chapi", "cha"], permission = "chemdah.command")
 object CommandChemdahAPI {
 
     @CommandBody
@@ -124,7 +126,7 @@ object CommandChemdahAPI {
                     TellrawJson().sendTo(adaptCommandSender(sender)) {
                         names.forEach { name ->
                             append("&c[Chemdah] &8- ".colored())
-                            append("&f$name".colored()).copyToClipboard(name).hoverText("&7Click to copy".colored())
+                            append("&f$name".colored()).suggestCommand(name).hoverText("&7Click to copy".colored())
                             newLine()
                         }
                     }
@@ -135,30 +137,95 @@ object CommandChemdahAPI {
                 sender.sendLang("command-name-generated")
                 TellrawJson().sendTo(adaptCommandSender(sender)) {
                     append("&c[Chemdah] &8- ".colored())
-                    append("&f$name".colored()).copyToClipboard(name).hoverText("&7Click to copy".colored())
+                    append("&f$name".colored()).suggestCommand(name).hoverText("&7Click to copy".colored())
                     newLine()
                 }
             }
         }
     }
 
-//    @CommandBody
-//    val generate = subCommand {
-//        execute<CommandSender> { sender, _, _ ->
-//            val json = Configuration.empty(Type.JSON)
-//            ChemdahAPI.questObjective.values.sortedBy { it.name }.forEach {
-//                val plugin = if (it.javaClass.isAnnotationPresent(Dependency::class.java)) {
-//                    val plugin = it.javaClass.getAnnotation(Dependency::class.java).plugin
-//                    if (plugin == "minecraft") "Minecraft" else plugin
-//                } else {
-//                    "Minecraft"
-//                }
-//                json["objective.$plugin.${it.name}.condition"] = it.conditions.keys
-//                json["objective.$plugin.${it.name}.goal"] = it.goals.keys.flatMap { k -> k.split(",") }.filter { k -> k != "null" }
-//            }
-//            val file = newFile(getDataFolder(), "api.json")
-//            json.saveToFile(file)
-//            sender.sendMessage("Generated api file: ${file.path}")
-//        }
-//    }
+    @CommandBody
+    val blockinfo = subCommand {
+        execute<Player> { sender, _, _ ->
+            val block = sender.getTargetBlock(setOf(Material.AIR), 16)
+            if (block.type.isAir) {
+                sender.sendLang("command-block-info-is-air")
+                return@execute
+            }
+            sender.sendLang("command-block-info-header")
+            TellrawJson().sendTo(adaptCommandSender(sender)) {
+                // 原版
+                append("&c[Chemdah] ".colored())
+                append("&8- &f${block.type.name.lowercase()}".colored())
+                    .hoverText("&7Click to copy".colored())
+                    .suggestCommand(block.type.name.lowercase())
+                    .newLine()
+                // 附加值
+                val blocKData = NMS.INSTANCE.getBlocKData(block)
+                if (blocKData.isNotEmpty()) {
+                    val info = "${block.type.name.lowercase()}[${blocKData.entries.joinToString(",") { "${it.key}=${it.value}" }}]"
+                    append("&c[Chemdah] ".colored())
+                    append("&8- &f$info".colored())
+                        .hoverText("&7Click to copy".colored())
+                        .suggestCommand(info)
+                }
+            }
+        }
+    }
+
+    @CommandBody(aliases = ["pos"])
+    val position = subCommand {
+        execute<Player> { sender, _, _ ->
+            val loc = sender.location
+            val x = Coerce.format(loc.x)
+            val y = Coerce.format(loc.y)
+            val z = Coerce.format(loc.z)
+            sender.sendLang("command-position-header")
+            TellrawJson().sendTo(adaptCommandSender(sender)) {
+                // x,y,z
+                append("&c[Chemdah] ".colored())
+                append("&8- &f$x,$y,$z".colored())
+                    .hoverText("&7Click to copy".colored())
+                    .suggestCommand("$x,$y,$z")
+                    .append(" ")
+                append("&7(${x.toInt()},${y.toInt()},${z.toInt()})".colored())
+                    .hoverText("&7Click to copy".colored())
+                    .suggestCommand("${x.toInt()},${y.toInt()},${z.toInt()}")
+                    .newLine()
+
+                // x=?,y=?,z=?
+                append("&c[Chemdah] ".colored())
+                append("&8- &fx=$x,y=$y,z=$z".colored())
+                    .hoverText("&7Click to copy".colored())
+                    .suggestCommand("x=$x,y=$y,z=$z")
+                    .append(" ")
+                append("&7(x=${x.toInt()},y=${y.toInt()},z=${z.toInt()})".colored())
+                    .hoverText("&7Click to copy".colored())
+                    .suggestCommand("x=${x.toInt()},y=${y.toInt()},z=${z.toInt()}")
+                    .newLine()
+
+                // x y z
+                append("&c[Chemdah] ".colored())
+                append("&8- &f$x $y $z".colored())
+                    .hoverText("&7Click to copy".colored())
+                    .suggestCommand("$x $y $z")
+                    .append(" ")
+                append("&7(${x.toInt()} ${y.toInt()} ${z.toInt()})".colored())
+                    .hoverText("&7Click to copy".colored())
+                    .suggestCommand("${x.toInt()} ${y.toInt()} ${z.toInt()}")
+                    .newLine()
+
+                // x to ? y to ? z to ?
+                append("&c[Chemdah] ".colored())
+                append("&8- &fx to $x y to $y z to $z".colored())
+                    .hoverText("&7Click to copy".colored())
+                    .suggestCommand("x to $x y to $y z to $z")
+                    .append(" ")
+                append("&7(x to ${x.toInt()} y to ${y.toInt()} z to ${z.toInt()})".colored())
+                    .hoverText("&7Click to copy".colored())
+                    .suggestCommand("x to ${x.toInt()} y to ${y.toInt()} z to ${z.toInt()}")
+                    .newLine()
+            }
+        }
+    }
 }

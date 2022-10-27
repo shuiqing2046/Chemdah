@@ -21,7 +21,7 @@ class InferEntity(val entities: List<Entity>) {
 
     fun isEntity(entity: org.bukkit.entity.Entity?) = entity != null && entities.any { it.match(entity) }
 
-    open class Entity(val name: String, val flags: List<Flags>, val data: Map<String, String>) {
+    open class Entity(val name: String, val flags: List<Flags>, val data: List<DataMatch>) {
 
         open fun match(entity: org.bukkit.entity.Entity) = matchType(entity.type.name.lowercase()) && matchData(entity)
 
@@ -30,7 +30,7 @@ class InferEntity(val entities: List<Entity>) {
         open fun matchData(entity: org.bukkit.entity.Entity): Boolean {
             return data.all {
                 when (it.key) {
-                    "name" -> it.value in entity.getI18nName()
+                    "name" -> it.check(entity.getI18nName())
                     else -> {
                         warning("$name[${it.key}=${it.value}] not supported.")
                         false
@@ -40,7 +40,8 @@ class InferEntity(val entities: List<Entity>) {
         }
     }
 
-    class CitizensEntity(material: String, flags: List<Flags>, data: Map<String, String>) : Entity(material, flags, data) {
+    @Suppress("IdentifierGrammar")
+    class CitizensEntity(material: String, flags: List<Flags>, data: List<DataMatch>) : Entity(material, flags, data) {
 
         override fun match(entity: org.bukkit.entity.Entity): Boolean {
             return matchType(entity.citizensId()) && matchData(entity)
@@ -50,8 +51,8 @@ class InferEntity(val entities: List<Entity>) {
             val npc = CitizensAPI.getNPCRegistry().getNPC(entity)
             return data.all {
                 when (it.key) {
-                    "type" -> it.value.equals(npc.entity.type.name, true)
-                    "name" -> it.value in npc.fullName
+                    "type" -> it.check(npc.entity.type.name)
+                    "name" -> it.check(npc.fullName)
                     else -> {
                         warning("$name[${it.key}=${it.value}] not supported.")
                         false
@@ -65,7 +66,7 @@ class InferEntity(val entities: List<Entity>) {
         }
     }
 
-    class MythicMobsEntity(material: String, flags: List<Flags>, data: Map<String, String>) : Entity(material, flags, data) {
+    class MythicMobsEntity(material: String, flags: List<Flags>, data: List<DataMatch>) : Entity(material, flags, data) {
 
         fun org.bukkit.entity.Entity.mythicMobId(): String {
             return Mythic.API.getMob(this)?.id ?: "@vanilla"
@@ -79,12 +80,13 @@ class InferEntity(val entities: List<Entity>) {
             val mob = Mythic.API.getMob(entity) ?: return false
             return data.all {
                 when (it.key) {
-                    "type" -> it.value.equals(mob.entityType.name, true)
-                    "name" -> it.value in entity.getI18nName()
+                    "type" -> it.check(mob.entityType.name)
+                    "name" -> it.check(entity.getI18nName())
                     "level" -> Coerce.toDouble(it.value) <= mob.level
                     "stance" -> it.value == mob.stance
                     "faction" -> it.value == mob.faction
-                    else -> mob.config.getString(it.key)?.contains(it.value) == true
+                    // 配置文件中的属性
+                    else -> it.check(mob.config.getString(it.key) ?: return false)
                 }
             }
         }
@@ -97,13 +99,11 @@ class InferEntity(val entities: List<Entity>) {
         @Suppress("DuplicatedCode")
         fun String.toInferEntity(): Entity {
             var type: String
-            val data = HashMap<String, String>()
+            val data = arrayListOf<DataMatch>()
             val flag = ArrayList<Flags>()
             if (indexOf('[') > -1 && endsWith(']')) {
                 type = substring(0, indexOf('['))
-                data.putAll(substring(indexOf('[') + 1, length - 1).split(",").map {
-                    it.trim().split("=").run { get(0) to (getOrNull(1) ?: get(0)) }
-                })
+                data += substring(indexOf('[') + 1, length - 1).split(',').map { DataMatch.fromString(it.trim()) }
             } else {
                 type = this
             }

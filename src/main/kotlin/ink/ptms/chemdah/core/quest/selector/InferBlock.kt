@@ -1,5 +1,6 @@
 package ink.ptms.chemdah.core.quest.selector
 
+import com.mojang.datafixers.types.templates.Check.CheckType
 import ink.ptms.chemdah.core.bukkit.NMS
 import ink.ptms.chemdah.core.quest.selector.Flags.Companion.matchType
 import taboolib.common.platform.function.console
@@ -34,14 +35,14 @@ class InferBlock(val mats: List<Block>) {
         return "InferBlock(mats=$mats)"
     }
 
-    data class Block(val material: String, val flags: List<Flags>, val data: Map<String, String>) {
+    data class Block(val material: String, val flags: List<Flags>, val data: List<DataMatch>) {
 
         fun matchFlags(type: String): Boolean {
             return flags.any { it.match(type, material) }
         }
 
         fun matchBlockData(map: Map<String, Any>): Boolean {
-            return data.all { map[it.key]?.toString() == it.value }
+            return data.all { it.check(map[it.key] ?: return false) }
         }
     }
 
@@ -52,15 +53,14 @@ class InferBlock(val mats: List<Block>) {
         @Suppress("DuplicatedCode")
         fun String.toInferBlock(): Block {
             var type: String
-            val data = HashMap<String, String>()
-            val flag = ArrayList<Flags>()
+            val data = arrayListOf<DataMatch>()
+            val flag = arrayListOf<Flags>()
+            // 存在 BlockData 选择器
             if (indexOf('[') > -1 && endsWith(']')) {
                 type = substring(0, indexOf('['))
                 // 只有 1.13+ 才允许加载 BlockData 选择器
                 if (MinecraftVersion.majorLegacy >= 11300) {
-                    data.putAll(substring(indexOf('[') + 1, length - 1).split(",").map {
-                        it.trim().split("=").run { get(0) to (getOrNull(1) ?: get(0)) }
-                    })
+                    data += substring(indexOf('[') + 1, length - 1).split(',').map { DataMatch.fromString(it.trim()) }
                 }
             } else {
                 type = this

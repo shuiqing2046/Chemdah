@@ -9,7 +9,6 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 import su.nightexpress.quantumrpg.stats.items.ItemStats
 import taboolib.common.platform.event.SubscribeEvent
-import taboolib.common5.Coerce
 import taboolib.module.nms.getItemTag
 import think.rpgitems.item.ItemManager
 
@@ -20,6 +19,7 @@ import think.rpgitems.item.ItemManager
  * @author sky
  * @since 2021/4/23 10:30 下午
  */
+@Suppress("SpellCheckingInspection")
 internal object InferItemHooks  {
 
     @SubscribeEvent
@@ -49,7 +49,7 @@ internal object InferItemHooks  {
         }
     }
 
-    class ItemZaphkiel(material: String, flags: List<Flags>, data: Map<String, String>) : InferItem.Item(material, flags, data) {
+    class ItemZaphkiel(material: String, flags: List<Flags>, data: List<DataMatch>) : InferItem.Item(material, flags, data) {
 
         fun ItemStack.zaphkielId(): String {
             val itemStream = ZaphkielAPI.read(this)
@@ -60,16 +60,28 @@ internal object InferItemHooks  {
             return matchType(item.zaphkielId()) && matchMetaData(item)
         }
 
-        override fun matchMetaData(item: ItemStack, itemMeta: ItemMeta?, key: String, value: String): Boolean {
-            return if (key.startsWith("data.")) {
-                ZaphkielAPI.read(item).getZaphkielData()[key.substring("data.".length)]?.asString().equals(value, true)
-            } else {
-                super.matchMetaData(item, itemMeta, key, value)
+        override fun matchMetaData(item: ItemStack, itemMeta: ItemMeta?, dataMatch: DataMatch): Boolean {
+            return when {
+                dataMatch.key.startsWith("config.") -> {
+                    val itemStream = ZaphkielAPI.read(item)
+                    if (itemStream.isVanilla()) return false
+                    val data = itemStream.getZaphkielItem().config[dataMatch.key.substringAfter("data.")]
+                    return if (data != null) dataMatch.check(data) else false
+                }
+                dataMatch.key.startsWith("data.") -> {
+                    val itemStream = ZaphkielAPI.read(item)
+                    if (itemStream.isVanilla()) return false
+                    val data = itemStream.getZaphkielData().getDeep(dataMatch.key.substringAfter("data."))?.unsafeData()
+                    return if (data != null) dataMatch.check(data) else false
+                }
+                else -> {
+                    super.matchMetaData(item, itemMeta, dataMatch)
+                }
             }
         }
     }
 
-    class ItemMMOItem(material: String, flags: List<Flags>, data: Map<String, String>) : InferItem.Item(material, flags, data) {
+    class ItemMMOItem(material: String, flags: List<Flags>, data: List<DataMatch>) : InferItem.Item(material, flags, data) {
 
         fun ItemStack.mmoId(): String {
             val item = MMOLib.plugin.version.wrapper.getNBTItem(this)
@@ -90,16 +102,16 @@ internal object InferItemHooks  {
             return matchType(item.mmoId()) && matchMetaData(item)
         }
 
-        override fun matchMetaData(item: ItemStack, itemMeta: ItemMeta?, key: String, value: String): Boolean {
-            return when (key) {
-                "set" -> item.mmoSet().equals(value, true)
-                "type" -> item.mmoType().equals(value, true)
-                else -> super.matchMetaData(item, itemMeta, key, value)
+        override fun matchMetaData(item: ItemStack, itemMeta: ItemMeta?, dataMatch: DataMatch): Boolean {
+            return when (dataMatch.key) {
+                "set" -> dataMatch.check(item.mmoSet())
+                "type" -> dataMatch.check(item.mmoType())
+                else -> super.matchMetaData(item, itemMeta, dataMatch)
             }
         }
     }
 
-    class ItemRPGItem(material: String, flags: List<Flags>, data: Map<String, String>) : InferItem.Item(material, flags, data) {
+    class ItemRPGItem(material: String, flags: List<Flags>, data: List<DataMatch>) : InferItem.Item(material, flags, data) {
 
         fun ItemStack.rpgName(): String {
             return ItemManager.toRPGItem(this).orElse(null)?.name ?: "@vanilla"
@@ -113,15 +125,15 @@ internal object InferItemHooks  {
             return matchType(item.rpgName()) && matchMetaData(item)
         }
 
-        override fun matchMetaData(item: ItemStack, itemMeta: ItemMeta?, key: String, value: String): Boolean {
-            return when (key) {
-                "uid" -> item.rpgUid() == Coerce.toInteger(value)
-                else -> super.matchMetaData(item, itemMeta, key, value)
+        override fun matchMetaData(item: ItemStack, itemMeta: ItemMeta?, dataMatch: DataMatch): Boolean {
+            return when (dataMatch.key) {
+                "uid" -> dataMatch.check(item.rpgUid())
+                else -> super.matchMetaData(item, itemMeta, dataMatch)
             }
         }
     }
 
-    class ItemQuantumRPG(material: String, flags: List<Flags>, data: Map<String, String>) : InferItem.Item(material, flags, data) {
+    class ItemQuantumRPG(material: String, flags: List<Flags>, data: List<DataMatch>) : InferItem.Item(material, flags, data) {
 
         fun ItemStack.quantumName(): String {
             return ItemStats.getId(this) ?: "@vanilla"
@@ -135,15 +147,15 @@ internal object InferItemHooks  {
             return matchType(item.quantumName()) && matchMetaData(item)
         }
 
-        override fun matchMetaData(item: ItemStack, itemMeta: ItemMeta?, key: String, value: String): Boolean {
-            return when (key) {
-                "level" -> item.quantumLevel() <= Coerce.toInteger(value)
-                else -> super.matchMetaData(item, itemMeta, key, value)
+        override fun matchMetaData(item: ItemStack, itemMeta: ItemMeta?, dataMatch: DataMatch): Boolean {
+            return when (dataMatch.key) {
+                "level" -> dataMatch.check(item.quantumLevel())
+                else -> super.matchMetaData(item, itemMeta, dataMatch)
             }
         }
     }
 
-    class ItemPxRPG(material: String, flags: List<Flags>, data: Map<String, String>) : InferItem.Item(material, flags, data) {
+    class ItemPxRPG(material: String, flags: List<Flags>, data: List<DataMatch>) : InferItem.Item(material, flags, data) {
 
         fun ItemStack.pxId(): String {
             return getItemTag().getDeep("pxrpg.id")?.asString() ?: "@vanilla"
@@ -181,21 +193,21 @@ internal object InferItemHooks  {
             return matchType(item.pxId()) && matchMetaData(item)
         }
 
-        override fun matchMetaData(item: ItemStack, itemMeta: ItemMeta?, key: String, value: String): Boolean {
-            return when (key) {
-                "name" -> item.pxName().contains(value)
-                "author" -> item.pxAuthor().equals(value, true)
-                "quality" -> item.pxQuality().equals(value, true)
-                "type" -> item.pxType().equals(value, true)
-                "template" -> item.pxTemplate().equals(value, true)
-                "level" -> item.pxLevel() <= Coerce.toInteger(value)
-                "bind" -> item.pxBind().equals(value, true)
-                else -> super.matchMetaData(item, itemMeta, key, value)
+        override fun matchMetaData(item: ItemStack, itemMeta: ItemMeta?, dataMatch: DataMatch): Boolean {
+            return when (dataMatch.key) {
+                "name" -> dataMatch.check(item.pxName())
+                "author" -> dataMatch.check(item.pxAuthor())
+                "quality" -> dataMatch.check(item.pxQuality())
+                "type" -> dataMatch.check(item.pxType())
+                "template" -> dataMatch.check(item.pxTemplate())
+                "level" -> dataMatch.check(item.pxLevel())
+                "bind" -> dataMatch.check(item.pxBind())
+                else -> super.matchMetaData(item, itemMeta, dataMatch)
             }
         }
     }
 
-    class ItemJulyItems(material: String, flags: List<Flags>, data: Map<String, String>) : InferItem.Item(material, flags, data) {
+    class ItemJulyItems(material: String, flags: List<Flags>, data: List<DataMatch>) : InferItem.Item(material, flags, data) {
 
         fun ItemStack.julyName(): String {
             return JItemAPI.getInstance().toJItem(this)?.itemId ?: "@vanilla"
@@ -210,7 +222,7 @@ internal object InferItemHooks  {
         }
     }
 
-    class ItemExecutableItems(material: String, flags: List<Flags>, data: Map<String, String>) : InferItem.Item(material, flags, data) {
+    class ItemExecutableItems(material: String, flags: List<Flags>, data: List<DataMatch>) : InferItem.Item(material, flags, data) {
 
         fun ItemStack.executableId(): String {
             return ExecutableItemsAPI.getExecutableItemConfig(this)?.identification ?: "@vanilla"

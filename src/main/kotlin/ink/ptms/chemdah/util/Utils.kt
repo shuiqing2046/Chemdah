@@ -149,6 +149,14 @@ fun String.replaces(vararg vars: Pair<String, Any>): String {
     return r
 }
 
+fun String.startsWith(vararg prefix: String): Boolean {
+    return prefix.any { startsWith(it) }
+}
+
+fun String.substringAfter(vararg morePrefix: String): String {
+    return substringAfter(morePrefix.firstOrNull { startsWith(it) } ?: return this)
+}
+
 fun <K, V, M : MutableMap<in K, in V>> Iterable<Couple<K, V>>.toMap(destination: M): M {
     return destination.apply { putAll(this@toMap) }
 }

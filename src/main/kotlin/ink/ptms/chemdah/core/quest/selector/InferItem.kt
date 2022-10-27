@@ -2,12 +2,13 @@ package ink.ptms.chemdah.core.quest.selector
 
 import ink.ptms.chemdah.api.event.InferItemHookEvent
 import ink.ptms.chemdah.core.quest.selector.Flags.Companion.matchType
+import ink.ptms.chemdah.util.startsWith
+import ink.ptms.chemdah.util.substringAfter
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.inventory.meta.PotionMeta
 import taboolib.common.platform.function.warning
-import taboolib.common5.Coerce
 import taboolib.library.reflex.Reflex.Companion.invokeConstructor
 import taboolib.module.nms.getItemTag
 import taboolib.module.nms.getName
@@ -38,36 +39,53 @@ class InferItem(val items: List<Item>) {
         return inventory.takeItem(amount) { items.any { item -> item.match(it) } }
     }
 
-    open class Item(val material: String, val flags: List<Flags>, val data: Map<String, String>) {
+    open class Item(val material: String, val flags: List<Flags>, val data: List<DataMatch>) {
 
         open fun match(item: ItemStack) = matchType(item.type.name.lowercase()) && matchMetaData(item)
 
         open fun matchType(type: String) = flags.any { it.match(type, material) }
 
+        @Suppress("SpellCheckingInspection")
         open fun matchMetaData(item: ItemStack): Boolean {
             val meta = item.itemMeta
             return data.all {
                 when (it.key) {
-                    "name" -> it.value in item.getName()
-                    "lore" -> meta?.lore?.toString()?.contains(it.value) == true
-                    "custom-model-data" -> meta?.customModelData == Coerce.toInteger(it.value)
-                    "enchant", "enchants", "enchantment" -> meta?.enchants?.any { e -> e.key.name.equals(it.value, true) } == true
+                    // 名称
+                    "name" -> it.check(item.getName())
+                    // 描述
+                    "lore" -> meta?.lore?.any { line -> it.check(line) } ?: false
+                    // CMD
+                    "custom-model-data" -> it.check(meta?.customModelData ?: 0)
+                    // 附魔
+                    "ench", "enchant", "enchants", "enchantment" -> meta?.enchants?.any { e -> it.check(e.key.name) } ?: false
+                    // 药水
                     "potion", "potions" -> if (meta is PotionMeta) {
-                        meta.basePotionData.type.name.equals(it.value, true) || meta.customEffects.any { e -> e.type.name.equals(it.value, true) }
+                        it.check(meta.basePotionData.type.name) || meta.customEffects.any { e -> it.check(e.type.name) }
                     } else {
                         false
                     }
-                    else -> if (it.key.startsWith("nbt.")) {
-                        item.getItemTag().getDeep(it.key.substring("nbt.".length))?.asString().equals(it.value, true)
-                    } else {
-                        matchMetaData(item, meta, it.key, it.value)
+                    // 其他选项
+                    else -> when {
+                        // 附魔等级
+                        it.key.startsWith("ench.", "enchant.", "enchantment.") -> {
+                            val ench = it.key.substringAfter("ench.", "enchant.", "enchantment.")
+                            val level = meta?.enchants?.entries?.firstOrNull { e -> e.key.name.equals(ench, true) } ?: 0
+                            it.check(level)
+                        }
+                        // NBT
+                        it.key.startsWith("nbt.", "tag.") -> {
+                            val data = item.getItemTag().getDeep(it.key.substringAfter("nbt.", "tag."))?.unsafeData()
+                            if (data != null) it.check(data) else false
+                        }
+                        // 扩展
+                        else -> matchMetaData(item, meta, it)
                     }
                 }
             }
         }
 
-        open fun matchMetaData(item: ItemStack, itemMeta: ItemMeta?, key: String, value: String): Boolean {
-            warning("$material[$key=$value] not supported.")
+        open fun matchMetaData(item: ItemStack, itemMeta: ItemMeta?, dataMatch: DataMatch): Boolean {
+            warning("$material[${dataMatch.key} ${dataMatch.type} ${dataMatch.value}] not supported.")
             return false
         }
 
@@ -87,13 +105,11 @@ class InferItem(val items: List<Item>) {
         @Suppress("DuplicatedCode")
         fun String.toInferItem(): Item {
             var type: String
-            val data = HashMap<String, String>()
+            val data = arrayListOf<DataMatch>()
             val flag = ArrayList<Flags>()
             if (indexOf('[') > -1 && endsWith(']')) {
                 type = substring(0, indexOf('['))
-                data.putAll(substring(indexOf('[') + 1, length - 1).split(",").map {
-                    it.trim().split("=").run { get(0) to (getOrNull(1) ?: get(0)) }
-                })
+                data += substring(indexOf('[') + 1, length - 1).split(',').map { DataMatch.fromString(it.trim()) }
             } else {
                 type = this
             }
