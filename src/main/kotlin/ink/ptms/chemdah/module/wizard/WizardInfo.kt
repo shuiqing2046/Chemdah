@@ -45,6 +45,9 @@ class WizardInfo(val root: ConfigurationSection) {
     /** 事件冷却 **/
     val eventCooldown = root.getString("event-cooldown")?.parseMillis() ?: 0
 
+    /** 关闭对话 **/
+    val disableConversation = root.getBoolean("disable-conversation")
+
     /**
      * Apply
      *

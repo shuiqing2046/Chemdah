@@ -44,9 +44,9 @@ object ConversationManager {
 
     val sessions = ConcurrentHashMap<String, Session>()
 
-    fun getConversation(player: Player, namespace: String, vararg name: String): Conversation? {
+    fun getConversation(player: Player, namespace: String, source: Any?, vararg name: String): Conversation? {
         val conversation = ChemdahAPI.conversation.values.firstOrNull { name.any { name -> it.isNPC(namespace, name) } }
-        val event = ConversationEvents.Select(player, namespace, name.toList(), conversation)
+        val event = ConversationEvents.Select(player, namespace, name.toList(), conversation, source)
         return if (event.call()) event.conversation else null
     }
 

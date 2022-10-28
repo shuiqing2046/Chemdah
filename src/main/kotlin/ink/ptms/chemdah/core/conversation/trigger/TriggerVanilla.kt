@@ -24,7 +24,7 @@ object TriggerVanilla {
     fun onInteract(e: PlayerInteractAtEntityEvent) {
         if (e.hand == EquipmentSlot.HAND && e.player.conversationSession == null) {
             val name = e.rightClicked.getDisplayName()
-            val conversation = ConversationManager.getConversation(e.player, "minecraft", *name)
+            val conversation = ConversationManager.getConversation(e.player, "minecraft", e.rightClicked, *name)
             if (conversation != null) {
                 e.isCancelled = true
                 conversation.open(e.player, object : Source<Entity>(name.last(), e.rightClicked) {

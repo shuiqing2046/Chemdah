@@ -1,6 +1,7 @@
 package ink.ptms.chemdah.module.wizard
 
 import ink.ptms.adyeshach.common.entity.EntityInstance
+import ink.ptms.chemdah.api.event.collect.ConversationEvents
 import ink.ptms.chemdah.module.Module
 import ink.ptms.chemdah.module.Module.Companion.register
 import org.bukkit.event.player.PlayerQuitEvent
@@ -69,6 +70,16 @@ object WizardSystem : Module {
         actions.values.filter { it.player.name == e.player.name }.forEach {
             it.cancel()
             actions.remove(it.entityInstance.uniqueId)
+        }
+    }
+
+    @SubscribeEvent
+    private fun onSelect(e: ConversationEvents.Select) {
+        if (e.source is EntityInstance) {
+            val info = getWizardInfo(e.source.uniqueId) ?: return
+            if (info.disableConversation) {
+                e.isCancelled = true
+            }
         }
     }
 }

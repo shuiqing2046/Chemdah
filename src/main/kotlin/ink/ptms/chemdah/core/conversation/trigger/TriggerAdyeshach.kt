@@ -73,7 +73,7 @@ internal object TriggerAdyeshach {
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onAdyInteract(e: AdyeshachEntityInteractEvent) {
         if (e.isMainHand && e.player.conversationSession == null) {
-            val conversation = ConversationManager.getConversation(e.player, "adyeshach", e.entity.id)
+            val conversation = ConversationManager.getConversation(e.player, "adyeshach", e.entity, e.entity.id)
             if (conversation != null) {
                 e.isCancelled = true
                 // 同步打开对话
@@ -88,7 +88,7 @@ internal object TriggerAdyeshach {
 
     @Suppress("UNCHECKED_CAST")
     fun EntityInstance.openConversation(player: Player): CompletableFuture<Session>? {
-        return ConversationManager.getConversation(player, "adyeshach", id)?.openByAdyeshach(player, this)
+        return ConversationManager.getConversation(player, "adyeshach", this, id)?.openByAdyeshach(player, this)
     }
 
     fun Conversation.openByAdyeshach(player: Player, entityInstance: EntityInstance, look: Boolean = true): CompletableFuture<Session> {

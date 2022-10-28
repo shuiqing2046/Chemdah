@@ -46,7 +46,7 @@ internal object TriggerMythicMobs {
         }
         if (e.hand == EquipmentSlot.HAND && e.rightClicked is LivingEntity && e.player.conversationSession == null) {
             val mob = Mythic.API.getMob(e.rightClicked) ?: return
-            val conversation = ConversationManager.getConversation(e.player, "mythicmobs", mob.id)
+            val conversation = ConversationManager.getConversation(e.player, "mythicmobs", mob, mob.id)
             if (conversation != null) {
                 e.isCancelled = true
                 // 打开对话

@@ -20,6 +20,8 @@ example_0:
   # The faster the movements speed the greater the value
   # Generally not changed, unless your Wizard NPC has no way to move between nodes
   effective-distance-corrections: 2.0
+  # Disable conversation
+  disable-conversation: true
   # Script triggered when an NPC changes state
   event:
     waiting: |-

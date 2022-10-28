@@ -24,7 +24,7 @@ class ConversationEvents {
     /**
      * 当玩家选择对话时（对话开始之前）
      */
-    class Select(val player: Player, val namespace: String, val id: List<String>, var conversation: Conversation?): BukkitProxyEvent()
+    class Select(val player: Player, val namespace: String, val id: List<String>, var conversation: Conversation?, val source: Any?): BukkitProxyEvent()
 
     /**
      * 当玩家选择对话回复时

@@ -47,7 +47,7 @@ internal object TriggerCitizens {
         val player = e.player
         if (e.hand == EquipmentSlot.HAND && e.rightClicked.hasMetadata("NPC") && player.conversationSession == null) {
             val npc = CitizensAPI.getNPCRegistry().getNPC(e.rightClicked) ?: return
-            val conversation = ConversationManager.getConversation(e.player, "citizens", npc.id.toString())
+            val conversation = ConversationManager.getConversation(e.player, "citizens", npc, npc.id.toString())
             if (conversation != null) {
                 e.isCancelled = true
                 // 打开对话
