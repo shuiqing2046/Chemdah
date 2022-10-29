@@ -48,7 +48,7 @@ object ThemeChest : Theme<ThemeChestSetting>() {
                     onBuild(async = true) { _, inventory ->
                         replies.forEachIndexed { index, reply ->
                             if (index < settings.playerSlot.size) {
-                                val rep = if (reply.isPlayerSelected(session.player)) settings.playerItem else settings.playerItemSelected
+                                val rep = if (!reply.isPlayerSelected(session.player)) settings.playerItem else settings.playerItemSelected
                                 inventory.setItem(settings.playerSlot[index], rep.buildItem(session, reply, index + 1))
                             }
                         }
