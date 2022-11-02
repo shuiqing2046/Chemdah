@@ -24,27 +24,26 @@ public class BlockDataManager {
 
 	/**
 	 * Creates a BlockDataManager backed by chunk PersistentDataContainers
-	 * @param plugin The Plugin that owns the data
 	 * @param autoLoad Whether to automatically load data for newly-loaded chunks asynchronously
 	 * @param events Whether to listen for events to automatically move and remove DataBlocks in response to their owning blocks being moved and removed
 	 * @return The created BlockDataManager
 	 */
-	public static BlockDataManager createPDC(Plugin plugin, boolean autoLoad, boolean events) {
+	public static BlockDataManager createPDC(boolean autoLoad, boolean events) {
+		Plugin plugin = JavaPlugin.getProvidingPlugin(BlockDataManager.class);
 		BlockDataBackend backend = BlockDataBackend.pdc(plugin);
-		return new BlockDataManager(plugin, backend, autoLoad, events);
+		return new BlockDataManager(backend, autoLoad, events);
 	}
 
 	/**
 	 * Creates a BlockDataManager backed by SQLite
-	 * @param plugin The Plugin that owns the data
 	 * @param path The path to the SQLite database
 	 * @param autoLoad Whether to automatically load data for newly-loaded chunks
 	 * @param events Whether to listen for events to automatically move and remove DataBlocks in response to their owning blocks being moved and removed
 	 * @return The created BlockDataManager
 	 */
-	public static BlockDataManager createSQLite(Plugin plugin, Path path, boolean autoLoad, boolean events) {
+	public static BlockDataManager createSQLite(Path path, boolean autoLoad, boolean events) {
 		BlockDataBackend backend = BlockDataBackend.sqlite(path);
-		return new BlockDataManager(plugin, backend, autoLoad, events);
+		return new BlockDataManager(backend, autoLoad, events);
 	}
 
 	/**
@@ -57,7 +56,7 @@ public class BlockDataManager {
 	public static BlockDataManager createAuto(Path path, boolean autoLoad, boolean events) {
 		Plugin plugin = JavaPlugin.getProvidingPlugin(BlockDataManager.class);
 		BlockDataBackend backend = MinecraftVersion.INSTANCE.getMajorLegacy() >= 11400 ? BlockDataBackend.pdc(plugin) : BlockDataBackend.sqlite(path);
-		return new BlockDataManager(plugin, backend, autoLoad, events);
+		return new BlockDataManager(backend, autoLoad, events);
 	}
 
 	private final BlockDataBackend backend;
@@ -91,8 +90,8 @@ public class BlockDataManager {
 		});
 	}
 
-	private BlockDataManager(Plugin plugin, BlockDataBackend backend, boolean autoLoad, boolean events) {
-		this.plugin = plugin;
+	private BlockDataManager(BlockDataBackend backend, boolean autoLoad, boolean events) {
+		this.plugin = JavaPlugin.getProvidingPlugin(BlockDataManager.class);
 		this.backend = backend;
 		new EventListener<>(plugin, ChunkUnloadEvent.class, e -> unload(new ChunkPosition(e.getChunk())));
 		if (autoLoad) {

@@ -37,6 +37,8 @@ object QuestDevelopment {
     var enableUniqueBlock = false
     var enableMessageTransmit = false
 
+    var uniqueBlockMode = UniqueBlockMode.AUTO
+
     init {
         val file = File(getDataFolder(), "development.yml")
         if (file.exists()) {
@@ -48,6 +50,14 @@ object QuestDevelopment {
             if (MinecraftVersion.majorLegacy >= 11900) {
                 enableMessageTransmit = false
                 console().sendLang("console-message-transmit-not-support")
+            }
+
+            // 唯一方块模式
+            uniqueBlockMode = when (conf.getString("unique-block-mode", "AUTO")!!) {
+                "AUTO" -> UniqueBlockMode.AUTO
+                "SQLITE" -> UniqueBlockMode.SQLITE
+                "PDC" -> UniqueBlockMode.PDC
+                else -> UniqueBlockMode.AUTO
             }
         }
     }
@@ -112,5 +122,10 @@ object QuestDevelopment {
                 sendPacket(packet)
             }
         }
+    }
+
+    enum class UniqueBlockMode {
+
+        AUTO, SQLITE, PDC
     }
 }

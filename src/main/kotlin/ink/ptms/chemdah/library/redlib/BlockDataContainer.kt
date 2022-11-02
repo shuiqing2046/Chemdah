@@ -1,5 +1,6 @@
 package ink.ptms.chemdah.library.redlib
 
+import ink.ptms.chemdah.core.quest.QuestDevelopment
 import ink.ptms.chemdah.library.redlib.event.DataBlockMoveEvent
 import org.bukkit.World
 import org.bukkit.block.Block
@@ -34,7 +35,15 @@ object BlockDataContainer {
     private fun init() {
         // 在 ENABLE 之前初始化 BlockDataManager，否则脚本将无法正常调用
         TabooLibCommon.postpone(LifeCycle.ENABLE) {
-            manager = BlockDataManager.createAuto(getDataFolder().toPath().resolve("blocks.db"), true, true)
+            if (QuestDevelopment.enableUniqueBlock) {
+                val path = getDataFolder().toPath().resolve("blocks.db")
+                // 加载不同模式的 BlockDataManager
+                manager = when (QuestDevelopment.uniqueBlockMode) {
+                    QuestDevelopment.UniqueBlockMode.AUTO -> BlockDataManager.createAuto(path, true, true)
+                    QuestDevelopment.UniqueBlockMode.SQLITE -> BlockDataManager.createSQLite(path, true, true)
+                    QuestDevelopment.UniqueBlockMode.PDC -> BlockDataManager.createPDC(true, true)
+                }
+            }
         }
     }
 
