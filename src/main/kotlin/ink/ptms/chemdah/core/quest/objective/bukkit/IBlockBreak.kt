@@ -33,7 +33,7 @@ object IBlockBreak : ObjectiveCountableI<BlockBreakEvent>() {
             data.toInt() <= it.expToDrop
         }
         addSimpleCondition("unique") { data, it ->
-            data.toBoolean() == it.block.isPlaced()
+            if (data.toBoolean()) !it.block.isPlaced() else true
         }
         addSimpleCondition("no-silk-touch") { data, it ->
             if (it.player.inventory.itemInMainHand.itemMeta?.hasEnchant(Enchantment.SILK_TOUCH) == true) data.toBoolean() else true

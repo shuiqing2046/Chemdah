@@ -92,7 +92,7 @@ object QuestDevelopment {
     }
 
     fun Block.isPlaced(): Boolean {
-        return getDataContainer(false)?.getBoolean("placed") == true
+        return if (enableUniqueBlock) getDataContainer(false)?.getBoolean("placed") == true else false
     }
 
     fun Player.hasTransmitMessages(): Boolean {
