@@ -2,9 +2,7 @@ package ink.ptms.chemdah.module.kether
 
 import ink.ptms.chemdah.api.ChemdahAPI.callTrigger
 import ink.ptms.chemdah.util.getBukkitPlayer
-import org.bukkit.entity.Player
 import taboolib.module.kether.*
-import java.util.concurrent.CompletableFuture
 
 /**
  * Chemdah

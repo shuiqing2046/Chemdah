@@ -2,7 +2,6 @@ package ink.ptms.chemdah.module.kether
 
 import ink.ptms.adyeshach.common.entity.EntityInstance
 import ink.ptms.chemdah.module.wizard.WizardSystem
-import org.bukkit.entity.EntityType
 import taboolib.common.platform.function.warning
 import taboolib.module.kether.*
 

@@ -11,7 +11,6 @@ import ink.ptms.chemdah.core.quest.addon.AddonTimeout.Companion.isTimeout
 import ink.ptms.chemdah.core.quest.addon.data.ControlTrigger
 import org.bukkit.entity.Player
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.CopyOnWriteArraySet
 
 /**
  * Chemdah

@@ -6,7 +6,6 @@ import ink.ptms.chemdah.core.quest.objective.bukkit.EMPTY_EVENT
 import org.bukkit.Bukkit
 import taboolib.common.platform.Schedule
 import taboolib.common.platform.function.console
-import taboolib.common.platform.function.warning
 import taboolib.module.lang.sendLang
 import java.util.concurrent.CompletableFuture
 

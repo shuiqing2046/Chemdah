@@ -25,7 +25,7 @@ taboolib {
     install("common-5")
     install("module-effect")
     install("module-database")
-//    install("module-database-mongodb")
+    // install("module-database-mongodb")
     install("module-configuration")
     install("module-kether")
     install("module-chat")
@@ -40,7 +40,7 @@ taboolib {
     install("expansion-command-helper")
     install("expansion-javascript")
     classifier = null
-    version = "6.0.10-12"
+    version = "6.0.10-16"
     relocate("ink.ptms.um", "ink.ptms.chemdah.um")
 }
 
@@ -93,7 +93,7 @@ dependencies {
     compileOnly("public:MythicMobs5:5.0.4")
     compileOnly("public:ExecutableItems:1.0.0")
     compileOnly("public:Brewery:1.0.0")
-    compileOnly("ink.ptms:Blockdb:1.1.0")
+    // compileOnly("ink.ptms:Blockdb:1.1.0")
     compileOnly("ink.ptms:Zaphkiel:1.6.0")
     compileOnly("ink.ptms:Adyeshach:1.5.13-op16")
     compileOnly("ink.ptms:Sandalphon:1.3.0")

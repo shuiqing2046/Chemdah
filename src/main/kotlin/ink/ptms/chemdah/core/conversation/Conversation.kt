@@ -8,7 +8,6 @@ import org.bukkit.entity.Player
 import taboolib.common.platform.function.warning
 import taboolib.common5.Coerce
 import taboolib.library.configuration.ConfigurationSection
-import taboolib.module.chat.colored
 import taboolib.module.kether.KetherFunction
 import taboolib.module.kether.KetherShell
 import taboolib.module.kether.extend

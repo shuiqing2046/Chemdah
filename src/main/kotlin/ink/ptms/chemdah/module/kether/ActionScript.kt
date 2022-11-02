@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableList
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.util.getBukkitPlayer
 import taboolib.common.platform.function.adaptPlayer
-import taboolib.common.platform.function.info
 import taboolib.common.platform.function.warning
 import taboolib.library.kether.ArgTypes
 import taboolib.library.kether.ParsedAction

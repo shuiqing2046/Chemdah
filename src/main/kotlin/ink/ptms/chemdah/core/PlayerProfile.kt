@@ -12,7 +12,6 @@ import ink.ptms.chemdah.util.namespaceQuest
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import taboolib.common.platform.function.adaptCommandSender
-import taboolib.common.platform.function.submit
 import taboolib.common.platform.function.submitAsync
 import taboolib.common.util.asList
 import taboolib.common5.Coerce

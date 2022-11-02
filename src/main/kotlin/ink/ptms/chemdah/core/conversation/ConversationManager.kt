@@ -7,7 +7,6 @@ import ink.ptms.chemdah.api.event.collect.ConversationEvents
 import ink.ptms.chemdah.api.event.collect.PlayerEvents
 import ink.ptms.chemdah.util.hidden
 import org.bukkit.Bukkit
-import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerCommandPreprocessEvent

@@ -1,10 +1,8 @@
 package ink.ptms.chemdah.core.quest.selector
 
-import com.mojang.datafixers.types.templates.Check.CheckType
 import ink.ptms.chemdah.core.bukkit.NMS
 import ink.ptms.chemdah.core.quest.selector.Flags.Companion.matchType
 import taboolib.common.platform.function.console
-import taboolib.common.platform.function.warning
 import taboolib.module.lang.sendLang
 import taboolib.module.nms.MinecraftVersion
 

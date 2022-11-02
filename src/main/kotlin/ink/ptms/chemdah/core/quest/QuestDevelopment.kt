@@ -1,10 +1,9 @@
 package ink.ptms.chemdah.core.quest
 
-import ink.ptms.blockdb.BlockFactory.createDataContainer
-import ink.ptms.blockdb.BlockFactory.getDataContainer
-import ink.ptms.blockdb.Data
 import ink.ptms.chemdah.api.ChemdahAPI.conversationSession
 import ink.ptms.chemdah.api.event.collect.PlayerEvents
+import ink.ptms.chemdah.library.redlib.getDataContainer
+import ink.ptms.chemdah.library.redlib.getDataContainerAsync
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockPlaceEvent
@@ -12,7 +11,6 @@ import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.console
 import taboolib.common.platform.function.getDataFolder
-import taboolib.common.platform.function.warning
 import taboolib.common5.Coerce
 import taboolib.library.reflex.Reflex.Companion.getProperty
 import taboolib.module.configuration.Configuration
@@ -63,7 +61,7 @@ object QuestDevelopment {
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private fun onBlockPlace(e: BlockPlaceEvent) {
         if (enableUniqueBlock) {
-            (e.block.getDataContainer() ?: e.block.createDataContainer())["placed"] = Data(true)
+            e.block.getDataContainerAsync(true).thenAccept { data -> data["placed"] = true }
         }
     }
 
@@ -94,7 +92,7 @@ object QuestDevelopment {
     }
 
     fun Block.isPlaced(): Boolean {
-        return getDataContainer()?.get("placed")?.toBoolean() == true
+        return getDataContainer(false)?.getBoolean("placed") == true
     }
 
     fun Player.hasTransmitMessages(): Boolean {

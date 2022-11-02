@@ -1,7 +1,6 @@
 package ink.ptms.chemdah.module.kether
 
 import ink.ptms.chemdah.api.ChemdahAPI
-import taboolib.common.platform.function.submit
 import taboolib.common.platform.function.submitAsync
 import taboolib.library.kether.ArgTypes
 import taboolib.library.kether.ParsedAction
