@@ -10,6 +10,7 @@ import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.inventory.meta.PotionMeta
 import taboolib.common.platform.function.warning
 import taboolib.library.reflex.Reflex.Companion.invokeConstructor
+import taboolib.module.kether.action.transform.CheckType
 import taboolib.module.nms.getItemTag
 import taboolib.module.nms.getName
 import taboolib.platform.util.hasItem
@@ -51,9 +52,9 @@ class InferItem(val items: List<Item>) {
             return data.all {
                 when (it.key) {
                     // 名称
-                    "name" -> it.check(item.getName())
+                    "name" -> it.check(item.getName(), CheckType.IN)
                     // 描述
-                    "lore" -> meta?.lore?.any { line -> it.check(line) } ?: false
+                    "lore" -> it.check(meta?.lore.toString(), CheckType.IN)
                     // 附加值
                     "damage", "durability" -> it.check(item.durability.toInt())
                     // CMD

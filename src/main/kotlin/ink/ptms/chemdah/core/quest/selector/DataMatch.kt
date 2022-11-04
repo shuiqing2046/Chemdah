@@ -12,7 +12,7 @@ import taboolib.module.kether.inferType
  */
 data class DataMatch(val key: String, val value: Any, val type: CheckType) {
 
-    fun check(target: Any): Boolean {
+    fun check(target: Any, type: CheckType = this.type): Boolean {
         return type.check(value, target)
     }
 
