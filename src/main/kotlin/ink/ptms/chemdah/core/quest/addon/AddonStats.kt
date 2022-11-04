@@ -259,19 +259,21 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
                 return progress
             }
             return when (this) {
+                // 任务
                 is Template -> {
-                    var p = Progress.ZERO
+                    var total = Progress.ZERO
                     taskMap.forEach { (_, task) ->
                         val tp = task.objective.getProgress(profile, task)
-                        p = Progress(p.value.increaseAny(tp.value), p.target.increaseAny(tp.target), p.percent + (tp.percent / this.taskMap.size))
+                        total = Progress(
+                            total.value.increaseAny(tp.value),
+                            total.target.increaseAny(tp.target),
+                            total.percent + (tp.percent / this.taskMap.size)
+                        )
                     }
-                    CompletableFuture.completedFuture(p)
+                    CompletableFuture.completedFuture(total)
                 }
-
-                is Task -> {
-                    CompletableFuture.completedFuture(objective.getProgress(profile, this))
-                }
-
+                // 条目
+                is Task -> CompletableFuture.completedFuture(objective.getProgress(profile, this))
                 else -> error("out of case")
             }
         }
