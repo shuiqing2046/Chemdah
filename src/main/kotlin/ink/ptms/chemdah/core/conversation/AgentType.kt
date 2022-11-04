@@ -33,7 +33,8 @@ enum class AgentType(val namespace: String) {
     fun namespaceAll() = listOf(
         "chemdah",
         "chemdah-conversation",
-        "chemdah-conversation-${namespace}"
+        "chemdah-conversation-${namespace}",
+        "adyeshach"
     )
 
     companion object {

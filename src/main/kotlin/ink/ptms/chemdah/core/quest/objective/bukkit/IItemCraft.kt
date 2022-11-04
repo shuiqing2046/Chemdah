@@ -1,5 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective.bukkit
 
+import ink.ptms.chemdah.core.PlayerProfile
+import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import org.bukkit.entity.Player
@@ -10,7 +12,7 @@ import taboolib.platform.util.isNotAir
  * Chemdah
  * ink.ptms.chemdah.core.quest.objective.bukkit.IItemCraft
  *
- * @author sky
+ r* @author sky
  * @since 2021/3/2 5:09 下午
  */
 @Dependency("minecraft")
@@ -32,5 +34,9 @@ object IItemCraft : ObjectiveCountableI<CraftItemEvent>() {
         addSimpleCondition("item:matrix") { data, e ->
             data.toInferItem().run { e.inventory.matrix.any { item -> isItem(item) } }
         }
+    }
+
+    override fun getCount(profile: PlayerProfile, task: Task, event: CraftItemEvent): Int {
+        return if (event.isShiftClick) event.inventory.matrix.minOf { it.amount } else 1
     }
 }
