@@ -33,6 +33,7 @@ object WizardSystem : Module {
     }
 
     override fun reload() {
+        infoMap.clear()
         val folder = File(getDataFolder(), "module/wizard")
         if (!folder.exists()) {
             releaseResourceFile("module/wizard/example.yml", false)

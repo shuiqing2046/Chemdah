@@ -75,6 +75,10 @@ class WizardInfo(val root: ConfigurationSection) {
      * 获取路径列表
      */
     private fun pathList0(): List<Location> {
+        if (world == null) {
+            warning("[Wizard] World not found: $id")
+            return emptyList()
+        }
         val path = mutableListOf<Location>()
         for (i in 0 until nodes.size - 1) {
             val a = nodes[i]
