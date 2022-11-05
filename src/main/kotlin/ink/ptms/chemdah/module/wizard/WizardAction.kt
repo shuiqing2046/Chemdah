@@ -1,11 +1,10 @@
 package ink.ptms.chemdah.module.wizard
 
 import ink.ptms.adyeshach.common.entity.EntityInstance
+import ink.ptms.chemdah.util.controllerMoveWithPathList
 import ink.ptms.chemdah.util.namespace
-import org.bukkit.Location
 import org.bukkit.entity.Player
 import taboolib.common.platform.function.adaptPlayer
-import taboolib.common.platform.function.warning
 import taboolib.common5.Baffle
 import taboolib.module.kether.KetherShell
 import taboolib.module.kether.runKether
@@ -24,14 +23,16 @@ class WizardAction(val player: Player, val entityInstance: EntityInstance, val i
     /** 行为结束时回调 **/
     val onFinish = CompletableFuture<Boolean>()
 
-    /** 当前节点 **/
-    var point: Location? = null
-
     /** NPC 状态 **/
     var state = State.MOVING
 
     /** 事件冷却 **/
     val cooldown = Baffle.of(info.eventCooldown, TimeUnit.MILLISECONDS)
+
+    init {
+        // 发起移动
+        entityInstance.controllerMoveWithPathList(info.nodes.last(), info.pathList)
+    }
 
     /**
      * NPC 是否可以移动（玩家是否在有效距离内）
@@ -44,7 +45,12 @@ class WizardAction(val player: Player, val entityInstance: EntityInstance, val i
      * 取消移动
      */
     fun cancel(success: Boolean = false) {
+        // 停止移动
+        entityInstance.isFreeze = false
+        entityInstance.controllerStill()
+        // 注销计划
         WizardSystem.actions.remove(entityInstance.uniqueId)
+        // 完成脚本
         onFinish.complete(success)
     }
 
@@ -52,35 +58,24 @@ class WizardAction(val player: Player, val entityInstance: EntityInstance, val i
      * 检查并移动
      */
     fun check(): WizardAction {
-        if (info.nodes.isEmpty()) {
-            warning("[${info.id}] Wizard nodes is empty.")
-            cancel()
-            return this
-        }
+        // 终点检测
         if (entityInstance.getLocation().distance(info.nodes.last()) < info.finishDistance) {
             cancel(success = true)
             return this
         }
+        // 可以移动
         if (shouldMoving()) {
-            val nearestNode = info.getNearestNode(entityInstance.getLocation())
-            if (nearestNode != null) {
-                point = nearestNode
-                entityInstance.controllerMove(nearestNode)
-                // 切换状态执行脚本
-                if (state == State.WAITING) {
-                    state = State.MOVING
-                    // 不在冷却中
-                    if (cooldown.hasNext()) {
-                        info.eventOnContinue?.let { runKether { KetherShell.eval(it, sender = adaptPlayer(player), namespace = namespace) } }
-                    }
+            entityInstance.isFreeze = false
+            // 切换状态执行脚本
+            if (state == State.WAITING) {
+                state = State.MOVING
+                // 不在冷却中
+                if (cooldown.hasNext()) {
+                    info.eventOnContinue?.let { runKether { KetherShell.eval(it, sender = adaptPlayer(player), namespace = namespace) } }
                 }
-            } else {
-                cancel()
-                return this
             }
         } else {
-            point = null
-            entityInstance.controllerStill()
+            entityInstance.isFreeze = true
             // 切换状态执行脚本
             if (state == State.MOVING) {
                 state = State.WAITING

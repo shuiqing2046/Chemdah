@@ -5,8 +5,11 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import taboolib.common.platform.function.warning
+import taboolib.common5.Coerce
 import taboolib.common5.util.parseMillis
 import taboolib.library.configuration.ConfigurationSection
+import taboolib.module.navigation.NodeEntity
+import taboolib.module.navigation.createPathfinder
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -33,9 +36,6 @@ class WizardInfo(val root: ConfigurationSection) {
     /** 等待距离 **/
     val waitingDistance = root.getDouble("waiting-distance")
 
-    /** 有效距离修正 **/
-    val effectiveDistanceCorrections = root.getDouble("effective-distance-corrections", 2.0)
-
     /** 当 NPC 暂停时触发脚本 **/
     val eventOnWaiting = root.getString("event.waiting")
 
@@ -48,6 +48,12 @@ class WizardInfo(val root: ConfigurationSection) {
     /** 关闭对话 **/
     val disableConversation = root.getBoolean("disable-conversation")
 
+    /** 路径列表 **/
+    val pathList = pathList0()
+
+    /** 路径列表是否连续有效 **/
+    val pathListValid = pathListValid0()
+
     /**
      * Apply
      *
@@ -55,33 +61,46 @@ class WizardInfo(val root: ConfigurationSection) {
      * @param entityInstance 单位实例
      */
     fun apply(player: Player, entityInstance: EntityInstance): CompletableFuture<Boolean> {
-        val action = WizardAction(player, entityInstance, this).check()
-        WizardSystem.actions[entityInstance.uniqueId] = action
-        return action.onFinish
+        return if (pathListValid) {
+            val action = WizardAction(player, entityInstance, this).check()
+            WizardSystem.actions[entityInstance.uniqueId] = action
+            action.onFinish
+        } else {
+            warning("[Wizard] Invalid path list: $id")
+            CompletableFuture.completedFuture(false)
+        }
     }
 
     /**
-     * Get nearest node
-     *
-     * @param location 单位坐标
-     * @return [Location]
+     * 获取路径列表
      */
-    fun getNearestNode(location: Location): Location? {
-        if (nodes.isEmpty()) {
-            warning("[$id] Wizard nodes is empty.")
-            return null
+    private fun pathList0(): List<Location> {
+        val path = mutableListOf<Location>()
+        for (i in 0 until nodes.size - 1) {
+            val a = nodes[i]
+            val b = nodes[i + 1]
+            val pathList = createPathfinder(NodeEntity(a, 2.0)).findPath(b, 32f)?.nodes
+            if (pathList != null) {
+                path += pathList.map { it.asBlockPos().toLocation(world!!) }
+            }
         }
-        // 获取目的地
-        val destination = nodes.last()
-        // 获取目的地与当前位置的距离
-        val valid = location.distance(destination) - effectiveDistanceCorrections
-        // 获取目的地与当前位置范围内的节点
-        // 获取最远移动节点
-        val next = nodes.filter { it.distance(destination) < valid }.filter { it.distance(location) < 32 }.maxByOrNull { it.distance(location) }
-        if (next == null) {
-            warning("[$id] No nearest node found.")
-            return null
+        return path
+    }
+
+    /**
+     * 检查路径是否连续有效
+     */
+    private fun pathListValid0(): Boolean {
+        for (i in 0 until pathList.size - 1) {
+            val a = pathList[i]
+            val b = pathList[i + 1]
+            if (a.distance(b) > 2.0) {
+                val at = "${a.blockX},${a.blockY},${a.blockZ}"
+                val bt = "${b.blockX},${b.blockY},${b.blockZ}"
+                warning("[Wizard] Discontinuous path list: $id ($at -> $bt distance: ${Coerce.format(a.distance(b))})")
+                return false
+            }
         }
-        return next
+        return pathList.isNotEmpty()
     }
 }

@@ -181,7 +181,9 @@ object ThemeChat : Theme<ThemeChatSettings>() {
     }
 
     override fun onBegin(session: Session): CompletableFuture<Void> {
-        ProxyParticle.CLOUD.sendTo(adaptPlayer(session.player), session.origin.clone().add(0.0, 0.5, 0.0).toProxyLocation())
+        if (!session.conversation.hasFlag("NO_EFFECT:PARTICLE")) {
+            ProxyParticle.CLOUD.sendTo(adaptPlayer(session.player), session.origin.clone().add(0.0, 0.5, 0.0).toProxyLocation())
+        }
         return super.onBegin(session)
     }
 

@@ -74,10 +74,11 @@ object WizardSystem : Module {
     }
 
     @SubscribeEvent
-    private fun onSelect(e: ConversationEvents.Select) {
-        if (e.source is EntityInstance) {
-            val info = getWizardInfo(e.source.uniqueId) ?: return
-            if (info.disableConversation) {
+    private fun onSelect(e: ConversationEvents.Pre) {
+        val entity = e.session.source.entity
+        if (entity is EntityInstance) {
+            val action = actions[entity.uniqueId] ?: return
+            if (action.info.disableConversation) {
                 e.isCancelled = true
             }
         }

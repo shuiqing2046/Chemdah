@@ -19,6 +19,8 @@ abstract class ThemeSettings(val root: ConfigurationSection) {
     val soundVolume = root.getDouble("sound.v").toFloat()
 
     fun playSound(session: Session) {
-        sound?.play(session.player, soundPitch, soundVolume)
+        if (!session.conversation.hasFlag("NO_EFFECT:SOUND")) {
+            sound?.play(session.player, soundPitch, soundVolume)
+        }
     }
 }

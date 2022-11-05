@@ -10,23 +10,33 @@ import taboolib.module.lang.sendLang
 
 object ConversationCreate {
 
+    /**
+     * conversation npc id force-looking
+     */
     @KetherParser(["conversation"], namespace = "chemdah")
     fun parser() = scriptParser {
         when (it.expects("npc", "self")) {
             "npc" -> {
                 val id = it.nextParsedAction()
+                val forceLooking = try {
+                    it.mark()
+                    it.expects("force-looking")
+                    true
+                } catch (ex: Exception) {
+                    it.reset()
+                    false
+                }
                 actionNow {
                     run(id).str { id ->
                         val npc = AdyeshachAPI.getVisibleEntities(player().cast()).firstOrNull { npc -> npc.id == id }
                         if (npc == null) {
                             player().sendLang("command-adyeshach-not-found")
                         } else {
-                            submit { npc.openConversation(player().cast()) }
+                            submit { npc.openConversation(player().cast(), look = forceLooking) }
                         }
                     }
                 }
             }
-
             "self" -> {
                 val conversation = it.nextParsedAction()
                 val name = it.nextParsedAction()
@@ -39,7 +49,6 @@ object ConversationCreate {
                     }
                 }
             }
-
             else -> error("out of case")
         }
     }

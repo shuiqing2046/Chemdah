@@ -94,6 +94,7 @@ command-name-generated: '&c[Chemdah] &7Name generated:'
 command-block-info-is-air: '&c[Chemdah] &7Block is air.'
 command-block-info-header: '&c[Chemdah] &7Block Info:'
 command-position-header: '&c[Chemdah] &7Position:'
+command-wizard-info-not-found: '&c[Chemdah] &7Wizard not found.'
 database-error: '&4&lERROR! &rThe &4&lChemdah&r database failed to initialize.'
 database-error-username: '&4&lWARNING! &rThe &4&lChemdah&r blocked this username.'
 

@@ -12,14 +12,11 @@ example_0:
   # From top to bottom, from start to finish
   nodes:
     - 50 80 0
-    - 100 80 0
+    - 70 80 0
   # Stops moving when the Wizard NPC is within this distance
   finish-distance: 2.0
   # Stops moving when the player is too far away from the Wizard NPC
-  waiting-distance: 5
-  # The faster the movements speed the greater the value
-  # Generally not changed, unless your Wizard NPC has no way to move between nodes
-  effective-distance-corrections: 2.0
+  waiting-distance: 3
   # Disable conversation
   disable-conversation: true
   # Script triggered when an NPC changes state
@@ -29,4 +26,4 @@ example_0:
     continue: |-
       tell "Quickly come to me"
   # Script triggered cooldown
-  event-cooldown: 5s
+  event-cooldown: 2s

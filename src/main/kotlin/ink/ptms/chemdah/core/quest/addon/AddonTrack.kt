@@ -270,7 +270,6 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                             nav.displayPoint(this, center)
                         }
                     }
-
                     "ARROW" -> {
                         if (nav.arrowPeriod.hasNext(name)) {
                             saveBaffle("${trackAddon.questContainer.path}.navigation.arrow", nav.arrowPeriod)

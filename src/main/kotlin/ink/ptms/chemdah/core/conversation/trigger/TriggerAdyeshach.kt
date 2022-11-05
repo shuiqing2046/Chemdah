@@ -87,8 +87,8 @@ internal object TriggerAdyeshach {
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun EntityInstance.openConversation(player: Player): CompletableFuture<Session>? {
-        return ConversationManager.getConversation(player, "adyeshach", this, id)?.openByAdyeshach(player, this)
+    fun EntityInstance.openConversation(player: Player, look: Boolean = true): CompletableFuture<Session>? {
+        return ConversationManager.getConversation(player, "adyeshach", this, id)?.openByAdyeshach(player, this, look)
     }
 
     fun Conversation.openByAdyeshach(player: Player, entityInstance: EntityInstance, look: Boolean = true): CompletableFuture<Session> {
