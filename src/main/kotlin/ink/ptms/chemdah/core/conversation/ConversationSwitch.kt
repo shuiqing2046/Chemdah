@@ -52,9 +52,6 @@ data class ConversationSwitch(val file: File?, val root: ConfigurationSection, v
 
         val open: String?
             get() = root["open"]?.toString()
-
-        val conversation: Conversation?
-            get() = if (open != null) ChemdahAPI.getConversation(open!!) else null
     }
 
     companion object {
@@ -77,12 +74,18 @@ data class ConversationSwitch(val file: File?, val root: ConfigurationSection, v
                 try {
                     val ele = switchMap.values.firstOrNull { it.npcId.id.any { npc -> e.id.any { id -> npc.isNPC(e.namespace, id) } } } ?: return
                     ele.get(e.player).thenAccept { case ->
-                        // 运行脚本
-                        if (case.run != null) {
-                            KetherShell.eval(case.run!!, sender = adaptPlayer(e.player), namespace = namespace)
-                        } else {
+                        when {
+                            // 运行脚本
+                            case.run != null -> {
+                                KetherShell.eval(case.run!!, sender = adaptPlayer(e.player), namespace = namespace)
+                            }
                             // 跳转对话
-                            e.conversation = case.conversation
+                            case.open != null -> {
+                                val id = KetherShell.eval(case.open!!, sender = adaptPlayer(e.player), namespace = namespace).getNow("null")
+                                if (id != null) {
+                                    e.conversation = ChemdahAPI.getConversation(id.toString())
+                                }
+                            }
                         }
                     }
                 } catch (ex: Exception) {
