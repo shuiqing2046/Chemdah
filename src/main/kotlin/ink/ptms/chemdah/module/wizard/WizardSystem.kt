@@ -9,6 +9,7 @@ import taboolib.common.platform.Awake
 import taboolib.common.platform.Schedule
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.getDataFolder
+import taboolib.common.platform.function.info
 import taboolib.common.platform.function.releaseResourceFile
 import taboolib.common.platform.function.submit
 import taboolib.module.configuration.Configuration
@@ -38,7 +39,10 @@ object WizardSystem : Module {
         if (!folder.exists()) {
             releaseResourceFile("module/wizard/example.yml", false)
         }
-        submit { loadFromFile(folder) }
+        submit {
+            loadFromFile(folder)
+            info("${infoMap.size} wizards loaded.")
+        }
     }
 
     fun loadFromFile(file: File) {
