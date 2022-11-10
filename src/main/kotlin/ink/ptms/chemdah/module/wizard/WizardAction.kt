@@ -27,7 +27,10 @@ class WizardAction(val player: Player, val entityInstance: EntityInstance, val i
     var state = State.MOVING
 
     /** 事件冷却 **/
-    val cooldown = Baffle.of(info.eventCooldown, TimeUnit.MILLISECONDS)
+    val cooldownWait = Baffle.of(info.eventCooldown, TimeUnit.MILLISECONDS)
+
+    /** 事件冷却 **/
+    val cooldownMove = Baffle.of(info.eventCooldown, TimeUnit.MILLISECONDS)
 
     init {
         // 发起移动
@@ -70,7 +73,7 @@ class WizardAction(val player: Player, val entityInstance: EntityInstance, val i
             if (state == State.WAITING) {
                 state = State.MOVING
                 // 不在冷却中
-                if (cooldown.hasNext()) {
+                if (cooldownMove.hasNext()) {
                     info.eventOnContinue?.let { runKether { KetherShell.eval(it, sender = adaptPlayer(player), namespace = namespace) } }
                 }
             }
@@ -80,7 +83,7 @@ class WizardAction(val player: Player, val entityInstance: EntityInstance, val i
             if (state == State.MOVING) {
                 state = State.WAITING
                 // 不在冷却中
-                if (cooldown.hasNext()) {
+                if (cooldownWait.hasNext()) {
                     info.eventOnWaiting?.let { runKether { KetherShell.eval(it, sender = adaptPlayer(player), namespace = namespace) } }
                 }
             }
