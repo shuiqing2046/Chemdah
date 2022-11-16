@@ -109,7 +109,10 @@ object ConversationManager {
             val direction = source.getOriginLocation(source.entity).subtract(e.session.player.eyeLocation).toVector().normalize()
             val temp = e.session.player.location.clone()
             temp.direction = direction
-            e.session.player.teleport(temp)
+            kotlin.runCatching {
+                temp.checkFinite()
+                e.session.player.teleport(temp)
+            }
         }
     }
 

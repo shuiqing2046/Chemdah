@@ -181,3 +181,12 @@ fun <K, V> MutableMap<in K, in V>.putAll(couples: Iterable<Couple<K, V>>) {
 fun <K, V> mapOf(couple: Couple<K, V>): Map<K, V> {
     return java.util.Collections.singletonMap(couple.key, couple.value)
 }
+
+fun Location.finite(): Location {
+    if (!x.isFinite()) x = 0.0
+    if (!y.isInfinite()) y = 0.0
+    if (!z.isInfinite()) z = 0.0
+    if (!yaw.isInfinite()) yaw = 0.0f
+    if (!pitch.isInfinite()) pitch = 0.0f
+    return this
+}

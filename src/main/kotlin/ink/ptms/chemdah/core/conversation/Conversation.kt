@@ -70,7 +70,7 @@ data class Conversation(
             }
 
             override fun getOriginLocation(entity: Any): Location {
-                return player.eyeLocation
+                return player.eyeLocation.add(player.eyeLocation.direction)
             }
         })
     }
