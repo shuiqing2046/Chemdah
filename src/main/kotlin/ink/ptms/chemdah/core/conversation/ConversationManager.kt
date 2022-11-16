@@ -56,11 +56,13 @@ object ConversationManager {
             if (session.isClosed || session.conversation.hasFlag("FORCE_DISPLAY")) {
                 return@forEach
             }
-            // 远离或背对对话单位
-            if (session.location.world!!.name != session.player.world.name
-                || session.location.direction.dot(session.player.location.direction) < 0
-                || session.distance > 0.5
-            ) {
+            // 不同世界
+            val anotherWorld = session.location.world!!.name != session.player.world.name
+            // 扭头
+            val turnHead = session.location.direction.dot(session.player.location.direction) < 0 && !session.conversation.hasFlag("IGNORE_TURN_HEAD")
+            // 距离过远
+            val tooFar = session.distance > conf.getDouble("theme-chat.close-distance", 0.5) && !session.conversation.hasFlag("IGNORE_TOO_FAR")
+            if (anotherWorld || turnHead || tooFar) {
                 session.isClosed = true
                 submit { session.close(refuse = true) }
             }

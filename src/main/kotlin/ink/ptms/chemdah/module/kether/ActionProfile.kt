@@ -49,11 +49,9 @@ class ActionProfile {
                             value == null -> {
                                 persistentDataContainer.remove(key.toString())
                             }
-
                             symbol == PlayerOperator.Method.INCREASE -> {
                                 persistentDataContainer[key.toString()] = (persistentDataContainer[key.toString()] ?: def).increaseAny(value)
                             }
-
                             else -> {
                                 persistentDataContainer[key.toString()] = value
                             }

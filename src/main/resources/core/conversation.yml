@@ -48,6 +48,8 @@ theme-chat:
     auto-swap: 36
     # Using only spaces characters
     reply-separator: ' '
+  # Move distance to close the conversation
+  close-distance: 0.5
 
 # Not recommended
 theme-chest:
