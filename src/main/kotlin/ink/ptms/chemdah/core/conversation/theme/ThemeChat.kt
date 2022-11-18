@@ -266,25 +266,29 @@ object ThemeChat : Theme<ThemeChatSettings>() {
                 settings.format.map {
                     // 识别内联脚本并继承会话变量
                     KetherFunction.parse(it, sender = adaptPlayer(session.player), namespace = namespace) { extend(session.variables) }.colored()
-                }.forEach {
+                }.forEach { format ->
                     when {
                         // 包含标题
-                        it.contains("title") -> {
+                        format.contains("title") -> {
                             val title = session.variables["title"]?.toString() ?: session.conversation.option.title
-                            json.append(it.replaces("title" to title.replaces("name" to session.source.name))).newLine()
+                            json.append(format.replaces("title" to title.replaces("name" to session.source.name))).newLine()
                         }
                         // 包含发言，兼容老版本 npcSide 变量
-                        it.contains("npc_side") || it.contains("npcSide") -> {
+                        format.contains("npc_side") || format.contains("npcSide") -> {
                             messages.colored().forEachIndexed { i, fully ->
                                 when {
-                                    index > i -> json.append(it.replaces("npc_side" to fully, "npcSide" to fully)).newLine()
-                                    index == i -> json.append(it.replaces("npc_side" to message, "npcSide" to message)).newLine()
+                                    index > i -> json.append(format.replaces("npc_side" to fully, "npcSide" to fully)).newLine()
+                                    index == i -> json.append(format.replaces("npc_side" to message, "npcSide" to message)).newLine()
                                     else -> json.newLine()
                                 }
                             }
+                            // 填充空行
+                            if (replies.size + messages.size < settings.spaceFilling) {
+                                repeat(settings.spaceFilling - (replies.size + messages.size)) { json.newLine() }
+                            }
                         }
                         // 包含回复
-                        it.contains("reply") -> {
+                        format.contains("reply") -> {
                             session.playerReplyForDisplay.clear()
                             session.playerReplyForDisplay.addAll(replies)
                             if (canReply) {
@@ -320,7 +324,7 @@ object ThemeChat : Theme<ThemeChatSettings>() {
                                         // 当动画结束时，显示回复内容
                                         if (animationStopped) {
                                             val replyText = rep.replaces("player_side" to text, "playerSide" to text, "index" to idx + 1)
-                                            json.append(it.replaces("reply" to replyText)).runCommand("/session reply ${reply.uuid}")
+                                            json.append(format.replaces("reply" to replyText)).runCommand("/session reply ${reply.uuid}")
                                             // 是否启用鼠标悬停显示
                                             if (settings.hoverText) {
                                                 json.hoverText(text)
@@ -334,7 +338,7 @@ object ThemeChat : Theme<ThemeChatSettings>() {
                                         // 当动画结束时，显示回复内容
                                         if (animationStopped) {
                                             val replyText = rep.replaces("player_side" to text, "playerSide" to text, "index" to idx + 1)
-                                            json.append(it.replaces("reply" to replyText)).runCommand("/session reply ${reply.uuid}")
+                                            json.append(format.replaces("reply" to replyText)).runCommand("/session reply ${reply.uuid}")
                                             // 是否启用鼠标悬停显示
                                             if (settings.hoverText) {
                                                 json.hoverText(text)
@@ -362,7 +366,7 @@ object ThemeChat : Theme<ThemeChatSettings>() {
                             }
                         }
                         else -> {
-                            json.append(it).newLine()
+                            json.append(format).newLine()
                         }
                     }
                 }

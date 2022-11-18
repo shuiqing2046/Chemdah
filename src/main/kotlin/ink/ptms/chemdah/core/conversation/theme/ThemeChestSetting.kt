@@ -31,6 +31,14 @@ class ThemeChestSetting(root: ConfigurationSection) : ThemeSettings(root) {
     val playerSlot = root.getIntegerList("player-side.slot")
 
     override fun toString(): String {
-        return "ThemeChestSetting(title='$title', rows='$rows', npcItem=$npcItem, playerItem=$playerItem, playerItemSelected=$playerItemSelected, npcSlot=$npcSlot, playerSlot=$playerSlot)"
+        return "ThemeChestSetting(" +
+                "title='$title', " +
+                "rows='$rows', " +
+                "npcItem=$npcItem, " +
+                "playerItem=$playerItem, " +
+                "playerItemSelected=$playerItemSelected, " +
+                "npcSlot=$npcSlot, " +
+                "playerSlot=$playerSlot" +
+                ")"
     }
 }

@@ -23,4 +23,8 @@ abstract class ThemeSettings(val root: ConfigurationSection) {
             sound?.play(session.player, soundPitch, soundVolume)
         }
     }
+
+    override fun toString(): String {
+        return "ThemeSettings(root=$root, sound=$sound, soundPitch=$soundPitch, soundVolume=$soundVolume)"
+    }
 }

@@ -1,5 +1,3 @@
-
-
 #         Powered by TabooLib 6.0         #
 
 
@@ -50,6 +48,9 @@ theme-chat:
     reply-separator: ' '
   # Move distance to close the conversation
   close-distance: 0.5
+  # If there are less than 5 lines between the reply and the npc message,
+  # then a blank line is automatically filled in below the npc message.
+  space-filling: 5
 
 # Not recommended
 theme-chest:

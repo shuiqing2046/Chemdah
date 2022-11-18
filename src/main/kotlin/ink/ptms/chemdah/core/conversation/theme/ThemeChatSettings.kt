@@ -39,11 +39,32 @@ class ThemeChatSettings(root: ConfigurationSection) : ThemeSettings(root) {
     val singleLineAutoSwap = root.getInt("single-line.auto-swap", 12)
     val singleLineReplySeparator = root.getString("single-line.reply-separator", " ")!!
 
+    val spaceFilling = root.getInt("space-filling", 5)
+
     fun playSelectSound(session: Session) {
         selectSound?.play(session.player, selectSoundPitch, selectSoundVolume)
     }
 
     override fun toString(): String {
-        return "ThemeChatSettings(format=$format, select='$select', selectOther='$selectOther', talking='$talking', animation=$animation, spaceLine=$spaceLine, useScroll=$useScroll, selectSound=$selectSound, selectSoundPitch=$selectSoundPitch, selectSoundVolume=$selectSoundVolume)"
+        return "ThemeChatSettings(" +
+                "format=$format, " +
+                "select='$select', " +
+                "selectOther='$selectOther', " +
+                "selected='$selected', " +
+                "selectedOther='$selectedOther', " +
+                "talking='$talking', " +
+                "animation=$animation, " +
+                "speed=$speed, " +
+                "hoverText=$hoverText, " +
+                "spaceLine=$spaceLine, " +
+                "useScroll=$useScroll, " +
+                "selectSound=$selectSound, " +
+                "selectSoundPitch=$selectSoundPitch, " +
+                "selectSoundVolume=$selectSoundVolume, " +
+                "singleLineEnable=$singleLineEnable, " +
+                "singleLineAutoSwap=$singleLineAutoSwap, " +
+                "singleLineReplySeparator='$singleLineReplySeparator', " +
+                "spaceFilling=$spaceFilling" +
+                ")"
     }
 }
