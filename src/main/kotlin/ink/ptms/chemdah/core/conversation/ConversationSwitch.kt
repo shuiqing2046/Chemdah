@@ -1,7 +1,9 @@
 package ink.ptms.chemdah.core.conversation
 
+import ink.ptms.adyeshach.common.entity.EntityInstance
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.event.collect.ConversationEvents
+import ink.ptms.chemdah.module.wizard.WizardSystem
 import ink.ptms.chemdah.util.namespace
 import org.bukkit.entity.Player
 import taboolib.common.platform.event.SubscribeEvent
@@ -71,6 +73,13 @@ data class ConversationSwitch(val file: File?, val root: ConfigurationSection, v
         @SubscribeEvent
         private fun onSelect(e: ConversationEvents.Select) {
             if (e.conversation == null) {
+                val entity = e.source
+                if (entity is EntityInstance) {
+                    val action = WizardSystem.actions[entity.uniqueId] ?: return
+                    if (action.info.disableConversation) {
+                        return
+                    }
+                }
                 try {
                     val ele = switchMap.values.firstOrNull { it.npcId.id.any { npc -> e.id.any { id -> npc.isNPC(e.namespace, id) } } } ?: return
                     ele.get(e.player).thenAccept { case ->
