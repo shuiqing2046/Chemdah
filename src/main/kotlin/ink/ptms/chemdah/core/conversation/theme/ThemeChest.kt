@@ -5,17 +5,19 @@ import ink.ptms.chemdah.core.conversation.ConversationManager
 import ink.ptms.chemdah.core.conversation.PlayerReply
 import ink.ptms.chemdah.core.conversation.Session
 import ink.ptms.chemdah.util.namespace
-import ink.ptms.chemdah.util.replaces
+import ink.ptms.chemdah.util.replace
 import ink.ptms.chemdah.util.setIcon
+import ink.ptms.chemdah.util.thenTrue
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 import taboolib.common.platform.function.adaptPlayer
 import taboolib.common.util.asList
-import taboolib.common5.Coerce
+import taboolib.common5.cint
 import taboolib.module.chat.colored
 import taboolib.module.kether.KetherFunction
 import taboolib.module.kether.KetherShell
+import taboolib.module.kether.extend
 import taboolib.module.kether.printKetherErrorMessage
 import taboolib.module.ui.openMenu
 import taboolib.module.ui.type.Basic
@@ -58,14 +60,12 @@ object ThemeChest : Theme<ThemeChestSetting>() {
                     }
                     onClick(lock = true) { event ->
                         replies.getOrNull(settings.playerSlot.indexOf(event.rawSlot))?.run {
-                            check(session).thenAccept { check ->
-                                if (check) {
-                                    end = true
-                                    select(session).thenAccept {
-                                        // 若未进行页面切换则关闭页面
-                                        if (session.player.openInventory.topInventory == event.inventory) {
-                                            session.player.closeInventory()
-                                        }
+                            check(session).thenTrue {
+                                end = true
+                                select(session).thenAccept {
+                                    // 若未进行页面切换则关闭页面
+                                    if (session.player.openInventory.topInventory == event.inventory) {
+                                        session.player.closeInventory()
                                     }
                                 }
                             }
@@ -89,9 +89,9 @@ object ThemeChest : Theme<ThemeChestSetting>() {
         }
         val build = reply.build(session)
         return modifyMeta<ItemMeta> {
-            setDisplayName(displayName.replaces("index" to index.toString(), "player_side" to build, "playerSide" to build))
+            setDisplayName(displayName.replace("index" to index.toString(), "player_side" to build, "playerSide" to build))
             lore = lore?.map { line ->
-                val str = line.replaces("index" to index.toString(), "player_side" to build, "playerSide" to build)
+                val str = line.replace("index" to index.toString(), "player_side" to build, "playerSide" to build)
                 KetherFunction.parse(str, sender = adaptPlayer(session.player), namespace = namespace)
             }
         }
@@ -107,7 +107,7 @@ object ThemeChest : Theme<ThemeChestSetting>() {
             lore = lore?.flatMap { line ->
                 val str = KetherFunction.parse(line, sender = adaptPlayer(session.player), namespace = namespace)
                 if (str.contains("npc_side") || str.contains("npcSide")) {
-                    message.map { str.replaces("npc_side" to it, "npcSide" to it) }
+                    message.map { str.replace("npc_side" to it, "npcSide" to it) }
                 } else {
                     str.toTitle(session).asList()
                 }
@@ -116,16 +116,16 @@ object ThemeChest : Theme<ThemeChestSetting>() {
     }
 
     private fun String.toTitle(session: Session): String {
-        val str = replaces("title" to session.conversation.option.title.replaces("name" to session.source.name)).colored()
+        val str = replace("title" to session.conversation.option.title.replace("name" to session.source.name)).colored()
         return KetherFunction.parse(str, sender = adaptPlayer(session.player), namespace = namespace)
     }
 
     private fun rows(player: Player, size: Int): CompletableFuture<Int> {
         return try {
             KetherShell.eval(settings.rows, sender = adaptPlayer(player), namespace = namespace) {
-                rootFrame().variables().set("size", size)
+                extend(mapOf("size" to size))
             }.thenApply {
-                Coerce.toInteger(it)
+                it.cint
             }
         } catch (ex: Exception) {
             ex.printKetherErrorMessage()

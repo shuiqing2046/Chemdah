@@ -11,5 +11,8 @@ import taboolib.library.configuration.ConfigurationSection
  */
 open class ConversationTransfer(val root: ConfigurationSection) {
 
+    /**
+     * 转移到目标
+     */
     val id = root.getString("id")
 }

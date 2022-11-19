@@ -3,13 +3,12 @@ package ink.ptms.chemdah.core.conversation.theme
 import ink.ptms.chemdah.api.ChemdahAPI.conversationSession
 import ink.ptms.chemdah.api.event.collect.ConversationEvents
 import ink.ptms.chemdah.core.conversation.ConversationManager
+import ink.ptms.chemdah.core.conversation.LineFormat
 import ink.ptms.chemdah.core.conversation.Session
 import ink.ptms.chemdah.core.quest.QuestDevelopment
 import ink.ptms.chemdah.core.quest.QuestDevelopment.hasTransmitMessages
 import ink.ptms.chemdah.core.quest.QuestDevelopment.releaseTransmit
-import ink.ptms.chemdah.util.namespace
-import ink.ptms.chemdah.util.realLength
-import ink.ptms.chemdah.util.replaces
+import ink.ptms.chemdah.util.*
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.event.player.AsyncPlayerChatEvent
@@ -21,6 +20,7 @@ import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.adaptCommandSender
 import taboolib.common.platform.function.adaptPlayer
 import taboolib.common.platform.function.submit
+import taboolib.common.util.resettableLazy
 import taboolib.common5.Coerce
 import taboolib.common5.util.printed
 import taboolib.library.reflex.Reflex.Companion.invokeConstructor
@@ -36,6 +36,7 @@ import taboolib.module.nms.sendPacket
 import taboolib.platform.util.asLangText
 import taboolib.platform.util.toProxyLocation
 import java.util.concurrent.CompletableFuture
+import kotlin.text.contains
 
 /**
  * Chemdah
@@ -45,6 +46,14 @@ import java.util.concurrent.CompletableFuture
  * @since 2021/2/12 2:08 上午
  */
 object ThemeChat : Theme<ThemeChatSettings>() {
+
+    /**
+     * 加载格式化模板
+     */
+    val formats by resettableLazy {
+        val section = ConversationManager.conf.getConfigurationSection("theme-chat.format-line")
+        section?.getKeys(false)?.associate { it to LineFormat(section.getConfigurationSection(it)!!) } ?: emptyMap()
+    }
 
     /**
      * 屏蔽其他插件在对话过程中发送的动作栏信息
@@ -72,7 +81,7 @@ object ThemeChat : Theme<ThemeChatSettings>() {
         if (session.conversation.option.theme == "chat") {
             if (session.npcTalking) {
                 // 是否不允许玩家跳过对话演出效果
-                if (session.conversation.hasFlag("NO_SKIP") || session.conversation.hasFlag("FORCE_DISPLAY")) {
+                if (session.conversation.hasFlag("NO_SKIP", "FORCE_DISPLAY")) {
                     e.isCancelled = true
                     return
                 }
@@ -110,7 +119,7 @@ object ThemeChat : Theme<ThemeChatSettings>() {
                 if (select != index) {
                     session.playerSide = replies[select]
                     settings.playSelectSound(session)
-                    CompletableFuture<Void>().npcTalk(session, session.npcSide, "", session.npcSide.size, endMessage = true, canReply = !session.isFarewell)
+                    CompletableFuture<Void>().npcTalk(session, session.npcSide, "", session.npcSide.size, stopAnimation = true, canReply = !session.isFarewell)
                 }
             }
         }
@@ -123,18 +132,12 @@ object ThemeChat : Theme<ThemeChatSettings>() {
             e.isCancelled = true
             if (session.npcTalking) {
                 // 是否不允许玩家跳过对话演出效果
-                if (session.conversation.hasFlag("NO_SKIP") || session.conversation.hasFlag("FORCE_DISPLAY")) {
+                if (session.conversation.hasFlag("NO_SKIP", "FORCE_DISPLAY")) {
                     return
                 }
                 session.npcTalking = false
             } else {
-                session.playerSide?.run {
-                    check(session).thenApply {
-                        if (it) {
-                            select(session)
-                        }
-                    }
-                }
+                session.playerSide?.run { check(session).thenTrue { select(session) } }
             }
         }
     }
@@ -145,11 +148,7 @@ object ThemeChat : Theme<ThemeChatSettings>() {
         if (session.conversation.option.theme == "chat" && !session.npcTalking && e.message.isInt()) {
             e.isCancelled = true
             session.playerReplyForDisplay.getOrNull(Coerce.toInteger(e.message) - 1)?.run {
-                check(session).thenApply {
-                    if (it) {
-                        select(session)
-                    }
-                }
+                check(session).thenTrue { select(session) }
             }
         }
     }
@@ -172,7 +171,7 @@ object ThemeChat : Theme<ThemeChatSettings>() {
             // 只有按键触发才存在默认回复修正
             if (!settings.useScroll) {
                 session.playerSide = it.getOrNull(session.player.inventory.heldItemSlot.coerceAtMost(it.size - 1))
-            }else {
+            } else {
                 session.playerSide = it.getOrNull(0)
             }
             future.complete(null)
@@ -181,7 +180,7 @@ object ThemeChat : Theme<ThemeChatSettings>() {
     }
 
     override fun onBegin(session: Session): CompletableFuture<Void> {
-        if (!session.conversation.hasFlag("NO_EFFECT:PARTICLE")) {
+        if (session.conversation.noFlag("NO_EFFECT:PARTICLE")) {
             ProxyParticle.CLOUD.sendTo(adaptPlayer(session.player), session.origin.clone().add(0.0, 0.5, 0.0).toProxyLocation())
         }
         return super.onBegin(session)
@@ -189,17 +188,26 @@ object ThemeChat : Theme<ThemeChatSettings>() {
 
     override fun onDisplay(session: Session, message: List<String>, canReply: Boolean): CompletableFuture<Void> {
         val future = CompletableFuture<Void>()
+        // 延迟
         var d = 0L
+        // 取消
         var cancel = false
+        // 标记为 NPC 正在发言
         session.npcTalking = true
-        message.colored().map { if (settings.animation) it.printed("_") else listOf(it) }.forEachIndexed { index, messageText ->
-            messageText.forEachIndexed { printIndex, printText ->
-                val endMessage = printIndex + 1 == messageText.size
+        // 文本动画 —— 打印机效果
+        val messageAnimated = message.colored().map { if (settings.animation) it.printed("_") else listOf(it) }
+        // 播放信息
+        messageAnimated.forEachIndexed { index, messageText ->
+            messageText.forEachIndexed { printIndex, printMessage ->
+                // 是否最终消息 —— 停止动画
+                val stopAnimation = printIndex + 1 == messageText.size
+                // 延迟发送
                 submit(delay = settings.speed * d++) {
+                    // 会话合法
                     if (session.isValid) {
                         // 如果 NPC 正在发言，则向玩家发送消息
                         if (session.npcTalking) {
-                            future.npcTalk(session, message, printText, index, endMessage = endMessage, canReply = canReply)
+                            future.npcTalk(session, message, printMessage, index, stopAnimation, canReply)
                         }
                         // 跳过对话
                         else if (!cancel) {
@@ -208,7 +216,7 @@ object ThemeChat : Theme<ThemeChatSettings>() {
                             if (session.isFarewell) {
                                 session.player.releaseTransmit()
                             }
-                            future.npcTalk(session, session.npcSide, "", session.npcSide.size, endMessage = true, canReply = !session.isFarewell)
+                            future.npcTalk(session, session.npcSide, printMessage = "", lineIndex = 999, stopAnimation = true, canReply = !session.isFarewell)
                             future.complete(null)
                         }
                     }
@@ -221,12 +229,13 @@ object ThemeChat : Theme<ThemeChatSettings>() {
                             // 转发信息
                             session.player.releaseTransmit()
                         }
-                        future.npcTalk(session, message, printText, index, endMessage = endMessage, canReply, noSpace = true)
+                        future.npcTalk(session, message, printMessage, index, stopAnimation, canReply, noSpace = true)
                         future.complete(null)
                     }
                 }
             }
         }
+        // 消息发送结束后解除标签
         future.thenAccept {
             session.npcTalking = false
         }
@@ -241,9 +250,9 @@ object ThemeChat : Theme<ThemeChatSettings>() {
      *
      * @param session 会话对象
      * @param messages 所有信息
-     * @param message 正在打印的信息
-     * @param index 打印信息在所有信息中的索引
-     * @param endMessage 本行信息的打印是否结束
+     * @param printMessage 正在打印的信息
+     * @param lineIndex 打印信息在所有信息中的索引
+     * @param stopAnimation 本行信息的打印是否结束
      * @param canReply 是否允许回复
      * @param noSpace 没有隔离空行
      */
@@ -251,40 +260,53 @@ object ThemeChat : Theme<ThemeChatSettings>() {
     fun CompletableFuture<Void>.npcTalk(
         session: Session,
         messages: List<String>,
-        message: String,
-        index: Int,
-        endMessage: Boolean,
+        printMessage: String,
+        lineIndex: Int,
+        stopAnimation: Boolean,
         canReply: Boolean,
-        noSpace: Boolean = false,
+        noSpace: Boolean = false
     ) {
+        // 获取有效回复
         session.conversation.playerSide.checked(session).thenApply { replies ->
             // 最终效果
-            val animationStopped = index + 1 >= messages.size && endMessage
+            val animationStopped = lineIndex + 1 >= messages.size && stopAnimation
             // 如果是最终效果并且存在对话转发，则不发送白信息
             val json = if (noSpace || (animationStopped && session.player.hasTransmitMessages() && !canReply)) TellrawJson().fixed() else newJson()
             try {
-                settings.format.map {
-                    // 识别内联脚本并继承会话变量
+                // 获取对话总格式 —— 识别内联脚本并继承会话变量
+                val mainFormat = settings.format.map {
                     KetherFunction.parse(it, sender = adaptPlayer(session.player), namespace = namespace) { extend(session.variables) }.colored()
-                }.forEach { format ->
+                }
+                mainFormat.forEach { format ->
                     when {
                         // 包含标题
                         format.contains("title") -> {
                             val title = session.variables["title"]?.toString() ?: session.conversation.option.title
-                            json.append(format.replaces("title" to title.replaces("name" to session.source.name))).newLine()
+                            json.append(format.replace("title" to title.replace("name" to session.source.name))).newLine()
                         }
                         // 包含发言，兼容老版本 npcSide 变量
-                        format.contains("npc_side") || format.contains("npcSide") -> {
+                        format.contains("npc_side", "npcSide") -> {
+                            // 单行格式化
+                            var mlf = session.conversation.format?.let { formats[it] }
+                            if (mlf == null && formats.containsKey("default")) {
+                                mlf = formats["default"]!!
+                            }
                             messages.colored().forEachIndexed { i, fully ->
                                 when {
-                                    index > i -> json.append(format.replaces("npc_side" to fully, "npcSide" to fully)).newLine()
-                                    index == i -> json.append(format.replaces("npc_side" to message, "npcSide" to message)).newLine()
+                                    lineIndex > i -> {
+                                        json.append(format.replace("npc_side", "npcSide", rep = mlf?.format(fully, i, messages.size) ?: fully)).newLine()
+                                    }
+                                    lineIndex == i -> {
+                                        val pm = mlf?.format(printMessage, i, messages.size) ?: printMessage
+                                        json.append(format.replace("npc_side", "npcSide", rep = pm)).newLine()
+                                    }
                                     else -> json.newLine()
                                 }
                             }
                             // 填充空行
-                            if (replies.size + messages.size < settings.spaceFilling) {
-                                repeat(settings.spaceFilling - (replies.size + messages.size)) { json.newLine() }
+                            val rs = replies.size.coerceAtLeast(1)
+                            if (rs + messages.size < settings.spaceFilling) {
+                                repeat(settings.spaceFilling - (rs + messages.size)) { json.newLine() }
                             }
                         }
                         // 包含回复
@@ -323,8 +345,8 @@ object ThemeChat : Theme<ThemeChatSettings>() {
                                         }
                                         // 当动画结束时，显示回复内容
                                         if (animationStopped) {
-                                            val replyText = rep.replaces("player_side" to text, "playerSide" to text, "index" to idx + 1)
-                                            json.append(format.replaces("reply" to replyText)).runCommand("/session reply ${reply.uuid}")
+                                            val replyText = rep.replace("player_side", "playerSide", rep = text).replace("index", rep = idx + 1)
+                                            json.append(format.replace("reply" to replyText)).runCommand("/session reply ${reply.uuid}")
                                             // 是否启用鼠标悬停显示
                                             if (settings.hoverText) {
                                                 json.hoverText(text)
@@ -337,8 +359,8 @@ object ThemeChat : Theme<ThemeChatSettings>() {
                                     } else {
                                         // 当动画结束时，显示回复内容
                                         if (animationStopped) {
-                                            val replyText = rep.replaces("player_side" to text, "playerSide" to text, "index" to idx + 1)
-                                            json.append(format.replaces("reply" to replyText)).runCommand("/session reply ${reply.uuid}")
+                                            val replyText = rep.replace("player_side", "playerSide", rep = text).replace("index", rep = idx + 1)
+                                            json.append(format.replace("reply" to replyText)).runCommand("/session reply ${reply.uuid}")
                                             // 是否启用鼠标悬停显示
                                             if (settings.hoverText) {
                                                 json.hoverText(text)
@@ -365,6 +387,7 @@ object ThemeChat : Theme<ThemeChatSettings>() {
                                 }
                             }
                         }
+                        // 其他
                         else -> {
                             json.append(format).newLine()
                         }

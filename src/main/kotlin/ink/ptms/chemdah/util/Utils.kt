@@ -14,6 +14,7 @@ import taboolib.library.xseries.XBlock
 import taboolib.library.xseries.XMaterial
 import taboolib.module.configuration.Configuration
 import taboolib.module.nms.MinecraftVersion
+import taboolib.platform.type.BukkitProxyEvent
 import taboolib.platform.util.modifyMeta
 
 val conf: Configuration
@@ -143,9 +144,15 @@ fun String.realLength(): Int {
  * @param vars 变量
  * @return [String]
  */
-fun String.replaces(vararg vars: Pair<String, Any>): String {
+fun String.replace(vararg vars: Pair<String, Any>): String {
     var r = this
     vars.forEach { r = r.replace("[\\[{]${it.first}[]}]".toRegex(), it.second.toString()) }
+    return r
+}
+
+fun String.replace(vararg key: String, rep: Any): String {
+    var r = this
+    key.forEach { r = r.replace("[\\[{]${it}[]}]".toRegex(), rep.toString()) }
     return r
 }
 
@@ -155,6 +162,10 @@ fun String.startsWith(vararg prefix: String): Boolean {
 
 fun String.substringAfter(vararg morePrefix: String): String {
     return substringAfter(morePrefix.firstOrNull { startsWith(it) } ?: return this)
+}
+
+fun String.contains(vararg value: String): Boolean {
+    return value.any { indexOf(it) != -1 }
 }
 
 fun <K, V, M : MutableMap<in K, in V>> Iterable<Couple<K, V>>.toMap(destination: M): M {
@@ -189,4 +200,8 @@ fun Location.finite(): Location {
     if (!yaw.isInfinite()) yaw = 0.0f
     if (!pitch.isInfinite()) pitch = 0.0f
     return this
+}
+
+fun BukkitProxyEvent.callIfFailed(): Boolean {
+    return !call()
 }

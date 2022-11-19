@@ -6,10 +6,21 @@ theme-chat:
     - ' '
     - ' {title}:'
     - ' '
-    - '  &f" &7{npc_side}&r &f"'
+    - '  {npc_side}'
     - ' '
     - '  {reply}'
     - ' '
+  format-line:
+    default:
+      single: '&f" &7{text}&r &f"'
+      top: '&f" &7{text}&r'
+      body: '  &7{text}&r'
+      bottom: '  &7{text}&r &f"'
+    main:
+      single: '&e* {text}'
+      top: '&e* {text}'
+      body: '  &e{text}'
+      bottom: '  &e{text}'
   select:
     reply:
       1: '&7▶ &f&n{player_side}&r &8(&6&lF&8)'

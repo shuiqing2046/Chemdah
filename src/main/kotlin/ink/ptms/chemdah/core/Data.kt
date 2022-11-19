@@ -23,7 +23,7 @@ open class Data {
     val data: Any
     var changed = false
 
-    protected var lazyCache: Any? = null
+    protected var selfValue: Any? = null
 
     constructor(value: Int) {
         this.data = value
@@ -86,38 +86,38 @@ open class Data {
     }
 
     fun toVector(): InferArea {
-        if (lazyCache !is InferArea) {
-            lazyCache = toString().toInferArea(true)
+        if (selfValue !is InferArea) {
+            selfValue = toString().toInferArea(true)
         }
-        return lazyCache as InferArea
+        return selfValue as InferArea
     }
 
     fun toPosition(): InferArea {
-        if (lazyCache !is InferArea) {
-            lazyCache = toString().toInferArea()
+        if (selfValue !is InferArea) {
+            selfValue = toString().toInferArea()
         }
-        return lazyCache as InferArea
+        return selfValue as InferArea
     }
 
     fun toInferEntity(): InferEntity {
-        if (lazyCache !is InferEntity) {
-            lazyCache = data.asList().toInferEntity()
+        if (selfValue !is InferEntity) {
+            selfValue = data.asList().toInferEntity()
         }
-        return lazyCache as InferEntity
+        return selfValue as InferEntity
     }
 
     fun toInferBlock(): InferBlock {
-        if (lazyCache !is InferBlock) {
-            lazyCache = data.asList().toInferBlock()
+        if (selfValue !is InferBlock) {
+            selfValue = data.asList().toInferBlock()
         }
-        return lazyCache as InferBlock
+        return selfValue as InferBlock
     }
 
     fun toInferItem(): InferItem {
-        if (lazyCache !is InferItem) {
-            lazyCache = data.asList().toInferItem()
+        if (selfValue !is InferItem) {
+            selfValue = data.asList().toInferItem()
         }
-        return lazyCache as InferItem
+        return selfValue as InferItem
     }
 
     fun asList(): List<String> {

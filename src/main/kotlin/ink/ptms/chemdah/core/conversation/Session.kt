@@ -93,9 +93,7 @@ class Session(
      */
     fun resetTheme(): CompletableFuture<Void> {
         val future = CompletableFuture<Void>()
-        conversation.option.instanceTheme.onReset(this).thenApply {
-            future.complete(null)
-        }
+        conversation.option.instanceTheme.onReset(this).thenApply { future.complete(null) }
         return future
     }
 }

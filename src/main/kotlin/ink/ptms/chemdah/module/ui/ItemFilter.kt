@@ -2,7 +2,7 @@ package ink.ptms.chemdah.module.ui
 
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Template
-import ink.ptms.chemdah.util.replaces
+import ink.ptms.chemdah.util.replace
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
@@ -30,7 +30,7 @@ open class ItemFilter(config: ConfigurationSection) : Item(config) {
                         if (filters.isEmpty()) {
                             filters.add(allKey)
                         }
-                        filters.map { lore.replaces("filter" to it) }
+                        filters.map { lore.replace("filter" to it) }
                     } else {
                         lore.asList()
                     }

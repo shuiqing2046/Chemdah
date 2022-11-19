@@ -13,7 +13,7 @@ data class PlayerSide(val reply: MutableList<PlayerReply>) {
 
     fun checked(session: Session): CompletableFuture<List<PlayerReply>> {
         val future = CompletableFuture<List<PlayerReply>>()
-        val r = ArrayList<PlayerReply>()
+        val r = arrayListOf<PlayerReply>()
         fun process(cur: Int) {
             if (cur < reply.size) {
                 val reply = reply[cur]

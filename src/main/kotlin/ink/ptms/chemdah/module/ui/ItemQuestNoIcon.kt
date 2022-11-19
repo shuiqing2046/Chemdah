@@ -4,7 +4,7 @@ import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Template
 import ink.ptms.chemdah.core.quest.addon.AddonUI.Companion.ui
 import ink.ptms.chemdah.core.quest.meta.MetaName.Companion.displayName
-import ink.ptms.chemdah.util.replaces
+import ink.ptms.chemdah.util.replace
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
@@ -24,10 +24,10 @@ open class ItemQuestNoIcon(config: ConfigurationSection) : Item(config) {
         return super.getItemStack(player, ui, template).also { item ->
             val addonUI = template.ui()
             item.modifyMeta<ItemMeta> {
-                setDisplayName(displayName.replaces("name" to format(template.displayName(colored = false), player, ui, template)))
+                setDisplayName(displayName.replace("name" to format(template.displayName(colored = false), player, ui, template)))
                 lore = lore?.flatMap { lore ->
                     if (lore.contains("description")) {
-                        addonUI?.description?.map { lore.replaces("description" to format(it, player, ui, template)) } ?: emptyList()
+                        addonUI?.description?.map { lore.replace("description" to format(it, player, ui, template)) } ?: emptyList()
                     } else {
                         listOf(lore)
                     }

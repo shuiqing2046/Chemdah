@@ -102,7 +102,7 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
     /**
      * 进度格式化后的内容
      */
-    fun getTitle(task: QuestContainer, progress: Progress) = content.replaces(
+    fun getTitle(task: QuestContainer, progress: Progress) = content.replace(
         "name" to task.displayName(),
         "value" to progress.value,
         "target" to progress.target,

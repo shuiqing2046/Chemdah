@@ -22,7 +22,7 @@ import ink.ptms.chemdah.core.quest.selector.InferArea
 import ink.ptms.chemdah.module.party.PartySystem.getMembers
 import ink.ptms.chemdah.util.conf
 import ink.ptms.chemdah.util.namespaceQuestUI
-import ink.ptms.chemdah.util.replaces
+import ink.ptms.chemdah.util.replace
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
@@ -333,12 +333,12 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                     hologramMap[id]!!.also { holo ->
                         holo.teleport(pos)
                         holo.update(trackAddon.landmark.content.map {
-                            it.replaces("name" to name, "distance" to Coerce.format(distance))
+                            it.replace("name" to name, "distance" to Coerce.format(distance))
                         })
                     }
                 } else {
                     hologramMap.put(id, AdyeshachAPI.createHologram(this, pos, trackAddon.landmark.content.map {
-                        it.replaces("name" to name, "distance" to Coerce.format(distance))
+                        it.replace("name" to name, "distance" to Coerce.format(distance))
                     }))?.delete()
                 }
             } else {
@@ -415,9 +415,9 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                                         sender = adaptCommandSender(this),
                                         vars = KetherShell.VariableMap("@QuestSelected" to quest.node)
                                     )
-                                    description.split(track.scoreboard.length).map { desc -> contentLine.replaces("description" to desc) }
+                                    description.split(track.scoreboard.length).map { desc -> contentLine.replace("description" to desc) }
                                 } else {
-                                    contentLine.replaces("name" to (track.name ?: quest.displayName())).asList()
+                                    contentLine.replace("name" to (track.name ?: quest.displayName())).asList()
                                 }
                             }
                         } else {
@@ -439,9 +439,9 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                                                 vars = KetherShell.VariableMap("@QuestSelected" to quest.node)
                                             )
                                             val size = quest.track()?.scoreboard?.length ?: defaultLength
-                                            description.split(size).map { d -> contentLine.replaces("description" to d) }
+                                            description.split(size).map { d -> contentLine.replace("description" to d) }
                                         } else {
-                                            contentLine.replaces("name" to (taskTrack.name ?: task.displayName())).asList()
+                                            contentLine.replace("name" to (taskTrack.name ?: task.displayName())).asList()
                                         }
                                     }
                                 } else {
@@ -554,8 +554,8 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                             e.player.sendLang(message.substring(1))
                         } else {
                             val name = e.trackingQuest.track()?.name ?: e.trackingQuest.displayName()
-                            TellrawJson().append(message.replaces("name" to name))
-                                .hoverText(message.replaces("name" to name))
+                            TellrawJson().append(message.replace("name" to name))
+                                .hoverText(message.replace("name" to name))
                                 .runCommand("/ChemdahTrackCancel")
                                 .sendTo(adaptCommandSender(e.player))
                         }

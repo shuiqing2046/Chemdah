@@ -6,7 +6,6 @@ import ink.ptms.chemdah.api.ChemdahAPI.conversationSession
 import ink.ptms.chemdah.api.event.collect.ConversationEvents
 import ink.ptms.chemdah.api.event.collect.PlayerEvents
 import ink.ptms.chemdah.util.hidden
-import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerCommandPreprocessEvent
@@ -23,6 +22,7 @@ import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
 import taboolib.module.configuration.Config
 import taboolib.module.configuration.Configuration
+import taboolib.platform.util.onlinePlayers
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -51,7 +51,7 @@ object ConversationManager {
 
     @Schedule(period = 1, async = true)
     private fun onTick() {
-        Bukkit.getOnlinePlayers().forEach { p ->
+        onlinePlayers.forEach { p ->
             val session = p.conversationSession ?: return@forEach
             if (session.isClosed || session.conversation.hasFlag("FORCE_DISPLAY")) {
                 return@forEach
@@ -71,7 +71,7 @@ object ConversationManager {
 
     @Awake(LifeCycle.DISABLE)
     private fun onDisable() {
-        Bukkit.getOnlinePlayers().forEach { player ->
+        onlinePlayers.forEach { player ->
             if (player.conversationSession?.conversation?.hasFlag("NO_EFFECT") == false) {
                 effectFreeze.forEach { player.removePotionEffect(it.key) }
                 effects.remove(player.name)?.forEach { player.addPotionEffect(it) }

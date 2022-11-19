@@ -26,6 +26,8 @@ import java.io.File
  */
 object ConversationLoader {
 
+    var optionKey = "__option__"
+
     init {
         ChemdahAPI.addConversationTheme("chat", ThemeChat)
         ChemdahAPI.addConversationTheme("chest", ThemeChest)
@@ -73,12 +75,12 @@ object ConversationLoader {
      * @return [List<Conversation>]
      */
     fun load(file: Configuration): List<Conversation> {
-        val option = if (file.isConfigurationSection("__option__")) {
-            Option(file.getConfigurationSection("__option__")!!)
+        val option = if (file.isConfigurationSection(optionKey)) {
+            Option(file.getConfigurationSection(optionKey)!!)
         } else {
             Option.default
         }
-        return file.getKeys(false).filter { it != "__option__" && file.isConfigurationSection(it) }.mapNotNull {
+        return file.getKeys(false).filter { it != optionKey && file.isConfigurationSection(it) }.mapNotNull {
             load(null, option, file.getConfigurationSection(it)!!)
         }
     }
@@ -93,6 +95,8 @@ object ConversationLoader {
             }
             // 获取 NPC 发言内容
             val npcSide = root["npc"]?.asList()?.flatMap { it.lines() }?.toMutableList() ?: arrayListOf() // 兼容 Chemdah Lab
+            // 格式化
+            val format = root.getString("format")
             // 获取 玩家 回复内容
             val playerSide = root.getList("player")?.run {
                 PlayerSide(mapNotNull { it.asMap() }.map {
@@ -114,7 +118,7 @@ object ConversationLoader {
                 )
             }?.toMutableList() ?: arrayListOf()
             // 创建对话
-            return Conversation(root.name, file, root, trigger, npcSide, playerSide, root.getString("condition"), agents, option)
+            return Conversation(root.name, file, root, trigger, npcSide, format, playerSide, root.getString("condition"), agents, option)
         }
         return null
     }

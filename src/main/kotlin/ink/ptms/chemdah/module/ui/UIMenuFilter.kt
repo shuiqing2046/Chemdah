@@ -2,7 +2,7 @@ package ink.ptms.chemdah.module.ui
 
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Template
-import ink.ptms.chemdah.util.replaces
+import ink.ptms.chemdah.util.replace
 import org.bukkit.Sound
 import taboolib.common.platform.function.submit
 import taboolib.module.configuration.Configuration
@@ -21,7 +21,7 @@ import taboolib.platform.util.isAir
 class UIMenuFilter(val ui: UI, val profile: PlayerProfile) {
 
     fun open(page: Int = 0) {
-        profile.player.openMenu<Linked<Include>>(ui.name.replaces("name" to profile.player.name, "page" to "%p")) {
+        profile.player.openMenu<Linked<Include>>(ui.name.replace("name" to profile.player.name, "page" to "%p")) {
             page(page)
             rows(ui.menuFilterRows)
             slots(ui.menuFilterSlot)
