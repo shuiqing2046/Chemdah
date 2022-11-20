@@ -64,9 +64,10 @@ class WizardAction(val player: Player, val entityInstance: EntityInstance, val i
         // 终点检测
         if (entityInstance.getLocation().distance(info.nodes.last()) < info.finishDistance) {
             // 停止移动时触发
-            if (!entityInstance.isControllerMoving()) {
-                cancel(success = true)
-            }
+//            if (!entityInstance.isControllerMoving()) {
+//                cancel(success = true)
+//            }
+            cancel(success = true)
             return this
         }
         // 可以移动
