@@ -33,6 +33,7 @@ import taboolib.module.nms.PacketSendEvent
 import taboolib.module.nms.nmsClass
 import taboolib.module.nms.sendPacket
 import taboolib.platform.util.asLangText
+import taboolib.platform.util.asLangTextOrNull
 import taboolib.platform.util.toProxyLocation
 import java.util.concurrent.CompletableFuture
 import kotlin.text.contains
@@ -395,7 +396,10 @@ object ThemeChat : Theme<ThemeChatSettings>() {
                 complete(null)
             }
         }
-        adaptPlayer(session.player).sendActionBar(session.player.asLangText("theme-chat-help"))
+        val help = session.player.asLangTextOrNull("theme-chat-help")
+        if (help?.isNotEmpty() == true) {
+            adaptPlayer(session.player).sendActionBar(help)
+        }
     }
 
     private fun getReplyFormat(session: Session, reply: PlayerReply): String {
