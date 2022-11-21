@@ -75,8 +75,8 @@ data class ConversationSwitch(val file: File?, val root: ConfigurationSection, v
             if (e.conversation == null) {
                 val entity = e.source
                 if (entity is EntityInstance) {
-                    val action = WizardSystem.actions[entity.uniqueId] ?: return
-                    if (action.info.disableConversation) {
+                    val action = WizardSystem.actions[entity.uniqueId]
+                    if (action?.info?.disableConversation == true) {
                         return
                     }
                 }
