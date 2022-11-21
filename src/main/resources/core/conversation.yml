@@ -1,3 +1,5 @@
+
+
 #         Powered by TabooLib 6.0         #
 
 
@@ -21,49 +23,56 @@ theme-chat:
       top: '&e* {text}'
       body: '  &e{text}'
       bottom: '  &e{text}'
+  # 回复格式
   select:
+    # 标准
     reply:
       1: '&7▶ &f&n{player_side}&r &8(&6&lF&8)'
       0: '&8▶ &7{player_side}&r   &r'
+    # 曾被选择
     reply-selected:
       1: '&7▶ &7&n{player_side}&r &8(&6&lF&8)'
       0: '&8▶ &8{player_side}&r   &r'
+    # 自定义
+    reply-custom:
+      main:
+        1: '&6▶ &7&n{player_side}&r &8(&6&lF&8)'
+        0: '&7▶ &8{player_side}&r   &r'
     sound:
       name: ENTITY_EXPERIENCE_ORB_PICKUP
       p: 2
       v: 0
   sound:
     name: ENTITY_ITEM_PICKUP
-    # Pitch
     p: 1
-    # Volume
     v: 0
-  # The reply content is displayed when the NPC is speaking
+  # NPC 正在发言时显示回复内容
   talking: '    &8...'
-  # Text animation
+  # 是否启用动画
   animation: true
-  # Text appearance speed
+  # 动画播放速度
   speed: 1
-  # Blank line between each conversation
+  # 空行
   space-line: 30
-  # Hover Text on the reply
+  # 是否在回复上以悬浮字形式显示回复文本
   hover-text: true
-  # Use the scroll wheel to switch the reply content
+  # 是否启用滚轮切换回复
   use-scroll: false
-  # Display the reply "block" to one line
+  # 单行回复
   single-line:
+    # 是否启用
     enable: true
-    # Character length per line
+    # 单行回复自动换行长度
     auto-swap: 36
-    # Using only spaces characters
+    # 单行回复每个回复之间的间隔文本
     reply-separator: ' '
-  # Move distance to close the conversation
+  # 移动关闭对话的判定距离
   close-distance: 0.5
-  # If there are less than 5 lines between the reply and the npc message,
-  # then a blank line is automatically filled in below the npc message.
+  # 自动空行填充
+  # 如果 NPC 发言内容与回复行数不足 5 行，则自动填充空行，仅在多行模式下有效
   space-filling: 5
 
-# Not recommended
+# 不推荐使用
 theme-chest:
   ui:
     title: 'Talking with {title}...'

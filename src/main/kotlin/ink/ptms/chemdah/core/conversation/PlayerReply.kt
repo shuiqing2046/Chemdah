@@ -3,8 +3,10 @@ package ink.ptms.chemdah.core.conversation
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.api.ChemdahAPI.isChemdahProfileLoaded
 import ink.ptms.chemdah.api.event.collect.ConversationEvents
+import ink.ptms.chemdah.util.flatLines
 import ink.ptms.chemdah.util.namespaceConversationPlayer
 import org.bukkit.entity.Player
+import taboolib.common.util.asList
 import taboolib.common5.Coerce
 import taboolib.module.chat.colored
 import taboolib.module.kether.KetherFunction
@@ -21,17 +23,28 @@ import java.util.concurrent.CompletableFuture
  * @author sky
  * @since 2021/2/9 6:23 下午
  */
-data class PlayerReply(
-    val root: MutableMap<String, Any?>,
-    var condition: String?,
-    var text: String,
-    val action: MutableList<String>,
-    val uuid: UUID = UUID.randomUUID(),
-) {
+data class PlayerReply(val root: MutableMap<String, Any?>) {
 
+    /** 回复条件 **/
+    var condition = root["if"]?.toString()
+
+    /** 回复文本 **/
+    var text = root["reply"].toString()
+
+    /** 回复格式 **/
+    var format = root["format"]?.toString() ?: root["type"]?.toString()
+
+    /** 回复动作 **/
+    val action = root["then"]?.asList()?.flatLines()?.toMutableList() ?: arrayListOf() // 兼容 Chemdah Lab
+
+    /** 换行 **/
     val swapLine = Coerce.toBoolean(root["swap"])
 
+    /** 唯一选择 **/
     val uniqueId = root["unique"]?.toString()
+
+    /** 回复 ID **/
+    val rid: UUID = UUID.randomUUID()
 
     /**
      * 玩家是否选择过该回复
@@ -68,6 +81,7 @@ data class PlayerReply(
             condition == null -> {
                 CompletableFuture.completedFuture(true)
             }
+
             else -> {
                 try {
                     KetherShell.eval(condition!!, namespace = namespaceConversationPlayer) { extend(session.variables) }.thenApply {

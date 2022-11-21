@@ -6,6 +6,7 @@ import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.potion.PotionEffect
+import taboolib.common.util.asList
 import taboolib.common5.Coerce
 import taboolib.common5.Demand.Companion.toDemand
 import taboolib.library.configuration.ConfigurationSection
@@ -204,4 +205,44 @@ fun Location.finite(): Location {
 
 fun BukkitProxyEvent.callIfFailed(): Boolean {
     return !call()
+}
+
+fun <V> ConfigurationSection.mapSection(transform: (ConfigurationSection) -> V): Map<String, V> {
+    return getKeys(false).associateWith { transform(getConfigurationSection(it)!!) }
+}
+
+fun <V> ConfigurationSection.mapSection(node: String, transform: (ConfigurationSection) -> V): Map<String, V> {
+    return getConfigurationSection(node)?.mapSection(transform) ?: emptyMap()
+}
+
+fun ConfigurationSection.getString(vararg path: String): String? {
+    path.forEach {
+        val r = getString(it)
+        if (r != null) return r
+    }
+    return null
+}
+
+fun ConfigurationSection.list(path: String): MutableList<String> {
+    return get(path)?.asList()?.toMutableList() ?: arrayListOf()
+}
+
+fun <T> ConfigurationSection.mapListAs(path: String, transform: (Map<String, Any?>) -> T): MutableList<T> {
+    return getMapList(path).map { transform(it.asMap()) }.toMutableList()
+}
+
+fun <K, T> ConfigurationSection.sectionAs(path: String, kf: (String) -> K, transform: (K, Any) -> T): MutableList<T> {
+    return getConfigurationSection(path)?.getValues(false)?.mapKeys { kf(it.key) }?.map { transform(it.key, it.value!!) }?.toMutableList() ?: arrayListOf()
+}
+
+fun List<String>.flatLines(): List<String> {
+    return flatMap { it.lines() }
+}
+
+fun List<String>.trim(): List<String> {
+    return map { it.trim() }
+}
+
+fun <T, R> T.to(transform: (T) -> R): R {
+    return transform(this)
 }

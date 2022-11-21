@@ -3,7 +3,7 @@ package ink.ptms.chemdah.core.conversation.theme
 import ink.ptms.chemdah.api.ChemdahAPI.conversationSession
 import ink.ptms.chemdah.api.event.collect.ConversationEvents
 import ink.ptms.chemdah.core.conversation.ConversationManager
-import ink.ptms.chemdah.core.conversation.LineFormat
+import ink.ptms.chemdah.core.conversation.PlayerReply
 import ink.ptms.chemdah.core.conversation.Session
 import ink.ptms.chemdah.core.quest.QuestDevelopment
 import ink.ptms.chemdah.core.quest.QuestDevelopment.hasTransmitMessages
@@ -20,7 +20,6 @@ import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.adaptCommandSender
 import taboolib.common.platform.function.adaptPlayer
 import taboolib.common.platform.function.submit
-import taboolib.common.util.resettableLazy
 import taboolib.common5.Coerce
 import taboolib.common5.util.printed
 import taboolib.library.reflex.Reflex.Companion.invokeConstructor
@@ -46,14 +45,6 @@ import kotlin.text.contains
  * @since 2021/2/12 2:08 上午
  */
 object ThemeChat : Theme<ThemeChatSettings>() {
-
-    /**
-     * 加载格式化模板
-     */
-    val formats by resettableLazy {
-        val section = ConversationManager.conf.getConfigurationSection("theme-chat.format-line")
-        section?.getKeys(false)?.associate { it to LineFormat(section.getConfigurationSection(it)!!) } ?: emptyMap()
-    }
 
     /**
      * 屏蔽其他插件在对话过程中发送的动作栏信息
@@ -287,19 +278,22 @@ object ThemeChat : Theme<ThemeChatSettings>() {
                         // 包含发言，兼容老版本 npcSide 变量
                         format.contains("npc_side", "npcSide") -> {
                             // 单行格式化
-                            var mlf = session.conversation.format?.let { formats[it] }
-                            if (mlf == null && formats.containsKey("default")) {
-                                mlf = formats["default"]!!
+                            var mlf = session.conversation.format?.let { settings.formatLine[it] }
+                            if (mlf == null && settings.formatLine.containsKey("default")) {
+                                mlf = settings.formatLine["default"]!!
                             }
                             messages.colored().forEachIndexed { i, fully ->
                                 when {
+                                    // 已经播放
                                     lineIndex > i -> {
                                         json.append(format.replace("npc_side", "npcSide", rep = mlf?.format(fully, i, messages.size) ?: fully)).newLine()
                                     }
+                                    // 正在播放
                                     lineIndex == i -> {
                                         val pm = mlf?.format(printMessage, i, messages.size) ?: printMessage
                                         json.append(format.replace("npc_side", "npcSide", rep = pm)).newLine()
                                     }
+                                    // 尚未播放
                                     else -> json.newLine()
                                 }
                             }
@@ -320,11 +314,7 @@ object ThemeChat : Theme<ThemeChatSettings>() {
                                     // 回复内容
                                     val text = reply.build(session)
                                     // 回复结构
-                                    val rep = if (session.playerSide == reply) {
-                                        if (reply.isPlayerSelected(session.player)) settings.selected else settings.select
-                                    } else {
-                                        if (reply.isPlayerSelected(session.player)) settings.selectedOther else settings.selectOther
-                                    }
+                                    val rf = getReplyFormat(session, reply).replace("player_side", "playerSide", rep = text).replace("index", rep = idx + 1)
                                     // 在单行中显示回复内容
                                     if (settings.singleLineEnable) {
                                         len += text.uncolored().realLength()
@@ -345,8 +335,7 @@ object ThemeChat : Theme<ThemeChatSettings>() {
                                         }
                                         // 当动画结束时，显示回复内容
                                         if (animationStopped) {
-                                            val replyText = rep.replace("player_side", "playerSide", rep = text).replace("index", rep = idx + 1)
-                                            json.append(format.replace("reply" to replyText)).runCommand("/session reply ${reply.uuid}")
+                                            json.append(format.replace("reply" to rf)).runCommand("/session reply ${reply.rid}")
                                             // 是否启用鼠标悬停显示
                                             if (settings.hoverText) {
                                                 json.hoverText(text)
@@ -359,8 +348,7 @@ object ThemeChat : Theme<ThemeChatSettings>() {
                                     } else {
                                         // 当动画结束时，显示回复内容
                                         if (animationStopped) {
-                                            val replyText = rep.replace("player_side", "playerSide", rep = text).replace("index", rep = idx + 1)
-                                            json.append(format.replace("reply" to replyText)).runCommand("/session reply ${reply.uuid}")
+                                            json.append(format.replace("reply" to rf)).runCommand("/session reply ${reply.rid}")
                                             // 是否启用鼠标悬停显示
                                             if (settings.hoverText) {
                                                 json.hoverText(text)
@@ -369,6 +357,7 @@ object ThemeChat : Theme<ThemeChatSettings>() {
                                             newLine = true
                                         }
                                     }
+                                    // 若对话未结束则显示 talking 状态
                                     if (!animationStopped) {
                                         if (settings.singleLineEnable) {
                                             if (idx == 0) {
@@ -407,6 +396,18 @@ object ThemeChat : Theme<ThemeChatSettings>() {
             }
         }
         adaptPlayer(session.player).sendActionBar(session.player.asLangText("theme-chat-help"))
+    }
+
+    private fun getReplyFormat(session: Session, reply: PlayerReply): String {
+        val format = when {
+            // 自定义
+            reply.format != null && settings.customSelect.containsKey(reply.format) -> settings.customSelect[reply.format]!!
+            // 曾被选过
+            reply.isPlayerSelected(session.player) -> settings.selected
+            // 默认
+            else -> settings.select
+        }
+        return if (reply.isPlayerSelected(session.player)) format.select else format.other
     }
 
     private fun newJson(): TellrawJson {

@@ -165,7 +165,7 @@ object ConversationManager {
             val args = e.message.split(" ").toMutableList().also { it.removeFirst() }
             if (args.size == 2 && args[0] == "reply") {
                 val session = e.player.conversationSession ?: return
-                val reply = session.conversation.playerSide.reply.firstOrNull { it.uuid.toString() == args[1] } ?: return
+                val reply = session.conversation.playerSide.reply.firstOrNull { it.rid.toString() == args[1] } ?: return
                 reply.check(session).thenApply { cond ->
                     if (cond) {
                         reply.select(session)

@@ -12,9 +12,16 @@ import taboolib.module.chat.colored
  */
 class LineFormat(val root: ConfigurationSection) {
 
+    /** 单行格式 **/
     val single = root.getString("single")?.colored()
+
+    /** 顶行格式 **/
     val top = root.getString("top")?.colored()
+
+    /** 间行格式 **/
     val body = root.getString("body")?.colored()
+
+    /** 底行格式 **/
     val bottom = root.getString("bottom")?.colored()
 
     /**

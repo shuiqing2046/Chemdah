@@ -4,32 +4,32 @@
 
 
 default:
-  # UI title
+  # 标题
   name: '{name}''s Quests [Pg. {page}]'
-  # UI settings
+  # 设置
   menu:
-    # UI settings of the quest list
+    # 任务设置
     quest:
-      # Size
+      # 行数
       rows: 6
-      # Quest slots
+      # 位置
       slot: [
           12, 13, 14, 15, 16,
           21, 22, 23, 24, 25,
           30, 31, 32, 33, 34,
           39, 40, 41, 42, 43
       ]
-      # Function slots
+      # 功能按键位置
       methods:
         info: 19
         filter: 28
-    # UI settings of the quest filter
+    # 过滤器设置
     filter:
-      # Size
+      # 行数
       rows: 3
-      # Filter slots
+      # 位置
       slot: [ 10, 11, 12, 13, 14, 15, 16 ]
-  # UI settings of the quest item
+  # 物品配置
   item:
     info:
       material: totem
@@ -113,7 +113,7 @@ default:
           - '&8UNTRACKED'
       unavailable:
         material: gray_stained_glass_pane
-  # Quest included
+  # 包含任务
   include:
     L1:
       active:
@@ -152,6 +152,6 @@ default:
         name: '&fL3 quests'
         lore:
           - '&7INCLUDE'
-  # Quest excluded
+  # 排除任务
   exclude:
     - S1

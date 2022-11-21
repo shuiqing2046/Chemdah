@@ -2,10 +2,10 @@ package ink.ptms.chemdah.core.conversation
 
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.event.collect.ConversationEvents
-import ink.ptms.chemdah.core.conversation.AgentType.Companion.toAgentType
+import ink.ptms.chemdah.core.conversation.AgentType.Companion.toAgent
 import ink.ptms.chemdah.core.conversation.theme.ThemeChat
 import ink.ptms.chemdah.core.conversation.theme.ThemeChest
-import ink.ptms.chemdah.util.asMap
+import ink.ptms.chemdah.util.*
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
 import taboolib.common.platform.function.getDataFolder
@@ -89,34 +89,18 @@ object ConversationLoader {
         if (ConversationEvents.Load(file, option, root).call()) {
             // 获取对话触发器
             val trigger = if (root["npc id"] != null) {
-                Trigger(root["npc id"]!!.asList().map { it.split(" ") }.filter { it.size == 2 }.map { Trigger.Id(it[0], it[1]) })
+                Trigger(root.list("npc id").map { it.split(" ") }.filter { it.size == 2 }.map { Trigger.Id(it[0], it[1]) })
             } else {
-                Trigger(emptyList())
+                Trigger()
             }
             // 获取 NPC 发言内容
-            val npcSide = root["npc"]?.asList()?.flatMap { it.lines() }?.toMutableList() ?: arrayListOf() // 兼容 Chemdah Lab
-            // 格式化
-            val format = root.getString("format")
-            // 获取 玩家 回复内容
-            val playerSide = root.getList("player")?.run {
-                PlayerSide(mapNotNull { it.asMap() }.map {
-                    PlayerReply(
-                        it.toMutableMap(),
-                        it["if"]?.toString(),
-                        it["reply"].toString(),
-                        it["then"]?.asList()?.flatMap { i -> i.lines() }?.toMutableList() ?: arrayListOf() // 兼容 Chemdah Lab
-                    )
-                }.toMutableList())
-            } ?: PlayerSide(arrayListOf())
-            // 代理
-            val agents = root.getConfigurationSection("agent")?.getKeys(false)?.map {
-                val args = it.split("@").map { a -> a.trim() }
-                Agent(
-                    args[0].toAgentType(),
-                    root["agent.$it"]!!.asList(),
-                    args.getOrNull(1) ?: "self"
-                )
-            }?.toMutableList() ?: arrayListOf()
+            val npcSide = root.list("npc").flatLines().toMutableList() // 兼容 Chemdah Lab
+            // 获取 NPC 发言内容格式化
+            val format = root.getString("format", "type")
+            // 获取玩家回复内容
+            val playerSide = root.mapListAs("player") { PlayerReply(it.toMutableMap()) }.to { PlayerSide(it) }
+            // 获取代理
+            val agents = root.sectionAs("agent", { it.split("@").trim() }) { k, v -> Agent(k[0].toAgent(), v.asList(), k.getOrElse(1) { "self" }) }
             // 创建对话
             return Conversation(root.name, file, root, trigger, npcSide, format, playerSide, root.getString("condition"), agents, option)
         }

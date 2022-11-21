@@ -4,7 +4,7 @@
 
 
 example:
-  # Realm world name
+  # 领域世界名
   in: world
-  # Realm area
+  # 领域范围
   area: 0 0 0 ~ 10 10 10

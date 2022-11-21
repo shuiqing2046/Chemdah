@@ -9,7 +9,7 @@ import java.util.concurrent.CompletableFuture
  * @author sky
  * @since 2021/2/9 6:23 下午
  */
-data class PlayerSide(val reply: MutableList<PlayerReply>) {
+data class PlayerSide(val reply: MutableList<PlayerReply> = arrayListOf()) {
 
     fun checked(session: Session): CompletableFuture<List<PlayerReply>> {
         val future = CompletableFuture<List<PlayerReply>>()

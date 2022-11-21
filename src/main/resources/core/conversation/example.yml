@@ -22,6 +22,7 @@ conversation_0:
         goto conversation_0_1
     - if: permission admin
       reply: 'You know Mr.Black?'
+      type: main
       then: |
         talk "Yes, I know him very well."
 

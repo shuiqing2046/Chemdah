@@ -4,16 +4,17 @@
 
 
 database:
-  # Data loading delay
-  # How soon after the player joins the game does the data load
+  # 数据加载延迟
+  # 玩家进入服务器后多久开始加载数据
   join-select-delay: 20
-  # Index of the data
-  # Player data indexed in a way that cannot be changed once in production
+  # 数据索引类型
+  # 在投入生产环境后不可修改
+  # 可用：NAME、UUID
   user-index: UUID
-  # Database type
-  # Available: LOCAL, SQL
+  # 数据储存类型
+  # 可用: LOCAL, SQL
   use: LOCAL
-  # Database settings
+  # 数据储存配置
   source:
     SQL:
       host: localhost
@@ -23,101 +24,100 @@ database:
       database: test
       table: chemdah
 
-# Default state configuration
+# 默认状态显示配置
 default-stats:
-  # Staying time, how long to remove
+  # 停留时间
   stay: 100
-  # BossBar style
-  # Available: SOLID, SEGMENTED_6, SEGMENTED_10, SEGMENTED_12, SEGMENTED_20
+  # 条类型
+  # 可用: SOLID, SEGMENTED_6, SEGMENTED_10, SEGMENTED_12, SEGMENTED_20
   style: SOLID
-  # BossBar color
-  # Available: PINK, BLUE, RED, GREEN, YELLOW, PURPLE, WHITE
+  # 条颜色
+  # 可用: PINK, BLUE, RED, GREEN, YELLOW, PURPLE, WHITE
   color: WHITE
-  # BossBar text
+  # 条文本
   content: '&3[{name}] &7{value}/{target} &f[{percent}%]'
 
-# Default tracking configuration
+# 默认追踪配置
 default-track:
-  # Message sent when the player starts tracking
+  # 开始追踪时显示信息
   message: '&7Tracking &3[{name}]&7... Click to cancel.'
-  # Beacon, particle pillar
+  # 信标（粒子光柱）
   beacon:
-    # Whether to enable
+    # 是否启用
     value: true
-    # Particle type
+    # 粒子类型
     type: CLOUD
-    # Particle width
+    # 粒子宽度
     size: 0.05
-    # Particle density
+    # 粒子密度
     count: 500
-    # Nearest visual distance
-    # Particle effects are only displayed from this distance
+    # 最近可见距离
     distance: 32
-    # Update interval
+    # 更新间隔
     period: 2
-    # Fixed position
-    # If true, the particle pillar will be fixed at the destination
+    # 是否固定到终点位置
     fixed: false
-  # Landmark, hologram in front of the player
+  # 地标
   landmark:
-    # Whether to enable
+    # 是否启用
     value: true
-    # Hologram text
+    # 文本
     content:
       - '&a{name}'
       - '&f({distance}m)'
-    # Display distance
+    # 显示距离
     distance: 3
-  # Navigation, pathfinding to the destination
+  # 导航
   navigation:
-    # Whether to enable
+    # 是否启用
     value: true
-    # Whether to calculate in the main thread
-    # Fast response but with performance loss
+    # 是否在主线程中运算
+    # 快速相应但会产生一些性能损耗
     sync: true
-    # Display type
+    # 显示形式
+    # 可用：POINT、ARROW
     type: POINT
-    # Longest search distance
+    # 最远距离
     distance: 64
-    # Display type of POINT
+    # POINT 配置
     point:
-      # Particle type
+      # 粒子类型
       type: CRIT
-      # Height above ground
+      # 距离地面高度
       y: 0
-      # Particle size
+      # 粒子大小
       size:
         x: 0.2
         y: 0.2
-      # Particle density
+      # 粒子密度
       count: 20
-      # Particle speed
+      # 粒子速度
       speed: 1
-      # Update interval
+      # 更新间隔
       period: 60
-    # Display type of ARROW
+    # ARROW 配置
     arrow:
-      # Particle type
+      # 粒子类型
       type: DRIP_LAVA
-      # Height above ground
+      # 距离地面高度
       y: 0.2
-      # Arrow density
+      # 密度
       density: 12
-      # Arrow length
+      # 长度
       len: 0.5
-      # Arrow angle
+      # 角度
       angle: 45
-      # Particle speed
+      # 粒子速度
       speed: 1
-      # Update interval
+      # 更新间隔
       period: 100
-  # Scoreboard, display information about the quest
+  # 记分板
   scoreboard:
-    # Whether to enable
+    # 是否启用
     value: true
-    # Automatic line break length
+    # 自动换行长度
     length: 64
-    # Display text
+    # 文本
     content:
       - '&6&lTRACKING'
       - - ''

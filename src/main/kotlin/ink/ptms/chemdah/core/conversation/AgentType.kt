@@ -39,7 +39,7 @@ enum class AgentType(val namespace: String) {
 
     companion object {
 
-        fun String.toAgentType(): AgentType {
+        fun String.toAgent(): AgentType {
             return try {
                 valueOf(uppercase())
             } catch (ignored: Exception) {

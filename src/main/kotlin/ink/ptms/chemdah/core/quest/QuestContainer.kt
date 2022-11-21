@@ -3,9 +3,10 @@ package ink.ptms.chemdah.core.quest
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.event.collect.QuestEvents
 import ink.ptms.chemdah.core.PlayerProfile
-import ink.ptms.chemdah.core.quest.AgentType.Companion.toAgentType
+import ink.ptms.chemdah.core.quest.AgentType.Companion.toAgent
 import ink.ptms.chemdah.core.quest.addon.Addon
 import ink.ptms.chemdah.core.quest.meta.Meta
+import ink.ptms.chemdah.util.trim
 import taboolib.common.platform.function.adaptPlayer
 import taboolib.common.platform.function.warning
 import taboolib.common.util.asList
@@ -141,14 +142,14 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
     }
 
     private fun loadAgent(source: String, value: Any) {
-        val args = source.split("@").map { a -> a.trim() }
+        val args = source.split("@").trim()
         val type = when (this) {
             is Template -> "quest_${args[0]}"
             is Task -> "task_${args[0]}"
             else -> args[0]
         }
-        if (type.toAgentType() != AgentType.NONE) {
-            agentList.add(Agent(type.toAgentType(), value.asList(), args.getOrElse(1) { "self" }))
+        if (type.toAgent() != AgentType.NONE) {
+            agentList.add(Agent(type.toAgent(), value.asList(), args.getOrElse(1) { "self" }))
         } else {
             warning("${args[0]} agent not supported.")
         }

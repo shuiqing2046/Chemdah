@@ -4,23 +4,23 @@
 
 
 default_0:
-  # Beginning value
+  # 起始值
   min: 0
-  # Maximum value
+  # 最大值
   max: 100
-  # Experience value algorithm
+  # 经验算法
   experience:
-    # Algorithm type
-    # Available: kether, javascript
+    # 算法类型
+    # 可用: kether, javascript
     type: kether
-    # Algorithm content
+    # 算法内容
     math: |
       case &level [
         when <= 15 -> calc "level * 2 + 7"
         when <= 30 -> calc "level * 5 - 38"
         else calc "level * 9 - 158"
       ]
-  # Leveling up rewards
+  # 等级提升奖励
   reward:
     5: tell colored inline *"&aLevel up! &f{{ &level }}!"
     10-20: tell colored inline *"&eLevel up! &f{{ &level }}!"

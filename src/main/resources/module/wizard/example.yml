@@ -4,26 +4,25 @@
 
 
 example_0:
-  # Wizard world name
+  # 引导所在世界名
   in: world
-  # Path nodes
-  # If the distance to the destination is long,
-  # it needs to be split into multiple nodes for movement
-  # From top to bottom, from start to finish
+  # 路径节点
+  # 如果距离目标点超过 32 格，则建议分为多个节点
+  # 从上至下，起点到终点
   nodes:
     - 50 80 0
     - 70 80 0
-  # Stops moving when the Wizard NPC is within this distance
+  # 距离终点多少格时结束
   finish-distance: 2.0
-  # Stops moving when the player is too far away from the Wizard NPC
+  # 当玩家离引导 NPC 多远时停止移动
   waiting-distance: 3
-  # Disable conversation
+  # 禁用对话
   disable-conversation: true
-  # Script triggered when an NPC changes state
+  # 特定状态触发时运行脚本
   event:
     waiting: |-
       tell "I'm waiting for you"
     continue: |-
       tell "Quickly come to me"
-  # Script triggered cooldown
+  # 脚本触发冷却
   event-cooldown: 2s

@@ -4,9 +4,7 @@
 
 
 synchronous:
-  # Whether to use player data to take over the economy
-  # Write the key
+  # 将玩家数据与 Vault 挂钩
   player-data-to-vault: ~
-  # Whether to map player data to experience values
-  # Write the key
+  # 将玩家数据映射到 Minecraft 玩家经验
   player-level-to-minecraft: ~

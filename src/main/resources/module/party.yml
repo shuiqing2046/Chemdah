@@ -4,8 +4,8 @@
 
 
 default:
-  # Supported plugins
-  # Available:
+  # 支持插件
+  # 可用:
   # BaiTeam, CustomGo, DungeonPlus, DungeonsXL, FriendsPremium, iTeamPro
   # mcMMO, MMOCore, NyTeam, PxTeam, Parties, PartyAndFriends, QuantumRPG
   plugin: none
