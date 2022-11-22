@@ -84,9 +84,7 @@ data class PlayerReply(val root: MutableMap<String, Any?>) {
 
             else -> {
                 try {
-                    KetherShell.eval(condition!!, namespace = namespaceConversationPlayer) { extend(session.variables) }.thenApply {
-                        Coerce.toBoolean(it)
-                    }
+                    KetherShell.eval(condition!!, namespace = namespaceConversationPlayer) { extend(session.variables) }.thenApply { Coerce.toBoolean(it) }
                 } catch (e: Throwable) {
                     e.printKetherErrorMessage()
                     CompletableFuture.completedFuture(false)

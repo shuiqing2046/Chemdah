@@ -77,5 +77,9 @@ class ThemeChatSettings(root: ConfigurationSection) : ThemeSettings(root) {
 
         /** 位于其他选项 **/
         val other = root.getString("0", "")!!.colored()
+
+        override fun toString(): String {
+            return "ReplyFormat(select='$select', other='$other')"
+        }
     }
 }

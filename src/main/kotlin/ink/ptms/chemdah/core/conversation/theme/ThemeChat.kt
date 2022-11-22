@@ -411,7 +411,7 @@ object ThemeChat : Theme<ThemeChatSettings>() {
             // 默认
             else -> settings.select
         }
-        return if (reply.isPlayerSelected(session.player)) format.select else format.other
+        return if (session.playerSide == reply) format.select else format.other
     }
 
     private fun newJson(): TellrawJson {
