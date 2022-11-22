@@ -1,6 +1,7 @@
 package ink.ptms.chemdah.core.conversation
 
 import ink.ptms.chemdah.api.event.collect.ConversationEvents
+import ink.ptms.chemdah.util.callIfFailed
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import java.util.concurrent.CompletableFuture
@@ -68,6 +69,10 @@ class Session(
      * 关闭会话
      */
     fun close(refuse: Boolean = false): CompletableFuture<Void> {
+        // 事件
+        if (ConversationEvents.Close(this, refuse).callIfFailed()) {
+            return CompletableFuture.completedFuture(null)
+        }
         val future = CompletableFuture<Void>()
         conversation.agent(this, if (refuse) AgentType.REFUSE else AgentType.END).thenApply {
             conversation.option.instanceTheme.onClose(this).thenApply {

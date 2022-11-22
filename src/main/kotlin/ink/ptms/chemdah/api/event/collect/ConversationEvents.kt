@@ -69,6 +69,11 @@ class ConversationEvents {
     }
 
     /**
+     * 当对话结束之前
+     */
+    class Close(val session: Session, val refuse: Boolean = false): BukkitProxyEvent()
+
+    /**
      * 当对话结束之后
      */
     class Closed(val session: Session, val refuse: Boolean = false): BukkitProxyEvent() {
