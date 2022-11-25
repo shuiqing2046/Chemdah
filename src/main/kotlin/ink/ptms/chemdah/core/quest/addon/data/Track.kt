@@ -1,6 +1,7 @@
 package ink.ptms.chemdah.core.quest.addon.data
 
 import ink.ptms.chemdah.util.Effects
+import ink.ptms.chemdah.util.asListOrLines
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import taboolib.common.platform.ProxyParticle
@@ -22,6 +23,13 @@ interface TrackCenter {
     fun identifier(): String
 
     fun getLocation(player: Player): Location?
+}
+
+object NullTrackCenter : TrackCenter {
+
+    override fun identifier() = "null"
+
+    override fun getLocation(player: Player) = null
 }
 
 class TrackBeacon(val config: ConfigurationSection, val root: ConfigurationSection) {
@@ -189,6 +197,7 @@ class TrackNavigation(val config: ConfigurationSection, val root: ConfigurationS
             val nodes = path?.nodes ?: return@submit
             // 播放特效
             (0 until (nodes.size - 1) step 2).forEach {
+                // 速度
                 submit(delay = it * arrowSpeed) {
                     // 起始坐标
                     val start = nodes[it].asBlockPos().toLocation(center.world!!).add(0.5, arrowY, 0.5).toProxyLocation()
@@ -227,7 +236,7 @@ class TrackScoreboard(val config: ConfigurationSection, val root: ConfigurationS
      */
     val content = if (config.getList("scoreboard-option.content")?.isNotEmpty() == true) {
         // 适配 Chemdah Lab
-        config.getList("scoreboard-option.content")!!.filterNotNull().map { Line((if (it is String) it.lines() else it.asList()).colored()) }
+        config.getList("scoreboard-option.content")!!.filterNotNull().map { Line(it.asListOrLines().colored()) }
     } else {
         root.getList("content")!!.filterNotNull().map { Line(it.asList().colored()) }
     }

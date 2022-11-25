@@ -14,7 +14,7 @@ annotation class Option(val type: Type) {
 
     enum class Type {
 
-        LIST, MAP_LIST, SECTION, TEXT, NUMBER, ANY;
+        LIST, MAP_LIST, SECTION, TEXT, NUMBER, BOOLEAN, ANY;
 
         operator fun get(config: ConfigurationSection, node: String): Any? {
             try {
@@ -24,6 +24,7 @@ annotation class Option(val type: Type) {
                     SECTION -> config.getConfigurationSection(node)
                     TEXT -> config.getString(node)
                     NUMBER -> config.getDouble(node)
+                    BOOLEAN -> config.getBoolean(node)
                     ANY -> config[node]
                 }
             } catch (e: Throwable) {

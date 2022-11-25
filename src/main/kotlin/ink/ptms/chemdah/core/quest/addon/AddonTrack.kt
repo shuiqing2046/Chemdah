@@ -15,6 +15,7 @@ import ink.ptms.chemdah.api.event.collect.QuestEvents
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.*
 import ink.ptms.chemdah.core.quest.addon.AddonDepend.Companion.isQuestDependCompleted
+import ink.ptms.chemdah.core.quest.addon.AddonOptional.Companion.isOptional
 import ink.ptms.chemdah.core.quest.addon.AddonUI.Companion.ui
 import ink.ptms.chemdah.core.quest.addon.data.*
 import ink.ptms.chemdah.core.quest.meta.MetaName.Companion.displayName
@@ -34,6 +35,7 @@ import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.*
 import taboolib.common.util.asList
 import taboolib.common.util.resettableLazy
+import taboolib.common.util.unsafeLazy
 import taboolib.common5.Baffle
 import taboolib.common5.Coerce
 import taboolib.library.configuration.ConfigurationSection
@@ -61,30 +63,21 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
     /**
      * 引导的目的地
      */
-    val center by lazy {
+    val center by unsafeLazy {
         val center = config.getString("center")
         when {
             // 无追踪
-            center.isNullOrEmpty() -> object : TrackCenter {
-
-                override fun identifier(): String {
-                    return "null"
-                }
-
-                override fun getLocation(player: Player): Location? {
-                    return null
-                }
-            }
+            center.isNullOrEmpty() -> NullTrackCenter
 
             // 追踪 Adyeshach 单位
             center.startsWith("adyeshach") -> object : TrackCenter {
 
                 val id = center.substringAfter("adyeshach").trim()
+
+                // 坐标缓存
                 val cache = CacheBuilder.newBuilder().expireAfterWrite(250, TimeUnit.MILLISECONDS).build<String, Location>()
 
-                override fun identifier(): String {
-                    return center
-                }
+                override fun identifier(): String = center
 
                 override fun getLocation(player: Player): Location? {
                     val loc = cache.get(player.name) {
@@ -100,9 +93,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
             // 追踪坐标
             else -> object : TrackCenter {
 
-                override fun identifier(): String {
-                    return center
-                }
+                override fun identifier(): String = center
 
                 override fun getLocation(player: Player): Location {
                     return InferArea.Single(center, false).positions[0].clone()
@@ -134,6 +125,18 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
     val landmark = TrackLandmark(config, conf.getConfigurationSection("default-track.landmark") ?: error("default-track.landmark not found"))
     val navigation = TrackNavigation(config, conf.getConfigurationSection("default-track.navigation") ?: error("default-track.navigation not found"))
     val scoreboard = TrackScoreboard(config, conf.getConfigurationSection("default-track.scoreboard") ?: error("default-track.scoreboard not found"))
+
+    /**
+     * 格式化描述
+     */
+    fun formatDesc(questSelected: String, def: List<String>): List<String> {
+        return KetherFunction.parse(
+            description ?: def,
+            namespace = namespaceQuestUI,
+            sender = adaptCommandSender(this),
+            vars = KetherShell.VariableMap("@QuestSelected" to questSelected)
+        )
+    }
 
     companion object {
 
@@ -264,12 +267,14 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
             val nav = trackAddon.navigation
             if (nav.enable && center.world?.name == world.name && center.distance(location) < nav.distance) {
                 when (nav.type) {
+                    // 点
                     "POINT" -> {
                         if (nav.pointPeriod.hasNext(name)) {
                             saveBaffle("${trackAddon.questContainer.path}.navigation.point", nav.pointPeriod)
                             nav.displayPoint(this, center)
                         }
                     }
+                    // 箭头
                     "ARROW" -> {
                         if (nav.arrowPeriod.hasNext(name)) {
                             saveBaffle("${trackAddon.questContainer.path}.navigation.arrow", nav.arrowPeriod)
@@ -396,52 +401,63 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
         /**
          * 创建或刷新任务追踪（Scoreboard）
          */
+        @Suppress("DuplicatedCode")
         private fun Player.displayTrackScoreboard() {
             if (nonChemdahProfileLoaded) {
                 return
             }
+            // 获取追踪任务
             val quest = chemdahProfile.trackQuest ?: return
-            if (quest.track()?.scoreboard?.enable == true) {
+            // 获取追踪组建
+            val questTrack = quest.track()
+            // 是否启用记分板
+            if (questTrack?.scoreboard?.enable == true) {
+                // 任务描述
+                val questDesc = quest.ui()?.description ?: emptyList()
+                // 单行描述长度
+                val length = questTrack.scoreboard.length
                 // 尚未接受任务，显示任务总信息
                 val content = if (chemdahProfile.getQuestById(quest.id) == null) {
-                    val track = quest.track() ?: return
-                    track.scoreboard.content.flatMap {
-                        if (it.isQuestFormat) {
-                            it.content.flatMap { contentLine ->
-                                if (contentLine.contains("description")) {
-                                    val description = KetherFunction.parse(
-                                        track.description ?: quest.ui()?.description ?: emptyList(),
-                                        namespace = namespaceQuestUI,
-                                        sender = adaptCommandSender(this),
-                                        vars = KetherShell.VariableMap("@QuestSelected" to quest.node)
-                                    )
-                                    description.split(track.scoreboard.length).map { desc -> contentLine.replace("description" to desc) }
+                    // 格式化
+                    questTrack.scoreboard.content.flatMap { line ->
+                        // 任务信息
+                        if (line.isQuestFormat) {
+                            // 格式化任务信息
+                            line.content.flatMap { cl ->
+                                // 任务描述
+                                if (cl.contains("description")) {
+                                    // 处理描述
+                                    questTrack.formatDesc(quest.node, questDesc).split(length).map { cl.replace("description" to it) }
                                 } else {
-                                    contentLine.replace("name" to (track.name ?: quest.displayName())).asList()
+                                    // 任务名称
+                                    cl.replace("name" to (questTrack.name ?: quest.displayName())).asList()
                                 }
                             }
                         } else {
-                            it.content
+                            // 其他内容
+                            line.content
                         }
                     }
                 } else {
-                    (quest.track()?.scoreboard?.content ?: defaultContent).flatMap {
-                        if (it.isQuestFormat) {
+                    // 格式化
+                    questTrack.scoreboard.content.flatMap { line ->
+                        // 任务信息
+                        if (line.isQuestFormat) {
+                            // 获取条目
                             quest.taskMap.flatMap { (_, task) ->
+                                // 获取条目追踪
                                 val taskTrack = task.track()
-                                if (taskTrack != null && !task.isCompleted(chemdahProfile) && task.isQuestDependCompleted(this)) {
-                                    it.content.flatMap { contentLine ->
-                                        if (contentLine.contains("description")) {
-                                            val description = KetherFunction.parse(
-                                                taskTrack.description ?: quest.ui()?.description ?: emptyList(),
-                                                namespace = namespaceQuestUI,
-                                                sender = adaptCommandSender(this),
-                                                vars = KetherShell.VariableMap("@QuestSelected" to quest.node)
-                                            )
-                                            val size = quest.track()?.scoreboard?.length ?: defaultLength
-                                            description.split(size).map { d -> contentLine.replace("description" to d) }
+                                // 条目尚未完成
+                                if (taskTrack != null && !task.isCompleted(chemdahProfile) && task.isQuestDependCompleted(this) && !task.isOptional()) {
+                                    // 格式化条目信息
+                                    line.content.flatMap { cl ->
+                                        // 条目描述
+                                        if (cl.contains("description")) {
+                                            // 处理描述
+                                            taskTrack.formatDesc(quest.node, questDesc).split(length).map { cl.replace("description" to it) }
                                         } else {
-                                            contentLine.replace("name" to (taskTrack.name ?: task.displayName())).asList()
+                                            // 条目名称
+                                            cl.replace("name" to (taskTrack.name ?: task.displayName())).asList()
                                         }
                                     }
                                 } else {
@@ -449,7 +465,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                                 }
                             }
                         } else {
-                            it.content
+                            line.content
                         }
                     }
                 }

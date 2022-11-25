@@ -328,7 +328,7 @@ object ThemeChat : Theme<ThemeChatSettings>() {
                                             }
                                         }
                                         // 主动换行
-                                        if (reply.swapLine) {
+                                        if (reply.swapLine && idx > 0) {
                                             newLine = true
                                             if (animationStopped) {
                                                 json.newLine()

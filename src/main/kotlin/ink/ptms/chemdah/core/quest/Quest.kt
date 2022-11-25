@@ -6,6 +6,7 @@ import ink.ptms.chemdah.api.event.collect.QuestEvents
 import ink.ptms.chemdah.core.DataContainer
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.addon.AddonControl.Companion.control
+import ink.ptms.chemdah.core.quest.addon.AddonOptional.Companion.isOptional
 import ink.ptms.chemdah.core.quest.addon.AddonRestart.Companion.canRestart
 import ink.ptms.chemdah.core.quest.addon.AddonTimeout.Companion.isTimeout
 import ink.ptms.chemdah.core.quest.addon.data.ControlTrigger
@@ -106,7 +107,7 @@ class Quest(val id: String, val profile: PlayerProfile, val persistentDataContai
                 restartQuestFuture().thenAccept { future.complete(false) }
             } else {
                 // 所有条目均已完成且通过事件检查
-                if (tasks.all { it.objective.hasCompletedSignature(profile, it) } && QuestEvents.Complete.Pre(this@Quest, profile).call()) {
+                if (tasks.all { it.objective.hasCompletedSignature(profile, it) || it.isOptional() } && QuestEvents.Complete.Pre(this@Quest, profile).call()) {
                     template.agent(profile, AgentType.QUEST_COMPLETE).thenAccept {
                         if (it) {
                             profile.persistentDataContainer["quest.complete.$id"] = System.currentTimeMillis()

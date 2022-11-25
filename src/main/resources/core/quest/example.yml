@@ -16,6 +16,8 @@
       objective: block break
       condition:
         material: diamond_ore
+      addon:
+        optional: true
   addon:
     ui:
       icon: iron_pickaxe

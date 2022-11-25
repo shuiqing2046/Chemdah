@@ -246,3 +246,7 @@ fun List<String>.trim(): List<String> {
 fun <T, R> T.to(transform: (T) -> R): R {
     return transform(this)
 }
+
+fun Any.asListOrLines(): List<String> {
+    return if (this is String) lines() else asList()
+}
