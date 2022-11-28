@@ -34,6 +34,7 @@ object QuestDevelopment {
     private val playerRelease = ConcurrentHashMap<String, MutableList<String>>()
     private val playerMessageCache = ConcurrentHashMap<String, MutableList<Any>>()
 
+    var enableBlockContainer = false
     var enableUniqueBlock = false
     var enableMessageTransmit = false
 
@@ -43,6 +44,7 @@ object QuestDevelopment {
         val file = File(getDataFolder(), "development.yml")
         if (file.exists()) {
             val conf = Configuration.loadFromFile(file)
+            enableBlockContainer = conf.getBoolean("enable-block-container")
             enableUniqueBlock = conf.getBoolean("enable-unique-block")
             enableMessageTransmit = conf.getBoolean("enable-message-transmit")
 

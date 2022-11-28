@@ -35,7 +35,7 @@ object BlockDataContainer {
     private fun init() {
         // 在 ENABLE 之前初始化 BlockDataManager，否则脚本将无法正常调用
         TabooLibCommon.postpone(LifeCycle.ENABLE) {
-            if (QuestDevelopment.enableUniqueBlock) {
+            if (QuestDevelopment.enableBlockContainer || QuestDevelopment.enableUniqueBlock) {
                 val path = getDataFolder().toPath().resolve("blocks.db")
                 // 加载不同模式的 BlockDataManager
                 manager = when (QuestDevelopment.uniqueBlockMode) {
@@ -53,7 +53,7 @@ object BlockDataContainer {
     }
 
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    private fun e(e: DataBlockMoveEvent) {
+    private fun onBlockMove(e: DataBlockMoveEvent) {
         if (e.parent is BlockPistonEvent && !e.block.isAllowPistonMove) {
             e.isCancelled = true
         }

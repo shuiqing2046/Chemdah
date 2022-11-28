@@ -42,6 +42,7 @@ taboolib {
     classifier = null
     version = "6.0.10-21"
     relocate("ink.ptms.um", "ink.ptms.chemdah.um")
+    options("keep-kotlin-module")
 }
 
 repositories {

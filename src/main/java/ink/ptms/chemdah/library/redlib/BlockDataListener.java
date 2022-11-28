@@ -106,6 +106,7 @@ class BlockDataListener implements Listener {
     /**
      * 树叶消散
      */
+    @SuppressWarnings("IdentifierGrammar")
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onLeavesDecay(LeavesDecayEvent e) {
         DataBlock db = manager.getDataBlock(e.getBlock(), false);
