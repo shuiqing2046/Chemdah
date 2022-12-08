@@ -63,7 +63,7 @@ object ConversationLoader {
     fun load(file: File): List<Conversation> {
         return when {
             file.isDirectory -> file.listFiles()?.flatMap { load(it) }?.toList() ?: emptyList()
-            file.extension == "yml" || file.extension == "json" -> load(Configuration.loadFromFile(file))
+            file.extension == "yml" || file.extension == "json" -> load(Configuration.loadFromFile(file), file)
             else -> emptyList()
         }
     }
@@ -71,17 +71,18 @@ object ConversationLoader {
     /**
      * 从配置中加载对话
      *
+     * @param conf 配置对象
      * @param file 配置文件
      * @return [List<Conversation>]
      */
-    fun load(file: Configuration): List<Conversation> {
-        val option = if (file.isConfigurationSection(optionKey)) {
-            Option(file.getConfigurationSection(optionKey)!!)
+    fun load(conf: Configuration, file: File?): List<Conversation> {
+        val option = if (conf.isConfigurationSection(optionKey)) {
+            Option(conf.getConfigurationSection(optionKey)!!)
         } else {
             Option.default
         }
-        return file.getKeys(false).filter { it != optionKey && file.isConfigurationSection(it) }.mapNotNull {
-            load(null, option, file.getConfigurationSection(it)!!)
+        return conf.getKeys(false).filter { it != optionKey && conf.isConfigurationSection(it) }.mapNotNull {
+            load(file, option, conf.getConfigurationSection(it)!!)
         }
     }
 
