@@ -4,6 +4,7 @@ import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.api.ChemdahAPI.isChemdahProfileLoaded
 import ink.ptms.chemdah.api.event.collect.ObjectiveEvents
+import ink.ptms.chemdah.api.event.collect.PluginReloadEvent
 import ink.ptms.chemdah.api.event.collect.TemplateEvents
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.addon.Addon
@@ -151,6 +152,7 @@ object QuestLoader {
     fun loadAll() {
         loadTemplate()
         loadTemplateGroup()
+        PluginReloadEvent.Quest().call()
     }
 
     /**

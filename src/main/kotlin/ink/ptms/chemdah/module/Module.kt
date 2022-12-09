@@ -1,5 +1,6 @@
 package ink.ptms.chemdah.module
 
+import ink.ptms.chemdah.api.event.collect.PluginReloadEvent
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
 
@@ -26,6 +27,7 @@ interface Module {
         @Awake(LifeCycle.ENABLE)
         fun reload() {
             modules.values.forEach { it.reload() }
+            PluginReloadEvent.Module().call()
         }
     }
 }

@@ -260,8 +260,7 @@ object ChemdahAPI {
         Chemdah.conf.reload()
         ConversationManager.conf.reload()
         ConversationLoader.loadAll()
-        QuestLoader.loadTemplate()
-        QuestLoader.loadTemplateGroup()
+        QuestLoader.loadAll()
         Module.reload()
         ResettableLazy.reset()
     }

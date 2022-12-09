@@ -2,6 +2,7 @@ package ink.ptms.chemdah.core.conversation
 
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.event.collect.ConversationEvents
+import ink.ptms.chemdah.api.event.collect.PluginReloadEvent
 import ink.ptms.chemdah.core.conversation.AgentType.Companion.toAgent
 import ink.ptms.chemdah.core.conversation.theme.ThemeChat
 import ink.ptms.chemdah.core.conversation.theme.ThemeChest
@@ -52,6 +53,7 @@ object ConversationLoader {
                 warning("${c.size} conversations use duplicate id: $id")
             }
         }
+        PluginReloadEvent.Conversation().call()
     }
 
     /**
