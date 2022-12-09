@@ -42,9 +42,7 @@ data class Conversation(
      * 对话约束
      * 例如控制是否允许玩家跳过对话，或在对话中移动等
      */
-    val flags = root.getStringList("flags").toMutableList().also {
-        it.addAll(option.globalFlags)
-    }
+    val flags = root.getStringList("flags").toMutableList().also { it.addAll(option.globalFlags) }
 
     /**
      * 对话转移

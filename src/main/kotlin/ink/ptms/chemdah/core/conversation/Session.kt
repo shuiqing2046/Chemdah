@@ -4,6 +4,7 @@ import ink.ptms.chemdah.api.event.collect.ConversationEvents
 import ink.ptms.chemdah.util.callIfFailed
 import org.bukkit.Location
 import org.bukkit.entity.Player
+import taboolib.common5.cbool
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -75,9 +76,16 @@ class Session(
         }
         val future = CompletableFuture<Void>()
         conversation.agent(this, if (refuse) AgentType.REFUSE else AgentType.END).thenApply {
+            // 关闭会话被取消
+            if (variables["@Cancelled"].cbool) {
+                future.complete(null)
+                return@thenApply
+            }
             conversation.option.instanceTheme.onClose(this).thenApply {
                 future.complete(null)
+                // 移除数据
                 ConversationManager.sessions.remove(player.name)
+                // 事件
                 ConversationEvents.Closed(this, refuse).call()
             }
         }

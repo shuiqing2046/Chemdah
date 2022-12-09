@@ -22,6 +22,7 @@ data class Option(
     val instanceTheme: Theme<*>
         get() = ChemdahAPI.getConversationTheme(theme) ?: error("theme $theme not supported.")
 
+    /** 全局标签 */
     val globalFlags = root.getStringList("global-flags")
 
     companion object {
