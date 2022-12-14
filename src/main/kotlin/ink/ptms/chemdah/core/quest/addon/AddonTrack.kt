@@ -26,6 +26,7 @@ import ink.ptms.chemdah.util.namespaceQuestUI
 import ink.ptms.chemdah.util.replace
 import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerCommandPreprocessEvent
 import org.bukkit.event.player.PlayerMoveEvent
@@ -129,11 +130,11 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
     /**
      * 格式化描述
      */
-    fun formatDesc(questSelected: String, def: List<String>): List<String> {
+    fun formatDesc(sender: CommandSender, questSelected: String, def: List<String>): List<String> {
         return KetherFunction.parse(
             description ?: def,
             namespace = namespaceQuestUI,
-            sender = adaptCommandSender(this),
+            sender = adaptCommandSender(sender),
             vars = KetherShell.VariableMap("@QuestSelected" to questSelected)
         )
     }
@@ -427,7 +428,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                                 // 任务描述
                                 if (cl.contains("description")) {
                                     // 处理描述
-                                    questTrack.formatDesc(quest.node, questDesc).split(length).map { cl.replace("description" to it) }
+                                    questTrack.formatDesc(this, quest.node, questDesc).split(length).map { cl.replace("description" to it) }
                                 } else {
                                     // 任务名称
                                     cl.replace("name" to (questTrack.name ?: quest.displayName())).asList()
@@ -454,7 +455,7 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                                         // 条目描述
                                         if (cl.contains("description")) {
                                             // 处理描述
-                                            taskTrack.formatDesc(quest.node, questDesc).split(length).map { cl.replace("description" to it) }
+                                            taskTrack.formatDesc(this, quest.node, questDesc).split(length).map { cl.replace("description" to it) }
                                         } else {
                                             // 条目名称
                                             cl.replace("name" to (taskTrack.name ?: task.displayName())).asList()
