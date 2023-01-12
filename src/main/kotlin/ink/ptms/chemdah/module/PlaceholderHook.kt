@@ -15,7 +15,7 @@ import taboolib.platform.compat.PlaceholderExpansion
  * @author sky
  * @since 2021/3/8 11:07 下午
  */
-object PlaceholderHok : PlaceholderExpansion {
+object PlaceholderHook : PlaceholderExpansion {
 
     override val identifier: String
         get() = "chemdah"

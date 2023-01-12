@@ -85,7 +85,7 @@ class WizardInfo(val root: ConfigurationSection) {
             val b = nodes[i + 1]
             val pathList = createPathfinder(NodeEntity(a, 2.0)).findPath(b, 32f)?.nodes
             if (pathList != null) {
-                path += pathList.map { it.asBlockPos().toLocation(world!!) }
+                path += pathList.map { it.asBlockPos().toLocation(world) }
             }
         }
         return path

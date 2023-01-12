@@ -3,6 +3,11 @@ package ink.ptms.chemdah.core.quest.objective.bukkit
 import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import org.bukkit.event.player.PlayerMoveEvent
+import org.bukkit.event.player.PlayerQuitEvent
+import taboolib.common.platform.event.SubscribeEvent
+import taboolib.common5.Baffle
+import taboolib.platform.util.isMovement
+import java.util.concurrent.TimeUnit
 
 /**
  * Chemdah
@@ -16,11 +21,12 @@ object IPlayerMove : ObjectiveCountableI<PlayerMoveEvent>() {
 
     override val name = "player move"
     override val event = PlayerMoveEvent::class.java
-    override val isAsync = true
+
+    val lock = Baffle.of(200, TimeUnit.MILLISECONDS)
 
     init {
         handler {
-            if (it.from.x != it.to!!.x || it.from.z != it.to!!.z) it.player else null
+            if (it.isMovement() && lock.hasNext(it.player.name)) it.player else null
         }
         addSimpleCondition("position") { data, e ->
             data.toPosition().inside(e.to!!)
@@ -31,5 +37,10 @@ object IPlayerMove : ObjectiveCountableI<PlayerMoveEvent>() {
         addSimpleCondition("position:from") { data, e ->
             data.toPosition().inside(e.from)
         }
+    }
+
+    @SubscribeEvent
+    private fun onQuit(e: PlayerQuitEvent) {
+        lock.reset(e.player.name)
     }
 }

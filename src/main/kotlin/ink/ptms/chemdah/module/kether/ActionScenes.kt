@@ -1,9 +1,7 @@
 package ink.ptms.chemdah.module.kether
 
 import ink.ptms.adyeshach.api.AdyeshachAPI
-import ink.ptms.adyeshach.api.event.AdyeshachEntityTickEvent
 import ink.ptms.adyeshach.common.entity.EntityTypes
-import ink.ptms.adyeshach.common.entity.ai.general.GeneralGravity
 import ink.ptms.adyeshach.common.entity.type.AdyFallingBlock
 import ink.ptms.chemdah.api.event.collect.PlayerEvents
 import ink.ptms.chemdah.module.scenes.ScenesBlockData
@@ -289,24 +287,24 @@ class ActionScenes {
             npc.registerController(AdyeshachAPI.getControllerGenerator("Gravity")!!.generator.apply(npc))
         }
 
-        @SubscribeEvent
-        private fun onTick(e: AdyeshachEntityTickEvent) {
-            val entity = e.entity
-            val manager = entity.manager ?: return
-            if (!manager.isPublic()
-                && entity is AdyFallingBlock
-                && entity.hasTag("chemdah:scenes")
-                && entity.getController().any { it is GeneralGravity }
-                && entity.isControllerOnGround()
-            ) {
-                if (entity.getTag("chemdah:scenes") == "SOLID") {
-                    entity.forViewers {
-                        it.createScenesBlock(entity.getLocation(), entity.material, entity.data)
-                    }
-                }
-                entity.removeTag("chemdah:scenes")
-                entity.delete()
-            }
-        }
+//        @SubscribeEvent
+//        private fun onTick(e: AdyeshachEntityTickEvent) {
+//            val entity = e.entity
+//            val manager = entity.manager ?: return
+//            if (!manager.isPublic()
+//                && entity is AdyFallingBlock
+//                && entity.hasTag("chemdah:scenes")
+//                && entity.getController().any { it is GeneralGravity }
+//                && entity.isControllerOnGround()
+//            ) {
+//                if (entity.getTag("chemdah:scenes") == "SOLID") {
+//                    entity.forViewers {
+//                        it.createScenesBlock(entity.getLocation(), entity.material, entity.data)
+//                    }
+//                }
+//                entity.removeTag("chemdah:scenes")
+//                entity.delete()
+//            }
+//        }
     }
 }

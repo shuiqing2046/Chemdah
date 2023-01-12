@@ -90,11 +90,12 @@ object QuestLoader {
                 // 若该事件被任何任务使用
                 if (using) {
                     // 获取该监听器中的玩家对象
-                    handler.apply(e)?.run {
+                    val player = handler.apply(e) ?: return@registerBukkitListener
+                    if (player.isChemdahProfileLoaded) {
                         if (isAsync) {
-                            submitAsync { handleEvent(this@run, e) }
+                            submitAsync { handleEvent(player, e) }
                         } else {
-                            handleEvent(this, e)
+                            handleEvent(player, e)
                         }
                     }
                 }
@@ -109,11 +110,11 @@ object QuestLoader {
      * @param player 玩家
      * @param event 事件
      */
-    fun <T : Any> handleEvent(player: Player, event: T) {
+    fun <T : Any> Objective<T>.handleEvent(player: Player, event: T) {
         if (player.isChemdahProfileLoaded) {
             player.chemdahProfile.also { profile ->
                 // 通过事件获取所有正在进行的任务条目
-                profile.tasks(event) { (quest, task) -> handleTask(profile, task, quest, event) }
+                profile.tasks(event, this) { (quest, task) -> handleTask(profile, task, quest, event) }
             }
         }
     }
@@ -194,6 +195,7 @@ object QuestLoader {
                     }
                 }
             }
+
             else -> emptyList()
         }
     }

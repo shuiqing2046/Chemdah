@@ -3,7 +3,6 @@ package ink.ptms.chemdah.core.quest.addon
 import com.google.common.cache.CacheBuilder
 import ink.ptms.adyeshach.api.AdyeshachAPI
 import ink.ptms.adyeshach.api.Hologram
-import ink.ptms.adyeshach.api.event.AdyeshachEntityTeleportEvent
 import ink.ptms.adyeshach.common.entity.EntityInstance
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
@@ -30,6 +29,8 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerCommandPreprocessEvent
 import org.bukkit.event.player.PlayerMoveEvent
+import taboolib.common.LifeCycle
+import taboolib.common.platform.Awake
 import taboolib.common.platform.Schedule
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
@@ -592,11 +593,12 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
         }
 
         /**
-         * NPC 移动时刷新 Navigation 导航
+         * 定时刷新 Navigation 导航
          */
-        @SubscribeEvent
-        private fun onMove(e: AdyeshachEntityTeleportEvent) {
-            submitAsync { e.entity.updateTrackLandmark() }
+        @Awake(LifeCycle.ENABLE)
+        @Schedule(period = 40, async = true)
+        private fun onUpdate40() {
+            Bukkit.getOnlinePlayers().forEach { it.displayTrackLandmark() }
         }
 
         @SubscribeEvent

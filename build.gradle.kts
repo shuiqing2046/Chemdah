@@ -40,7 +40,7 @@ taboolib {
     install("expansion-command-helper")
     install("expansion-javascript")
     classifier = null
-    version = "6.0.10-31"
+    version = "6.0.10-59"
     relocate("ink.ptms.um", "ink.ptms.chemdah.um")
     options("keep-kotlin-module")
 }
@@ -53,6 +53,9 @@ repositories {
 }
 
 dependencies {
+    // adyeshach
+    compileOnly("ink.ptms.adyeshach:all:2.0.0-snapshot-1")
+
     taboo("ink.ptms:um:1.0.0-beta-23")
     compileOnly("ink.ptms:error_reporter:1.0.0")
     compileOnly("net.milkbowl.vault:Vault:1")
@@ -96,7 +99,7 @@ dependencies {
     compileOnly("public:Brewery:1.0.0")
     // compileOnly("ink.ptms:Blockdb:1.1.0")
     compileOnly("ink.ptms:Zaphkiel:1.6.0")
-    compileOnly("ink.ptms:Adyeshach:1.5.13-op16")
+    // compileOnly("ink.ptms:Adyeshach:1.5.13-op16")
     compileOnly("ink.ptms:Sandalphon:1.3.0")
     compileOnly("ink.ptms.core:v11900:11900:all-mapped")
     compileOnly("ink.ptms.core:v11400:11400")
