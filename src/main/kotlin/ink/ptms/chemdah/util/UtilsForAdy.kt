@@ -3,7 +3,6 @@ package ink.ptms.chemdah.util
 import ink.ptms.adyeshach.common.entity.EntityInstance
 import ink.ptms.adyeshach.common.entity.ai.general.GeneralGravity
 import ink.ptms.adyeshach.common.entity.ai.general.GeneralMove
-import ink.ptms.adyeshach.core.entity.path.ResultNavigation
 import ink.ptms.chemdah.AdyeshachChecker
 import org.bukkit.Location
 
@@ -15,8 +14,7 @@ fun EntityInstance.controllerMoveWithPathList(location: Location, pathList: List
         return
     }
     if (AdyeshachChecker.isNewVersion) {
-        val rn = ResultNavigation(pathList.map { it.toVector() }.toMutableList(), 0, 0)
-        v2.moveFrames = rn.toInterpolated(getWorld(), moveSpeed, location)
+        v2.controllerMoveBy(pathList)
     } else {
         if (getController().none { it is GeneralMove } || getController().none { it is GeneralGravity }) {
             error("Entity walking movement requires GeneralMove and GeneralGravity.")

@@ -1,6 +1,8 @@
 package ink.ptms.chemdah.module.kether
 
 import ink.ptms.adyeshach.common.entity.EntityInstance
+import ink.ptms.adyeshach.common.entity.EntityTypes
+import ink.ptms.chemdah.AdyeshachChecker
 import ink.ptms.chemdah.module.wizard.WizardSystem
 import taboolib.common.platform.function.warning
 import taboolib.module.kether.*
@@ -37,7 +39,11 @@ object ActionWizard {
                             f.complete(false)
                             return@str null
                         }
-                        wizardInfo.apply(player().cast(), npc.first()!!).thenAccept { success -> f.complete(success) }
+                        try {
+                            wizardInfo.apply(player().cast(), npc.first()!!).thenAccept { success -> f.complete(success) }
+                        } catch (ex: Throwable) {
+                            ex.printStackTrace()
+                        }
                     }
                 }
             }
@@ -55,6 +61,10 @@ object ActionWizard {
     }
 
     fun ScriptContext.getEntities(): List<EntityInstance?>? {
-        return rootFrame().variables().get<List<EntityInstance?>?>("@entities").orElse(null)
+        return if (AdyeshachChecker.isNewVersion) {
+            get<List<Any>?>("@entities")?.map { EntityTypes.adapt(it as ink.ptms.adyeshach.core.entity.EntityInstance) }
+        } else {
+            get<List<Any>?>("@entities")?.map { it as? EntityInstance }
+        }
     }
 }

@@ -19,6 +19,7 @@ import taboolib.common5.Coerce
 import taboolib.expansion.createHelper
 import taboolib.module.chat.TellrawJson
 import taboolib.module.chat.colored
+import taboolib.platform.util.isAir
 import taboolib.platform.util.sendLang
 
 /**
@@ -163,7 +164,7 @@ object CommandChemdahAPI {
     val blockinfo = subCommand {
         execute<Player> { sender, _, _ ->
             val block = sender.getTargetBlock(setOf(Material.AIR), 16)
-            if (block.type.isAir) {
+            if (block.type.isAir()) {
                 sender.sendLang("command-block-info-is-air")
                 return@execute
             }
@@ -181,7 +182,7 @@ object CommandChemdahAPI {
         literal("target") {
             execute<Player> { sender, _, _ ->
                 val block = sender.getTargetBlock(setOf(Material.AIR), 16)
-                if (block.type.isAir) {
+                if (block.type.isAir()) {
                     sender.sendLang("command-block-info-is-air")
                     return@execute
                 }
