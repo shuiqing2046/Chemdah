@@ -40,7 +40,7 @@ taboolib {
     install("expansion-command-helper")
     install("expansion-javascript")
     classifier = null
-    version = "6.0.10-59"
+    version = "6.0.10-61"
     relocate("ink.ptms.um", "ink.ptms.chemdah.um")
     options("keep-kotlin-module")
 }
@@ -54,7 +54,7 @@ repositories {
 
 dependencies {
     // adyeshach
-    compileOnly("ink.ptms.adyeshach:all:2.0.0-snapshot-1")
+    compileOnly("ink.ptms.adyeshach:all:2.0.0-snapshot-4")
 
     taboo("ink.ptms:um:1.0.0-beta-23")
     compileOnly("ink.ptms:error_reporter:1.0.0")
