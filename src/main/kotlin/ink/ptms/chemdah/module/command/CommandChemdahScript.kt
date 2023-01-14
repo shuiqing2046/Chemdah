@@ -109,9 +109,15 @@ object CommandChemdahScript {
             execute<CommandSender> { sender, _, argument ->
                 try {
                     KetherShell.eval(argument, namespace = namespace, sender = adaptCommandSender(sender)).thenApply { v ->
-                        sender.sendMessage("§c[System] §7Result: $v")
+                        try {
+                            Class.forName(v.toString().substringBefore('$'))
+                            sender.sendMessage("§c[System] §7Result: §f${v!!.javaClass.simpleName} §7(Java Object)")
+                        } catch (_: Throwable) {
+                            sender.sendMessage("§c[System] §7Result: §f$v")
+                        }
                     }
                 } catch (ex: Throwable) {
+                    sender.sendMessage("§c[System] §7Error: ${ex.message}")
                     ex.printKetherErrorMessage()
                 }
             }
