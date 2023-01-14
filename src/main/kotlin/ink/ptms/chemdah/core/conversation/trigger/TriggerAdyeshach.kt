@@ -3,6 +3,7 @@ package ink.ptms.chemdah.core.conversation.trigger
 import ink.ptms.adyeshach.api.event.AdyeshachEntityInteractEvent
 import ink.ptms.adyeshach.common.entity.EntityInstance
 import ink.ptms.adyeshach.common.entity.ai.expand.ControllerLookAtPlayerAlways
+import ink.ptms.chemdah.AdyeshachChecker
 import ink.ptms.chemdah.api.ChemdahAPI.conversationSession
 import ink.ptms.chemdah.api.event.collect.ConversationEvents
 import ink.ptms.chemdah.core.conversation.Conversation
@@ -29,7 +30,7 @@ internal object TriggerAdyeshach {
     fun onBegin(e: ConversationEvents.Begin) {
         val npc = e.session.source.entity
         if (npc is EntityInstance) {
-            npc.setTag("isFreeze", "true")
+            npc.isFreeze = true
             npc.setTag("conversation:${e.session.player.name}", "conversation")
             // 让 NPC 看向玩家
             if (e.conversation.hasFlag("LOOK_PLAYER")) {
@@ -54,7 +55,7 @@ internal object TriggerAdyeshach {
             // 若没有玩家在与该 NPC 对话
             if (npc.getTags().none { it.value == "conversation" }) {
                 // 移除冻结标记
-                npc.removeTag("isFreeze")
+                npc.isFreeze = false
                 // 移除 LookAtPlayerAlways 控制器
                 if (npc.hasTag("conversation-controller")) {
                     npc.removeTag("conversation-controller")
@@ -115,8 +116,13 @@ internal object TriggerAdyeshach {
         }
         // 打开对话
         return open(player, source) {
-            it.variables["@manager"] = entityInstance.manager
-            it.variables["@entities"] = listOf(entityInstance)
+            if (AdyeshachChecker.isNewVersion) {
+                it.variables["@manager"] = entityInstance.manager?.v2()
+                it.variables["@entities"] = listOf(entityInstance.v2)
+            } else {
+                it.variables["@manager"] = entityInstance.manager
+                it.variables["@entities"] = listOf(entityInstance)
+            }
         }
     }
 }
