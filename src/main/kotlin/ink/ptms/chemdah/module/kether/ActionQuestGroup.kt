@@ -32,7 +32,7 @@ object ActionQuestGroup {
                             future.complete(false)
                         } else {
                             val profile = getProfile()
-                            future.complete(templateGroup.group.all { t -> profile.getQuestById(t.id) != null })
+                            future.complete(templateGroup.quests.all { t -> profile.getQuestById(t.id) != null })
                         }
                     }
                 }
@@ -46,7 +46,7 @@ object ActionQuestGroup {
                             future.complete(false)
                         } else {
                             val profile = getProfile()
-                            future.complete(templateGroup.group.all { t -> profile.isQuestCompleted(t) })
+                            future.complete(templateGroup.quests.all { t -> profile.isQuestCompleted(t) })
                         }
                     }
                 }

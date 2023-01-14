@@ -114,7 +114,7 @@ object QuestLoader {
         if (player.isChemdahProfileLoaded) {
             player.chemdahProfile.also { profile ->
                 // 通过事件获取所有正在进行的任务条目
-                profile.tasks(event, this) { (quest, task) -> handleTask(profile, task, quest, event) }
+                profile.tasks(this) { (quest, task) -> handleTask(profile, task, quest, event) }
             }
         }
     }

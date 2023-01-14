@@ -3,13 +3,9 @@ package ink.ptms.chemdah.core.quest.addon
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.api.event.collect.ObjectiveEvents
-import ink.ptms.chemdah.core.quest.Id
-import ink.ptms.chemdah.core.quest.Option
-import ink.ptms.chemdah.core.quest.QuestContainer
-import ink.ptms.chemdah.core.quest.Task
+import ink.ptms.chemdah.core.quest.*
 import org.bukkit.entity.Player
 import taboolib.common.platform.event.SubscribeEvent
-import taboolib.common.util.asList
 
 /**
  * Chemdah
@@ -26,31 +22,42 @@ import taboolib.common.util.asList
 @Option(Option.Type.TEXT)
 class AddonDepend(root: String, questContainer: QuestContainer) : Addon(root, questContainer) {
 
-    val depend = if (root.startsWith("group:")) {
-        ChemdahAPI.getQuestTemplateGroup(root)?.group?.map { it.id }?.toList()
-    } else {
-        root.asList()
+    val depend = root.split("[,;]".toRegex()).flatMap {
+        // 任务组
+        if (it.startsWith("group:")) {
+            // 从任务组中获取所有任务名称
+            ChemdahAPI.getQuestTemplateGroup(root.substringAfter("group:"))?.quests?.map { q -> q.id } ?: emptyList()
+        } else {
+            listOf(it)
+        }
     }
 
     companion object {
 
         fun QuestContainer.depend() = addon<AddonDepend>("depend")?.depend
 
+        /**
+         * 检查任务依赖是否完成
+         */
         fun QuestContainer.isQuestDependCompleted(player: Player): Boolean {
-            // 任务依赖
-            val questDepend = if (this is Task) template.depend() else depend()
-            if (questDepend != null) {
-                if (questDepend.any { !player.chemdahProfile.isQuestCompleted(it) }) {
-                    return false
+            when (this) {
+                // 是任务，只能依赖任务
+                is Template -> {
+                    val depends = depend() ?: return true
+                    return depends.all { player.chemdahProfile.isQuestCompleted(it) }
                 }
-            }
-            // 条目依赖
-            if (this is Task) {
-                val taskDepend = depend()
-                if (taskDepend != null) {
-                    val taskMap = template.taskMap
-                    if (taskDepend.any { taskMap[it]?.isCompleted(player.chemdahProfile) != true }) {
-                        return false
+                // 是条目，可以依赖任务或条目
+                is Task -> {
+                    val depends = depend() ?: return true
+                    val tasks = template.taskMap
+                    return depends.all {
+                        // 是当前任务中的条目
+                        if (tasks.containsKey(it)) {
+                            // 检查条目是否完成
+                            tasks[it]!!.isCompleted(player.chemdahProfile)
+                        } else {
+                            player.chemdahProfile.isQuestCompleted(it)
+                        }
                     }
                 }
             }

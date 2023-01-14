@@ -181,11 +181,10 @@ class PlayerProfile(val uniqueId: UUID) {
     }
 
     /**
-     * 通过事件和 Objective 获取所有正在进行中的有效条目（有效任务）
+     * 通过 Objective 获取所有正在进行中的有效条目（有效任务）
      */
-    fun tasks(event: Any, objective: Objective<*>, func: Consumer<Couple<Quest, Task>>) {
-        val quest = getQuestById(objective.name, true) ?: return
-        quest.tasks.filter { it.objective.isListener && it.objective.event.isInstance(event) }.forEach { func.accept(Couple(quest, it)) }
+    fun tasks(objective: Objective<*>, func: Consumer<Couple<Quest, Task>>) {
+        getQuests(true).forEach { quest -> quest.tasks.filter { it.objective == objective }.forEach { func.accept(Couple(quest, it)) } }
     }
 
     /**
