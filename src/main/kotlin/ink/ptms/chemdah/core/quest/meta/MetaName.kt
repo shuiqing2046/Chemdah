@@ -21,6 +21,7 @@ class MetaName(source: String?, questContainer: QuestContainer) : Meta<String?>(
 
     companion object {
 
+        /** 获取展示名称 */
         fun QuestContainer.displayName(colored: Boolean = true): String {
             val displayName = meta<MetaName>("name")?.displayName ?: if (this is Task) template.displayName(colored) else id
             return if (colored) displayName.colored() else displayName

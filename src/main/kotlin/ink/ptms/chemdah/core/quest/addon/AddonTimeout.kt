@@ -17,7 +17,10 @@ import java.text.SimpleDateFormat
 @Option(Option.Type.TEXT)
 class AddonTimeout(root: String, questContainer: QuestContainer) : Addon(root, questContainer) {
 
+    /** 超时周期 */
     val timeout = root.parseTimeCycle()
+
+    /** 现实时间 */
     val real = try {
         SimpleDateFormat("yyyy/M/d H:m").parse(root).time
     } catch (ignore: Throwable) {
@@ -26,6 +29,7 @@ class AddonTimeout(root: String, questContainer: QuestContainer) : Addon(root, q
 
     companion object {
 
+        /** 任务是否超时 */
         fun QuestContainer.isTimeout(startTime: Long): Boolean {
             val meta = addon<AddonTimeout>("timeout") ?: return false
             return (meta.real > 0 && meta.real < System.currentTimeMillis()) || meta.timeout.start(startTime)?.isTimeout(startTime) == true

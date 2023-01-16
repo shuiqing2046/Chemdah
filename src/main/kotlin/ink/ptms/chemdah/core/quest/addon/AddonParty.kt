@@ -39,6 +39,7 @@ class AddonParty(config: ConfigurationSection, questContainer: QuestContainer) :
 
     companion object {
 
+        /** 获取组队组件 */
         fun QuestContainer.party() = addon<AddonParty>("party")
     }
 }

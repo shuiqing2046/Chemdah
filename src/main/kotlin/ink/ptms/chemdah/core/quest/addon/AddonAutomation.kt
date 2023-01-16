@@ -72,10 +72,13 @@ class AddonAutomation(source: ConfigurationSection, questContainer: QuestContain
 
     companion object {
 
+        /** 是否自动接受 */
         fun Template.isAutoAccept() = addon<AddonAutomation>("automation")?.isAutoAccept ?: false
 
+        /** 获取计划组件 */
         fun Template.plan() = addon<AddonAutomation>("automation")?.plan
 
+        /** 获取计划组 */
         fun Template.planGroup() = addon<AddonAutomation>("automation")?.planGroup
 
         @Schedule(period = 40, async = true)

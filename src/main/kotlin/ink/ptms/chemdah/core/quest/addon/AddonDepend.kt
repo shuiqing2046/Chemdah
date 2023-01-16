@@ -34,11 +34,10 @@ class AddonDepend(root: String, questContainer: QuestContainer) : Addon(root, qu
 
     companion object {
 
+        /** 获取依赖组件 */
         fun QuestContainer.depend() = addon<AddonDepend>("depend")?.depend
 
-        /**
-         * 检查任务依赖是否完成
-         */
+        /** 检查任务依赖是否完成 */
         fun QuestContainer.isQuestDependCompleted(player: Player): Boolean {
             when (this) {
                 // 是任务，只能依赖任务

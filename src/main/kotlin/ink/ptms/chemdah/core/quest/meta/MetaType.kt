@@ -17,10 +17,11 @@ import taboolib.common.util.asList
 @Option(Option.Type.ANY)
 class MetaType(source: Any?, questContainer: QuestContainer) : Meta<Any?>(source, questContainer) {
 
-    val type = source?.asList()?.flatMap { it.split(";") }?.map { it.trim() } ?: emptyList()
+    val type = source?.asList()?.flatMap { it.split("[,;]".toRegex()) }?.map { it.trim() } ?: emptyList()
 
     companion object {
 
+        /** 获取任务类型 Meta */
         fun Template.type() = meta<MetaType>("type")?.type ?: emptyList()
     }
 }

@@ -16,8 +16,14 @@ import taboolib.module.navigation.NodeEntity
 import taboolib.module.navigation.createPathfinder
 import taboolib.platform.util.toProxyLocation
 
+/**
+ * 空坐标单例
+ */
 object NullLocation : Location(null, 0.0, 0.0, 0.0)
 
+/**
+ * 追踪中心接口
+ */
 interface TrackCenter {
 
     fun identifier(): String
@@ -25,6 +31,9 @@ interface TrackCenter {
     fun getLocation(player: Player): Location?
 }
 
+/**
+ * 空追踪中心单例
+ */
 object NullTrackCenter : TrackCenter {
 
     override fun identifier() = "null"
@@ -32,6 +41,9 @@ object NullTrackCenter : TrackCenter {
     override fun getLocation(player: Player) = null
 }
 
+/**
+ * 信标追踪配置
+ */
 class TrackBeacon(val config: ConfigurationSection, val root: ConfigurationSection) {
 
     /**
@@ -87,6 +99,9 @@ class TrackBeacon(val config: ConfigurationSection, val root: ConfigurationSecti
     }
 }
 
+/**
+ * 地标追踪配置
+ */
 class TrackLandmark(val config: ConfigurationSection, val root: ConfigurationSection) {
 
     /**
@@ -110,6 +125,9 @@ class TrackLandmark(val config: ConfigurationSection, val root: ConfigurationSec
     val distance = config.getDouble("landmark-option.distance", root.getDouble("distance"))
 }
 
+/**
+ * 导航追踪配置
+ */
 class TrackNavigation(val config: ConfigurationSection, val root: ConfigurationSection) {
 
     /**
@@ -213,6 +231,9 @@ class TrackNavigation(val config: ConfigurationSection, val root: ConfigurationS
     }
 }
 
+/**
+ * 记分板追踪配置
+ */
 class TrackScoreboard(val config: ConfigurationSection, val root: ConfigurationSection) {
 
     class Line(val content: List<String>) {

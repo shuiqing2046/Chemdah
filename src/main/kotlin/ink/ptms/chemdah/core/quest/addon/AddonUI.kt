@@ -41,6 +41,7 @@ class AddonUI(root: ConfigurationSection, questContainer: QuestContainer) : Addo
 
     companion object {
 
+        /** 获取 UI 组件 */
         fun Template.ui() = addon<AddonUI>("ui")
     }
 }

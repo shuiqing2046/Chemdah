@@ -164,63 +164,10 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
 
     companion object {
 
-        private val statsMap = ConcurrentHashMap<String, StatsMap>()
+        /** 状态显示花怒操你 */
+        val statsMap = ConcurrentHashMap<String, StatsMap>()
 
-        @Schedule(period = 20)
-        internal fun bossBarRemove20() {
-            statsMap.forEach { (_, statsMap) ->
-                statsMap.bossBar.forEach {
-                    if (it.value.value < System.currentTimeMillis()) {
-                        it.value.key.removeAll()
-                        statsMap.bossBar.remove(it.key)
-                    }
-                }
-            }
-        }
-
-        @SubscribeEvent
-        private fun onReleased(e: PlayerEvents.Released) {
-            statsMap.remove(e.player.name)
-        }
-
-        @SubscribeEvent
-        private fun onSelected(e: PlayerEvents.Selected) {
-            e.playerProfile.getQuests().forEach { quest ->
-                quest.getMembers(self = true).forEach {
-                    quest.refreshStatusAlwaysType(it.chemdahProfile)
-                }
-            }
-        }
-
-        @SubscribeEvent
-        private fun onRegistered(e: QuestEvents.Registered) {
-            e.quest.getMembers(self = true).forEach {
-                e.quest.refreshStatusAlwaysType(it.chemdahProfile)
-            }
-        }
-
-        @SubscribeEvent
-        private fun onUnregistered(e: QuestEvents.Unregistered) {
-            e.quest.getMembers(self = true).forEach {
-                e.quest.hiddenStats(it.chemdahProfile)
-            }
-        }
-
-        @SubscribeEvent
-        private fun onCompletePost(e: ObjectiveEvents.Complete.Post) {
-            e.quest.getMembers(self = true).forEach {
-                e.task.hiddenStats(it.chemdahProfile)
-            }
-        }
-
-        @SubscribeEvent
-        private fun onContinuePost(e: ObjectiveEvents.Continue.Post) {
-            e.quest.getMembers(self = true).forEach {
-                e.task.refreshStats(it.chemdahProfile)
-                e.quest.template.refreshStats(it.chemdahProfile)
-            }
-        }
-
+        /** 获取状态显示组件 */
         fun QuestContainer.stats() = addon<AddonStats>("stats")
 
         /**
@@ -316,12 +263,10 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
                 }
             }
             // 条目
-            tasks.forEach {
-                if (it.stats()?.visibleAlways == true) {
-                    it.statsDisplay(profile).thenApply { bossBar ->
-                        if (bossBar != null) {
-                            statsMap.bossBarAlways.put(it.path, bossBar)?.removeAll()
-                        }
+            tasks.filter { it.stats()?.visibleAlways == true }.forEach {
+                it.statsDisplay(profile).thenApply { bossBar ->
+                    if (bossBar != null) {
+                        statsMap.bossBarAlways.put(it.path, bossBar)?.removeAll()
                     }
                 }
             }
@@ -334,6 +279,7 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
             val stats = stats() ?: return
             val statsMap = statsMap.computeIfAbsent(profile.player.name) { StatsMap() }
             when {
+                // 持续可见
                 stats.visibleAlways -> {
                     val bossBar = statsMap.bossBarAlways[path]
                     if (bossBar == null) {
@@ -349,6 +295,7 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
                         }
                     }
                 }
+                // 短暂可见
                 stats.visible -> {
                     val bossBar = statsMap.bossBar[path]
                     if (bossBar == null) {
@@ -365,6 +312,61 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
                         }
                     }
                 }
+            }
+        }
+
+        @Schedule(period = 20)
+        internal fun bossBarRemove20() {
+            statsMap.forEach { (_, statsMap) ->
+                statsMap.bossBar.forEach {
+                    if (it.value.value < System.currentTimeMillis()) {
+                        it.value.key.removeAll()
+                        statsMap.bossBar.remove(it.key)
+                    }
+                }
+            }
+        }
+
+        @SubscribeEvent
+        private fun onReleased(e: PlayerEvents.Released) {
+            statsMap.remove(e.player.name)
+        }
+
+        @SubscribeEvent
+        private fun onSelected(e: PlayerEvents.Selected) {
+            e.playerProfile.getQuests().forEach { quest ->
+                quest.getMembers(self = true).forEach {
+                    quest.refreshStatusAlwaysType(it.chemdahProfile)
+                }
+            }
+        }
+
+        @SubscribeEvent
+        private fun onRegistered(e: QuestEvents.Registered) {
+            e.quest.getMembers(self = true).forEach {
+                e.quest.refreshStatusAlwaysType(it.chemdahProfile)
+            }
+        }
+
+        @SubscribeEvent
+        private fun onUnregistered(e: QuestEvents.Unregistered) {
+            e.quest.getMembers(self = true).forEach {
+                e.quest.hiddenStats(it.chemdahProfile)
+            }
+        }
+
+        @SubscribeEvent
+        private fun onCompletePost(e: ObjectiveEvents.Complete.Post) {
+            e.quest.getMembers(self = true).forEach {
+                e.task.hiddenStats(it.chemdahProfile)
+            }
+        }
+
+        @SubscribeEvent
+        private fun onContinuePost(e: ObjectiveEvents.Continue.Post) {
+            e.quest.getMembers(self = true).forEach {
+                e.task.refreshStats(it.chemdahProfile)
+                e.quest.template.refreshStats(it.chemdahProfile)
             }
         }
     }

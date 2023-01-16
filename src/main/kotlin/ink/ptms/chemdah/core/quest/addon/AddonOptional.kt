@@ -21,6 +21,7 @@ class AddonOptional(val value: Boolean, task: Task) : Addon(value, task) {
 
     companion object {
 
+        /** 是否可选条目 */
         fun Task.isOptional() = addon<AddonOptional>("optional")?.value == true
     }
 }

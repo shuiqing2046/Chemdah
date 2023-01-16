@@ -13,18 +13,31 @@ import taboolib.module.kether.KetherShell
 import taboolib.module.kether.printKetherErrorMessage
 import java.util.concurrent.CompletableFuture
 
+/**
+ * 管控结果
+ *
+ * @param pass 是否通过
+ * @param reason 理由
+ */
 data class ControlResult(val pass: Boolean, val reason: String? = null)
 
+/**
+ * 管控触发器
+ */
 enum class ControlTrigger {
 
     ACCEPT, FAIL, COMPLETE;
 
     companion object {
 
+        /** 从字符串获取枚举 */
         fun fromName(name: String) = Enums.getIfPresent(ControlTrigger::class.java, name.uppercase()).or(COMPLETE)!!
     }
 }
 
+/**
+ * 管控
+ */
 abstract class Control {
 
     abstract val trigger: ControlTrigger?
@@ -38,7 +51,10 @@ abstract class Control {
     }
 }
 
-class ControlAgent(val agent: List<String>) : Control() {
+/**
+ * 管控：脚本代理
+ */
+open class ControlAgent(val agent: List<String>) : Control() {
 
     override val trigger: ControlTrigger?
         get() = null
@@ -62,7 +78,14 @@ class ControlAgent(val agent: List<String>) : Control() {
     }
 }
 
-class ControlCooldown(val type: ControlTrigger, val time: TimeCycle, val group: String?) : Control() {
+/**
+ * 管控：冷却
+ *
+ * @param type 管控触发器类型
+ * @param time 间隔
+ * @param group 组
+ */
+open class ControlCooldown(val type: ControlTrigger, val time: TimeCycle, val group: String?) : Control() {
 
     override val trigger: ControlTrigger
         get() = type
@@ -79,6 +102,11 @@ class ControlCooldown(val type: ControlTrigger, val time: TimeCycle, val group: 
     }
 }
 
+/**
+ * 管控：共存
+ *
+ * @param type 标签与数量
+ */
 class ControlCoexist(val type: Map<String, Int>) : Control() {
 
     override val trigger: ControlTrigger?
@@ -96,7 +124,15 @@ class ControlCoexist(val type: Map<String, Int>) : Control() {
     }
 }
 
-class ControlRepeat(val type: ControlTrigger, val amount: Int, val period: TimeCycle?, val group: String?) : Control() {
+/**
+ * 管控：重复
+ *
+ * @param type 管控触发器类型
+ * @param amount 重复数量
+ * @param period 刷新周期
+ * @param group 组
+ */
+open class ControlRepeat(val type: ControlTrigger, val amount: Int, val period: TimeCycle?, val group: String?) : Control() {
 
     override val trigger: ControlTrigger
         get() = type
@@ -126,7 +162,10 @@ class ControlRepeat(val type: ControlTrigger, val amount: Int, val period: TimeC
     }
 }
 
-class ControlOperator(val template: Template, val control: List<Control>?) {
+/**
+ * 管控控制器
+ */
+open class ControlOperator(val template: Template, val control: List<Control>?) {
 
     /**
      * 任务是否被限制接受
