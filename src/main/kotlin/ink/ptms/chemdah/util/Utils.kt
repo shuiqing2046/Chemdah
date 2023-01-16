@@ -13,6 +13,7 @@ import taboolib.library.configuration.ConfigurationSection
 import taboolib.library.reflex.Reflex.Companion.setProperty
 import taboolib.library.xseries.XBlock
 import taboolib.library.xseries.XMaterial
+import taboolib.module.chat.colored
 import taboolib.module.configuration.Configuration
 import taboolib.module.nms.MinecraftVersion
 import taboolib.platform.type.BukkitProxyEvent
@@ -131,20 +132,12 @@ fun Location.toCenter(): Location {
 
 /**
  * 获取字符串的真实长度（对中文进行处理）
- *
- * @return [Int]
  */
 fun String.realLength(): Int {
     val regex = "[\u3091-\uFFe5]".toRegex()
     return sumBy { if (it.toString().matches(regex)) 2 else 1 }
 }
 
-/**
- * 替换字符串中的变量
- *
- * @param vars 变量
- * @return [String]
- */
 fun String.replace(vararg vars: Pair<String, Any>): String {
     var r = this
     vars.forEach { r = r.replace("[\\[{]${it.first}[]}]".toRegex(), it.second.toString()) }
@@ -157,12 +150,12 @@ fun String.replace(vararg key: String, rep: Any): String {
     return r
 }
 
-fun String.startsWith(vararg prefix: String): Boolean {
+fun String.startsWithAny(vararg prefix: String): Boolean {
     return prefix.any { startsWith(it) }
 }
 
-fun String.substringAfter(vararg morePrefix: String): String {
-    return substringAfter(morePrefix.firstOrNull { startsWith(it) } ?: return this)
+fun String.substringAfterAny(vararg morePrefix: String): String {
+    return substringAfter(morePrefix.firstOrNull { startsWithAny(it) } ?: return this)
 }
 
 fun String.contains(vararg value: String): Boolean {
@@ -249,4 +242,25 @@ fun <T, R> T.to(transform: (T) -> R): R {
 
 fun Any.asListOrLines(): List<String> {
     return if (this is String) lines() else asList()
+}
+
+fun List<String>.splitBy(size: Int) = colored().flatMap { line ->
+    if (line.length > size) {
+        val arr = ArrayList<String>()
+        var s = line
+        while (s.length > size) {
+            val c = s.substring(0, size)
+            val i = c.lastIndexOf("§")
+            arr.add(c)
+            s = if (i != -1 && i + 2 < c.length) {
+                s.substring(i, i + 2) + s.substring(size)
+            } else {
+                s.substring(size)
+            }
+        }
+        arr.add(s)
+        arr
+    } else {
+        line.asList()
+    }
 }

@@ -21,9 +21,6 @@ class QuestEvents {
      */
     class Agent(val questContainer: QuestContainer, val playerProfile: PlayerProfile, val agentType: AgentType, val restrict: String): BukkitProxyEvent()
 
-    @Deprecated("请使用 ChemdahAPI.eventFactory")
-    class Collect(val quests: MutableList<Quest>, val playerProfile: PlayerProfile): BukkitProxyEvent()
-
     /**
      * 当任务接受时
      */
@@ -97,4 +94,7 @@ class QuestEvents {
         override val allowCancelled: Boolean
             get() = false
     }
+
+    @Deprecated("请使用 ChemdahAPI.eventFactory")
+    class Collect(val quests: MutableList<Quest>, val playerProfile: PlayerProfile): BukkitProxyEvent()
 }

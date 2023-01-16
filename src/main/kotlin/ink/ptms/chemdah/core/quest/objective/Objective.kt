@@ -13,6 +13,7 @@ import ink.ptms.chemdah.util.Function3
 import ink.ptms.chemdah.util.safely
 import org.bukkit.entity.Player
 import taboolib.common.platform.event.EventPriority
+import taboolib.common.platform.function.warning
 import java.util.concurrent.CompletableFuture
 import java.util.function.Function
 
@@ -123,7 +124,15 @@ abstract class Objective<E : Any> {
      * 简化版本
      */
     fun addSimpleCondition(name: String, func: Function2<Data, E, Boolean>) {
-        conditions[name] = Function3 { _, task, e -> func(task.condition[name]!!, e) }
+        conditions[name] = Function3 { _, task, e ->
+            try {
+                func(task.condition[name]!!, e)
+            } catch (ex: NoSuchMethodError) {
+                warning("The condition \"$name\" is not compatible with the current minecraft version:")
+                warning(ex.message)
+                false
+            }
+        }
     }
 
     /**

@@ -16,9 +16,7 @@ class LevelReward(val level: List<Int>, val script: List<String>) {
 
     fun eval(player: Player, level: Int) {
         try {
-            KetherShell.eval(script, sender = adaptPlayer(player)) {
-                rootFrame().variables().set("level", level)
-            }
+            KetherShell.eval(script, sender = adaptPlayer(player)) { set("level", level) }
         } catch (ex: Exception) {
             ex.printKetherErrorMessage()
         }

@@ -37,7 +37,7 @@ class ActionScript {
                             val scriptId = if (self) "$name@${frame.getBukkitPlayer().name}" else name
                             val scriptContext = ScriptContext.create(script) {
                                 sender = adaptPlayer(frame.getBukkitPlayer())
-                                args.forEachIndexed { index, any -> rootFrame().variables().set("arg$index", any) }
+                                args.forEachIndexed { index, any -> set("arg$index", any) }
                             }
                             ChemdahAPI.workspace.runScript(scriptId, scriptContext).thenAccept { future.complete(it) }
                         }

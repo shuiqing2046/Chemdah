@@ -16,10 +16,13 @@ import java.io.File
 class TemplateEvents {
 
     /**
-     * 当模板被加载
+     * 当模板被加载时
      */
     class Load(val file: File?, val id: String, val root: ConfigurationSection): BukkitProxyEvent()
 
+    /**
+     * 控制器挂钩事件
+     */
     class ControlHook(val template: Template, val type: String, val map: Map<String, Any>) : BukkitProxyEvent() {
 
         override val allowCancelled: Boolean

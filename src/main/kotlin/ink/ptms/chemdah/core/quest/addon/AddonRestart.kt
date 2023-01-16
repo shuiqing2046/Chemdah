@@ -39,9 +39,7 @@ class AddonRestart(root: Any?, questContainer: QuestContainer) : Addon(root, que
                 } else {
                     try {
                         KetherShell.eval(reset, sender = adaptPlayer(profile.player), namespace = namespaceQuest) {
-                            rootFrame().variables().also { vars ->
-                                vars.set("@QuestContainer", this@canRestart)
-                            }
+                            set("@QuestContainer", this@canRestart)
                         }.thenApply {
                             future.complete(Coerce.toBoolean(it))
                         }

@@ -9,8 +9,8 @@ import ink.ptms.chemdah.core.quest.addon.data.*
 import org.bukkit.Bukkit
 import taboolib.common.platform.Schedule
 import taboolib.common.platform.function.console
-import taboolib.common5.Coerce
 import taboolib.common5.RealTime
+import taboolib.common5.cint
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.module.lang.sendLang
 import java.util.*
@@ -36,22 +36,22 @@ class AddonAutomation(source: ConfigurationSection, questContainer: QuestContain
             "hour" -> PlanTypeHour(
                 method,
                 RealTime.Type.HOUR,
-                Coerce.toInteger(args[1]),
+                args[1].cint,
             )
             "day", "daily" -> PlanTypeDaily(
                 method,
                 RealTime.Type.DAY,
-                Coerce.toInteger(args[1]),
-                Coerce.toInteger(args.getOrNull(2) ?: 6),
-                Coerce.toInteger(args.getOrNull(3) ?: 0)
+                args[1].cint,
+                args.getOrNull(2)?.cint ?: 6,
+                args.getOrNull(3)?.cint ?: 0
             )
             "week", "weekly" -> PlanTypeWeekly(
                 method,
                 RealTime.Type.WEEK,
-                Coerce.toInteger(args[1]),
-                Coerce.toInteger(args.getOrNull(2) ?: 0),
-                Coerce.toInteger(args.getOrNull(3) ?: 6),
-                Coerce.toInteger(args.getOrNull(4) ?: 0)
+                args[1].cint,
+                args.getOrNull(2)?.cint ?: 6,
+                args.getOrNull(3)?.cint ?: 0,
+                args.getOrNull(4)?.cint ?: 0
             )
             else -> null
         }

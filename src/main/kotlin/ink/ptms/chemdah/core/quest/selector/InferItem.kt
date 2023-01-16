@@ -2,8 +2,8 @@ package ink.ptms.chemdah.core.quest.selector
 
 import ink.ptms.chemdah.api.event.InferItemHookEvent
 import ink.ptms.chemdah.core.quest.selector.Flags.Companion.matchType
-import ink.ptms.chemdah.util.startsWith
-import ink.ptms.chemdah.util.substringAfter
+import ink.ptms.chemdah.util.startsWithAny
+import ink.ptms.chemdah.util.substringAfterAny
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
@@ -70,14 +70,14 @@ class InferItem(val items: List<Item>) {
                     // 其他选项
                     else -> when {
                         // 附魔等级
-                        it.key.startsWith("ench.", "enchant.", "enchantment.") -> {
-                            val ench = it.key.substringAfter("ench.", "enchant.", "enchantment.")
+                        it.key.startsWithAny("ench.", "enchant.", "enchantment.") -> {
+                            val ench = it.key.substringAfterAny("ench.", "enchant.", "enchantment.")
                             val level = meta?.enchants?.entries?.firstOrNull { e -> e.key.name.equals(ench, true) } ?: 0
                             it.check(level)
                         }
                         // NBT
-                        it.key.startsWith("nbt.", "tag.") -> {
-                            val data = item.getItemTag().getDeep(it.key.substringAfter("nbt.", "tag."))?.unsafeData()
+                        it.key.startsWithAny("nbt.", "tag.") -> {
+                            val data = item.getItemTag().getDeep(it.key.substringAfterAny("nbt.", "tag."))?.unsafeData()
                             if (data != null) it.check(data) else false
                         }
                         // 扩展

@@ -1,5 +1,9 @@
 package ink.ptms.chemdah.core.quest.addon.data
 
+import com.google.common.cache.Cache
+import com.google.common.cache.CacheBuilder
+import ink.ptms.adyeshach.api.AdyeshachAPI
+import ink.ptms.chemdah.core.quest.selector.InferArea
 import ink.ptms.chemdah.util.Effects
 import ink.ptms.chemdah.util.asListOrLines
 import org.bukkit.Location
@@ -15,6 +19,7 @@ import taboolib.module.chat.colored
 import taboolib.module.navigation.NodeEntity
 import taboolib.module.navigation.createPathfinder
 import taboolib.platform.util.toProxyLocation
+import java.util.concurrent.TimeUnit
 
 /**
  * 空坐标单例
@@ -39,6 +44,35 @@ object NullTrackCenter : TrackCenter {
     override fun identifier() = "null"
 
     override fun getLocation(player: Player) = null
+}
+
+/**
+ * Location 追踪中心
+ */
+class LocationTrackCenter(val center: String) : TrackCenter {
+
+    override fun identifier(): String = center
+
+    override fun getLocation(player: Player): Location {
+        return InferArea.Single(center, false).positions[0].clone()
+    }
+}
+
+/**
+ * Adyeshach 追踪中心
+ */
+class AdyeshachTrackCenter(val id: String) : TrackCenter {
+
+    // 坐标缓存
+    val cache: Cache<String, Location> = CacheBuilder.newBuilder().expireAfterWrite(250, TimeUnit.MILLISECONDS).build()
+
+    override fun identifier(): String = id
+
+    override fun getLocation(player: Player): Location? {
+        // 获取缓存坐标
+        val loc = cache.get(player.name) { AdyeshachAPI.getEntityFromId(id, player)?.getLocation()?.add(0.0, 1.0, 0.0) ?: NullLocation }
+        return if (loc is NullLocation) null else loc
+    }
 }
 
 /**

@@ -316,7 +316,7 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
         }
 
         @Schedule(period = 20)
-        internal fun bossBarRemove20() {
+        private fun bossBarRemove20() {
             statsMap.forEach { (_, statsMap) ->
                 statsMap.bossBar.forEach {
                     if (it.value.value < System.currentTimeMillis()) {

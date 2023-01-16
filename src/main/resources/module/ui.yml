@@ -113,6 +113,7 @@ default:
           - '&8UNTRACKED'
       unavailable:
         material: gray_stained_glass_pane
+        name: '&7'
   # 包含任务
   include:
     L1:

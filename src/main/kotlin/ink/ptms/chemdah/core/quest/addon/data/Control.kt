@@ -62,9 +62,7 @@ open class ControlAgent(val agent: List<String>) : Control() {
     override fun check(profile: PlayerProfile, template: Template): CompletableFuture<ControlResult> {
         return try {
             KetherShell.eval(agent.asList(), sender = adaptPlayer(profile.player), namespace = namespaceQuest) {
-                rootFrame().variables().also { vars ->
-                    vars.set("@QuestContainer", template)
-                }
+                set("@QuestContainer", template)
             }.thenApply {
                 Coerce.toBoolean(it).toResult("agent")
             }

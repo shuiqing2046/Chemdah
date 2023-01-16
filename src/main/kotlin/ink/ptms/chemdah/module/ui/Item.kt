@@ -36,8 +36,8 @@ open class Item(val config: ConfigurationSection) {
     /**
      * 进行 Kether 格式化并进行颜色替换
      */
-    protected fun format(str: String, player: PlayerProfile, ui: UI, template: Template): String {
-        return KetherFunction.parse(str,
+    protected fun format(str: String?, player: PlayerProfile, ui: UI, template: Template): String {
+        return KetherFunction.parse(str ?: return "null",
             namespace = namespaceQuestUI,
             sender = adaptCommandSender(player.player),
             vars = KetherShell.VariableMap("@QuestUI" to ui, "@QuestSelected" to template.node)

@@ -117,11 +117,9 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
             if (cur < agent.size) {
                 try {
                     KetherShell.eval(agent[cur].action, sender = adaptPlayer(profile.player), namespace = agentType.namespaceAll()) {
-                        rootFrame().variables().also { vars ->
-                            vars.set("reason", reason)
-                            vars.set("@QuestSelected", node)
-                            vars.set("@QuestContainer", this@QuestContainer)
-                        }
+                        set("reason", reason)
+                        set("@QuestSelected", node)
+                        set("@QuestContainer", this@QuestContainer)
                     }.thenApply {
                         if (it is Boolean && !it) {
                             future.complete(false)

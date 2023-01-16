@@ -189,7 +189,7 @@ object LevelSystem : Module {
                         override fun getExp(level: Int): CompletableFuture<Int> {
                             return try {
                                 KetherShell.eval(section.getString("experience.math").toString()) {
-                                    rootFrame().variables().set("level", level)
+                                    set("level", level)
                                 }.thenApply {
                                     Coerce.toInteger(it)
                                 }

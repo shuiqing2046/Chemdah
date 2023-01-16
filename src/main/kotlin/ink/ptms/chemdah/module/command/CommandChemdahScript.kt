@@ -136,7 +136,7 @@ object CommandChemdahScript {
                 }
                 var i = 0
                 while (i < args.size) {
-                    rootFrame().variables().set("arg${i}", args[i])
+                    set("arg${i}", args[i])
                     i++
                 }
             }

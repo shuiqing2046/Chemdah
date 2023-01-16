@@ -1,6 +1,7 @@
 package ink.ptms.chemdah.api.event.collect
 
 import ink.ptms.chemdah.core.PlayerProfile
+import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.Template
 import ink.ptms.chemdah.module.level.LevelOption
 import ink.ptms.chemdah.module.scenes.ScenesBlockData
@@ -48,6 +49,18 @@ class PlayerEvents {
      * 当玩家追踪任务时
      */
     class Track(val player: Player, val playerProfile: PlayerProfile, val trackingQuest: Template?, val cancel: Boolean) : BukkitProxyEvent()
+
+    /**
+     * 当玩家追踪条目时
+     */
+    class TrackTask(val player: Player, val playerProfile: PlayerProfile, val trackingTask: Task, val trackType: Type) : BukkitProxyEvent() {
+
+        /** 追踪器类型 */
+        enum class Type {
+
+            BEACON, LANDMARK, NAVIGATION, SCOREBOARD
+        }
+    }
 
     /**
      * 当玩家的自定义等级数据发生变动
