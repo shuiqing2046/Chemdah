@@ -270,10 +270,11 @@ class TrackNavigation(val config: ConfigurationSection, val root: ConfigurationS
  */
 class TrackScoreboard(val config: ConfigurationSection, val root: ConfigurationSection) {
 
+    /** 记分板行信息 */
     class Line(val content: List<String>) {
 
-        val isQuestFormat = content.size > 1
-        val value = content[0]
+        /** 是否用于显示任务信息 */
+        val isQuestLine = content.size > 1
     }
 
     /**

@@ -8,8 +8,8 @@ import ink.ptms.chemdah.api.ChemdahAPI.nonChemdahProfileLoaded
 import ink.ptms.chemdah.api.event.collect.PlayerEvents
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.*
+import ink.ptms.chemdah.core.quest.Template.Companion.toTemplate
 import ink.ptms.chemdah.core.quest.addon.AddonDepend.Companion.isQuestDependCompleted
-import ink.ptms.chemdah.core.quest.addon.AddonOptional.Companion.isOptional
 import ink.ptms.chemdah.core.quest.addon.AddonUI.Companion.ui
 import ink.ptms.chemdah.core.quest.addon.data.*
 import ink.ptms.chemdah.core.quest.meta.MetaName.Companion.displayName
@@ -83,14 +83,32 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
     /** 记分板配置 */
     val scoreboard = TrackScoreboard(config, conf.getConfigurationSection("default-track.scoreboard") ?: error("default-track.scoreboard not found"))
 
+    /** 获取格式化后的描述 */
+    fun getFormattedDescription(sender: CommandSender, quest: QuestContainer, line: TrackScoreboard.Line): List<String> {
+        // 任务候选描述
+        // 如果这个任务没有写追踪描述、则使用 UI 组件中的描述
+        val defaultDesc = quest.toTemplate().ui()?.description ?: emptyList()
+        // 处理任务信息
+        return line.content.flatMap { body ->
+            // 处理多行描述
+            if (body.contains("description")) {
+                // 格式化描述
+                formatDescription(sender, quest.toTemplate().node, defaultDesc).map { body.replace("description" to it) }
+            } else {
+                // 处理名称
+                body.replace("name" to (name ?: quest.displayName())).asList()
+            }
+        }
+    }
+
     /** 使用 Kether 格式化描述 */
-    fun formatDesc(sender: CommandSender, questSelected: String, def: List<String>): List<String> {
+    fun formatDescription(sender: CommandSender, questSelected: String, def: List<String>): List<String> {
         return KetherFunction.parse(
             description ?: def,
             namespace = namespaceQuestUI,
             sender = adaptCommandSender(sender),
             vars = KetherShell.VariableMap("@QuestSelected" to questSelected)
-        )
+        ).splitBy(scoreboard.length)
     }
 
     companion object {
@@ -206,8 +224,10 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
         }
 
         /**
-         * 发送地标追踪器
+         * 更新地标追踪器
          * 由全息构成，因此需要托管，发送后会产生资源占用
+         *
+         * 在更新条目的地标全息时触发 PlayerEvents.TrackTask 事件，如果事件被取消，则会回收地标全息
          */
         fun Player.updateLandmarkTracker() {
             if (nonChemdahProfileLoaded) {
@@ -224,15 +244,21 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                 trackQuest.taskMap.filter { (_, task) -> task.track() != null }.forEach { (_, task) ->
                     // 条目未完成 && 条目依赖已完成
                     if (!task.isCompleted(chemdahProfile) && task.isQuestDependCompleted(this)) {
-                        // 创建追踪器
-                        updateLandmarkTracker(task.track()!!, task.path)
+                        // 唤起事件
+                        if (PlayerEvents.TrackTask(this, chemdahProfile, task, PlayerEvents.TrackTask.Type.LANDMARK).call()) {
+                            // 更新追踪器
+                            updateLandmarkTracker(task.track()!!, task.path)
+                        } else {
+                            // 删除追踪器
+                            landmarkHologramMap[name]?.remove(task.path)?.delete()
+                        }
                     }
                 }
             }
         }
 
         /**
-         * 发送地标追踪器
+         * 更新地标追踪器
          * 由全息构成，因此需要托管，发送后会产生资源占用
          */
         fun Player.updateLandmarkTracker(trackAddon: AddonTrack, landmarkId: String) {
@@ -259,7 +285,8 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                         holo.update(content)
                     }
                 } else {
-                    // 如果全息不存在 -> 创建全息
+                    // 如果
+                    // 全息不存在 -> 创建全息
                     hologramMap.put(landmarkId, AdyeshachAPI.createHologram(this, pos, content))?.delete()
                 }
             } else {
@@ -269,72 +296,62 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
         }
 
         /**
-         * 取消地标效果
+         * 删除地标追踪器
          */
         fun Player.removeLandmarkTracker() {
             landmarkHologramMap.remove(name)?.forEach { it.value.delete() }
         }
 
         /**
-         * 发送记分板任务追踪器
+         * 更新记分板追踪器
+         * 在显示条目信息时触发 PlayerEvents.TrackTask 事件，如果事件均被取消，则不会显示记分板
          */
-        fun Player.sendScoreboardTracker() {
+        fun Player.updateScoreboardTracker() {
             if (nonChemdahProfileLoaded) {
                 return
             }
+            // 是否为有效内容
+            var isValidContents = false
             // 获取追踪任务
             val quest = chemdahProfile.trackQuest ?: return
             // 获取追踪组建
             val questTrack = quest.track()
             // 是否启用记分板
             if (questTrack?.scoreboard?.enable == true) {
-                // 任务描述
-                val questDesc = quest.ui()?.description ?: emptyList()
-                // 单行描述长度
-                val length = questTrack.scoreboard.length
-                // 尚未接受任务，显示任务总信息
+                // 未接受任务 -> 显示任务信息
                 val content = if (chemdahProfile.getQuestById(quest.id) == null) {
+                    // 标记为有效内容
+                    isValidContents = true
                     // 格式化
                     questTrack.scoreboard.content.flatMap { line ->
                         // 任务信息
-                        if (line.isQuestFormat) {
+                        if (line.isQuestLine) {
                             // 格式化任务信息
-                            line.content.flatMap { cl ->
-                                // 任务描述
-                                if (cl.contains("description")) {
-                                    // 处理描述
-                                    questTrack.formatDesc(this, quest.node, questDesc).splitBy(length).map { cl.replace("description" to it) }
-                                } else {
-                                    // 任务名称
-                                    cl.replace("name" to (questTrack.name ?: quest.displayName())).asList()
-                                }
-                            }
+                            questTrack.getFormattedDescription(this, quest, line)
                         } else {
                             // 其他内容
                             line.content
                         }
                     }
                 } else {
-                    // 格式化
+                    // 已接受任务 -> 显示任务所有条目信息
                     questTrack.scoreboard.content.flatMap { line ->
                         // 任务信息
-                        if (line.isQuestFormat) {
+                        if (line.isQuestLine) {
                             // 获取条目
                             quest.taskMap.flatMap { (_, task) ->
                                 // 获取条目追踪
                                 val taskTrack = task.track()
                                 // 条目尚未完成
-                                if (taskTrack != null && !task.isCompleted(chemdahProfile) && task.isQuestDependCompleted(this) && !task.isOptional()) {
-                                    // 格式化条目信息
-                                    line.content.flatMap { cl ->
-                                        // 条目描述
-                                        if (cl.contains("description")) {
-                                            // 处理描述
-                                            taskTrack.formatDesc(this, quest.node, questDesc).splitBy(length).map { cl.replace("description" to it) }
-                                        } else {
-                                            // 条目名称
-                                            cl.replace("name" to (taskTrack.name ?: task.displayName())).asList()
-                                        }
+                                if (taskTrack != null && !task.isCompleted(chemdahProfile) && task.isQuestDependCompleted(this)) {
+                                    // 唤起事件
+                                    if (PlayerEvents.TrackTask(this, chemdahProfile, task, PlayerEvents.TrackTask.Type.SCOREBOARD).call()) {
+                                        // 标记为有效内容
+                                        isValidContents = true
+                                        // 格式化条目信息
+                                        taskTrack.getFormattedDescription(this, task, line)
+                                    } else {
+                                        emptyList()
                                     }
                                 } else {
                                     emptyList()
@@ -345,16 +362,19 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                         }
                     }
                 }
-                if (content.size > 2) {
+                // 记分板内容有效
+                if (content.size > 2 && isValidContents) {
+                    // 发送记分板
                     sendScoreboard(*content.colored().mapIndexed { index, s -> "§${uniqueChars[index]}$s" }.toTypedArray())
                 } else {
+                    // 移除记分板
                     removeScoreboardTracker(quest)
                 }
             }
         }
 
         /**
-         * 删除任务追踪
+         * 删除记分板追踪器
          * 将任务作为参数的原因是要判断这个任务追踪是否启用了记分板
          */
         fun Player.removeScoreboardTracker(quest: Template?) {
@@ -368,7 +388,9 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
         }
 
         /**
-         * 记录玩家的 Baffle 对象，用于在离线时释放缓存
+         * 记录玩家所使用到的阻断器
+         * 这些阻断器可能位于任务配置中，无法在离线时有效的获取
+         * 因此需要储存到临时容器中
          */
         internal fun Player.saveCounter(node: String, baffle: Baffle) {
             val map = releaseCounterMap.computeIfAbsent(name) { ConcurrentHashMap() }

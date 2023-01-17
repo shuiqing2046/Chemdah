@@ -101,6 +101,7 @@ class PlayerProfile(val uniqueId: UUID) {
 
     /**
      * 通过序号获取正在进行中的有效任务
+     * @param openAPI 是否启用开放 API，即允许第三方直接修改这个结果
      */
     fun getQuestById(value: String, openAPI: Boolean = true): Quest? {
         return if (openAPI) {

@@ -11,10 +11,10 @@ import ink.ptms.chemdah.core.quest.addon.AddonTrack.Companion.removeLandmarkTrac
 import ink.ptms.chemdah.core.quest.addon.AddonTrack.Companion.removeScoreboardTracker
 import ink.ptms.chemdah.core.quest.addon.AddonTrack.Companion.sendBeaconTracker
 import ink.ptms.chemdah.core.quest.addon.AddonTrack.Companion.sendNavigationTracker
-import ink.ptms.chemdah.core.quest.addon.AddonTrack.Companion.sendScoreboardTracker
 import ink.ptms.chemdah.core.quest.addon.AddonTrack.Companion.track
 import ink.ptms.chemdah.core.quest.addon.AddonTrack.Companion.trackQuest
 import ink.ptms.chemdah.core.quest.addon.AddonTrack.Companion.updateLandmarkTracker
+import ink.ptms.chemdah.core.quest.addon.AddonTrack.Companion.updateScoreboardTracker
 import ink.ptms.chemdah.core.quest.meta.MetaName.Companion.displayName
 import ink.ptms.chemdah.module.party.PartySystem.getMembers
 import ink.ptms.chemdah.util.replace
@@ -77,7 +77,7 @@ object AddonTrackEvents {
             }
             // 发送记分板追踪器
             if (scoreboardCounter.hasNext(player.name)) {
-                player.sendScoreboardTracker()
+                player.updateScoreboardTracker()
             }
             // 未接受任务 -> 追踪任务整体
             if (acceptedQuestsMap[player.name]?.none { it.id == trackQuest.id } == true) {
@@ -118,7 +118,7 @@ object AddonTrackEvents {
             // 更新地标追踪器
             e.playerProfile.player.updateLandmarkTracker()
             // 更新记分板追踪器
-            e.playerProfile.player.sendScoreboardTracker()
+            e.playerProfile.player.updateScoreboardTracker()
         }
     }
 
@@ -147,7 +147,7 @@ object AddonTrackEvents {
         e.quest.getMembers(self = true).forEach {
             if (it.chemdahProfile.trackQuest == e.task.template) {
                 // 更新记分板 -> 更新进度
-                it.sendScoreboardTracker()
+                it.updateScoreboardTracker()
             }
         }
     }
@@ -162,7 +162,7 @@ object AddonTrackEvents {
                 // 更新地标 -> 回收全息
                 it.updateLandmarkTracker()
                 // 更新记分板 -> 回收条目
-                it.sendScoreboardTracker()
+                it.updateScoreboardTracker()
             }
         }
     }
@@ -182,7 +182,7 @@ object AddonTrackEvents {
                 e.player.removeScoreboardTracker(trackQuest)
                 // 发送追踪器
                 e.player.updateLandmarkTracker()
-                e.player.sendScoreboardTracker()
+                e.player.updateScoreboardTracker()
             }
         }
     }
@@ -205,7 +205,7 @@ object AddonTrackEvents {
                 // 创建地标追踪器
                 e.player.updateLandmarkTracker()
                 // 更新记分板追踪器（因为记分板不需要创建）
-                e.player.sendScoreboardTracker()
+                e.player.updateScoreboardTracker()
                 // 发送追踪信息
                 (e.trackingQuest!!.track()?.message ?: AddonTrack.defaultMessage).forEach { message ->
                     // 指向语言文件

@@ -103,4 +103,11 @@ class Template(id: String, config: ConfigurationSection) : QuestContainer(id, co
     private fun loadTask(taskId: String, taskNode: String = "task.$taskId") {
         taskMap[taskId] = Task(taskId, config.getConfigurationSection(taskNode)!!, this)
     }
+
+    companion object {
+
+        fun QuestContainer.toTemplate(): Template {
+            return if (this is Task) this.template else this as Template
+        }
+    }
 }
