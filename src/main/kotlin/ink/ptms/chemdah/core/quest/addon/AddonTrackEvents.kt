@@ -198,7 +198,10 @@ object AddonTrackEvents {
         e.player.removeScoreboardTracker(e.trackingQuest)
         // 取消追踪
         if (e.cancel) {
-            e.player.sendLang("track-cancel")
+            // 如果当前存在追踪任务，则发送取消追踪提示
+            if (e.trackingQuest != null) {
+                e.player.sendLang("track-cancel", e.trackingQuest.id)
+            }
         } else {
             // 推迟到下一个游戏刻执行
             submit(delay = 1) {

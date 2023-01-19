@@ -3,6 +3,7 @@ package ink.ptms.chemdah.core.conversation.trigger
 import ink.ptms.adyeshach.api.event.AdyeshachEntityInteractEvent
 import ink.ptms.adyeshach.common.entity.EntityInstance
 import ink.ptms.adyeshach.common.entity.ai.expand.ControllerLookAtPlayerAlways
+import ink.ptms.adyeshach.impl.entity.controller.ControllerLookAtPlayer
 import ink.ptms.chemdah.AdyeshachChecker
 import ink.ptms.chemdah.api.ChemdahAPI.conversationSession
 import ink.ptms.chemdah.api.event.collect.ConversationEvents
@@ -39,9 +40,16 @@ internal object TriggerAdyeshach {
                     npc.setTag("conversation-eye-location", "${npc.getLocation().yaw},${npc.getLocation().pitch}")
                 }
                 // 检查 NPC 是否持有 LookAtPlayerAlways 控制器
-                if (npc.getController(ControllerLookAtPlayerAlways::class.java) == null) {
-                    npc.registerController(ControllerLookAtPlayerAlways(npc))
-                    npc.setTag("conversation-controller", "true")
+                if (AdyeshachChecker.isNewVersion) {
+                    if (npc.v2.getController(ControllerLookAtPlayer::class.java) == null) {
+                        npc.v2.registerController(ControllerLookAtPlayer(npc.v2, 8.0, 1.0))
+                        npc.setTag("conversation-controller", "true")
+                    }
+                } else {
+                    if (npc.getController(ControllerLookAtPlayerAlways::class.java) == null) {
+                        npc.registerController(ControllerLookAtPlayerAlways(npc))
+                        npc.setTag("conversation-controller", "true")
+                    }
                 }
             }
         }
@@ -59,7 +67,12 @@ internal object TriggerAdyeshach {
                 // 移除 LookAtPlayerAlways 控制器
                 if (npc.hasTag("conversation-controller")) {
                     npc.removeTag("conversation-controller")
-                    npc.unregisterController(ControllerLookAtPlayerAlways::class.java)
+                    // 新版本
+                    if (AdyeshachChecker.isNewVersion) {
+                        npc.v2.unregisterController(ControllerLookAtPlayer::class.java)
+                    } else {
+                        npc.unregisterController(ControllerLookAtPlayerAlways::class.java)
+                    }
                 }
                 // 在对话结束时恢复视角
                 if (e.session.conversation.hasFlag("LOOK_PLAYER") && npc.hasTag("conversation-eye-location")) {

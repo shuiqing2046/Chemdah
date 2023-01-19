@@ -248,11 +248,11 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                         if (PlayerEvents.TrackTask(this, chemdahProfile, task, PlayerEvents.TrackTask.Type.LANDMARK).call()) {
                             // 更新追踪器
                             updateLandmarkTracker(task.track()!!, task.path)
-                        } else {
-                            // 删除追踪器
-                            landmarkHologramMap[name]?.remove(task.path)?.delete()
+                            return@forEach
                         }
                     }
+                    // 删除追踪器
+                    landmarkHologramMap[name]?.remove(task.path)?.delete()
                 }
             }
         }
