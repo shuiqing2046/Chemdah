@@ -316,10 +316,10 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
             val quest = chemdahProfile.trackQuest ?: return
             // 获取追踪组建
             val questTrack = quest.track()
-            // 是否启用记分板
-            if (questTrack?.scoreboard?.enable == true) {
-                // 未接受任务 -> 显示任务信息
-                val content = if (chemdahProfile.getQuestById(quest.id) == null) {
+            // 未接受任务 -> 显示任务信息
+            val content = if (chemdahProfile.getQuestById(quest.id) == null) {
+                // 是否启用记分板
+                if (questTrack?.scoreboard?.enable == true) {
                     // 标记为有效内容
                     isValidContents = true
                     // 格式化
@@ -334,42 +334,44 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
                         }
                     }
                 } else {
-                    // 已接受任务 -> 显示任务所有条目信息
-                    questTrack.scoreboard.content.flatMap { line ->
-                        // 任务信息
-                        if (line.isQuestLine) {
-                            // 获取条目
-                            quest.taskMap.flatMap { (_, task) ->
-                                // 获取条目追踪
-                                val taskTrack = task.track()
+                    emptyList()
+                }
+            } else {
+                // 已接受任务 -> 显示任务所有条目信息
+                questTrack?.scoreboard?.content?.flatMap { line ->
+                    // 任务信息
+                    if (line.isQuestLine) {
+                        // 获取条目
+                        quest.taskMap.flatMap task@ { (_, task) ->
+                            // 获取条目追踪
+                            val taskTrack = task.track()
+                            // 是否启用记分板
+                            if (taskTrack?.scoreboard?.enable == true) {
                                 // 条目尚未完成
-                                if (taskTrack != null && !task.isCompleted(chemdahProfile) && task.isQuestDependCompleted(this)) {
+                                if (!task.isCompleted(chemdahProfile) && task.isQuestDependCompleted(this)) {
                                     // 唤起事件
                                     if (PlayerEvents.TrackTask(this, chemdahProfile, task, PlayerEvents.TrackTask.Type.SCOREBOARD).call()) {
                                         // 标记为有效内容
                                         isValidContents = true
                                         // 格式化条目信息
-                                        taskTrack.getFormattedDescription(this, task, line)
-                                    } else {
-                                        emptyList()
+                                        return@task taskTrack.getFormattedDescription(this, task, line)
                                     }
-                                } else {
-                                    emptyList()
                                 }
                             }
-                        } else {
-                            line.content
+                            emptyList()
                         }
+                    } else {
+                        line.content
                     }
-                }
-                // 记分板内容有效
-                if (content.size > 2 && isValidContents) {
-                    // 发送记分板
-                    sendScoreboard(*content.colored().mapIndexed { index, s -> "§${uniqueChars[index]}$s" }.toTypedArray())
-                } else {
-                    // 移除记分板
-                    removeScoreboardTracker(quest)
-                }
+                } ?: emptyList()
+            }
+            // 记分板内容有效
+            if (content.size > 2 && isValidContents) {
+                // 发送记分板
+                sendScoreboard(*content.colored().mapIndexed { index, s -> "§${uniqueChars[index]}$s" }.toTypedArray())
+            } else {
+                // 移除记分板
+                removeScoreboardTracker(quest)
             }
         }
 
