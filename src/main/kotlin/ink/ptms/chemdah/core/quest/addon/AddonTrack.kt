@@ -4,6 +4,7 @@ import ink.ptms.adyeshach.api.AdyeshachAPI
 import ink.ptms.adyeshach.api.Hologram
 import ink.ptms.chemdah.api.ChemdahAPI
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
+import ink.ptms.chemdah.api.ChemdahAPI.conversationSession
 import ink.ptms.chemdah.api.ChemdahAPI.nonChemdahProfileLoaded
 import ink.ptms.chemdah.api.event.collect.PlayerEvents
 import ink.ptms.chemdah.core.PlayerProfile
@@ -264,8 +265,8 @@ class AddonTrack(config: ConfigurationSection, questContainer: QuestContainer) :
         fun Player.updateLandmarkTracker(trackAddon: AddonTrack, landmarkId: String) {
             val trackCenter = trackAddon.center.getLocation(this) ?: return
             val hologramMap = landmarkHologramMap.computeIfAbsent(name) { ConcurrentHashMap() }
-            // 启用追踪器 && 相同世界
-            if (trackAddon.landmark.enable && trackCenter.world?.name == world.name) {
+            // 启用追踪器 && 相同世界 && 不在对话中
+            if (trackAddon.landmark.enable && trackCenter.world?.name == world.name && conversationSession == null) {
                 // 获取任务名称
                 val name = trackAddon.name ?: trackAddon.questContainer.displayName()
                 // 显示距离

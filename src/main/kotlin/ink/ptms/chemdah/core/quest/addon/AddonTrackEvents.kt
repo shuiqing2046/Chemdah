@@ -2,6 +2,7 @@ package ink.ptms.chemdah.core.quest.addon
 
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.api.ChemdahAPI.isChemdahProfileLoaded
+import ink.ptms.chemdah.api.event.collect.ConversationEvents
 import ink.ptms.chemdah.api.event.collect.ObjectiveEvents
 import ink.ptms.chemdah.api.event.collect.PlayerEvents
 import ink.ptms.chemdah.api.event.collect.QuestEvents
@@ -236,6 +237,14 @@ object AddonTrackEvents {
         if (e.isMovement()) {
             submitAsync { e.player.updateLandmarkTracker() }
         }
+    }
+
+    /**
+     * 对话时隐藏地标追踪器
+     */
+    @SubscribeEvent
+    fun onTalk(e: ConversationEvents.Begin) {
+        e.session.player.removeLandmarkTracker()
     }
 
     /**
