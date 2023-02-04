@@ -13,10 +13,12 @@
         stats:
           visible: true
     1:
-      objective: block break
-      condition:
-        material: diamond_ore
+      objective: player data
+      goal:
+        key: test
+        value: 10
       addon:
+        reset-data-on-accepted: true
         optional: true
   addon:
     ui:

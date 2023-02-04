@@ -8,10 +8,6 @@ import ink.ptms.chemdah.core.quest.Task
  * Chemdah
  * ink.ptms.chemdah.core.quest.addon.AddonOptional
  *
- * addon:
- *   depend: quest
- *   depend: group:quest
- *
  * @author sky
  * @since 2021/3/4 9:04 上午
  */

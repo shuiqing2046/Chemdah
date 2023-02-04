@@ -6,6 +6,7 @@ import ink.ptms.chemdah.util.mapSection
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.library.xseries.XSound
 import taboolib.module.chat.colored
+import taboolib.module.configuration.Configuration
 
 /**
  * Chemdah
@@ -23,10 +24,10 @@ class ThemeChatSettings(root: ConfigurationSection) : ThemeSettings(root) {
     val formatLine = root.mapSection("format-line") { LineFormat(it) }
 
     /** 标准回复模板 **/
-    val select = ReplyFormat(root.getConfigurationSection("select.reply")!!)
+    val select = ReplyFormat(root.getConfigurationSection("select.reply") ?: defaultReplySection)
 
     /** 曾被选过的回复模板 **/
-    val selected = ReplyFormat(root.getConfigurationSection("select.reply-selected")!!)
+    val selected = ReplyFormat(root.getConfigurationSection("select.reply-selected") ?: defaultReplySection)
 
     /** 自定义回复模板 **/
     val customSelect = root.mapSection("select.reply-custom") { ReplyFormat(it) }
@@ -70,6 +71,9 @@ class ThemeChatSettings(root: ConfigurationSection) : ThemeSettings(root) {
         selectSound?.play(session.player, selectSoundPitch, selectSoundVolume)
     }
 
+    /**
+     * 回复格式
+     */
     class ReplyFormat(val root: ConfigurationSection) {
 
         /** 位于当前选项 **/
@@ -80,6 +84,16 @@ class ThemeChatSettings(root: ConfigurationSection) : ThemeSettings(root) {
 
         override fun toString(): String {
             return "ReplyFormat(select='$select', other='$other')"
+        }
+    }
+
+    companion object {
+
+        val defaultReplySection = Configuration.empty()
+
+        init {
+            defaultReplySection["1"] = "&7▶ &f&n{player_side}&r &8(&6&lF&8)"
+            defaultReplySection["0"] = "&8▶ &7{player_side}&r   &r"
         }
     }
 }
