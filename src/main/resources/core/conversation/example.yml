@@ -18,8 +18,10 @@ conversation_0:
   format: generic
   player:
     - reply: 'Hi!'
-      then: |
+      then: &ab |
         goto conversation_0_1
+    - reply: 'Hi! (copy)'
+      then: *ab
     - if: permission admin
       reply: 'You know Mr.Black?'
       type: main
