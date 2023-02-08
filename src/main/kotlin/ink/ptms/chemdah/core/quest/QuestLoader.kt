@@ -127,15 +127,17 @@ object QuestLoader {
             return
         }
         // 判断条件并进行该条目
-        objective.checkCondition(profile, task, quest, event).thenAccept { cond ->
-            if (cond && ObjectiveEvents.Continue.Pre(objective, task, quest, profile).call()) {
-                objective.onContinue(profile, task, quest, event)
-                task.agent(quest.profile, AgentType.TASK_CONTINUED)
-                ObjectiveEvents.Continue.Post(objective, task, quest, profile).call()
-                // 检查条目
-                objective.checkComplete(profile, task, quest).thenAccept {
-                    // 检查任务
-                    quest.checkCompleteFuture()
+        if (ObjectiveEvents.Continue.Pre(objective, task, quest, profile).call()) {
+            objective.checkCondition(profile, task, quest, event).thenAccept { cond ->
+                if (cond) {
+                    objective.onContinue(profile, task, quest, event)
+                    task.agent(quest.profile, AgentType.TASK_CONTINUED)
+                    ObjectiveEvents.Continue.Post(objective, task, quest, profile).call()
+                    // 检查条目
+                    objective.checkComplete(profile, task, quest).thenAccept {
+                        // 检查任务
+                        quest.checkCompleteFuture()
+                    }
                 }
             }
         }
