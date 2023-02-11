@@ -82,6 +82,8 @@ dependencies {
     compileOnly("public:CustomGo:1.0.0")
     compileOnly("public:Skript:1.0.0")
     compileOnly("public:SkillAPI:s1.98")
+    //compileOnly("com.promcteam:proskillapi:1.1.8")
+    //compileOnly("com.promcteam:promccore:1.0.4")
     compileOnly("public:mcMMO:1.0.0")
     compileOnly("public:MMOLib:1.0.0")
     compileOnly("public:MMOCore:1.10.2")
