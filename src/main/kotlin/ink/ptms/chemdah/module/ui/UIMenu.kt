@@ -47,11 +47,13 @@ class UIMenu(val ui: UI, val profile: PlayerProfile, val templates: List<UITempl
             onClick { event ->
                 if (event.rawSlot == -999) {
                     when {
+                        // 左键翻页
                         event.clickEvent().isLeftClick -> {
                             if (hasPreviousPage()) {
                                 open(page - 1)
                             }
                         }
+                        // 右键翻页
                         event.clickEvent().isRightClick -> {
                             if (hasNextPage()) {
                                 open(page + 1)
@@ -60,19 +62,22 @@ class UIMenu(val ui: UI, val profile: PlayerProfile, val templates: List<UITempl
                     }
                 }
             }
-            onClick { event, template ->
+            onClick { event, el ->
                 // 当任务为正在进行或可以开始时
-                if (template.itemType == ItemType.QUEST_STARTED
-                    || template.itemType == ItemType.QUEST_STARTED_SHARED
-                    || template.itemType == ItemType.QUEST_CAN_START
-                ) {
-                    // 当任务允许被追踪时才会关闭界面
-                    if (template.template.allowTracked()) {
-                        // 追踪任务
-                        profile.trackQuest = template.template
+                if (el.itemType == ItemType.QUEST_STARTED || el.itemType == ItemType.QUEST_STARTED_SHARED || el.itemType == ItemType.QUEST_CAN_START) {
+                    // 关闭追踪
+                    if (el.template == profile.trackQuest) {
+                        // 放弃追踪
+                        profile.trackQuest = null
                         // 播放音效并关闭界面
                         event.clicker.playSound(event.clicker.location, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1f, 1f)
-                        event.clicker.closeInventory()
+                    }
+                    // 当任务允许被追踪时才会关闭界面
+                    else if (el.template.allowTracked()) {
+                        // 追踪任务
+                        profile.trackQuest = el.template
+                        // 播放音效并关闭界面
+                        event.clicker.playSound(event.clicker.location, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1f, 1f)
                     }
                 }
             }
