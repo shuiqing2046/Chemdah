@@ -44,7 +44,7 @@ object CommandChemdahVariables {
                 execute<CommandSender> { sender, ctx, argument ->
                     val time = System.currentTimeMillis()
                     ChemdahAPI.setVariable(ctx.argument(-1), argument)
-                    if (sender !is Player) {
+                    if (sender is Player) {
                         sender.sendLang("command-variables-change", "${ctx.argument(-1)} §8= §f$argument §7(${System.currentTimeMillis() - time}ms)")
                     }
                 }
@@ -60,7 +60,7 @@ object CommandChemdahVariables {
                 execute<CommandSender> { sender, ctx, argument ->
                     val time = System.currentTimeMillis()
                     ChemdahAPI.setVariable(ctx.argument(-1), argument, true)
-                    if (sender !is Player) {
+                    if (sender is Player) {
                         sender.sendLang("command-variables-change", "${ctx.argument(-1)} §8+= §f$argument §7(${System.currentTimeMillis() - time}ms)")
                     }
                 }
@@ -75,7 +75,7 @@ object CommandChemdahVariables {
             execute<CommandSender> { sender, _, argument ->
                 val time = System.currentTimeMillis()
                 ChemdahAPI.setVariable(argument, null)
-                if (sender !is Player) {
+                if (sender is Player) {
                     sender.sendLang("command-variables-change", "$argument §8= §fnull §7(${System.currentTimeMillis() - time}ms)")
                 }
             }
