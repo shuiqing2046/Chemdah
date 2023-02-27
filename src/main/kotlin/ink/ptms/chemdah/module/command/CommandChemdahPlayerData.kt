@@ -34,7 +34,9 @@ object CommandChemdahPlayerData {
                 dynamic(comment ="value") {
                     execute<CommandSender> { sender, ctx, argument ->
                         ctx.player(-2).cast<Player>().chemdahProfile.persistentDataContainer[ctx.argument(-1)] = argument
-                        sender.sendLang("command-variables-change", "${ctx.argument(-1)} §8= §f${argument}")
+                        if (sender !is Player) {
+                            sender.sendLang("command-variables-change", "${ctx.argument(-1)} §8= §f${argument}")
+                        }
                     }
                 }
             }
@@ -54,7 +56,9 @@ object CommandChemdahPlayerData {
                         val key = ctx.argument(-1)
                         val persistentDataContainer = ctx.player(-2).cast<Player>().chemdahProfile.persistentDataContainer
                         persistentDataContainer[key] = persistentDataContainer[key].increaseAny(argument)
-                        sender.sendLang("command-variables-change", "$key §8+= §f${argument}")
+                        if (sender !is Player) {
+                            sender.sendLang("command-variables-change", "$key §8+= §f${argument}")
+                        }
                     }
                 }
             }
@@ -73,10 +77,14 @@ object CommandChemdahPlayerData {
                     val playerExact = ctx.player(-1).cast<Player>()
                     if (argument == "*") {
                         playerExact.chemdahProfile.persistentDataContainer.clear()
-                        sender.sendLang("command-variables-change", "CLEAR")
+                        if (sender !is Player) {
+                            sender.sendLang("command-variables-change", "* §8= §fnull")
+                        }
                     } else {
                         playerExact.chemdahProfile.persistentDataContainer.remove(argument)
-                        sender.sendLang("command-variables-change", "$argument §8= §fnull")
+                        if (sender !is Player) {
+                            sender.sendLang("command-variables-change", "$argument §8= §fnull")
+                        }
                     }
                 }
             }
@@ -89,7 +97,9 @@ object CommandChemdahPlayerData {
             suggestPlayers()
             execute<CommandSender> { sender, ctx, _ ->
                 ctx.player(0).cast<Player>().chemdahProfile.persistentDataContainer.clear()
-                sender.sendLang("command-variables-change", "* §8= §fnull")
+                if (sender !is Player) {
+                    sender.sendLang("command-variables-change", "* §8= §fnull")
+                }
             }
         }
     }
