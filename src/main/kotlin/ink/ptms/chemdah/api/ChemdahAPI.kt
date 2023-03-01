@@ -43,17 +43,22 @@ object ChemdahAPI {
 
     /** 已注册对话 **/
     val conversation = HashMap<String, Conversation>()
+
     /** 已注册主题 **/
     val conversationTheme = HashMap<String, Theme<*>>()
 
     /** 已注册任务元数据 **/
     val questMeta = HashMap<String, Class<out Meta<*>>>()
+
     /** 已注册任务组件 **/
     val questAddon = HashMap<String, Class<out Addon>>()
+
     /** 已注册任务模板 **/
     val questTemplate = HashMap<String, Template>()
+
     /** 已注册任务模板分组 **/
     val questTemplateGroup = HashMap<String, TemplateGroup>()
+
     /** 已注册任务目标 **/
     val questObjective = HashMap<String, Objective<*>>()
 
@@ -89,7 +94,7 @@ object ChemdahAPI {
      * 获取玩家正在进行的会话
      */
     val Player.conversationSession: Session?
-       get() = ConversationManager.sessions[name]
+        get() = ConversationManager.sessions[name]
 
     /**
      * 唤起玩家的 Trigger 类型任务
@@ -107,28 +112,28 @@ object ChemdahAPI {
     }
 
     /**
-     * 获取对话资源
+     * 获取对话
      */
     fun getConversation(id: String): Conversation? {
         return conversation[id]
     }
 
     /**
-     * 注册任务模板
+     * 注册对话
      */
     fun addConversation(id: String, con: Conversation) {
         conversation[id] = con
     }
 
     /**
-     * 获取对话模式
+     * 获取对话风格
      */
     fun getConversationTheme(id: String): Theme<*>? {
         return conversationTheme[id]
     }
 
     /**
-     * 注册任务模板
+     * 注册对话风格
      */
     fun addConversationTheme(id: String, theme: Theme<*>) {
         conversationTheme[id] = theme
@@ -198,7 +203,8 @@ object ChemdahAPI {
     }
 
     /**
-     * 注册任务元数据
+     * 注册任务目标
+     * 请不要直接使用此方法注册任务目标，第三方插件请使用扩展方法 [Objective.register()]
      */
     fun addQuestObjective(id: String, objective: Objective<*>) {
         questObjective[id] = objective
@@ -238,9 +244,11 @@ object ChemdahAPI {
             value == null -> {
                 Database.INSTANCE.releaseVariable(key)
             }
+
             append -> {
                 Database.INSTANCE.updateVariable(key, (Database.INSTANCE.selectVariable(key) ?: default).increaseAny(value).toString())
             }
+
             else -> {
                 Database.INSTANCE.updateVariable(key, value)
             }
