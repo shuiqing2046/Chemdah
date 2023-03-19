@@ -109,4 +109,15 @@ class Session(
         conversation.option.instanceTheme.onReset(this).thenApply { future.complete(null) }
         return future
     }
+
+    /**
+     * 跳转对话
+     */
+    internal fun goto(next: Conversation, vars: Map<String, Any?>) {
+        isNext = true
+        npcSide.clear()
+        variables.clear()
+        variables.putAll(vars)
+        conversation = next
+    }
 }

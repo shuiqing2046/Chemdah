@@ -40,7 +40,7 @@ taboolib {
     install("expansion-command-helper")
     install("expansion-javascript")
     classifier = null
-    version = "6.0.10-94"
+    version = "6.0.10-98"
     relocate("ink.ptms.um", "ink.ptms.chemdah.um")
     options("keep-kotlin-module")
 }

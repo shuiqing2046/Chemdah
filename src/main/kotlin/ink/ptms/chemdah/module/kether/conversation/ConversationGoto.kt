@@ -1,13 +1,12 @@
 package ink.ptms.chemdah.module.kether.conversation
 
 import ink.ptms.chemdah.api.ChemdahAPI
+import ink.ptms.chemdah.core.conversation.ConversationSwitch
 import ink.ptms.chemdah.core.conversation.Session
 import ink.ptms.chemdah.util.getSession
 import ink.ptms.chemdah.util.vars
-import taboolib.module.kether.KetherParser
-import taboolib.module.kether.ScriptAction
-import taboolib.module.kether.ScriptFrame
-import taboolib.module.kether.scriptParser
+import org.bukkit.entity.Player
+import taboolib.module.kether.*
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -20,14 +19,28 @@ import java.util.concurrent.CompletableFuture
 class ConversationGoto(val conversation: String) : ScriptAction<Session>() {
 
     override fun run(frame: ScriptFrame): CompletableFuture<Session> {
-        val conversation = ChemdahAPI.getConversation(conversation) ?: error("Conversation not found: $conversation")
         val session = frame.getSession()
-        session.isNext = true
-        session.npcSide.clear()
-        session.variables.clear()
-        session.variables.putAll(frame.vars())
-        session.conversation = conversation
-        return conversation.open(session.player, session.source, session)
+        val conversation = ChemdahAPI.getConversation(conversation)
+        if (conversation != null) {
+            session.goto(conversation, frame.vars())
+            return conversation.open(session.player, session.source, session)
+        }
+        val switchTo = ConversationSwitch.switchMap[this.conversation]
+        if (switchTo != null) {
+            val future = CompletableFuture<Session>()
+            val player = frame.player().castSafely<Player>() ?: error("No player selected.")
+            switchTo.get(player).thenAccept { case ->
+                val find = case.open(player)
+                if (find != null) {
+                    session.goto(find, frame.vars())
+                    find.open(session.player, session.source, session).thenAccept { future.complete(it) }
+                } else {
+                    future.complete(session)
+                }
+            }
+            return future
+        }
+        error("Conversation not found: ${this.conversation}")
     }
 
     companion object {

@@ -78,6 +78,9 @@ object WizardSystem : Module {
         }
     }
 
+    /**
+     * 打开对话
+     */
     @SubscribeEvent
     private fun onSelect(e: ConversationEvents.Pre) {
         val entity = e.session.source.entity
@@ -85,6 +88,22 @@ object WizardSystem : Module {
             val action = actions[entity.uniqueId] ?: return
             if (action.info.disableConversation) {
                 e.isCancelled = true
+            }
+        }
+    }
+
+    /**
+     * 从 NPC 选取对话
+     */
+    @SubscribeEvent
+    private fun onSelect(e: ConversationEvents.Select) {
+        if (e.conversation == null) {
+            val entity = e.source
+            if (entity is EntityInstance) {
+                val action = actions[entity.uniqueId]
+                if (action?.info?.disableConversation == true) {
+                    e.isCancelled = true
+                }
             }
         }
     }
