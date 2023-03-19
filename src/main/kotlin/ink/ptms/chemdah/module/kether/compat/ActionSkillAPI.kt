@@ -1,5 +1,6 @@
 package ink.ptms.chemdah.module.kether.compat
 
+
 import com.sucy.skill.SkillAPI
 import com.sucy.skill.api.player.PlayerData
 import ink.ptms.chemdah.util.getBukkitPlayer
@@ -35,9 +36,11 @@ class ActionSkillAPI {
         fun parser() = scriptParser {
             when (it.expects("class", "skills", "attribute", "level", "exp", "experience", "mana", "cast")) {
                 "class" -> {
-                    Base(when (it.expects("main", "size")) {
+                    Base(when (it.expects("main", "size", "name", "group")) {
                         "main" -> { data -> data.mainClass }
                         "size" -> { data -> data.classes.size }
+                        "name" -> { data -> data.mainClass.data.name }
+                        "group" -> { data -> data.mainClass.data.group }
                         else -> error("out of case")
                     })
                 }
