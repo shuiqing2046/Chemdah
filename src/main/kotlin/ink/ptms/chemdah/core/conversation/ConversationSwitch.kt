@@ -85,8 +85,12 @@ data class ConversationSwitch(val file: File?, val root: ConfigurationSection, v
         private fun onLoad(e: ConversationEvents.Load) {
             if (e.root.contains("when") && e.root.getMapList("when").isNotEmpty()) {
                 e.isCancelled = true
-                val id = e.root["npc id"] ?: return
-                val trigger = Trigger(id.asList().map { it.split(" ") }.filter { it.size == 2 }.map { Trigger.Id(it[0], it[1]) })
+                val id = e.root["npc id"]
+                val trigger = if (id != null) {
+                    Trigger(id.asList().map { it.split(" ") }.filter { it.size == 2 }.map { Trigger.Id(it[0], it[1]) })
+                } else {
+                    Trigger()
+                }
                 switchMap[e.root.name] = ConversationSwitch(e.file, e.root, trigger)
             }
         }
