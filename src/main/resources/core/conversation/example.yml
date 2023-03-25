@@ -37,7 +37,7 @@ conversation_0_1:
       then: |
         set game true
         goto conversation_0_2
-    - reply: 'Not bed.'
+    - reply: 'SB.'
       then: |
         talk "All right, see you later."
 
