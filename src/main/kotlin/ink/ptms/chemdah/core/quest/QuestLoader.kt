@@ -87,6 +87,8 @@ object QuestLoader {
         if (isListener) {
             // 对该条目注册独立监听器
             registerBukkitListener(event, EventPriority.values()[priority.ordinal], ignoreCancelled) { e ->
+                // 回调事件
+                ChemdahAPI.eventFactory.callObjectiveCall(this@register, e)
                 // 若该事件被任何任务使用
                 if (using) {
                     // 获取该监听器中的玩家对象

@@ -1,8 +1,10 @@
 package ink.ptms.chemdah.api
 
 import ink.ptms.chemdah.api.event.plugin.CollectEvent
+import ink.ptms.chemdah.api.event.plugin.ObjectiveCallEvent
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Quest
+import ink.ptms.chemdah.core.quest.objective.Objective
 
 /**
  * Chemdah
@@ -14,6 +16,11 @@ import ink.ptms.chemdah.core.quest.Quest
 open class ChemdahEventFactory {
 
     protected val questCollectCallback = arrayListOf<CollectEvent>()
+    protected val objectiveCallCallback = arrayListOf<ObjectiveCallEvent>()
+
+    open fun prepareObjectiveCall(consumer: ObjectiveCallEvent) {
+        objectiveCallCallback.add(consumer)
+    }
 
     open fun prepareQuestCollect(consumer: CollectEvent) {
         questCollectCallback.add(consumer)
@@ -23,5 +30,10 @@ open class ChemdahEventFactory {
         val list = quests.toMutableList()
         questCollectCallback.forEach { it(playerProfile, list) }
         return list
+    }
+
+    open fun callObjectiveCall(objective: Objective<*>, event: Any): Boolean {
+        objectiveCallCallback.forEach { it(objective, event) }
+        return true
     }
 }
