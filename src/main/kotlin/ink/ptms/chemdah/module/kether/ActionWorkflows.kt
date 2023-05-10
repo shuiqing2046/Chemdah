@@ -51,13 +51,13 @@ object ActionWorkflows {
                 data.set(id, content)
                 actionNow {
                     fetchMap.computeIfAbsent(getBukkitPlayer().name) { ArrayList() } += script()
-                    getProfile().persistentDataContainer.set("workflows.fetch.$id", true)
+                    getProfile()?.persistentDataContainer?.set("workflows.fetch.$id", true)
                 }
             }
             case("reset") {
                 val id = it.nextToken()
                 actionNow {
-                    getProfile().persistentDataContainer.remove("workflows.fetch.$id")
+                    getProfile()?.persistentDataContainer?.remove("workflows.fetch.$id")
                 }
             }
         }
