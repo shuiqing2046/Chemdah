@@ -7,9 +7,11 @@ import ink.ptms.chemdah.core.quest.addon.AddonStats.Companion.refreshStats
 import ink.ptms.chemdah.core.quest.addon.AddonStats.Companion.refreshStatusAlwaysType
 import ink.ptms.chemdah.core.quest.addon.AddonTrack.Companion.trackQuest
 import ink.ptms.chemdah.core.quest.meta.MetaType.Companion.type
+import ink.ptms.chemdah.util.getBukkitPlayer
 import ink.ptms.chemdah.util.getProfile
 import ink.ptms.chemdah.util.getQuestSelected
 import ink.ptms.chemdah.util.increaseAny
+import taboolib.common.platform.function.warning
 import taboolib.common5.Coerce
 import taboolib.library.kether.ArgTypes
 import taboolib.library.kether.ParsedAction
@@ -28,7 +30,7 @@ class ActionQuest {
     class Quests(val self: Boolean) : ScriptAction<List<String>>() {
 
         override fun run(frame: ScriptFrame): CompletableFuture<List<String>> {
-            return CompletableFuture.completedFuture(frame.getProfile().getQuests(openAPI = !self).map { it.id })
+            return CompletableFuture.completedFuture(frame.getProfile()?.getQuests(openAPI = !self)?.map { it.id } ?: emptyList())
         }
     }
 
@@ -36,7 +38,7 @@ class ActionQuest {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Any?> {
             return CompletableFuture.completedFuture(
-                frame.getProfile().getQuestById(frame.getQuestSelected())?.persistentDataContainer?.keys() ?: emptyList<String>()
+                frame.getProfile()?.getQuestById(frame.getQuestSelected())?.persistentDataContainer?.keys() ?: emptyList<String>()
             )
         }
     }
@@ -45,7 +47,7 @@ class ActionQuest {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Any?> {
             return frame.newFrame(key).run<Any>().thenApply {
-                frame.getProfile().getQuestById(frame.getQuestSelected())?.persistentDataContainer?.get(it.toString())?.data
+                frame.getProfile()?.getQuestById(frame.getQuestSelected())?.persistentDataContainer?.get(it.toString())?.data
             }
         }
     }
@@ -54,8 +56,13 @@ class ActionQuest {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Void> {
             return frame.newFrame(key).run<Any>().thenAccept { key ->
-                frame.newFrame(value).run<Any?>().thenAccept { value ->
-                    val persistentDataContainer = frame.getProfile().getQuestById(frame.getQuestSelected())?.persistentDataContainer
+                frame.newFrame(value).run<Any?>().thenAccept top@ { value ->
+                    val profile = frame.getProfile()
+                    if (profile == null) {
+                        warning("Player data has not been loaded yet. (${frame.getBukkitPlayer().name})")
+                        return@top
+                    }
+                    val persistentDataContainer = profile.getQuestById(frame.getQuestSelected())?.persistentDataContainer
                     if (persistentDataContainer != null) {
                         when {
                             value == null -> {
@@ -83,6 +90,10 @@ class ActionQuest {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Void> {
             val profile = frame.getProfile()
+            if (profile == null) {
+                warning("Player data has not been loaded yet. (${frame.getBukkitPlayer().name})")
+                return CompletableFuture.completedFuture(null)
+            }
             if (task == null) {
                 profile.getQuestById(frame.getQuestSelected())?.run {
                     when (action) {
@@ -134,6 +145,10 @@ class ActionQuest {
         override fun run(frame: ScriptFrame): CompletableFuture<Any> {
             val future = CompletableFuture<Any>()
             val profile = frame.getProfile()
+            if (profile == null) {
+                future.complete("NULL")
+                return future
+            }
             val quest = profile.getQuestById(frame.getQuestSelected())
             if (quest == null) {
                 future.complete("NULL")
@@ -228,17 +243,11 @@ class ActionQuest {
                         it.reset()
                         null
                     }
-                    actionNow {
-                        getProfile().getQuests(openAPI = true).count { filter == null || it.template.type().contains(filter) }
-                    }
+                    actionNow { getProfile()?.getQuests(openAPI = true)?.count { q -> filter == null || q.template.type().contains(filter) } ?: 0 }
                 }
                 case("select") {
                     val quest = it.next(ArgTypes.ACTION)
-                    actionNow {
-                        newFrame(quest).run<Any>().thenAccept { r ->
-                            variables().set("@QuestSelected", r.toString())
-                        }
-                    }
+                    actionNow { newFrame(quest).run<Any>().thenAccept { r -> variables().set("@QuestSelected", r.toString()) } }
                 }
                 case("accept") {
                     actionFuture { future ->
@@ -246,8 +255,12 @@ class ActionQuest {
                         if (template == null) {
                             future.complete("NULL")
                         } else {
-                            template.acceptTo(getProfile()).thenAccept { r ->
-                                future.complete(r.type.toString())
+                            val profile = getProfile()
+                            if (profile == null) {
+                                warning("Player data has not been loaded yet. (${getBukkitPlayer().name})")
+                                future.complete("NULL")
+                            } else {
+                                template.acceptTo(profile).thenAccept { r -> future.complete(r.type.toString()) }
                             }
                         }
                     }
@@ -258,67 +271,90 @@ class ActionQuest {
                         if (template == null) {
                             future.complete("NULL")
                         } else {
-                            template.checkAccept(getProfile()).thenAccept { r ->
-                                future.complete(r.type.toString())
+                            val profile = getProfile()
+                            if (profile == null) {
+                                future.complete("NULL")
+                            } else {
+                                template.checkAccept(profile).thenAccept { r -> future.complete(r.type.toString()) }
                             }
                         }
                     }
                 }
                 case("accepted") {
                     actionNow {
-                        getProfile().getQuestById(getQuestSelected()) != null
+                        getProfile()?.getQuestById(getQuestSelected()) != null
                     }
                 }
                 case("complete") {
                     actionNow {
-                        getProfile().getQuestById(getQuestSelected())?.completeQuest()
+                        val profile = getProfile()
+                        if (profile == null) {
+                            warning("Player data has not been loaded yet. (${getBukkitPlayer().name})")
+                        } else {
+                            profile.getQuestById(getQuestSelected())?.completeQuest()
+                        }
                     }
                 }
                 case("completed") {
-                    actionNow {
-                        getProfile().isQuestCompleted(getQuestSelected())
-                    }
+                    actionNow { getProfile()?.isQuestCompleted(getQuestSelected()) ?: false }
                 }
                 case("fail", "failure") {
                     actionTake {
-                        getProfile().getQuestById(getQuestSelected())?.failQuestFuture() ?: CompletableFuture.completedFuture(null)
+                        val profile = getProfile()
+                        if (profile == null) {
+                            warning("Player data has not been loaded yet. (${getBukkitPlayer().name})")
+                            CompletableFuture.completedFuture(null)
+                        } else {
+                            profile.getQuestById(getQuestSelected())?.failQuestFuture() ?: CompletableFuture.completedFuture(null)
+                        }
                     }
                 }
                 case("reset", "restart") {
                     actionTake {
-                        getProfile().getQuestById(getQuestSelected())?.restartQuestFuture() ?: CompletableFuture.completedFuture(null)
+                        val profile = getProfile()
+                        if (profile == null) {
+                            warning("Player data has not been loaded yet. (${getBukkitPlayer().name})")
+                            CompletableFuture.completedFuture(null)
+                        } else {
+                            profile.getQuestById(getQuestSelected())?.restartQuestFuture() ?: CompletableFuture.completedFuture(null)
+                        }
                     }
                 }
                 case("stop", "cancel") {
                     actionNow {
-                        getProfile().unregisterQuest(getProfile().getQuestById(getQuestSelected()) ?: return@actionNow null)
+                        val profile = getProfile()
+                        if (profile == null) {
+                            warning("Player data has not been loaded yet. (${getBukkitPlayer().name})")
+                            CompletableFuture.completedFuture(null)
+                        } else {
+                            profile.unregisterQuest(profile.getQuestById(getQuestSelected()) ?: return@actionNow null)
+                        }
                     }
                 }
                 case("track") {
                     it.mark()
-                    try {
+                    val cancel = try {
                         it.expect("cancel")
-                        actionNow {
-                            getProfile().trackQuest = null
-                            null
-                        }
+                        true
                     } catch (ignored: Exception) {
                         it.reset()
-                        actionNow {
-                            getProfile().trackQuest = ChemdahAPI.getQuestTemplate(getQuestSelected())
-                            null
+                        false
+                    }
+                    actionNow {
+                        val profile = getProfile()
+                        if (profile == null) {
+                            warning("Player data has not been loaded yet. (${getBukkitPlayer().name})")
+                            CompletableFuture.completedFuture(null)
+                        } else {
+                            profile.trackQuest = if (cancel) null else ChemdahAPI.getQuestTemplate(getQuestSelected())
                         }
                     }
                 }
                 case("tracking") {
-                    actionNow {
-                        getProfile().trackQuest?.id
-                    }
+                    actionNow { getProfile()?.trackQuest?.id }
                 }
                 case("tasks") {
-                    actionNow {
-                        ChemdahAPI.getQuestTemplate(getQuestSelected())?.taskMap?.keys ?: emptyList<String>()
-                    }
+                    actionNow { ChemdahAPI.getQuestTemplate(getQuestSelected())?.taskMap?.keys ?: emptyList<String>() }
                 }
                 case("data") {
                     try {

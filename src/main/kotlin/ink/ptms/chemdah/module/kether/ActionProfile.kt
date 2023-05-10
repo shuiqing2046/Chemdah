@@ -3,8 +3,10 @@ package ink.ptms.chemdah.module.kether
 import ink.ptms.chemdah.module.level.LevelSystem
 import ink.ptms.chemdah.module.level.LevelSystem.getLevel
 import ink.ptms.chemdah.module.level.LevelSystem.setLevel
+import ink.ptms.chemdah.util.getBukkitPlayer
 import ink.ptms.chemdah.util.getProfile
 import ink.ptms.chemdah.util.increaseAny
+import taboolib.common.platform.function.warning
 import taboolib.common5.Coerce
 import taboolib.library.kether.ArgTypes
 import taboolib.library.kether.ParsedAction
@@ -26,7 +28,7 @@ class ActionProfile {
             val future = CompletableFuture<Any>()
             frame.newFrame(key).run<Any>().thenApply {
                 frame.newFrame(default).run<Any>().thenApply { def ->
-                    future.complete(frame.getProfile().persistentDataContainer[it.toString()]?.data ?: def)
+                    future.complete(frame.getProfile()?.persistentDataContainer?.get(it.toString())?.data ?: def)
                 }
             }
             return future
@@ -43,8 +45,12 @@ class ActionProfile {
         override fun run(frame: ScriptFrame): CompletableFuture<Void> {
             return frame.newFrame(key).run<Any>().thenAccept { key ->
                 frame.newFrame(value).run<Any>().thenAccept { value ->
-                    frame.newFrame(default).run<Any>().thenAccept { def ->
-                        val persistentDataContainer = frame.getProfile().persistentDataContainer
+                    frame.newFrame(default).run<Any>().thenAccept top@ { def ->
+                        val persistentDataContainer = frame.getProfile()?.persistentDataContainer
+                        if (persistentDataContainer == null) {
+                            warning("Player data has not been loaded yet. (${frame.getBukkitPlayer().name})")
+                            return@top
+                        }
                         when {
                             value == null -> {
                                 persistentDataContainer.remove(key.toString())
@@ -65,7 +71,7 @@ class ActionProfile {
     class ProfileDataKeys : ScriptAction<List<String>>() {
 
         override fun run(frame: ScriptFrame): CompletableFuture<List<String>> {
-            return CompletableFuture.completedFuture(frame.getProfile().persistentDataContainer.keys())
+            return CompletableFuture.completedFuture(frame.getProfile()?.persistentDataContainer?.keys() ?: emptyList())
         }
     }
 
@@ -73,29 +79,33 @@ class ActionProfile {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Void> {
             return frame.newFrame(key).run<Any>().thenAccept { key ->
-                frame.newFrame(value).run<Any>().thenAccept { value ->
+                frame.newFrame(value).run<Any>().thenAccept top@ { value ->
                     val option = LevelSystem.getLevelOption(key.toString())
                     if (option != null) {
-                        val playerProfile = frame.getProfile()
-                        val playerLevel = option.toLevel(playerProfile.getLevel(option))
+                        val profile = frame.getProfile()
+                        if (profile == null) {
+                            warning("Player data has not been loaded yet. (${frame.getBukkitPlayer().name})")
+                            return@top
+                        }
+                        val playerLevel = option.toLevel(profile.getLevel(option))
                         if (symbol == PlayerOperator.Method.INCREASE) {
                             if (type == LevelType.LEVEL) {
                                 playerLevel.addLevel(Coerce.toInteger(value)).thenAccept {
-                                    playerProfile.setLevel(option, playerLevel.toPlayerLevel())
+                                    profile.setLevel(option, playerLevel.toPlayerLevel())
                                 }
                             } else {
                                 playerLevel.addExperience(Coerce.toInteger(value)).thenAccept {
-                                    playerProfile.setLevel(option, playerLevel.toPlayerLevel())
+                                    profile.setLevel(option, playerLevel.toPlayerLevel())
                                 }
                             }
                         } else {
                             if (type == LevelType.LEVEL) {
                                 playerLevel.setLevel(Coerce.toInteger(value)).thenAccept {
-                                    playerProfile.setLevel(option, playerLevel.toPlayerLevel())
+                                    profile.setLevel(option, playerLevel.toPlayerLevel())
                                 }
                             } else {
                                 playerLevel.setExperience(Coerce.toInteger(value)).thenAccept {
-                                    playerProfile.setLevel(option, playerLevel.toPlayerLevel())
+                                    profile.setLevel(option, playerLevel.toPlayerLevel())
                                 }
                             }
                         }
@@ -112,15 +122,20 @@ class ActionProfile {
             frame.newFrame(key).run<Any>().thenApply {
                 val option = LevelSystem.getLevelOption(it.toString())
                 if (option != null) {
+                    val profile = frame.getProfile()
+                    if (profile == null) {
+                        future.complete(-1)
+                        return@thenApply
+                    }
                     when (type) {
                         LevelType.LEVEL -> {
-                            future.complete(frame.getProfile().getLevel(option).level)
+                            future.complete(profile.getLevel(option).level)
                         }
                         LevelType.EXP -> {
-                            future.complete(frame.getProfile().getLevel(option).experience)
+                            future.complete(profile.getLevel(option).experience)
                         }
                         LevelType.EXP_MAX -> {
-                            option.algorithm.getExp(frame.getProfile().getLevel(option).level).thenAccept { exp -> future.complete(exp) }
+                            option.algorithm.getExp(profile.getLevel(option).level).thenAccept { exp -> future.complete(exp) }
                         }
                     }
                 } else {

@@ -35,7 +35,7 @@ class NMSImpl : NMS() {
 
 typealias NMSBlock = net.minecraft.world.level.block.Block
 
-typealias CraftBlockData19 = org.bukkit.craftbukkit.v1_19_R1.block.data.CraftBlockData
+typealias CraftBlockData19 = org.bukkit.craftbukkit.v1_19_R3.block.data.CraftBlockData
 
 typealias CraftBlockData16 = org.bukkit.craftbukkit.v1_16_R3.block.data.CraftBlockData
 

@@ -40,7 +40,7 @@ taboolib {
     install("expansion-command-helper")
     install("expansion-javascript")
     classifier = null
-    version = "6.0.10-115"
+    version = "6.0.10-local"
     relocate("ink.ptms.um", "ink.ptms.chemdah.um")
     options("keep-kotlin-module")
 }
@@ -103,7 +103,7 @@ dependencies {
     compileOnly("ink.ptms:Zaphkiel:1.6.0")
     // compileOnly("ink.ptms:Adyeshach:1.5.13-op16")
     compileOnly("ink.ptms:Sandalphon:1.3.0")
-    compileOnly("ink.ptms.core:v11900:11900:all-mapped")
+    compileOnly("ink.ptms.core:v11904:11904:mapped")
     compileOnly("ink.ptms.core:v11400:11400")
     compileOnly("ink.ptms:nms-all:1.0.0")
     implementation(kotlin("stdlib"))

@@ -76,7 +76,7 @@ object ChemdahAPI {
      */
     val Player.chemdahProfile: PlayerProfile
         @Throws(NullPointerException::class)
-        get() = ChemdahAPI.playerProfile[name]!!
+        get() = ChemdahAPI.playerProfile[name] ?: throw NullPointerException("Player data has not been loaded yet. ($name)")
 
     /**
      * 玩家数据已经加载完成

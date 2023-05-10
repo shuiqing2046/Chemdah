@@ -7,6 +7,7 @@ import ink.ptms.chemdah.core.quest.selector.InferArea
 import ink.ptms.chemdah.util.Effects
 import ink.ptms.chemdah.util.asListOrLines
 import org.bukkit.Location
+import org.bukkit.Particle
 import org.bukkit.entity.Player
 import taboolib.common.platform.ProxyParticle
 import taboolib.common.platform.function.adaptPlayer
@@ -18,6 +19,9 @@ import taboolib.library.configuration.ConfigurationSection
 import taboolib.module.chat.colored
 import taboolib.module.navigation.NodeEntity
 import taboolib.module.navigation.createPathfinder
+import taboolib.module.nms.NMSParticle.Companion.createPacket
+import taboolib.module.nms.sendBundlePacket
+import taboolib.platform.util.toBukkitLocation
 import taboolib.platform.util.toProxyLocation
 import java.util.concurrent.TimeUnit
 
@@ -204,9 +208,9 @@ class TrackNavigation(val config: ConfigurationSection, val root: ConfigurationS
      * 箭形特效相关设置
      */
     val arrowType = try {
-        ProxyParticle.valueOf(config.getString("navigation-option.arrow.type", root.getString("arrow.type"))!!.uppercase())
+        Particle.valueOf(config.getString("navigation-option.arrow.type", root.getString("arrow.type"))!!.uppercase())
     } catch (ex: Throwable) {
-        ProxyParticle.DRIP_LAVA
+        Particle.DRIP_LAVA
     }
     val arrowY = config.getDouble("navigation-option.arrow.y", root.getDouble("arrow.y"))
     val arrowDensity = config.getInt("navigation-option.arrow.density", root.getInt("arrow.density"))
@@ -256,9 +260,10 @@ class TrackNavigation(val config: ConfigurationSection, val root: ConfigurationS
                     // 结束坐标
                     val target = nodes[it + 1].asBlockPos().toLocation(center.world!!).add(0.5, arrowY, 0.5).toProxyLocation()
                     // 绘制特效
-                    Effects.drawArrow(start, target, arrowDensity, arrowLen, arrowAngle).forEach { pos ->
-                        arrowType.sendTo(adaptPlayer(player), pos, Vector(0, 0, 0))
+                    val packets = Effects.drawArrow(start, target, arrowDensity, arrowLen, arrowAngle).map { pos ->
+                        arrowType.createPacket(pos.toBukkitLocation(), org.bukkit.util.Vector(0, 0, 0))
                     }
+                    player.sendBundlePacket(packets)
                 }
             }
         }

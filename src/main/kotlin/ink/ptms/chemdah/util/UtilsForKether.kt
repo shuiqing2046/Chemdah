@@ -2,6 +2,7 @@ package ink.ptms.chemdah.util
 
 import ink.ptms.chemdah.api.ChemdahAPI.chemdahProfile
 import ink.ptms.chemdah.api.ChemdahAPI.conversationSession
+import ink.ptms.chemdah.api.ChemdahAPI.isChemdahProfileLoaded
 import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.conversation.Session
 import ink.ptms.chemdah.core.quest.QuestContainer
@@ -47,8 +48,9 @@ fun ScriptFrame.getSession(): Session {
     return getBukkitPlayer().conversationSession ?: error("No session selected.")
 }
 
-fun ScriptFrame.getProfile(): PlayerProfile {
-    return getBukkitPlayer().chemdahProfile
+fun ScriptFrame.getProfile(): PlayerProfile? {
+    val bukkitPlayer = getBukkitPlayer()
+    return if (bukkitPlayer.isChemdahProfileLoaded) getBukkitPlayer().chemdahProfile else null
 }
 
 fun ScriptFrame.getBukkitPlayer(): Player {
