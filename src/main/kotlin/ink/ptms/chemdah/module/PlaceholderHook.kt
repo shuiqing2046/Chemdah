@@ -24,7 +24,7 @@ object PlaceholderHook : PlaceholderExpansion {
         player ?: return "<NO_PLAYER>"
         return if (player.isChemdahProfileLoaded) {
             try {
-                KetherShell.eval(args, sender = adaptPlayer(player), namespace = namespaceQuest).getNow("<TIMEOUT>").toString()
+                KetherShell.eval(args, sender = adaptPlayer(player), namespace = namespaceQuest).getNow(null).toString()
             } catch (ex: Throwable) {
                 ex.printKetherErrorMessage()
                 "<ERROR>"

@@ -24,7 +24,6 @@ import taboolib.common.platform.function.pluginId
 import taboolib.common.platform.function.submit
 import taboolib.common.platform.function.submitAsync
 import taboolib.platform.util.asLangText
-import java.util.*
 
 /**
  * Chemdah
@@ -143,11 +142,16 @@ abstract class Database {
 
         @SubscribeEvent
         private fun onReleased(e: PlayerEvents.Released) {
-            val playerProfile = ChemdahAPI.playerProfile.remove(e.player.name)
+            val playerProfile = ChemdahAPI.playerProfile[e.player.name]
             if (playerProfile?.isDataChanged == true) {
+                // 异步保存
                 submitAsync {
                     INSTANCE.update(e.player, playerProfile)
                     PlayerEvents.Updated(e.player, playerProfile).call()
+                }
+                // 延迟释放
+                submit(delay = 40) {
+                    ChemdahAPI.playerProfile.remove(e.player.name)
                 }
             }
         }
