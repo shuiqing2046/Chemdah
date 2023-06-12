@@ -4,6 +4,7 @@ import com.sucy.skill.api.event.SkillDamageEvent
 import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import org.bukkit.entity.Player
+import taboolib.common5.cdouble
 
 /**
  * Chemdah

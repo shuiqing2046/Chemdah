@@ -39,6 +39,11 @@ data class AcceptResult(val type: Type, val reason: String? = null) {
         /**
          * 成功
          */
-        SUCCESSFUL
+        SUCCESSFUL,
+
+        /**
+         * 失败
+         */
+        FAILED
     }
 }

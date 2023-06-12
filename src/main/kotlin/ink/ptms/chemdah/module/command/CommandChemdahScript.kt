@@ -109,18 +109,50 @@ object CommandChemdahScript {
             execute<CommandSender> { sender, _, argument ->
                 try {
                     KetherShell.eval(argument, namespace = namespace, sender = adaptCommandSender(sender)).thenApply { v ->
-                        try {
-                            Class.forName(v.toString().substringBefore('$'))
-                            sender.sendMessage("§c[System] §7Result: §f${v!!.javaClass.simpleName} §7(Java Object)")
-                        } catch (_: Throwable) {
-                            sender.sendMessage("§c[System] §7Result: §f$v")
-                        }
+                        sender.sendResult(v)
                     }
                 } catch (ex: Throwable) {
                     sender.sendMessage("§c[System] §7Error: ${ex.message}")
                     ex.printKetherErrorMessage()
                 }
             }
+        }
+    }
+
+    @CommandBody
+    val `invoke-now` = subCommand {
+        dynamic(comment ="script") {
+            execute<CommandSender> { sender, _, argument ->
+                try {
+                    sender.sendResult(KetherShell.eval(argument, namespace = namespace, sender = adaptCommandSender(sender)).getNow(null))
+                } catch (ex: Throwable) {
+                    sender.sendMessage("§c[System] §7Error: ${ex.message}")
+                    ex.printKetherErrorMessage()
+                }
+            }
+        }
+    }
+
+    @CommandBody
+    val `invoke-wait` = subCommand {
+        dynamic(comment ="script") {
+            execute<CommandSender> { sender, _, argument ->
+                try {
+                    sender.sendResult(KetherShell.eval(argument, namespace = namespace, sender = adaptCommandSender(sender)).get())
+                } catch (ex: Throwable) {
+                    sender.sendMessage("§c[System] §7Error: ${ex.message}")
+                    ex.printKetherErrorMessage()
+                }
+            }
+        }
+    }
+
+    internal fun CommandSender.sendResult(v: Any?) {
+        try {
+            Class.forName(v.toString().substringBefore('$'))
+            sendMessage("§c[System] §7Result: §f${v!!.javaClass.simpleName} §7(Java Object)")
+        } catch (_: Throwable) {
+            sendMessage("§c[System] §7Result: §f$v")
         }
     }
 

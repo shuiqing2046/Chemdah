@@ -68,9 +68,11 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
         }
 
     init {
-        // 容错写法
-        config.getConfigurationSection("agent")?.getKeys(false)?.forEach { node -> loadAgent(node, config.get("agent.$node")!!) }
+        // 加载代理
+        config.getConfigurationSection("agent")?.getKeys(false)?.forEach { node -> loadAgent(node, config["agent.$node"]!!) }
+        // 加载组件
         config.getConfigurationSection("addon")?.getKeys(false)?.forEach { node -> loadAddon(node) }
+        // 加载元数据
         config.getConfigurationSection("meta")?.getKeys(false)?.forEach { node -> loadMeta(node) }
     }
 
@@ -161,7 +163,18 @@ abstract class QuestContainer(val id: String, val config: ConfigurationSection) 
             } else {
                 Option.Type.ANY
             }
-            addonMap[addonId] = addon.invokeConstructor(option[config, addonNode], this)
+            val data = option[config, addonNode]
+            // 过滤空的组件节点
+            if (data is ConfigurationSection && data.getKeys(false).isEmpty()) {
+                return
+            }
+            if (data is Map<*, *> && data.isEmpty()) {
+                return
+            }
+            if (data is List<*> && data.isEmpty()) {
+                return
+            }
+            addonMap[addonId] = addon.invokeConstructor(data, this)
         } else {
             warning("$addonId addon not supported.")
         }

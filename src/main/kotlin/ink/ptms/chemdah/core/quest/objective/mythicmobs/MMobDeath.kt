@@ -4,6 +4,7 @@ import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import ink.ptms.um.event.MobDeathEvent
 import org.bukkit.entity.Player
+import taboolib.common5.cdouble
 
 @Dependency("MythicMobs")
 object MMobDeath : ObjectiveCountableI<MobDeathEvent>() {

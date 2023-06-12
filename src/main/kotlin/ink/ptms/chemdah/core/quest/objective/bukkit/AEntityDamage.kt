@@ -9,6 +9,7 @@ import ink.ptms.chemdah.core.quest.objective.Progress
 import ink.ptms.chemdah.core.quest.objective.Progress.Companion.toProgress
 import org.bukkit.event.entity.EntityDamageEvent
 import taboolib.common5.Coerce
+import taboolib.common5.cdouble
 
 /**
  * Chemdah
@@ -44,12 +45,12 @@ abstract class AEntityDamage<E : EntityDamageEvent> : Objective<E>() {
         }
         addGoal("damage") { profile, task ->
             profile.dataOperator(task) {
-                get("damage", 0).toDouble() >= task.goal["damage", 1].toDouble()
+                get("damage", 0).cdouble >= task.goal["damage", 1].cdouble
             }
         }
         addGoalVariable("damage") { profile, task ->
             profile.dataOperator(task) {
-                get("damage", 0).toDouble()
+                get("damage", 0).cdouble
             }
         }
     }
@@ -57,17 +58,17 @@ abstract class AEntityDamage<E : EntityDamageEvent> : Objective<E>() {
     @Suppress("UNCHECKED_CAST")
     override fun onContinue(profile: PlayerProfile, task: Task, quest: Quest, event: Any) {
         profile.dataOperator(task) {
-            put("damage", get("damage", 0).toDouble() + getDamage(profile, task, event as E))
+            put("damage", get("damage", 0).cdouble + getDamage(profile, task, event as E))
         }
     }
 
     override fun getProgress(profile: PlayerProfile, task: Task): Progress {
-        val target = Coerce.format(task.goal["damage", 1].toDouble())
+        val target = Coerce.format(task.goal["damage", 1].cdouble)
         return if (hasCompletedSignature(profile, task)) {
             target.toProgress(target, 1.0)
         } else {
             profile.dataOperator(task) {
-                get("damage", 0).toDouble().let { a -> Coerce.format(a).toProgress(target, Coerce.format(a / target)) }
+                get("damage", 0).cdouble.let { a -> Coerce.format(a).toProgress(target, Coerce.format(a / target)) }
             }
         }
     }

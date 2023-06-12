@@ -123,22 +123,20 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
                 future.complete(Progress.ZERO)
                 return future
             }
-            val vars = AtomicReference<QuestContext.VarTable>()
+            val refs = AtomicReference<QuestContext.VarTable>()
             KetherShell.eval(agent, sender = adaptPlayer(profile.player), namespace = namespaceQuest) {
-                vars.set(rootFrame().variables().also { vars ->
-                    vars.set("@QuestContainer", task)
-                })
+                refs.set(rootFrame().variables().also { vars -> vars.set("@QuestContainer", task) })
             }.thenApply {
                 task.objective.getProgress(profile, task).run {
                     future.complete(
                         Progress(
-                            vars.get().get<Any?>("value").orElse(value),
-                            vars.get().get<Any?>("target").orElse(target),
-                            vars.get().get<Any?>("percent").orElse(null).asDouble(percent)
+                            refs.get().get<Any?>("value").orElse(value),
+                            refs.get().get<Any?>("target").orElse(target),
+                            refs.get().get<Any?>("percent").orElse(null).asDouble(percent)
                         )
                     )
                 }
-            }
+            }.except { future.complete(Progress.ZERO) }
             return future
         }
         return if (questContainer is Template) {
@@ -149,6 +147,8 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
                 if (cur < tasks.size) {
                     getProgress(profile, tasks[cur]).thenAccept {
                         p = Progress(p.value.increaseAny(it.value), p.target.increaseAny(it.target), p.percent + (it.percent / tasks.size))
+                        process(cur + 1)
+                    }.exceptNull {
                         process(cur + 1)
                     }
                 } else {
@@ -192,6 +192,8 @@ class AddonStats(config: ConfigurationSection, questContainer: QuestContainer) :
                 bossBar.setTitle(stats.getTitle(this@statsDisplay, progress))
                 bossBar.addPlayer(profile.player)
                 future.complete(bossBar)
+            }.exceptNull {
+                future.complete(null)
             }
             return future
         }

@@ -4,6 +4,7 @@ import ink.ptms.chemdah.core.quest.objective.Dependency
 import ink.ptms.chemdah.core.quest.objective.ObjectiveCountableI
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityShootBowEvent
+import taboolib.common5.cbool
 
 /**
  * Chemdah
@@ -41,7 +42,7 @@ object IPlayerShootBow : ObjectiveCountableI<EntityShootBowEvent>() {
             data.toDouble() <= e.force
         }
         addSimpleCondition("consumable") { data, e ->
-            data.toBoolean() == e.shouldConsumeItem()
+            data.cbool == e.shouldConsumeItem()
         }
         addConditionVariable("force") {
             it.force

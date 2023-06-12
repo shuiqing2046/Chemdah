@@ -4,6 +4,7 @@ import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.Quest
 import ink.ptms.chemdah.core.quest.Task
 import ink.ptms.chemdah.core.quest.objective.Progress.Companion.toProgress
+import taboolib.common5.cdouble
 
 /**
  * Chemdah
@@ -18,12 +19,12 @@ abstract class ObjectiveCountableF<E : Any> : Objective<E>() {
     init {
         addGoal("amount") { profile, task ->
             profile.dataOperator(task) {
-                get("amount", 0).toDouble() >= task.goal["amount", 1].toDouble()
+                get("amount", 0).cdouble >= task.goal["amount", 1].cdouble
             }
         }
         addGoalVariable("amount") { profile, task ->
             profile.dataOperator(task) {
-                get("amount", 0).toDouble()
+                get("amount", 0).cdouble
             }
         }
     }
@@ -31,16 +32,16 @@ abstract class ObjectiveCountableF<E : Any> : Objective<E>() {
     @Suppress("UNCHECKED_CAST")
     override fun onContinue(profile: PlayerProfile, task: Task, quest: Quest, event: Any) {
         profile.dataOperator(task) {
-            put("amount", get("amount", 0).toDouble() + getCount(profile, task, event as E))
+            put("amount", get("amount", 0).cdouble + getCount(profile, task, event as E))
         }
     }
 
     override fun getProgress(profile: PlayerProfile, task: Task): Progress {
-        val target = task.goal["amount", 1].toDouble()
+        val target = task.goal["amount", 1].cdouble
         return if (hasCompletedSignature(profile, task)) {
             target.toProgress(target, 1.0)
         } else {
-            profile.dataOperator(task) { get("amount", 0).toDouble().toProgress(target) }
+            profile.dataOperator(task) { get("amount", 0).cdouble.toProgress(target) }
         }
     }
 

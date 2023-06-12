@@ -10,6 +10,7 @@ import ink.ptms.chemdah.core.quest.addon.AddonOptional.Companion.isOptional
 import ink.ptms.chemdah.core.quest.addon.AddonRestart.Companion.canRestart
 import ink.ptms.chemdah.core.quest.addon.AddonTimeout.Companion.isTimeout
 import ink.ptms.chemdah.core.quest.addon.data.ControlTrigger
+import ink.ptms.chemdah.util.exceptNull
 import org.bukkit.entity.Player
 import java.util.concurrent.CompletableFuture
 
@@ -117,6 +118,8 @@ class Quest(val id: String, val profile: PlayerProfile, val persistentDataContai
                             QuestEvents.Complete.Post(this@Quest, profile).call()
                         }
                         future.complete(it)
+                    }.exceptNull {
+                        future.complete(false)
                     }
                 } else {
                     future.complete(false)
@@ -145,6 +148,8 @@ class Quest(val id: String, val profile: PlayerProfile, val persistentDataContai
                     QuestEvents.Fail.Post(this@Quest, profile).call()
                 }
                 future.complete(it)
+            }.exceptNull {
+                future.complete(false)
             }
         } else {
             future.complete(false)
@@ -177,6 +182,8 @@ class Quest(val id: String, val profile: PlayerProfile, val persistentDataContai
                     QuestEvents.Restart.Post(this@Quest, profile).call()
                 }
                 future.complete(it)
+            }.exceptNull {
+                future.complete(false)
             }
         } else {
             future.complete(false)

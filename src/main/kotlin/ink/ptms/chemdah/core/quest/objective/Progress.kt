@@ -1,6 +1,7 @@
 package ink.ptms.chemdah.core.quest.objective
 
 import taboolib.common5.Coerce
+import taboolib.common5.cdouble
 
 /**
  * Chemdah
@@ -20,6 +21,6 @@ open class Progress(val value: Any, val target: Any, percent: Double) {
 
         fun Any.toProgress(target: Any, percent: Double) = Progress(this, target, percent)
 
-        fun Number.toProgress(target: Number) = Progress(this, target, toDouble() / target.toDouble())
+        fun Number.toProgress(target: Number) = Progress(this, target, cdouble / target.cdouble)
     }
 }

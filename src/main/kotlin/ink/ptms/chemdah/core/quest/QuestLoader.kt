@@ -186,7 +186,9 @@ object QuestLoader {
      */
     fun loadTemplate(file: File): List<Template> {
         return when {
+            // 文件夹
             file.isDirectory -> file.listFiles()?.flatMap { loadTemplate(it) }?.toList() ?: emptyList()
+            // 仅支持 yml 和 json
             file.extension == "yml" || file.extension == "json" -> {
                 Configuration.loadFromFile(file).run {
                     getKeys(false).mapNotNull {
@@ -199,7 +201,7 @@ object QuestLoader {
                     }
                 }
             }
-
+            // 不支持的文件格式
             else -> emptyList()
         }
     }
@@ -213,9 +215,11 @@ object QuestLoader {
             val groupList = HashSet<Template>()
             groupConf.getStringList("group.$group").forEach {
                 when {
+                    // 以 type: 开头的字符串
                     it.startsWith("type:") -> {
                         groupList += ChemdahAPI.questTemplate.values.filter { tem -> it.substringAfter("type:") in tem.type() }
                     }
+                    // 其他
                     else -> {
                         val template = ChemdahAPI.getQuestTemplate(it)
                         if (template != null) {

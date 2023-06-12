@@ -6,6 +6,7 @@ import org.bukkit.Location
 import org.bukkit.entity.Player
 import taboolib.common.platform.function.warning
 import taboolib.common5.Coerce
+import taboolib.common5.cdouble
 import taboolib.common5.util.parseMillis
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.module.navigation.NodeEntity
@@ -28,7 +29,7 @@ class WizardInfo(val root: ConfigurationSection) {
     val world = Bukkit.getWorld(root.getString("in").toString())
 
     /** 节点 **/
-    val nodes = root.getStringList("nodes").map { Location(world, it.split(" ")[0].toDouble(), it.split(" ")[1].toDouble(), it.split(" ")[2].toDouble()) }
+    val nodes = root.getStringList("nodes").map { Location(world, it.split(" ")[0].cdouble, it.split(" ")[1].cdouble, it.split(" ")[2].cdouble) }
 
     /** 结束距离 **/
     val finishDistance = root.getDouble("finish-distance", 2.0)

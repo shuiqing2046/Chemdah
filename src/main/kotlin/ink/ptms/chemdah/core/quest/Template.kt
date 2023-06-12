@@ -6,6 +6,7 @@ import ink.ptms.chemdah.core.PlayerProfile
 import ink.ptms.chemdah.core.quest.addon.AddonControl.Companion.control
 import ink.ptms.chemdah.core.quest.addon.data.ControlTrigger
 import ink.ptms.chemdah.core.quest.meta.Meta
+import ink.ptms.chemdah.util.except
 import taboolib.common.util.asList
 import taboolib.library.configuration.ConfigurationSection
 import java.util.concurrent.CompletableFuture
@@ -65,7 +66,7 @@ class Template(id: String, config: ConfigurationSection) : QuestContainer(id, co
                 agent(profile, AgentType.QUEST_ACCEPT_CANCELLED, reason = it.reason)
             }
             it
-        }
+        }.except { AcceptResult(AcceptResult.Type.FAILED, it.message) }
     }
 
     /**
@@ -96,7 +97,7 @@ class Template(id: String, config: ConfigurationSection) : QuestContainer(id, co
             } else {
                 future.complete(AcceptResult(AcceptResult.Type.CANCELLED_BY_CONTROL, c.reason))
             }
-        }
+        }.except { future.complete(AcceptResult(AcceptResult.Type.FAILED, it.message)) }
         return future
     }
 

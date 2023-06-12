@@ -12,6 +12,21 @@ fun <T> CompletableFuture<T>.thenBool(proc: ProcessBool.() -> Unit) {
     thenApply { if (it.cbool) processBool.runTrue() else processBool.runElse() }
 }
 
+fun <T> CompletableFuture<T>.except(fn: (Throwable) -> T): CompletableFuture<T> {
+    return exceptionally {
+        it.printStackTrace()
+        fn(it)
+    }
+}
+
+fun <T> CompletableFuture<T>.exceptNull(fn: (Throwable) -> Unit): CompletableFuture<T> {
+    return exceptionally {
+        it.printStackTrace()
+        fn(it)
+        null
+    }
+}
+
 class ProcessBool {
 
     private var trueFunc: (() -> Unit)? = null
