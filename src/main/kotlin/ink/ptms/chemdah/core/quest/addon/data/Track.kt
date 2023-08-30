@@ -19,7 +19,7 @@ import taboolib.library.configuration.ConfigurationSection
 import taboolib.module.chat.colored
 import taboolib.module.navigation.NodeEntity
 import taboolib.module.navigation.createPathfinder
-import taboolib.module.nms.NMSParticle.Companion.createPacket
+import taboolib.module.nms.createPacket
 import taboolib.module.nms.sendBundlePacket
 import taboolib.platform.util.toBukkitLocation
 import taboolib.platform.util.toProxyLocation
