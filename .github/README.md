@@ -7,7 +7,7 @@
 ![Paper](https://cdn.jsdelivr.net/gh/intergrav/devins-badges/assets/compact/supported/paper_vector.svg)
 ![Purpur](https://cdn.jsdelivr.net/gh/intergrav/devins-badges/assets/compact/supported/purpur_vector.svg)
 
-[![Chemdah Release](https://github.com/shuiqing2046/Chemdah/actions/workflows/build.yml/badge.svg)](https://github.com/shuiqing2046/Chemdah/actions/workflows/release.yml)
+[![Chemdah Release](https://github.com/shuiqing2046/Chemdah/actions/workflows/release.yml/badge.svg)](https://github.com/shuiqing2046/Chemdah/actions/workflows/release.yml)
   <p align="center">
     <strong style="color:#999999;">Attempt to actively maintain this resource.</strong>
     <br />
